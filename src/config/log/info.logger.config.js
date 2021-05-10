@@ -11,9 +11,7 @@ module.exports = {
       format: timezoned,
     }),
     format.printf(
-      (info) => `
-      [${info.level}] [${info.timestamp}]: ${info.message}
-      `
+      (info) => `[${info.level}] [${info.timestamp}]: ${info.message}`
     )
   ),
   transports: [

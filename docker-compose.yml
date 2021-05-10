@@ -1,0 +1,50 @@
+version: "3"
+services:
+  client:
+    build: ./src/client
+    container_name: loketla-react
+    restart: always
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./src/client:/app/client
+      - /app/client/node_modules
+  server:
+    build: ./src
+    container_name: loketla-express
+    restart: always
+    env_file: ./src/.env
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./src:/app
+      - /app/node_modules
+  db:
+    container_name: postgresql
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: test_db
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    restart: always
+    depends_on:
+      - db
+    environment:
+      PGADMIN_DEFAULT_EMAIL: loketla.um@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: loketla@fsktm
+    ports:
+      - "5050:80"
+    volumes:
+      - pg-data:/var/lib/pgadmin
+volumes:
+  postgres-data:
+  pg-data:

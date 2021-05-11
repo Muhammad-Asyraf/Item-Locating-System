@@ -11,18 +11,18 @@ const getConsoleLoggingFormat = (printf) => {
     let format = '';
 
     if (logLevel === 'info') {
-      format = chalk.black.bgBlue.underline('[💡 ' + logLevel + ']');
+      format = chalk.black.bgBlue.underline(`[💡${logLevel}]`);
     } else if (logLevel === 'warn') {
-      format = chalk.black.bgYellowBright.underline('[⚠️ ' + logLevel + ']');
+      format = chalk.black.bgYellowBright.underline(`[⚠️${logLevel}]`);
     } else if (logLevel === 'error') {
-      format = chalk.black.bgRed.underline('[🚨 ' + logLevel + ']');
+      format = chalk.black.bgRed.underline(`[🚨${logLevel}]`);
     }
 
     return format.concat(
-      ' :: ',
-      chalk.white('[🕒 ' + log.timestamp + ']'),
-      ' :: ',
-      chalk.white('[📁 ' + log.label + ']'),
+      '::',
+      chalk.white(`[🕒 ${log.timestamp}]`),
+      '::',
+      chalk.white(`[📁 ${log.label}]`),
       ' ➡️ ',
       chalk.blue(log.message)
     );

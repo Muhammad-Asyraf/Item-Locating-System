@@ -11,11 +11,10 @@ db.setupConnection
   .then(
     loketla.listen(PORT, () => {
       databaseLogger.info(`LOKETLA listening on port => ${highlight(PORT)}`);
-      databaseLogger.error(`LOKETLA listening on port => ${highlight(PORT)}`);
-      databaseLogger.warn(`LOKETLA listening on port => ${highlight(PORT)}`);
     })
   )
   .catch((err) => {
+    console.log(err);
     databaseLogger.error(
       `Database connection error: ${highlight(err.message)}`
     );

@@ -1,16 +1,19 @@
 {
   "name": "loketla-app",
   "version": "0.0.1",
-  "description": "",
+  "description": "Loketla repository",
   "main": "index.js",
   "scripts": {
+    "lint": "eslint . || true",
+    "lint:fix": "eslint . --fix || true",
     "test:jest": "jest --watchAll",
     "test:jest:report": "jest --coverage",
     "test:newman": "./scripts/newman.sh",
     "test:newman:report": "./scripts/newman.report.sh",
     "test": "jest --coverage && ./scripts/newman.report.sh",
     "dev:serve": "NODE_ENV=development nodemon index",
-    "dev:migrate": "knex migrate:latest --knexfile ./database/config/knexfile.js",
+    "dev:migrate": "knex migrate:latest --knexfile ./config/database/knexfile.js",
+    "dev:seed": "knex seed:run --knexfile ./config/database/knexfile.js",
     "dev:start": "concurrently \"NODE_ENV=development\" \"npm run serve\" \"cd client && npm start\"",
     "client:build": "cd client && npm run build",
     "prod:start": "NODE_ENV=production node index"
@@ -19,10 +22,14 @@
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^5.0.1",
+    "chalk": "^4.1.1",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "knex": "^0.95.4",
+    "moment": "^2.29.1",
+    "moment-timezone": "^0.5.33",
+    "morgan": "^1.10.0",
     "objection": "^2.2.15",
     "pg": "^8.6.0",
     "uuid": "^8.3.2",
@@ -46,5 +53,9 @@
   },
   "engines": {
     "node": "v14.16.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.com/loketla-um/item-locating-system.git"
   }
 }

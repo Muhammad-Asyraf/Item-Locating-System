@@ -19,7 +19,8 @@
     "comma-dangle": ["error", "only-multiline"],
     "react/react-in-jsx-scope": "off",
     "react/jsx-one-expression-per-line": "off",
-    "no-console": "off" // 'Off' only for development
+    "no-console": "off", // 'Off' only for development;
+    "arrow-body-style": ["error", "always"]
   },
   "root": true
 }

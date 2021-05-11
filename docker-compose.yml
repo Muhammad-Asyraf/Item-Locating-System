@@ -10,14 +10,16 @@ services:
       - ./src/client:/app/client
       - /app/client/node_modules
   server:
-    build: ./src
+    build: ./src/server
     container_name: loketla-express
     restart: always
-    env_file: ./src/.env
+    env_file: ./src/server/.env
+    environment:
+      FORCE_COLOR: 1
     ports:
       - "8000:8000"
     volumes:
-      - ./src:/app
+      - ./src/server:/app
       - /app/node_modules
   db:
     container_name: postgresql

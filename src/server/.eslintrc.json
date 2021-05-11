@@ -16,6 +16,7 @@
     "jest/prefer-expect-assertions": [
       "warn",
       { "onlyFunctionsWithAsyncKeyword": true }
-    ]
+    ],
+    "arrow-body-style": ["error", "always"]
   }
 }

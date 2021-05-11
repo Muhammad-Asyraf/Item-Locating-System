@@ -12,10 +12,10 @@ module.exports = {
       password: process.env.POSTGRES_PASSWORD,
     },
     migrations: {
-      directory: './migrations',
+      directory: '../../database/migrations',
     },
     seeds: {
-      directory: './seeds',
+      directory: '../../database/seeds',
     },
     ...knexSnakeCaseMappers,
     pool: {

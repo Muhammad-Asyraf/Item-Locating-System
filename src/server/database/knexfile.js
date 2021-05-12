@@ -1,5 +1,3 @@
-const { knexSnakeCaseMappers } = require('objection');
-
 require('dotenv').config();
 
 module.exports = {
@@ -12,15 +10,14 @@ module.exports = {
       password: process.env.POSTGRES_PASSWORD,
     },
     migrations: {
-      directory: '../../database/migrations',
+      directory: './migrations',
     },
     seeds: {
-      directory: '../../database/seeds',
+      directory: './seeds',
     },
-    ...knexSnakeCaseMappers,
     pool: {
       min: 2,
-      max: 5,
+      max: 10,
     },
   },
 };

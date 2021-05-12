@@ -1,5 +1,4 @@
 {
-  "testPathIgnorePatterns": ["<rootDir>/client/"],
   "testEnvironment": "node",
   "clearMocks": true
 }

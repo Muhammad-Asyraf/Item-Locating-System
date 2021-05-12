@@ -1,4 +1,4 @@
-const tableNames = require('../../utils/table.names.util');
+const tableNames = require('../../utils/table_names');
 
 exports.up = async (knex) => {
   await knex.schema.createTable(tableNames.customer, (table) => {

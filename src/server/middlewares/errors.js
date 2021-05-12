@@ -18,7 +18,8 @@ const endpointNotFound = (req, res, next) => {
   next(error);
 };
 
-const errorHandler = (error, req, res) => {
+// eslint-disable-next-line no-unused-vars
+const errorHandler = (error, req, res, next) => {
   const statusCode =
     res.statusCode === 200 ? errorTypes[error.name] || 500 : res.statusCode;
   res.status(statusCode);

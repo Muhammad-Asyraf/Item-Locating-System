@@ -1,9 +1,7 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
-import { getLogger } from './utils/logger.util';
 
-const logger = getLogger(__filename, 'set');
 class App extends Component {
   constructor() {
     super();
@@ -11,7 +9,6 @@ class App extends Component {
       // eslint-disable-line no-unused-vars
       data: '',
     };
-    logger.info('sdfsdf');
   }
 
   componentDidMount() {

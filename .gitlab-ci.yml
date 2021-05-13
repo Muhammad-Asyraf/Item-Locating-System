@@ -5,7 +5,8 @@ services:
   - docker:dind
 
 stages:
-  -test
+  - test
+  - production
 
 test:
   stage: test

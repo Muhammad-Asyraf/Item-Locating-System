@@ -5,13 +5,17 @@ services:
   - docker:dind
 
 stages:
+  - build
   - test
-  - production
 
-test:
-  stage: test
-  only:
-    - pre-release
-    - release
+before_script:
+  - docker version
+  - docker-compose version
+
+build:
+  stage: build
   script:
-    - echo run tests in this section
+    - docker-compose down
+    - docker-compose up --build -d
+    - docker exec -it loketla-express bash
+    - npm run test:all:report

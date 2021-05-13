@@ -29,7 +29,7 @@ class App extends Component {
     Note the route we are fetching matches the GET route from server.js
   */
   callBackendAPI = async () => {
-    const response = await fetch('/api/backoffice/customer-services/customers');
+    const response = await fetch('/api/backoffice/customer-service/customers');
     const body = await response.json();
 
     if (response.status !== 200) {

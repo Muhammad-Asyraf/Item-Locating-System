@@ -1,9 +1,3 @@
-image:
-  name: docker/compose:latest
-
-services:
-  - docker:dind
-
 stages:
   - build
   - test
@@ -24,4 +18,8 @@ build:
     - docker-compose run server npm run test:all:report
     - docker system prune -f
     - docker-compose down -v
+  artifacts:
+    paths:
+      - coverage/
+      - apis/test/
   

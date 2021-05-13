@@ -26,7 +26,8 @@ src/client/yarn-error.log*
 .vscode
 
 src/server/coverage
-src/server/newman
+src/server/apis/test/report.html
 src/server/logs
-
 src/server/.env
+
+.env

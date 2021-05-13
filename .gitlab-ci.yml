@@ -13,9 +13,9 @@ build:
   script:
     - docker-compose down -v
     - docker-compose up --build -d
-    - docker-compose exec -T loketla-express npm run migrate:latest
-    - docker-compose exec -T loketla-express npm run seed:run
-    - docker-compose exec -T loketla-express npm run test:all:report
+    - docker-compose exec -T server npm run migrate:latest
+    - docker-compose exec -T server npm run seed:run
+    - docker-compose exec -T server npm run test:all:report
     - docker system prune -f
     - docker-compose down -v
   artifacts:

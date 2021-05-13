@@ -6,9 +6,8 @@ const getLogger = require('../utils/logger');
 const databaseLogger = getLogger(__filename, 'server');
 
 const testingConnection = (knex) => {
-  knex
-    .select()
-    .from('knex_migrations')
+  knex.schema
+    .hasTable('Test')
     .then(() => {
       databaseLogger.info(`Database connection: ✅ working`);
     })

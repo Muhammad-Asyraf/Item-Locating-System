@@ -14,8 +14,14 @@ before_script:
 
 build:
   stage: build
+  tags:
+    - loketla-runner
   script:
-    - docker-compose down
+    - docker-compose down -v
     - docker-compose up --build -d
-    - docker exec -it loketla-express bash
-    - npm run test:all:report
+    - docker-compose run server npm run migrate:latest
+    - docker-compose run server npm run seed:run
+    - docker-compose run server npm run test:all:report
+    - docker system prune -f
+    - docker-compose down -v
+  

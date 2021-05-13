@@ -1,0 +1,16 @@
+image:
+  name: docker/compose:latest
+
+services:
+  - docker:dind
+
+stages:
+  -test
+
+test:
+  stage: test
+  only:
+    - pre-release
+    - release
+  script:
+    - echo run tests in this section

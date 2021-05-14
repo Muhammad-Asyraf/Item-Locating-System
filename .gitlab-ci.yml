@@ -15,11 +15,11 @@ build:
     - docker-compose up --build -d
     - docker-compose exec -T server npm run migrate:latest
     - docker-compose exec -T server npm run seed:run
-    - docker-compose exec -T server npm run test:all:report
+    - docker-compose exec -T server npm run test:all:report --privileged --user
     - docker system prune -f
     - docker-compose down -v
   after_script:
-    - sudo git gc && git clean -ffdx
+    - git gc && git clean -ffdx 
   artifacts:
     paths:
       - coverage/

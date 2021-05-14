@@ -1,7 +1,7 @@
 stages:
   - build
   - test
-  - reset
+  - quality
 
 build:
   stage: build
@@ -13,11 +13,16 @@ build:
   - docker-compose down -v 
   script:
     - docker-compose up --build -d
-    - docker exec -t loketla-express chmod -R 0777 logs scripts
+    - docker exec -t loketla-express chmod -R 0777 logs scripts 
+    - docker exec -t loketla-react chmod -R 0777 node_modules
     - docker exec -t loketla-express npm run migrate:latest
     - docker exec -t loketla-express npm run seed:run
+  artifacts:
+    paths:
+      - src/
+    expire_in: 15 mins
 
-unit/integration-test:
+unit-integration-test:
   stage: test
   tags:
     - loketla-runner
@@ -39,14 +44,17 @@ api-test:
     paths:
       - src/server/apis/test/report.html
 
-reset:
-  stage: reset
+quality-control:
+  stage: quality
   tags:
     - loketla-runner
   script:
+    - docker exec -t loketla-express npm run lint
+  after_script:
     - docker exec -t loketla-express chmod -R 0777 logs coverage
     - docker system prune -f 
     - docker-compose down -v 
+
 
       
   

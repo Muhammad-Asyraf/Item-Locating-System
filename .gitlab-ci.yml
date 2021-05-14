@@ -10,18 +10,15 @@ build:
   stage: build
   tags:
     - loketla-runner
-
   before_script:
     - docker-compose down -v 
   script:
-   
     - docker-compose up --build -d
-    - docker exec -t loketla-express npm run test:newman
-    # - docker-compose exec -T server npm run migrate:latest --privileged --user
-    # - docker-compose exec -T server npm run seed:run --privileged --user
-    # - docker-compose exec -T server npm run test:all --privileged --user
-
+    - docker exec -t loketla-express npm run migrate:latest
+    - docker exec -t loketla-express npm run seed:run
+    - docker exec -t loketla-express npm run test:all
   after_script:
+    - docker exec -t loketla-express chmod -R 0777 logs
     - docker system prune -f 
     - docker-compose down -v 
     - git gc && git clean -ffdx 

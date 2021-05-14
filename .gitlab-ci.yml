@@ -13,7 +13,7 @@ build:
   - docker-compose down -v 
   script:
     - docker-compose up --build -d
-    - docker exec -t loketla-express chmod -R 0777 logs coverage scripts
+    - docker exec -t loketla-express chmod -R 0777 logs scripts
     - docker exec -t loketla-express npm run migrate:latest
     - docker exec -t loketla-express npm run seed:run
 
@@ -23,6 +23,8 @@ unit/integration-test:
     - loketla-runner
   script:
     - docker exec -t loketla-express npm run test:jest:report
+  after_script:
+    - docker exec -t loketla-express chmod -R 0777 logs coverage
   artifacts:
     paths:
       - src/server/coverage/
@@ -32,9 +34,7 @@ api-test:
   tags:
     - loketla-runner
   script:
-    - docker exec -t loketla-express npm run test:jest:report
-  after_script:
-    - docker exec -t loketla-express chmod -R 0777 logs coverage
+    - docker exec -t loketla-express npm run test:newman:report
   artifacts:
     paths:
       - src/server/apis/test/report.html

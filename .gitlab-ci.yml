@@ -6,18 +6,22 @@ stages:
 
 build:
   stage: build
+  tags:
+    - loketla-runner
   before_script:
-  - docker version
-  - docker-compose version
-  - docker-compose down -v 
+    - docker version
+    - docker-compose version
+    - docker-compose down -v
   script:
     - docker-compose up --build -d
-    - docker exec -t loketla-express chmod -R 0777 logs scripts 
+    - docker exec -t loketla-express chmod -R 0777 logs scripts
     - docker exec -t loketla-express npm run migrate:latest
     - docker exec -t loketla-express npm run seed:run
 
 unit-integration-test:
   stage: test
+  tags:
+    - loketla-runner
   variables:
     GIT_CHECKOUT: "false"
   script:
@@ -27,9 +31,14 @@ unit-integration-test:
   artifacts:
     paths:
       - src/server/coverage/
+    expire_in: 2 day
+    when: always
+  allow_failure: true
 
 api-test:
   stage: test
+  tags:
+    - loketla-runner
   variables:
     GIT_CHECKOUT: "false"
   script:
@@ -37,21 +46,31 @@ api-test:
   artifacts:
     paths:
       - src/server/apis/test/report.html
+    expire_in: 2 day
+    when: always
+  allow_failure: true
 
 quality-control:
   stage: quality
+  tags:
+    - loketla-runner
   needs: ["build"]
   variables:
     GIT_CHECKOUT: "false"
   script:
     - docker exec -t loketla-express npm run lint
+  allow_failure: true
 
 reset-container:
   stage: reset
+  tags:
+    - loketla-runner
   variables:
     GIT_CHECKOUT: "false"
   script:
     - docker exec -t loketla-express chmod -R 0777 logs coverage
-    - docker system prune -f 
-    - docker-compose down -v 
- 
+    - docker system prune -f
+    - docker-compose down -v
+  dependencies:
+    - api-test
+    - unit-integration-test

@@ -6,8 +6,6 @@ stages:
 
 build:
   stage: build
-  tags:
-    - loketla-runner
   before_script:
   - docker version
   - docker-compose version
@@ -20,8 +18,6 @@ build:
 
 unit-integration-test:
   stage: test
-  tags:
-    - loketla-runner
   variables:
     GIT_CHECKOUT: "false"
   script:
@@ -34,8 +30,6 @@ unit-integration-test:
 
 api-test:
   stage: test
-  tags:
-    - loketla-runner
   variables:
     GIT_CHECKOUT: "false"
   script:
@@ -46,8 +40,6 @@ api-test:
 
 quality-control:
   stage: quality
-  tags:
-    - loketla-runner
   needs: ["build"]
   variables:
     GIT_CHECKOUT: "false"
@@ -56,8 +48,6 @@ quality-control:
 
 reset-container:
   stage: reset
-  tags:
-    - loketla-runner
   variables:
     GIT_CHECKOUT: "false"
   script:

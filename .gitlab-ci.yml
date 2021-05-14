@@ -11,13 +11,13 @@ build:
   tags:
     - loketla-runner
   script:
-    - docker-compose down -v
-    - docker-compose up --build -d
-    - docker-compose exec -T server npm run migrate:latest
-    - docker-compose exec -T server npm run seed:run
+    - docker-compose down -v --privileged --user
+    - docker-compose up --build -d --privileged --user
+    - docker-compose exec -T server npm run migrate:latest --privileged --user
+    - docker-compose exec -T server npm run seed:run --privileged --user
     - docker-compose exec -T server npm run test:all:report --privileged --user
-    - docker system prune -f
-    - docker-compose down -v
+    - docker system prune -f --privileged --user
+    - docker-compose down -v --privileged --user
   after_script:
     - git gc && git clean -ffdx 
   artifacts:

@@ -2,6 +2,9 @@ stages:
   - build
   - test
 
+after_script:
+    - docker exec -t loketla-express chmod -R 0777 logs coverage
+
 build:
   stage: build
   tags:
@@ -33,9 +36,9 @@ api-test:
     - docker exec -t loketla-express chmod -R 0777 scripts
     - docker exec -t loketla-express npm run test:jest:report
   after_script:
-  - docker exec -t loketla-express chmod -R 0777 logs coverage
-  - docker system prune -f 
-  - docker-compose down -v 
+    - docker exec -t loketla-express chmod -R 0777 logs coverage
+    - docker system prune -f 
+    - docker-compose down -v 
   artifacts:
     paths:
       - src/server/apis/test/report.html

@@ -23,7 +23,7 @@ unit-integration-test:
   tags:
     - loketla-runner
   variables:
-    - GIT_CHECKOUT: "false"
+    GIT_CHECKOUT: "false"
   script:
     - docker exec -t loketla-express npm run test:jest:report
   after_script:
@@ -37,7 +37,7 @@ api-test:
   tags:
     - loketla-runner
   variables:
-    - GIT_CHECKOUT: "false"
+    GIT_CHECKOUT: "false"
   script:
     - docker exec -t loketla-express npm run test:newman:report
   artifacts:
@@ -49,7 +49,7 @@ quality-control:
   tags:
     - loketla-runner
   variables:
-    - GIT_CHECKOUT: "false"
+    GIT_CHECKOUT: "false"
   script:
     - docker exec -t loketla-express npm run lint
   after_script:

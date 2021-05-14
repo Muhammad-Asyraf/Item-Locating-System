@@ -19,7 +19,7 @@ build:
     - docker system prune -f
     - docker-compose down -v
   after_script:
-    - git gc && git clean -ffdx
+    - sudo git gc && git clean -ffdx
   artifacts:
     paths:
       - coverage/

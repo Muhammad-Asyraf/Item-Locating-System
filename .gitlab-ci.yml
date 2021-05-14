@@ -9,12 +9,12 @@ build:
   tags:
     - loketla-runner
   before_script:
-  - docker version
-  - docker-compose version
-  - docker-compose down -v 
+    - docker version
+    - docker-compose version
+    - docker-compose down -v
   script:
     - docker-compose up --build -d
-    - docker exec -t loketla-express chmod -R 0777 logs scripts 
+    - docker exec -t loketla-express chmod -R 0777 logs scripts
     - docker exec -t loketla-express npm run migrate:latest
     - docker exec -t loketla-express npm run seed:run
 
@@ -64,6 +64,8 @@ reset-container:
     GIT_CHECKOUT: "false"
   script:
     - docker exec -t loketla-express chmod -R 0777 logs coverage
-    - docker system prune -f 
+    - docker system prune -f
     - docker-compose down -v
-  dependencies: []
+  dependencies:
+    - api-test
+    - unit-integration-test

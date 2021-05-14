@@ -31,8 +31,7 @@ unit-integration-test:
   artifacts:
     paths:
       - src/server/coverage/
-    expire_in:
-      - 1 day
+    expire_in: 3 day
 
 api-test:
   stage: test
@@ -45,8 +44,7 @@ api-test:
   artifacts:
     paths:
       - src/server/apis/test/report.html
-    expire_in:
-      - 1 day
+    expire_in: 3 day
 
 quality-control:
   stage: quality

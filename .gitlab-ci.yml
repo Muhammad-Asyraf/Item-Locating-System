@@ -18,6 +18,8 @@ build:
     - docker-compose exec -T server npm run test:all:report
     - docker system prune -f
     - docker-compose down -v
+  after_script:
+    - git gc && git clean -ffdx
   artifacts:
     paths:
       - coverage/

@@ -17,7 +17,7 @@ build:
     - docker exec -t loketla-express chmod -R 0777 scripts
     - docker exec -t loketla-express npm run migrate:latest
     - docker exec -t loketla-express npm run seed:run
-    - docker exec -t loketla-express npm run test:all
+    - docker exec -t loketla-express npm run test:all:report
   after_script:
     - docker exec -t loketla-express chmod -R 0777 logs coverage
     - docker system prune -f 

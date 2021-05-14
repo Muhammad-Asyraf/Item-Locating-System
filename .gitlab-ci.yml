@@ -2,28 +2,44 @@ stages:
   - build
   - test
 
-before_script:
-  - docker version
-  - docker-compose version
-
 build:
   stage: build
   tags:
     - loketla-runner
   before_script:
-    - docker-compose down -v 
+  - docker version
+  - docker-compose version
+  - docker-compose down -v 
   script:
     - docker-compose up --build -d
-    - docker exec -t loketla-express chmod -R 0777 scripts
     - docker exec -t loketla-express npm run migrate:latest
     - docker exec -t loketla-express npm run seed:run
-    - docker exec -t loketla-express npm run test:all:report
-  after_script:
-    - docker exec -t loketla-express chmod -R 0777 logs coverage
-    - docker system prune -f 
-    - docker-compose down -v 
+
+unit/integration-test:
+  stage: test
+  tags:
+    - loketla-runner
+  script:
+    - docker exec -t loketla-express npm run test:jest:report
   artifacts:
     paths:
       - src/server/coverage/
-      - src/server/apis/test/
+
+api-test:
+  stage: test
+  tags:
+    - loketla-runner
+  script:
+    - docker exec -t loketla-express chmod -R 0777 scripts
+    - docker exec -t loketla-express npm run test:jest:report
+  after_script:
+  - docker exec -t loketla-express chmod -R 0777 logs coverage
+  - docker system prune -f 
+  - docker-compose down -v 
+  artifacts:
+    paths:
+      - src/server/apis/test/report.html
+
+
+      
   

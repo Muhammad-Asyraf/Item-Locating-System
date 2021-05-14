@@ -2,6 +2,7 @@ stages:
   - build
   - test
   - quality
+  - reset
 
 build:
   stage: build
@@ -47,14 +48,24 @@ quality-control:
   stage: quality
   tags:
     - loketla-runner
+  needs: ["build"]
   variables:
     GIT_CHECKOUT: "false"
   script:
     - docker exec -t loketla-express npm run lint
-  after_script:
+
+reset-container:
+  stage: reset
+  tags:
+    - loketla-runner
+  variables:
+    GIT_CHECKOUT: "false"
+  script:
     - docker exec -t loketla-express chmod -R 0777 logs coverage
     - docker system prune -f 
     - docker-compose down -v 
+
+
 
 
       

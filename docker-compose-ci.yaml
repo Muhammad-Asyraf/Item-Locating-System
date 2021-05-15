@@ -1,0 +1,10 @@
+version: "3.4"
+services:
+  client:
+    image: loketla/item-locating-system-client:${CI_COMMIT_SHORT_SHA}
+  server:
+    image: loketla/item-locating-system-server:${CI_COMMIT_SHORT_SHA}
+  db:
+    image: postgres
+volumes:
+  postgres-data:

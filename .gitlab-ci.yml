@@ -74,6 +74,8 @@ unit-integration-test:
     - docker pull loketla/item-locating-system-server:${CI_COMMIT_SHORT_SHA}
     - docker pull postgres:latest
     - docker-compose -f docker-compose-ci.yaml up -d
+    - docker exec -t loketla-express npm run migrate:latest
+    - docker exec -t loketla-express npm run seed:run
     - docker exec -t loketla-express npm run test:jest:report
   artifacts:
     paths:
@@ -101,6 +103,8 @@ api-test:
     - docker pull postgres:latest
     - docker-compose -f docker-compose-ci.yaml up -d
     - docker exec -t loketla-express chmod -R 0777 scripts
+    - docker exec -t loketla-express npm run migrate:latest
+    - docker exec -t loketla-express npm run seed:run
     - docker exec -t loketla-express npm run test:newman:report
   artifacts:
     paths:

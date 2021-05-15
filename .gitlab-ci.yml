@@ -6,6 +6,8 @@ stages:
 
 build:
   stage: build
+  only:
+    - merge_requests
   tags:
     - loketla-runner
   before_script:
@@ -20,6 +22,8 @@ build:
 
 unit-integration-test:
   stage: test
+  only:
+    - merge_requests
   tags:
     - loketla-runner
   variables:
@@ -37,6 +41,8 @@ unit-integration-test:
 
 api-test:
   stage: test
+  only:
+    - merge_requests
   tags:
     - loketla-runner
   variables:
@@ -52,6 +58,8 @@ api-test:
 
 quality-control:
   stage: quality
+  only:
+    - merge_requests
   tags:
     - loketla-runner
   needs: ["build"]
@@ -63,6 +71,8 @@ quality-control:
 
 reset-container:
   stage: reset
+  only:
+    - merge_requests
   tags:
     - loketla-runner
   variables:

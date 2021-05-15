@@ -17,7 +17,7 @@ stages:
 before_script:
   - docker version
   - docker-compose version
-  - docker login --username loketla --password loketla@fsktm
+  - docker login --username ${DOCKER_USERNAME} --password ${DOCKER_PASSWORD}
 
 build-client:
   stage: build

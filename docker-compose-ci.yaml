@@ -1,0 +1,45 @@
+version: "3.4"
+services:
+  client:
+    image: loketla/item-locating-system-client:${CI_COMMIT_SHORT_SHA}
+    container_name: loketla-react
+    restart: always
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./src/client:/app/client
+      - /app/client/node_modules
+    depends_on:
+      - server
+  server:
+    image: loketla/item-locating-system-server:${CI_COMMIT_SHORT_SHA}
+    container_name: loketla-express
+    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      FORCE_COLOR: 3
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./src/server:/app
+      - /app/node_modules
+    depends_on:
+      - db
+  db:
+    container_name: postgresql
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+volumes:
+  postgres-data:

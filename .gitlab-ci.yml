@@ -6,7 +6,7 @@ variables:
   DOCKER_DRIVER: overlay2
   DOCKER_TLS_CERTDIR: ""
   CI_COMMIT_REF_NAME: ${CI_COMMIT_REF_NAME}
-  COMMIT_BRANCH: ${${CI_COMMIT_REF_NAME}#*/}
+  COMMIT_BRANCH: ${CI_COMMIT_REF_NAME#*/}
 
 services:
   - docker:dind
@@ -31,7 +31,7 @@ build-client:
   script:
     - docker pull loketla/item-locating-system-client:$COMMIT_BRANCH-latest || true
     - docker build 
-        --cache-from loketla/item-locating-system-client:${COMMIT_BRANCH}-latest 
+        --cache-from loketla/item-locating-system-client:$COMMIT_BRANCH-latest 
         --tag loketla/item-locating-system-client:${COMMIT_BRANCH}-latest 
         --tag loketla/item-locating-system-client:${CI_COMMIT_SHORT_SHA} ./src/client
     - docker push loketla/item-locating-system-client:${CI_COMMIT_SHORT_SHA}

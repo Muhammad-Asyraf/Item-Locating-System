@@ -1,47 +1,93 @@
+image:
+  name: docker/compose:latest
+
+variables:
+  DOCKER_HOST: tcp://docker:2375/
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: ""
+
+services:
+  - docker:dind
+
+workflow:
+  rules:
+    - if: '$CI_COMMIT_BRANCH && $CI_PIPELINE_SOURCE == "push" && $CI_OPEN_MERGE_REQUESTS'
+      when: never
+    - when: always
+
 stages:
   - build
   - test
-  - quality
-  - reset
 
-build:
+before_script:
+  - docker version
+  - docker-compose version
+  - docker login --username ${DOCKER_USERNAME} --password ${DOCKER_PASSWORD}
+
+build-client:
   stage: build
-  tags:
-    - loketla-runner
-  before_script:
-    - docker version
-    - docker-compose version
-    - docker-compose down -v
   script:
-    - docker-compose up --build -d
-    - docker exec -t loketla-express chmod -R 0777 logs scripts
+    - docker pull loketla/item-locating-system-client:${CI_COMMIT_REF_NAME}-latest || true
+    - docker build 
+        --cache-from loketla/item-locating-system-client:${CI_COMMIT_REF_NAME}-latest 
+        --tag loketla/item-locating-system-client:${CI_COMMIT_REF_NAME}-latest 
+        --tag loketla/item-locating-system-client:${CI_COMMIT_SHORT_SHA} ./src/client
+    - docker push loketla/item-locating-system-client:${CI_COMMIT_SHORT_SHA}
+    - docker push loketla/item-locating-system-client:${CI_COMMIT_REF_NAME}-latest
+  retry:
+    max: 2
+    when:
+      - runner_system_failure
+      - stuck_or_timeout_failure
+build-server:
+  stage: build
+  script:
+    - docker pull loketla/item-locating-system-server:${CI_COMMIT_REF_NAME}-latest || true
+    - docker build 
+        --cache-from loketla/item-locating-system-server:${CI_COMMIT_REF_NAME}-latest 
+        --tag loketla/item-locating-system-server:${CI_COMMIT_REF_NAME}-latest 
+        --tag loketla/item-locating-system-server:${CI_COMMIT_SHORT_SHA} ./src/server
+    - docker push loketla/item-locating-system-server:${CI_COMMIT_SHORT_SHA}
+    - docker push loketla/item-locating-system-server:${CI_COMMIT_REF_NAME}-latest
+  retry:
+    max: 2
+    when:
+      - runner_system_failure
+      - stuck_or_timeout_failure
+lint-unit-integration-test:
+  stage: test
+  script:
+    - docker pull loketla/item-locating-system-client:${CI_COMMIT_SHORT_SHA}
+    - docker pull loketla/item-locating-system-server:${CI_COMMIT_SHORT_SHA}
+    - docker pull postgres:latest
+    - docker-compose -f docker-compose-ci.yaml up -d
+    - docker exec -t loketla-react npm run lint
+    - docker exec -t loketla-express npm run lint
     - docker exec -t loketla-express npm run migrate:latest
     - docker exec -t loketla-express npm run seed:run
-
-unit-integration-test:
-  stage: test
-  tags:
-    - loketla-runner
-  variables:
-    GIT_CHECKOUT: "false"
-  script:
     - docker exec -t loketla-express npm run test:jest:report
-  after_script:
-    - docker exec -t loketla-express chmod -R 0777 logs coverage
   artifacts:
     paths:
       - src/server/coverage/
     expire_in: 2 day
     when: always
   allow_failure: true
-
+  interruptible: true
+  retry:
+    max: 2
+    when:
+      - runner_system_failure
+      - stuck_or_timeout_failure
 api-test:
   stage: test
-  tags:
-    - loketla-runner
-  variables:
-    GIT_CHECKOUT: "false"
   script:
+    - docker pull loketla/item-locating-system-client:${CI_COMMIT_SHORT_SHA}
+    - docker pull loketla/item-locating-system-server:${CI_COMMIT_SHORT_SHA}
+    - docker pull postgres:latest
+    - docker-compose -f docker-compose-ci.yaml up -d
+    - docker exec -t loketla-express chmod -R 0777 scripts
+    - docker exec -t loketla-express npm run migrate:latest
+    - docker exec -t loketla-express npm run seed:run
     - docker exec -t loketla-express npm run test:newman:report
   artifacts:
     paths:
@@ -49,28 +95,9 @@ api-test:
     expire_in: 2 day
     when: always
   allow_failure: true
-
-quality-control:
-  stage: quality
-  tags:
-    - loketla-runner
-  needs: ["build"]
-  variables:
-    GIT_CHECKOUT: "false"
-  script:
-    - docker exec -t loketla-express npm run lint
-  allow_failure: true
-
-reset-container:
-  stage: reset
-  tags:
-    - loketla-runner
-  variables:
-    GIT_CHECKOUT: "false"
-  script:
-    - docker exec -t loketla-express chmod -R 0777 logs coverage
-    - docker system prune -f
-    - docker-compose down -v
-  dependencies:
-    - api-test
-    - unit-integration-test
+  interruptible: true
+  retry:
+    max: 2
+    when:
+      - runner_system_failure
+      - stuck_or_timeout_failure

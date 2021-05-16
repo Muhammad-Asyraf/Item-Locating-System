@@ -10,13 +10,17 @@ COPY package.json ./
 # install our dependency into the container when buidling the image
 RUN npm install --silent
 
-RUN npm install -g expo-cli
+# install global packages
+RUN npm install -g expo-cli --silent
 
 # copy all src/client files to './' = working directory
 COPY . ./
 
-# expose container to port 3000
+# expose container to port
+EXPOSE 19000
+EXPOSE 19001
 EXPOSE 19002
+EXPOSE 19006
 
 # command run by container
-CMD ["npm", "run" ,"start"]
+CMD ["npm","start"]

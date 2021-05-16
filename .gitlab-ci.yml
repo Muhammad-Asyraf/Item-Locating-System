@@ -5,6 +5,8 @@ variables:
   DOCKER_HOST: tcp://docker:2375/
   DOCKER_DRIVER: overlay2
   DOCKER_TLS_CERTDIR: ""
+  CI_COMMIT_REF_NAME: ${CI_COMMIT_REF_NAME}
+  COMMIT_BRANCH: ${${CI_COMMIT_REF_NAME}#*/}
 
 services:
   - docker:dind
@@ -27,13 +29,13 @@ before_script:
 build-client:
   stage: build
   script:
-    - docker pull loketla/item-locating-system-client:${CI_COMMIT_REF_NAME}-latest || true
+    - docker pull loketla/item-locating-system-client:${COMMIT_BRANCH}-latest || true
     - docker build 
-        --cache-from loketla/item-locating-system-client:${CI_COMMIT_REF_NAME}-latest 
-        --tag loketla/item-locating-system-client:${CI_COMMIT_REF_NAME}-latest 
+        --cache-from loketla/item-locating-system-client:${COMMIT_BRANCH}-latest 
+        --tag loketla/item-locating-system-client:${COMMIT_BRANCH}-latest 
         --tag loketla/item-locating-system-client:${CI_COMMIT_SHORT_SHA} ./src/client
     - docker push loketla/item-locating-system-client:${CI_COMMIT_SHORT_SHA}
-    - docker push loketla/item-locating-system-client:${CI_COMMIT_REF_NAME}-latest
+    - docker push loketla/item-locating-system-client:${COMMIT_BRANCH}-latest
   retry:
     max: 2
     when:
@@ -42,13 +44,13 @@ build-client:
 build-server:
   stage: build
   script:
-    - docker pull loketla/item-locating-system-server:${CI_COMMIT_REF_NAME}-latest || true
+    - docker pull loketla/item-locating-system-server:${COMMIT_BRANCH}-latest || true
     - docker build 
-        --cache-from loketla/item-locating-system-server:${CI_COMMIT_REF_NAME}-latest 
-        --tag loketla/item-locating-system-server:${CI_COMMIT_REF_NAME}-latest 
+        --cache-from loketla/item-locating-system-server:${COMMIT_BRANCH}-latest 
+        --tag loketla/item-locating-system-server:${COMMIT_BRANCH}-latest 
         --tag loketla/item-locating-system-server:${CI_COMMIT_SHORT_SHA} ./src/server
     - docker push loketla/item-locating-system-server:${CI_COMMIT_SHORT_SHA}
-    - docker push loketla/item-locating-system-server:${CI_COMMIT_REF_NAME}-latest
+    - docker push loketla/item-locating-system-server:${COMMIT_BRANCH}-latest
   retry:
     max: 2
     when:
@@ -69,7 +71,7 @@ lint-unit-integration-test:
   artifacts:
     paths:
       - src/server/coverage/
-    expire_in: 2 day
+    expire_in: 3 day
     when: always
   allow_failure: true
   interruptible: true
@@ -92,7 +94,7 @@ api-test:
   artifacts:
     paths:
       - src/server/apis/test/report.html
-    expire_in: 2 day
+    expire_in: 4 day
     when: always
   allow_failure: true
   interruptible: true

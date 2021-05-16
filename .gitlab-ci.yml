@@ -6,7 +6,11 @@ variables:
   DOCKER_DRIVER: overlay2
   DOCKER_TLS_CERTDIR: ""
   CI_COMMIT_REF_NAME: ${CI_COMMIT_REF_NAME}
+<<<<<<< HEAD
   COMMIT_BRANCH: ${${CI_COMMIT_REF_NAME}#*/}
+=======
+  COMMIT_BRANCH: ${CI_COMMIT_REF_NAME#*/}
+>>>>>>> Modified gitlab-ci #LOKET-60
 
 services:
   - docker:dind

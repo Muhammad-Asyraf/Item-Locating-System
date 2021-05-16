@@ -22,8 +22,7 @@ build-client:
   stage: build
   only:
     - merge_requests
-    - pre-release
-    - release
+    - /${BRANCH_REGEX}/
   script:
     - docker pull loketla/item-locating-system-client:${CI_COMMIT_REF_NAME}-latest || true
     - docker build 
@@ -41,8 +40,7 @@ build-server:
   stage: build
   only:
     - merge_requests
-    - pre-release
-    - release
+    - /${BRANCH_REGEX}/
   script:
     - docker pull loketla/item-locating-system-server:${CI_COMMIT_REF_NAME}-latest || true
     - docker build 
@@ -60,8 +58,7 @@ lint-unit-integration-test:
   stage: test
   only:
     - merge_requests
-    - pre-release
-    - release
+    - /${BRANCH_REGEX}/
   script:
     - docker pull loketla/item-locating-system-client:${CI_COMMIT_SHORT_SHA}
     - docker pull loketla/item-locating-system-server:${CI_COMMIT_SHORT_SHA}
@@ -88,8 +85,7 @@ api-test:
   stage: test
   only:
     - merge_requests
-    - pre-release
-    - release
+    - /${BRANCH_REGEX}/
   script:
     - docker pull loketla/item-locating-system-client:${CI_COMMIT_SHORT_SHA}
     - docker pull loketla/item-locating-system-server:${CI_COMMIT_SHORT_SHA}

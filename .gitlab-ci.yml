@@ -20,10 +20,6 @@ before_script:
 
 build-client:
   stage: build
-  tags:
-    - loketla-docker-runner
-    - docker
-    - gitlab-org-docker
   only:
     - merge_requests
     - pre-release
@@ -43,10 +39,6 @@ build-client:
       - stuck_or_timeout_failure
 build-server:
   stage: build
-  tags:
-    - loketla-docker-runner
-    - docker
-    - gitlab-org-docker
   only:
     - merge_requests
     - pre-release
@@ -66,8 +58,6 @@ build-server:
       - stuck_or_timeout_failure
 lint-unit-integration-test:
   stage: test
-  tags:
-    - loketla-docker-runner-2
   only:
     - merge_requests
     - pre-release
@@ -96,8 +86,6 @@ lint-unit-integration-test:
       - stuck_or_timeout_failure
 api-test:
   stage: test
-  tags:
-    - loketla-docker-runner-2
   only:
     - merge_requests
     - pre-release

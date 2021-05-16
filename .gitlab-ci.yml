@@ -21,6 +21,7 @@ before_script:
 build-client:
   stage: build
   tags:
+    - loketla-docker-runner
     - docker
     - gitlab-org-docker
   only:
@@ -43,6 +44,7 @@ build-client:
 build-server:
   stage: build
   tags:
+    - loketla-docker-runner
     - docker
     - gitlab-org-docker
   only:
@@ -65,7 +67,7 @@ build-server:
 lint-unit-integration-test:
   stage: test
   tags:
-    - loketla-docker-runner
+    - loketla-docker-runner-2
   only:
     - merge_requests
     - pre-release
@@ -95,7 +97,7 @@ lint-unit-integration-test:
 api-test:
   stage: test
   tags:
-    - loketla-docker-runner
+    - loketla-docker-runner-2
   only:
     - merge_requests
     - pre-release

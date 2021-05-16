@@ -29,7 +29,7 @@ before_script:
 build-client:
   stage: build
   script:
-    - docker pull loketla/item-locating-system-client:${COMMIT_BRANCH}-latest || true
+    - docker pull loketla/item-locating-system-client:$COMMIT_BRANCH-latest || true
     - docker build 
         --cache-from loketla/item-locating-system-client:${COMMIT_BRANCH}-latest 
         --tag loketla/item-locating-system-client:${COMMIT_BRANCH}-latest 

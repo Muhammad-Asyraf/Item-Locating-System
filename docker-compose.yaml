@@ -1,5 +1,16 @@
 version: "3"
 services:
+  app:
+    build: ./src/app
+    container_name: loketla-app
+    restart: always
+    ports:
+      - "19002:19002"
+    volumes:
+      - ./src/app:/app/mobile
+      - /app/mobile/node_modules
+    depends_on:
+      - server
   client:
     build: ./src/client
     container_name: loketla-react

@@ -10,6 +10,8 @@ COPY package.json ./
 # install our dependency into the container when buidling the image
 RUN npm install --silent
 
+RUN npm install -g expo-cli
+
 # copy all src/client files to './' = working directory
 COPY . ./
 

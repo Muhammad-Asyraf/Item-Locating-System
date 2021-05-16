@@ -35,7 +35,7 @@ build-client:
     - docker push loketla/item-locating-system-client:${CI_COMMIT_SHORT_SHA}
     - docker push loketla/item-locating-system-client:${CI_COMMIT_REF_NAME}-latest
   retry:
-    max: 3
+    max: 2
     when:
       - runner_system_failure
       - stuck_or_timeout_failure
@@ -50,7 +50,7 @@ build-server:
     - docker push loketla/item-locating-system-server:${CI_COMMIT_SHORT_SHA}
     - docker push loketla/item-locating-system-server:${CI_COMMIT_REF_NAME}-latest
   retry:
-    max: 3
+    max: 2
     when:
       - runner_system_failure
       - stuck_or_timeout_failure
@@ -69,7 +69,7 @@ lint-unit-integration-test:
   artifacts:
     paths:
       - src/server/coverage/
-    expire_in: 2 day
+    expire_in: 3 day
     when: always
   allow_failure: true
   interruptible: true
@@ -92,7 +92,7 @@ api-test:
   artifacts:
     paths:
       - src/server/apis/test/report.html
-    expire_in: 2 day
+    expire_in: 3 day
     when: always
   allow_failure: true
   interruptible: true

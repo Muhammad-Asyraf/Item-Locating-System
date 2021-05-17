@@ -27,13 +27,13 @@ before_script:
 build-client:
   stage: build
   script:
-    - docker pull loketla/item-locating-system-client:${CI_COMMIT_REF_NAME}-latest || true
+    - docker pull loketla/item-locating-system-client:${CI_COMMIT_REF_SLUG}-latest || true
     - docker build 
-        --cache-from loketla/item-locating-system-client:${CI_COMMIT_REF_NAME}-latest 
-        --tag loketla/item-locating-system-client:${CI_COMMIT_REF_NAME}-latest 
+        --cache-from loketla/item-locating-system-client:${CI_COMMIT_REF_SLUG}-latest 
+        --tag loketla/item-locating-system-client:${CI_COMMIT_REF_SLUG}-latest 
         --tag loketla/item-locating-system-client:${CI_COMMIT_SHORT_SHA} ./src/client
     - docker push loketla/item-locating-system-client:${CI_COMMIT_SHORT_SHA}
-    - docker push loketla/item-locating-system-client:${CI_COMMIT_REF_NAME}-latest
+    - docker push loketla/item-locating-system-client:${CI_COMMIT_REF_SLUG}-latest
   retry:
     max: 2
     when:
@@ -42,13 +42,13 @@ build-client:
 build-server:
   stage: build
   script:
-    - docker pull loketla/item-locating-system-server:${CI_COMMIT_REF_NAME}-latest || true
+    - docker pull loketla/item-locating-system-server:${CI_COMMIT_REF_SLUG}-latest || true
     - docker build 
-        --cache-from loketla/item-locating-system-server:${CI_COMMIT_REF_NAME}-latest 
-        --tag loketla/item-locating-system-server:${CI_COMMIT_REF_NAME}-latest 
+        --cache-from loketla/item-locating-system-server:${CI_COMMIT_REF_SLUG}-latest 
+        --tag loketla/item-locating-system-server:${CI_COMMIT_REF_SLUG}-latest 
         --tag loketla/item-locating-system-server:${CI_COMMIT_SHORT_SHA} ./src/server
     - docker push loketla/item-locating-system-server:${CI_COMMIT_SHORT_SHA}
-    - docker push loketla/item-locating-system-server:${CI_COMMIT_REF_NAME}-latest
+    - docker push loketla/item-locating-system-server:${CI_COMMIT_REF_SLUG}-latest
   retry:
     max: 2
     when:

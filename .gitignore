@@ -31,3 +31,17 @@ src/server/logs
 src/server/.env
 
 .env
+
+src/app/node_modules/
+src/app/.expo/
+src/app/npm-debug.*
+src/app/*.jks
+src/app/*.p8
+src/app/*.p12
+src/app/*.key
+src/app/*.mobileprovision
+src/app/*.orig.*
+src/app/web-build/
+
+# macOS
+src/app/.DS_Store

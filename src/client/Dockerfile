@@ -10,6 +10,9 @@ COPY package.json ./
 # install our dependency into the container when buidling the image
 RUN npm install --silent
 
+# update latest version of npm
+RUN npm install -g npm
+
 # copy all src/client files to './' = working directory
 COPY . ./
 

@@ -95,16 +95,6 @@ const getLogger = (moduleName, logFile) => {
           format: getFileLoggingFormat(),
         }),
         new File({
-          filename: './logs/uncaught.exception.log',
-          handleExceptions: true,
-          format: getFileLoggingFormat(),
-        }),
-        new File({
-          filename: './logs/uncaught.promise.rejections.log',
-          handleRejections: true,
-          format: getFileLoggingFormat(),
-        }),
-        new File({
           filename: `./logs/${logFile}.log`,
           format: getFileLoggingFormat(),
         }),

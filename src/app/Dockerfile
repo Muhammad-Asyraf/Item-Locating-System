@@ -17,10 +17,7 @@ RUN npm install -g expo-cli --silent
 COPY . ./
 
 # expose container to port
-EXPOSE 19000
-EXPOSE 19001
-EXPOSE 19002
-EXPOSE 19006
+EXPOSE 19000-19100
 
 # command run by container
 CMD ["npm","start"]

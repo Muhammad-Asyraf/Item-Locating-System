@@ -5,10 +5,7 @@ services:
     container_name: loketla-app
     restart: always
     ports:
-      - "19000:19000"
-      - "19001:19001"
-      - "19002:19002"
-      - "19006:19006"
+      - "19000-19100:19000-19100"
     volumes:
       - ./src/app:/app/mobile
       - /app/mobile/node_modules

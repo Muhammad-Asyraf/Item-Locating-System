@@ -7,7 +7,7 @@ import {
   Button
 } from "react-native-paper";
 
-function Login() {
+export default function Login() {
       
     return(
         <ScrollView style={styles.container}>
@@ -34,7 +34,6 @@ function Login() {
             </Button>
           </View>
 
-          <StatusBar style="auto" />
         </ScrollView>
     )
 
@@ -95,6 +94,3 @@ const styles = StyleSheet.create({
     color: "#545454"
   }
 });
-
-
-export default function Login()

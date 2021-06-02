@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { StyleSheet, ScrollView, View, Text } from "react-native";
 import { TextInput, Title, Paragraph, Button } from "react-native-paper";
-import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs'
-import auth from '@react-native-firebase/auth'
+import Icon from "react-native-vector-icons/AntDesign";
+import auth from "@react-native-firebase/auth";
 
 export default function Login() {
   const [credentials, setCredentials] = useState({
@@ -25,42 +25,45 @@ export default function Login() {
     console.log(credentials);
 
     // Authenticate
-    auth().signInWithEmailAndPassword(credentials.email, credentials.password)
-    .then(() => {
-      console.log("Signed in")
+    auth()
+      .signInWithEmailAndPassword(credentials.email, credentials.password)
+      .then(() => {
+        console.log("Signed in");
+      })
+      .catch((error) => {
+        if (error.code === "auth/email-already-in-use") {
+          console.log("That email address is already in use!");
+        }
 
-    })
-    .catch(error => {
-      if (error.code === 'auth/email-already-in-use') {
-        console.log('That email address is already in use!');
-      }
-  
-      if (error.code === 'auth/invalid-email') {
-        console.log('That email address is invalid!');
-      }
-  
-      console.error(error);
-    })
+        if (error.code === "auth/invalid-email") {
+          console.log("That email address is invalid!");
+        }
+
+        console.error(error);
+      });
   };
 
   const validateEmail = (text) => {
-    let reg = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+    let reg =
+      /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
     if (reg.test(text) === false) {
       console.log("Email is Not Correct");
       return false;
-    }
-    else {
+    } else {
       setCredentials({
         ...credentials,
         email: text,
       });
       console.log("Email is Correct");
-      return true
+      return true;
     }
-  }
+  };
 
   return (
-    <ScrollView style={{...styles.container, paddingBottom: useBottomTabBarHeight()}} contentContainerStyle={{flexGrow:1, justifyContent: "center"}}>
+    <ScrollView
+      style={{ ...styles.container }}
+      contentContainerStyle={{ flexGrow: 1, justifyContent: "center" }}
+    >
       <Title style={styles.title}>Hello There.</Title>
       <Paragraph style={styles.description}>
         Please login or sign up to continue
@@ -70,6 +73,7 @@ export default function Login() {
         <TextInput
           onChangeText={handleEmailChange}
           autoCompleteType="email"
+          textContentType="emailAddress"
           autoCapitalize="none"
           label="Email"
           style={styles.textInput}
@@ -77,6 +81,7 @@ export default function Login() {
         <TextInput
           secureTextEntry={true}
           onChangeText={handlePasswordChange}
+          textContentType="password"
           autoCapitalize="none"
           label="Password"
           style={styles.textInput}
@@ -87,25 +92,29 @@ export default function Login() {
         Forgot password? Reset here
       </Button>
 
-      <View style={styles.buttonContainerRow}>
-        <Button
-          onPress={handleLogIn}
-          style={[styles.button, styles.signInButton]}
-          labelStyle={styles.buttonLabel}
-          mode="contained"
-        >
-          Sign In
-        </Button>
+      <Button
+        onPress={handleLogIn}
+        style={[styles.button, styles.signInButton]}
+        labelStyle={styles.buttonLabel}
+        mode="contained"
+      >
+        Sign In
+      </Button>
 
-        {/* TODO: Add google icon */}
-        <Button
-          style={[styles.button, styles.googleSignInButton]}
-          labelStyle={styles.googleButtonLabel}
-          mode="contained"
-        >
-          Google
-        </Button>
-      </View>
+      <Paragraph
+        style={{ ...styles.description, alignSelf: "center", marginTop: 24 }}
+      >
+        OR
+      </Paragraph>
+
+      {/* TODO: Add google icon */}
+      <Button
+        style={[styles.button, styles.googleSignInButton]}
+        labelStyle={styles.googleButtonLabel}
+        mode="outlined"
+      >
+        Sign in with Google
+      </Button>
     </ScrollView>
   );
 }
@@ -119,18 +128,19 @@ const styles = StyleSheet.create({
     fontFamily: "interBold",
   },
   description: {
-    fontSize: 12,
+    fontSize: 14,
     color: "#545454",
   },
   forgotPassword: {
-    marginVertical: 24,
+    marginVertical: 12,
     alignSelf: "center",
-    fontSize: 10,
+    fontSize: 12,
     color: "#545454",
   },
   container: {
     height: "100%",
     paddingHorizontal: 48,
+    backgroundColor: "white",
   },
   textInputContainer: {
     paddingVertical: 24,
@@ -138,7 +148,7 @@ const styles = StyleSheet.create({
   textInput: {
     backgroundColor: "transparent",
     marginVertical: 5,
-    fontSize: 12,
+    fontSize: 14,
   },
   buttonContainerRow: {
     flexDirection: "row",
@@ -146,17 +156,13 @@ const styles = StyleSheet.create({
   },
   button: {
     marginTop: 24,
-    paddingVertical: 3,
+    paddingVertical: 6,
+    paddingHorizontal: 6,
   },
   signInButton: {},
-  googleSignInButton: {
-    backgroundColor: "white",
-  },
-  buttonLabel: {
-    fontSize: 12,
-  },
+  googleSignInButton: {},
+  buttonLabel: {},
   googleButtonLabel: {
-    fontSize: 12,
     color: "#545454",
   },
 });

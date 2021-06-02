@@ -1,9 +1,7 @@
-import { StatusBar } from "expo-status-bar";
-import React from "react";
-import { StyleSheet, ScrollView, View, Text } from "react-native";
+import React, { useState, useEffect } from "react";
+import { StyleSheet, StatusBar, Text } from "react-native";
 import { Provider as PaperProvider } from "react-native-paper";
 import Theme from "./styles/theme";
-import AppLoading from "expo-app-loading";
 import {
   useFonts,
   Inter_500Medium as interMedium,
@@ -11,14 +9,30 @@ import {
   Inter_800ExtraBold as interBoldExtra,
 } from "@expo-google-fonts/inter";
 import { NavigationContainer } from "@react-navigation/native";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { createStackNavigator } from "@react-navigation/stack"
 
-// Screens
-import Login from "./screens/Login";
-import Registration from "./screens/Registration"
+// Navigation
+import AuthTabsNavigator from "./navigation/AuthTabsNavigator";
+import MainTabsNavigator from "./navigation/MainTabsNavigator";
+
+// Auth modules
+import auth from "@react-native-firebase/auth";
 
 export default function App() {
+  // Authentication states
+  const [isInitializing, setInitializing] = useState(true);
+  const [user, setUser] = useState();
+
+  // Handle user state changes
+  function onAuthStateChanged(user) {
+    setUser(user);
+    if (isInitializing) setInitializing(false);
+  }
+
+  useEffect(() => {
+    const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
+    return subscriber;
+  }, []);
+
   // Fonts to be used
   let [fontsLoaded] = useFonts({
     interMedium,
@@ -26,38 +40,27 @@ export default function App() {
     interBoldExtra,
   });
 
-
-
-  const AuthTabs = createBottomTabNavigator();
-  // Authentication screen with Login/Register Tabs
-  const AuthTabsScreen = () => {
-    return(
-    <AuthTabs.Navigator>
-      <AuthTabs.Screen name="Login" component={Login} />
-      <AuthTabs.Screen name="Register" component={Registration} />
-    </AuthTabs.Navigator>
-    )
-  }
-  
-
-  const AppStack = createStackNavigator()
-
-
-
-  if (!fontsLoaded) {
-    return <AppLoading />;
+  if (!fontsLoaded && isInitializing) {
+    return <Text>Loading</Text>;
   } else {
-    return (
+    if (!user) {
+      return (
+        // Use NavigationContainer to implement navigation throughout the app
+        <NavigationContainer>
+          {/* PaperProvider for global theming */}
+          <PaperProvider theme={Theme()}>
+            <AuthTabsNavigator />
+          </PaperProvider>
+        </NavigationContainer>
+      );
+    }
 
+    return (
       // Use NavigationContainer to implement navigation throughout the app
       <NavigationContainer>
-
         {/* PaperProvider for global theming */}
         <PaperProvider theme={Theme()}>
-          <AppStack.Navigator headerMode="none">
-            <AppStack.Screen name="Auth" component={AuthTabsScreen}/>
-
-          </AppStack.Navigator>
+          <MainTabsNavigator />
         </PaperProvider>
       </NavigationContainer>
     );
@@ -65,5 +68,7 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-  footer: {},
+  container: {
+    marginTop: StatusBar.currentHeight,
+  },
 });

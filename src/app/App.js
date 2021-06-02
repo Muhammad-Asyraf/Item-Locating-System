@@ -40,7 +40,7 @@ export default function App() {
     interBoldExtra,
   });
 
-  if (!fontsLoaded && isInitializing) {
+  if (!fontsLoaded || isInitializing) {
     return <Text>Loading</Text>;
   } else {
     if (!user) {

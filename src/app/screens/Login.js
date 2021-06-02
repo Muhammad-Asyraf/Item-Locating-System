@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { StyleSheet, ScrollView, View, Text } from "react-native";
 import { TextInput, Title, Paragraph, Button } from "react-native-paper";
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs'
 import auth from '@react-native-firebase/auth'
 
 export default function Login() {
@@ -59,7 +60,7 @@ export default function Login() {
   }
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={{flexGrow:1, justifyContent: "center"}}>
+    <ScrollView style={{...styles.container, paddingBottom: useBottomTabBarHeight()}} contentContainerStyle={{flexGrow:1, justifyContent: "center"}}>
       <Title style={styles.title}>Hello There.</Title>
       <Paragraph style={styles.description}>
         Please login or sign up to continue

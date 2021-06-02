@@ -6,11 +6,12 @@ import {
   Paragraph,
   Button
 } from "react-native-paper";
+import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs"
 
 
 export default function Registration() {
     return(
-        <ScrollView style={styles.container}>
+        <ScrollView style={{...styles.container, paddingBottom: useBottomTabBarHeight()}} contentContainerStyle={{flexGrow:1, justifyContent: "center"}}>
           <Title style={styles.title}>Sign Up.</Title>
           <Paragraph style={styles.description}>
             Please enter your details to sign up
@@ -18,19 +19,14 @@ export default function Registration() {
 
           <View style={styles.textInputContainer}>
             <TextInput label="Email" style={styles.textInput} />
+            <TextInput label="Username" style={styles.textInput} />
             <TextInput label="Password" style={styles.textInput} />
+            <TextInput label="Confirm Password" style={styles.textInput} />
           </View>
 
-          <Button labelStyle={styles.forgotPassword}>Forgot password? Reset here</Button>
-
           <View style={styles.buttonContainerRow}>
-            <Button style={[styles.button,styles.signInButton]} labelStyle={styles.buttonLabel} mode="contained">
-              Sign In
-            </Button>
-        
-            {/* TODO: Add google icon */}
-            <Button style={[styles.button,styles.googleSignInButton]} labelStyle={styles.googleButtonLabel} mode="contained">
-              Google
+            <Button style={[styles.button,styles.signUpButton]} labelStyle={styles.buttonLabel} mode="contained">
+              Sign Up
             </Button>
           </View>
 
@@ -80,10 +76,7 @@ const styles = StyleSheet.create({
       marginTop: 24,
       paddingVertical: 3,
     },
-    signInButton: {
-    },
-    googleSignInButton: {
-      backgroundColor: 'white'
+    signUpButton: {
     },
     buttonLabel: {
       fontSize: 12

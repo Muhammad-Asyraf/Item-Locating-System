@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { StyleSheet, ScrollView, View, Text } from "react-native";
 import { TextInput, Title, Paragraph, Button } from "react-native-paper";
-import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs'
 import auth from '@react-native-firebase/auth'
 
 export default function Login() {
@@ -38,6 +37,10 @@ export default function Login() {
       if (error.code === 'auth/invalid-email') {
         console.log('That email address is invalid!');
       }
+      
+      if (error.code === 'auth/user-not-found') {
+        // Error handling here
+      }
   
       console.error(error);
     })
@@ -60,7 +63,7 @@ export default function Login() {
   }
 
   return (
-    <ScrollView style={{...styles.container, paddingBottom: useBottomTabBarHeight()}} contentContainerStyle={{flexGrow:1, justifyContent: "center"}}>
+    <ScrollView style={{...styles.container, }} contentContainerStyle={{flexGrow:1, justifyContent: "center"}}>
       <Title style={styles.title}>Hello There.</Title>
       <Paragraph style={styles.description}>
         Please login or sign up to continue
@@ -131,6 +134,7 @@ const styles = StyleSheet.create({
   container: {
     height: "100%",
     paddingHorizontal: 48,
+    backgroundColor: "white"
   },
   textInputContainer: {
     paddingVertical: 24,

@@ -6,12 +6,10 @@ import {
   Paragraph,
   Button
 } from "react-native-paper";
-import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs"
-
 
 export default function Registration() {
     return(
-        <ScrollView style={{...styles.container, paddingBottom: useBottomTabBarHeight()}} contentContainerStyle={{flexGrow:1, justifyContent: "center"}}>
+        <ScrollView style={{...styles.container,}} contentContainerStyle={{flexGrow:1, justifyContent: "center"}}>
           <Title style={styles.title}>Sign Up.</Title>
           <Paragraph style={styles.description}>
             Please enter your details to sign up
@@ -58,6 +56,7 @@ const styles = StyleSheet.create({
     container: {
       height: "100%",
       paddingHorizontal: 48,
+      backgroundColor: "white"
     },
     textInputContainer: {
       paddingVertical: 24,

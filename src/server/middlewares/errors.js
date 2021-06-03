@@ -6,7 +6,8 @@ const errorTypes = {
   UniqueViolationError: 409,
 };
 const errorMessages = {
-  UniqueViolationError: 'Already exists.',
+  UniqueViolationError:
+    'The email address is already in use by another account.',
 };
 
 const endpointNotFound = (req, res, next) => {

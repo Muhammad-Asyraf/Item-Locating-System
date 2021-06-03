@@ -4,11 +4,7 @@
     "es2021": true,
     "jest": true
   },
-  "extends": [
-    "plugin:react/recommended",
-    "plugin:prettier/recommended",
-    "airbnb"
-  ],
+  "extends": ["plugin:react/recommended", "prettier", "airbnb"],
   "parser": "babel-eslint",
   "parserOptions": {
     "ecmaFeatures": {
@@ -24,7 +20,9 @@
     "react/react-in-jsx-scope": "off",
     "react/jsx-one-expression-per-line": "off",
     "no-console": "off", // 'Off' only for development;
-    "arrow-body-style": ["error", "always"]
-  },
-  "root": true
+    "arrow-body-style": ["error", "as-needed"],
+    "no-param-reassign": 0,
+    "object-curly-newline": "off",
+    "react/jsx-props-no-spreading": "off"
+  }
 }

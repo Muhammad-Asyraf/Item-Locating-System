@@ -1,4 +1,4 @@
-const { admin } = require('../firebase/auth');
+const admin = require('../firebase');
 const getLogger = require('../utils/logger');
 
 const authLogger = getLogger(__dirname, 'auth');

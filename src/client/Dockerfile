@@ -10,8 +10,10 @@ COPY package.json ./
 # install our dependency into the container when buidling the image
 RUN npm install --silent
 
+RUN mkdir -p node_modules/.cache && chmod -R 777 node_modules/.cache
+
 # update latest version of npm
-RUN npm install -g npm
+RUN npm install -g npm@latest npm-check-updates --silent
 
 # copy all src/client files to './' = working directory
 COPY . ./

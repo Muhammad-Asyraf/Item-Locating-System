@@ -60,15 +60,13 @@ const Login = () => {
   const dispatch = useDispatch();
   const history = useHistory();
 
-  const [email, setEmail] = useState({
+  const initInput = {
     error: false,
     value: '',
-  });
-  const [password, setPassword] = useState({
-    error: false,
-    showPassword: false,
-    value: '',
-  });
+  };
+
+  const [email, setEmail] = useState(initInput);
+  const [password, setPassword] = useState({ ...initInput, showPassword: false });
 
   const authErrors = useSelector(selectAuthMessage);
   const authLoading = useSelector(selectAuthIsLoading);
@@ -195,8 +193,8 @@ const Login = () => {
                     label="Password"
                     variant="outlined"
                     type={password.showPassword ? 'text' : 'password'}
-                    onChange={validatePassword}
                     onBlur={validatePassword}
+                    onChange={validatePassword}
                     error={password.error}
                     helperText={password.error}
                     inputRef={passwordRef}

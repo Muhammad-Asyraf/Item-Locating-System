@@ -74,69 +74,99 @@ const Login = () => {
   const authErrors = useSelector(selectAuthMessage);
   const authLoading = useSelector(selectAuthIsLoading);
 
-  const [firstName, setFirstName] = useState();
-  const [lastName, setLastName] = useState();
-  const [email, setEmail] = useState();
-  const [password, setPassword] = useState();
-  const [confirmPassword, setConfirmPassword] = useState();
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const initInput = {
+    error: false,
+    value: '',
+  };
 
-  const firstNameRef = useRef();
-  const lastNameRef = useRef();
+  const [fullName, setFullName] = useState(initInput);
+  const [email, setEmail] = useState(initInput);
+  const [password, setPassword] = useState({ ...initInput, showPassword: false });
+
+  const fullNameRef = useRef();
   const emailRef = useRef();
   const passwordRef = useRef();
-  const confirmPasswordRef = useRef();
+
+  const validateFullName = () => {
+    if (!fullNameRef.current.value) {
+      setFullName({
+        ...fullName,
+        error: 'First name is required',
+      });
+    } else {
+      setFullName({
+        ...fullName,
+        error: false,
+        value: fullNameRef.current.value,
+      });
+    }
+  };
+
+  const validateEmail = () => {
+    const reg =
+      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))*$/;
+
+    const value = emailRef.current.value.trim().toLowerCase();
+    const isValidEmail = reg.test(value);
+
+    if (!emailRef.current.value) {
+      setEmail({
+        ...email,
+        error: 'Email is required',
+      });
+    } else if (!isValidEmail) {
+      setEmail({
+        ...email,
+        error: 'Email must be a valid email address',
+      });
+    } else {
+      setEmail({
+        ...email,
+        error: false,
+        value: emailRef.current.value,
+      });
+    }
+  };
+
+  const validatePassword = () => {
+    if (!passwordRef.current.value) {
+      setPassword({
+        ...password,
+        error: 'Password is required',
+      });
+    } else {
+      setPassword({
+        ...password,
+        error: false,
+        value: passwordRef.current.value,
+      });
+    }
+  };
+
+  const handleShowPassword = () => {
+    setPassword({
+      ...password,
+      showPassword: !password.showPassword,
+    });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    console.log(firstName);
-    console.log(lastName);
+    validateFullName();
+    validateEmail();
+    validatePassword();
 
-    if (password === confirmPassword) {
-      console.log('Same');
+    if (fullName.value && email.value && password.value) {
+      const { type } = await dispatch(
+        signup({ firebase: auth, email: email.value, password: password.value })
+      );
+
+      if (type.includes('fulfilled')) {
+        history.push('/dashboard');
+      }
+      dispatch(verified());
     }
-    const { type } = await dispatch(signup({ firebase: auth, email, password }));
-
-    if (type.includes('fulfilled')) {
-      history.push('/dashboard');
-    }
-    dispatch(verified());
-  };
-
-  const onChangeFirstName = () => {
-    setFirstName(firstNameRef.current.value);
-  };
-
-  const onChangeLastName = () => {
-    setLastName(lastNameRef.current.value);
-  };
-
-  const onChangeEmail = () => {
-    setEmail(emailRef.current.value);
-  };
-  const onChangePassword = () => {
-    setPassword(passwordRef.current.value);
-  };
-
-  const onChangeConfirmPassword = () => {
-    setConfirmPassword(confirmPasswordRef.current.value);
-  };
-
-  const handleMouseDownPassword = () => {
-    setShowPassword(!showPassword);
-  };
-
-  const handleMouseDownConfirmPassword = () => {
-    setShowConfirmPassword(!showConfirmPassword);
-  };
-
-  const handleClickShowPassword = () => {
-    setShowPassword(!showPassword);
-  };
-  const handleClickShowConfirmPassword = () => {
-    setShowConfirmPassword(!showConfirmPassword);
   };
 
   return (
@@ -181,23 +211,16 @@ const Login = () => {
                 style={{ flexGrow: 1 }}
               >
                 <Grid container spacing={2} style={{ marginTop: '0px' }}>
-                  <Grid item sm={12} md={6} style={{ width: '100%' }}>
+                  <Grid item sm={12}>
                     <TextField
-                      id="firstName"
-                      label="First Name"
+                      id="fullName"
+                      label="Full Name"
                       variant="outlined"
-                      onChange={onChangeFirstName}
-                      inputRef={firstNameRef}
-                      className={classes.inputFields}
-                    />
-                  </Grid>
-                  <Grid item sm={12} md={6} style={{ width: '100%' }}>
-                    <TextField
-                      id="lastName"
-                      label="Last Name"
-                      variant="outlined"
-                      onChange={onChangeLastName}
-                      inputRef={lastNameRef}
+                      onBlur={validateFullName}
+                      onChange={validateFullName}
+                      error={fullName.error}
+                      helperText={fullName.error}
+                      inputRef={fullNameRef}
                       className={classes.inputFields}
                     />
                   </Grid>
@@ -206,7 +229,10 @@ const Login = () => {
                       id="email"
                       label="Email"
                       variant="outlined"
-                      onChange={onChangeEmail}
+                      onBlur={validateEmail}
+                      onChange={validateEmail}
+                      error={email.error}
+                      helperText={email.error}
                       inputRef={emailRef}
                       className={classes.inputFields}
                     />
@@ -216,8 +242,11 @@ const Login = () => {
                       id="password"
                       label="Password"
                       variant="outlined"
-                      type={showPassword ? 'text' : 'password'}
-                      onChange={onChangePassword}
+                      type={password.showPassword ? 'text' : 'password'}
+                      onBlur={validatePassword}
+                      onChange={validatePassword}
+                      error={password.error}
+                      helperText={password.error}
                       inputRef={passwordRef}
                       className={classes.inputFields}
                       InputProps={{
@@ -225,34 +254,10 @@ const Login = () => {
                           <InputAdornment position="end">
                             <IconButton
                               aria-label="toggle password visibility"
-                              onClick={handleClickShowPassword}
-                              onMouseDown={handleMouseDownPassword}
+                              onClick={handleShowPassword}
+                              onMouseDown={handleShowPassword}
                             >
-                              {showPassword ? <Visibility /> : <VisibilityOff />}
-                            </IconButton>
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      id="confirmPassword"
-                      label="Confirm Password"
-                      variant="outlined"
-                      type={showConfirmPassword ? 'text' : 'password'}
-                      onChange={onChangeConfirmPassword}
-                      inputRef={confirmPasswordRef}
-                      className={classes.inputFields}
-                      InputProps={{
-                        endAdornment: (
-                          <InputAdornment position="end">
-                            <IconButton
-                              aria-label="toggle password visibility"
-                              onClick={handleClickShowConfirmPassword}
-                              onMouseDown={handleMouseDownConfirmPassword}
-                            >
-                              {showConfirmPassword ? (
+                              {password.showPassword ? (
                                 <Visibility />
                               ) : (
                                 <VisibilityOff />
@@ -268,7 +273,12 @@ const Login = () => {
                       variant="contained"
                       color="primary"
                       type="submit"
-                      disabled={authLoading}
+                      disabled={
+                        authLoading ||
+                        fullName.error ||
+                        email.error ||
+                        password.error
+                      }
                       className={classes.submitButton}
                     >
                       {authLoading ? (

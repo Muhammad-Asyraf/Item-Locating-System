@@ -23,6 +23,7 @@
     "arrow-body-style": ["error", "as-needed"],
     "no-param-reassign": 0,
     "object-curly-newline": "off",
-    "react/jsx-props-no-spreading": "off"
+    "react/jsx-props-no-spreading": "off",
+    "operator-linebreak": [2, "after"]
   }
 }

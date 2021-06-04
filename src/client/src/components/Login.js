@@ -60,9 +60,15 @@ const Login = () => {
   const dispatch = useDispatch();
   const history = useHistory();
 
-  const [email, setEmail] = useState();
-  const [password, setPassword] = useState();
-  const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState({
+    error: false,
+    value: '',
+  });
+  const [password, setPassword] = useState({
+    error: false,
+    showPassword: false,
+    value: '',
+  });
 
   const authErrors = useSelector(selectAuthMessage);
   const authLoading = useSelector(selectAuthIsLoading);
@@ -70,31 +76,71 @@ const Login = () => {
   const emailRef = useRef();
   const passwordRef = useRef();
 
+  const validateEmail = () => {
+    const reg =
+      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))*$/;
+
+    const value = emailRef.current.value.trim().toLowerCase();
+    const isValidEmail = reg.test(value);
+
+    if (!emailRef.current.value) {
+      setEmail({
+        ...email,
+        error: 'Email is required',
+      });
+    } else if (!isValidEmail) {
+      setEmail({
+        ...email,
+        error: 'Email must be a valid email address',
+      });
+    } else {
+      setEmail({
+        ...email,
+        error: false,
+        value: emailRef.current.value,
+      });
+    }
+  };
+
+  const validatePassword = () => {
+    if (!passwordRef.current.value) {
+      setPassword({
+        ...password,
+        error: 'Password is required',
+      });
+    } else {
+      setPassword({
+        ...password,
+        error: false,
+        value: passwordRef.current.value,
+      });
+    }
+  };
+
+  const handleShowPassword = () => {
+    setPassword({
+      ...password,
+      showPassword: !password.showPassword,
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { type } = await dispatch(login({ firebase: auth, email, password }));
 
-    if (type.includes('fulfilled')) {
-      history.push('/dashboard');
+    validateEmail();
+    validatePassword();
+
+    if (email.value && password.value) {
+      const { type } = await dispatch(
+        login({ firebase: auth, email: email.value, password: password.value })
+      );
+
+      if (type.includes('fulfilled')) {
+        history.push('/dashboard');
+      }
+
+      dispatch(verified());
     }
-
-    dispatch(verified());
-  };
-
-  const onChangeEmail = () => {
-    setEmail(emailRef.current.value);
-  };
-
-  const onChangePassword = () => {
-    setPassword(passwordRef.current.value);
-  };
-
-  const handleMouseDownPassword = () => {
-    setShowPassword(!showPassword);
-  };
-
-  const handleClickShowPassword = () => {
-    setShowPassword(!showPassword);
   };
 
   return (
@@ -135,7 +181,10 @@ const Login = () => {
                     id="email"
                     label="Email"
                     variant="outlined"
-                    onChange={onChangeEmail}
+                    onBlur={validateEmail}
+                    onChange={validateEmail}
+                    error={email.error}
+                    helperText={email.error}
                     inputRef={emailRef}
                     className={classes.inputFields}
                   />
@@ -145,8 +194,11 @@ const Login = () => {
                     id="password"
                     label="Password"
                     variant="outlined"
-                    type={showPassword ? 'text' : 'password'}
-                    onChange={onChangePassword}
+                    type={password.showPassword ? 'text' : 'password'}
+                    onChange={validatePassword}
+                    onBlur={validatePassword}
+                    error={password.error}
+                    helperText={password.error}
                     inputRef={passwordRef}
                     className={classes.inputFields}
                     InputProps={{
@@ -154,10 +206,14 @@ const Login = () => {
                         <InputAdornment position="end">
                           <IconButton
                             aria-label="toggle password visibility"
-                            onClick={handleClickShowPassword}
-                            onMouseDown={handleMouseDownPassword}
+                            onClick={handleShowPassword}
+                            onMouseDown={handleShowPassword}
                           >
-                            {showPassword ? <Visibility /> : <VisibilityOff />}
+                            {password.showPassword ? (
+                              <Visibility />
+                            ) : (
+                              <VisibilityOff />
+                            )}
                           </IconButton>
                         </InputAdornment>
                       ),
@@ -169,7 +225,7 @@ const Login = () => {
                     variant="contained"
                     color="primary"
                     type="submit"
-                    disabled={authLoading}
+                    disabled={authLoading || email.error || password.error}
                     className={classes.submitButton}
                   >
                     {authLoading ? (

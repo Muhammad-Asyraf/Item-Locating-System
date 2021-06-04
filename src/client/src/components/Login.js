@@ -65,7 +65,7 @@ const Login = () => {
     value: '',
   };
 
-  const [email, setEmail] = useState(initInput);
+  const [email, setEmail] = useState({ ...initInput, blurOnce: false });
   const [password, setPassword] = useState({ ...initInput, showPassword: false });
 
   const authErrors = useSelector(selectAuthMessage);
@@ -74,19 +74,26 @@ const Login = () => {
   const emailRef = useRef();
   const passwordRef = useRef();
 
-  const validateEmail = () => {
+  /* eslint-disable no-useless-escape */
+  const validateEmail = (outOfFocus = false) => {
     const reg =
-      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))*$/;
+      /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))*$/;
 
     const value = emailRef.current.value.trim().toLowerCase();
     const isValidEmail = reg.test(value);
 
-    if (!emailRef.current.value) {
+    if (emailRef.current.value && outOfFocus === true && email.blurOnce === false) {
+      setEmail({
+        ...email,
+        blurOnce: true,
+        error: !isValidEmail ? 'Email must be a valid email address' : false,
+      });
+    } else if (!emailRef.current.value) {
       setEmail({
         ...email,
         error: 'Email is required',
       });
-    } else if (!isValidEmail) {
+    } else if (!isValidEmail && email.blurOnce === true) {
       setEmail({
         ...email,
         error: 'Email must be a valid email address',
@@ -179,9 +186,9 @@ const Login = () => {
                     id="email"
                     label="Email"
                     variant="outlined"
-                    onBlur={validateEmail}
+                    onBlur={() => validateEmail(true)}
                     onChange={validateEmail}
-                    error={email.error}
+                    error={email.error !== false}
                     helperText={email.error}
                     inputRef={emailRef}
                     className={classes.inputFields}
@@ -195,7 +202,7 @@ const Login = () => {
                     type={password.showPassword ? 'text' : 'password'}
                     onBlur={validatePassword}
                     onChange={validatePassword}
-                    error={password.error}
+                    error={password.error !== false}
                     helperText={password.error}
                     inputRef={passwordRef}
                     className={classes.inputFields}
@@ -223,7 +230,11 @@ const Login = () => {
                     variant="contained"
                     color="primary"
                     type="submit"
-                    disabled={authLoading || email.error || password.error}
+                    disabled={
+                      authLoading === true ||
+                      email.error !== false ||
+                      password.error !== false
+                    }
                     className={classes.submitButton}
                   >
                     {authLoading ? (

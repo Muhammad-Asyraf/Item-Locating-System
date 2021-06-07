@@ -1,0 +1,17 @@
+com/loketla/app/BuildConfig.java
+ com.loketla.app.BuildConfig
+com/loketla/app/generated/BasePackageList.java
+ com.loketla.app.generated.BasePackageList
+com/app/ReactNativeFlipper.java
+ com.app.ReactNativeFlipper
+ com.app.ReactNativeFlipper$1
+ com.app.ReactNativeFlipper$2
+ com.app.ReactNativeFlipper$2$1
+com/loketla/app/MainApplication.java
+ com.loketla.app.MainApplication
+ com.loketla.app.MainApplication$1
+com/loketla/app/MainActivity.java
+ com.loketla.app.MainActivity
+ com.loketla.app.MainActivity$1
+com/facebook/react/PackageList.java
+ com.facebook.react.PackageList

@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "613380780578",
+    "project_id": "loketla",
+    "storage_bucket": "loketla.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:613380780578:android:2230fdc50ec972be16107b",
+        "android_client_info": {
+          "package_name": "com.loketla.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "613380780578-9nd27th42uj27kc68t7v4j4n4on35j92.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDbLjjQP-Jp6y0NhhqXNe5wrtgwZhjeFXg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "613380780578-9nd27th42uj27kc68t7v4j4n4on35j92.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "613380780578-98pb984sgfr512qperjf7asalbkfhtd0.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.loketla.app"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -92,7 +92,7 @@ api-test:
   artifacts:
     paths:
       - src/server/apis/test/report.html
-    expire_in: 4 day
+    expire_in: 3 day
     when: always
   allow_failure: true
   interruptible: true

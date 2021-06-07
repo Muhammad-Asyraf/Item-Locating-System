@@ -46,3 +46,5 @@ src/app/web-build/
 
 # macOS
 src/app/.DS_Store
+
+src/app/android/local.properties

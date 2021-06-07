@@ -30,7 +30,7 @@ const useStyles = makeStyles((theme) => ({
     },
     // minWidth: 275,
     width: 500,
-    borderRadius: '10px',
+    borderRadius: '8px',
   },
   form: {
     '& > *': {
@@ -158,14 +158,15 @@ const Login = () => {
         justify="center"
         style={{
           minHeight: '100vh',
-          backgroundColor: '#0984e3',
+          backgroundColor: 'rgb(246, 248, 251)',
+          // backgroundColor: '#007AFF',
         }}
       >
-        <Card elevation={5} className={classes.card}>
+        <Card elevation={1} className={classes.card}>
           <CardContent style={{ marginLeft: '20px', marginRight: '20px' }}>
             <Grid item xs={12}>
               <h1 style={{ marginTop: '30px', fontSize: '35px' }}>
-                <span style={{ color: '#0984e3' }}>LOKETLA</span> Login
+                <span style={{ color: '#007AFF' }}>LOKETLA</span> Login
               </h1>
             </Grid>
             <Grid item xs={12}>

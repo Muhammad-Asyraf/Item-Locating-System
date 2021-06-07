@@ -3,6 +3,7 @@ import { useDispatch } from 'react-redux';
 import { withRouter, Switch, Route } from 'react-router-dom';
 
 import { makeStyles } from '@material-ui/core/styles';
+import Container from '@material-ui/core/Container';
 
 import Drawer from './Drawer';
 import AppBars from './AppBars';
@@ -25,9 +26,10 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   toolbar: theme.mixins.toolbar,
-  content: {
-    flexGrow: 1,
-    padding: theme.spacing(3),
+  container: {
+    // flexGrow: 1,
+    // padding: theme.spacing(3),
+    padding: '70px 30px 10px 30px',
     backgroundColor: 'rgb(248, 248, 248)',
   },
 }));
@@ -58,14 +60,13 @@ const Dashboard = (props) => {
         />
         <Drawer type="Desktop" />
       </nav>
-      <main className={classes.content}>
-        <div className={classes.toolbar} />
+      <Container maxWidth="xl" className={classes.container}>
         <Switch>
           <Route path={`${match.path}`} exact component={Home} />
           <Route path={`${match.path}/inventory`} component={Inventory} />
           <Route path={`${match.path}/sales`} component={Sales} />
         </Switch>
-      </main>
+      </Container>
     </div>
   );
 };

@@ -32,7 +32,7 @@ const useStyles = makeStyles((theme) => ({
     width: '40%',
     minWidth: '376px',
     maxHeight: '650px',
-    borderRadius: '10px',
+    borderRadius: '8px',
   },
   cardContent: {
     flexGrow: 1,
@@ -186,10 +186,11 @@ const Login = () => {
         style={{
           minHeight: '100vh',
           minWidth: '100vw',
-          backgroundColor: '#0984e3',
+          backgroundColor: 'rgb(246, 248, 251)',
+          // backgroundColor: '#0984e3',
         }}
       >
-        <Card elevation={5} className={classes.card}>
+        <Card elevation={2} className={classes.card}>
           <CardContent className={classes.cardContent}>
             <Grid container spacing={0}>
               <Grid item xs={12}>
@@ -200,7 +201,7 @@ const Login = () => {
                     fontSize: '35px',
                   }}
                 >
-                  <span style={{ color: '#0984e3' }}>LOKETLA</span> Sign Up
+                  <span style={{ color: '#007AFF' }}>LOKETLA</span> Sign Up
                 </h1>
               </Grid>
               <Grid item xs={12} style={{ marginBottom: '10px' }}>
@@ -290,7 +291,7 @@ const Login = () => {
                       {authLoading ? (
                         <CircularProgress size={20}> </CircularProgress>
                       ) : (
-                        <>Sign In</>
+                        <>Sign Up</>
                       )}
                     </Button>
                   </Grid>

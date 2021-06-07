@@ -177,11 +177,7 @@ const Login = () => {
               )}
             </Grid>
             <Grid item xs={12}>
-              <form
-                className={classes.form}
-                onSubmit={handleSubmit}
-                autoComplete="on"
-              >
+              <form className={classes.form} onSubmit={handleSubmit} autoComplete="on">
                 <Grid item xs={12}>
                   <TextField
                     id="email"
@@ -215,11 +211,7 @@ const Login = () => {
                             onClick={handleShowPassword}
                             onMouseDown={handleShowPassword}
                           >
-                            {password.showPassword ? (
-                              <Visibility />
-                            ) : (
-                              <VisibilityOff />
-                            )}
+                            {password.showPassword ? <Visibility /> : <VisibilityOff />}
                           </IconButton>
                         </InputAdornment>
                       ),

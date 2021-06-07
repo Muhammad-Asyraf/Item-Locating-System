@@ -3,5 +3,6 @@ semi: true
 trailingComma: 'es5'
 tabWidth: 2
 quoteProps: 'as-needed'
-proseWrap: 'always'
+# proseWrap: 'always'
 bracketSpacing: True
+printWidth: 85

@@ -29,6 +29,7 @@ src/server/coverage
 src/server/apis/test/report.html
 src/server/logs
 src/server/.env
+src/server/components/auth/firebase/service_acount_key.json
 
 .env
 

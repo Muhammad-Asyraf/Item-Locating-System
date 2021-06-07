@@ -1,7 +1,8 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { withRouter } from 'react-router-dom';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import 'react-perfect-scrollbar/dist/css/styles.css';
+import { loadCSS } from 'fg-loadcss';
 
 import { Drawer as MUIDrawer, useMediaQuery } from '@material-ui/core';
 // import Divider from '@material-ui/core/Divider';
@@ -9,7 +10,11 @@ import Hidden from '@material-ui/core/Hidden';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
+import Collapse from '@material-ui/core/Collapse';
 
+import Icon from '@material-ui/core/Icon';
+import ExpandLess from '@material-ui/icons/ExpandLess';
+import ExpandMore from '@material-ui/icons/ExpandMore';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import DashboardRoundedIcon from '@material-ui/icons/DashboardRounded';
 import MonetizationOnIcon from '@material-ui/icons/MonetizationOn';
@@ -50,6 +55,9 @@ const useStyles = makeStyles((theme) => ({
     color: '#007AFF !important',
     fontWeight: 600,
   },
+  nested: {
+    paddingLeft: theme.spacing(4),
+  },
 }));
 
 /* eslint-disable react/prop-types */
@@ -60,24 +68,45 @@ const Drawer = (props) => {
   const theme = useTheme();
   const isDesktop = useMediaQuery(theme.breakpoints.up('lg'));
   const container = window !== undefined ? () => window().document.body : undefined;
+  const [open, setOpen] = useState(false);
+
+  const handleClick = (path) => {
+    history.push(path);
+    if (type === 'Mobile') {
+      handleDrawerToggle();
+    }
+  };
+
   const itemsList = [
     {
       text: 'Dashboard',
       path: `${match.path}`,
       icon: <DashboardRoundedIcon fontSize="large" />,
-      onClick: () => history.push(`${match.path}`),
+      onClick: () => handleClick(`${match.path}`),
     },
     {
       text: 'Inventory',
       path: `${match.path}/inventory`,
       icon: <StoreRoundedIcon fontSize="large" />,
-      onClick: () => history.push(`${match.path}/inventory`),
+      onClick: () => setOpen(!open),
+      itemListDetails: [
+        {
+          _text: 'List',
+          _path: `${match.path}/inventory/List`,
+          _onClick: () => handleClick(`${match.path}/inventory/list`),
+        },
+        {
+          _text: 'Create',
+          _path: `${match.path}/inventory/Create`,
+          _onClick: () => handleClick(`${match.path}/inventory/create`),
+        },
+      ],
     },
     {
       text: 'Sales',
       path: `${match.path}/sales`,
       icon: <MonetizationOnIcon fontSize="large" />,
-      onClick: () => history.push(`${match.path}/sales`),
+      onClick: () => handleClick(`${match.path}/sales`),
     },
   ];
 
@@ -90,7 +119,17 @@ const Drawer = (props) => {
     }
   }, [isDesktop]);
 
-  console.log(props);
+  useEffect(() => {
+    const node = loadCSS(
+      'https://use.fontawesome.com/releases/v5.12.0/css/all.css',
+      document.querySelector('#font-awesome-css')
+    );
+
+    return () => {
+      node.parentNode.removeChild(node);
+    };
+  }, []);
+
   return (
     <Hidden
       mdDown={type === 'Desktop' && true}
@@ -113,22 +152,58 @@ const Drawer = (props) => {
             {/* <div className={classes.toolbar} /> */}
             {/* <Divider /> */}
             <List>
-              {itemsList.map(({ text, path, icon, onClick }) => (
-                <ListItem
-                  button
-                  key={text}
-                  onClick={onClick}
-                  classes={{ selected: classes.selected }}
-                  selected={location.pathname === path}
-                >
-                  <ListItemIcon className={classes.listItemIcons}>
-                    {icon}
-                  </ListItemIcon>
-                  <ListItemText className={classes.listItemTexts}>
-                    {text}
-                  </ListItemText>
-                </ListItem>
-              ))}
+              {itemsList.map(
+                ({ text, path, icon, onClick, itemListDetails = [] }) => {
+                  const isExpandable = itemListDetails && itemListDetails.length > 0;
+                  return (
+                    <div key={text}>
+                      <ListItem
+                        button
+                        classes={{ selected: classes.selected }}
+                        selected={location.pathname === path}
+                        onClick={onClick}
+                      >
+                        <ListItemIcon className={classes.listItemIcons}>
+                          {icon}
+                        </ListItemIcon>
+                        <ListItemText className={classes.listItemTexts}>
+                          {text}
+                        </ListItemText>
+                        {/* {isExpandable && open ? <ExpandLess /> : <ExpandMore />} */}
+                        {isExpandable && !open && (
+                          <ExpandMore style={{ transform: 'rotate(-90deg)' }} />
+                        )}
+                        {isExpandable && open && (
+                          <ExpandLess style={{ transform: 'rotate(180deg)' }} />
+                        )}
+                      </ListItem>
+                      {isExpandable && (
+                        <Collapse in={open} timeout="auto" unmountOnExit>
+                          <List component="div" disablePadding>
+                            {itemListDetails.map(({ _text, _path, _onClick }) => (
+                              <ListItem
+                                button
+                                key={_text}
+                                className={classes.nested}
+                                onClick={_onClick}
+                                selected={location.pathname === _path}
+                              >
+                                <ListItemIcon>
+                                  <Icon
+                                    className="fas fa-circle"
+                                    style={{ fontSize: 5 }}
+                                  />
+                                </ListItemIcon>
+                                <ListItemText>{_text}</ListItemText>
+                              </ListItem>
+                            ))}
+                          </List>
+                        </Collapse>
+                      )}
+                    </div>
+                  );
+                }
+              )}
             </List>
           </MUIDrawer>
         </PerfectScrollbar>

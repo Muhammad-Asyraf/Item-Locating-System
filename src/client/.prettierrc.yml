@@ -5,4 +5,4 @@ tabWidth: 2
 quoteProps: 'as-needed'
 # proseWrap: 'always'
 bracketSpacing: True
-printWidth: 85
+printWidth: 90

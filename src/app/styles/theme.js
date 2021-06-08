@@ -6,7 +6,7 @@ export default function Theme() {
     colors: {
       ...DefaultTheme.colors,
       primary: "#007AFF",
-      accent: "white",
+      background: "white",
     },
   };
 }

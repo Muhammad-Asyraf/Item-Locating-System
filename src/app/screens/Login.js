@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { StyleSheet, ScrollView, View, Text } from "react-native";
 import { TextInput, Title, Paragraph, Button } from "react-native-paper";
-import Icon from "react-native-vector-icons/AntDesign";
 import auth from "@react-native-firebase/auth";
 
 export default function Login() {
@@ -39,13 +38,17 @@ export default function Login() {
           console.log("That email address is invalid!");
         }
 
+        if (error.code === "auth/user-not-found") {
+          // Error handling here
+        }
+
         console.error(error);
       });
   };
 
   const validateEmail = (text) => {
     let reg =
-      /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+    /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     if (reg.test(text) === false) {
       console.log("Email is Not Correct");
       return false;

@@ -4,6 +4,7 @@ exports.up = async (knex) => {
   await knex.schema.createTable(tableNames.merchant, (table) => {
     table.increments().notNullable();
     table.uuid('UUID').notNullable().unique();
+    table.string('full_name').notNullable();
     table.string('email').notNullable().unique();
     table.string('password').notNullable();
     table.timestamps(true, true);

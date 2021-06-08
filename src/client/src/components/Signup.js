@@ -163,10 +163,15 @@ const Login = () => {
     validateEmail();
     validatePassword();
 
+    const data = {
+      firebase: auth,
+      fullName: fullName.value,
+      email: email.value,
+      password: password.value,
+    };
+
     if (fullName.value && email.value && password.value) {
-      const { type } = await dispatch(
-        signup({ firebase: auth, email: email.value, password: password.value })
-      );
+      const { type } = await dispatch(signup(data));
 
       if (type.includes('fulfilled')) {
         history.push('/dashboard');

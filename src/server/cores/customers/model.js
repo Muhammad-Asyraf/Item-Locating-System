@@ -15,7 +15,7 @@ class Customer extends Model {
       type: 'object',
       title: 'Customer',
       description: 'The customer schema',
-      required: ['UUID', 'first_name', 'last_name', 'email', 'password'],
+      required: ['UUID', 'email', 'username', 'password'],
       properties: {
         UUID: {
           $id: '#/properties/UUID',
@@ -25,19 +25,12 @@ class Customer extends Model {
           description: 'The customer UUID.',
           examples: ['1dafa876-7f8c-45f8-a39a-a43d3d7774c3'],
         },
-        first_name: {
-          $id: '#/properties/first_name',
+        full_name: {
+          $id: '#/properties/full_name',
           type: 'string',
-          title: 'The first_name schema',
+          title: 'The full_name schema',
           description: 'The customer first name.',
-          examples: ['Muhammad'],
-        },
-        last_name: {
-          $id: '#/properties/last_name',
-          type: 'string',
-          title: 'The last_name schema',
-          description: 'The customer last name.',
-          examples: ['Asyraf'],
+          examples: ['Muhammad Asyraf'],
         },
         email: {
           $id: '#/properties/email',
@@ -45,6 +38,13 @@ class Customer extends Model {
           title: 'The email schema',
           description: 'The customer email. must be unique',
           examples: ['asyraf.rmc@gmail.com'],
+        },
+        username: {
+          $id: '#/properties/username',
+          type: 'string',
+          title: 'The username schema',
+          description: 'The customer username. must be unique',
+          examples: ['asyraf131'],
         },
         password: {
           $id: '#/properties/password',

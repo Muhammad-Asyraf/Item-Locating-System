@@ -88,7 +88,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const InventoryList = () => {
+const ItemList = () => {
   const classes = useStyles();
   const [order, setOrder] = React.useState('asc');
   const [orderBy, setOrderBy] = React.useState('calories');
@@ -219,4 +219,4 @@ const InventoryList = () => {
   );
 };
 
-export default InventoryList;
+export default ItemList;

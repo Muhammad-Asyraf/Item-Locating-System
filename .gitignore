@@ -48,3 +48,5 @@ src/app/web-build/
 src/app/.DS_Store
 
 src/app/android/local.properties
+src/app/android/local.properties
+.android/local.properties

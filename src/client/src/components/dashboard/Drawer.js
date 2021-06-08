@@ -13,12 +13,13 @@ import ListItemText from '@material-ui/core/ListItemText';
 import Collapse from '@material-ui/core/Collapse';
 
 import Icon from '@material-ui/core/Icon';
+import SupervisorAccountRoundedIcon from '@material-ui/icons/SupervisorAccountRounded';
+import LocalShippingRoundedIcon from '@material-ui/icons/LocalShippingRounded';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import DashboardRoundedIcon from '@material-ui/icons/DashboardRounded';
-import MonetizationOnIcon from '@material-ui/icons/MonetizationOn';
-import StoreRoundedIcon from '@material-ui/icons/StoreRounded';
+import LocalOfferRoundedIcon from '@material-ui/icons/LocalOfferRounded';
 
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 
@@ -31,13 +32,11 @@ const useStyles = makeStyles((theme) => ({
   toolbar: theme.mixins.toolbar,
   drawerPaper: {
     width: drawerWidth,
-    boxShadow:
-      'rgb(159 162 191 / 18%) 2px 0px 3px, rgb(159 162 191 / 32%) 1px 0px 1px',
+    boxShadow: 'rgb(159 162 191 / 18%) 2px 0px 3px, rgb(159 162 191 / 32%) 1px 0px 1px',
   },
   drawerPaperCurve: {
     width: drawerWidth,
-    boxShadow:
-      'rgb(159 162 191 / 18%) 2px 0px 3px, rgb(159 162 191 / 32%) 1px 0px 1px',
+    boxShadow: 'rgb(159 162 191 / 18%) 2px 0px 3px, rgb(159 162 191 / 32%) 1px 0px 1px',
     borderRadius: '0px 8px 8px 0px',
   },
   listItem: {
@@ -63,8 +62,7 @@ const useStyles = makeStyles((theme) => ({
 /* eslint-disable react/prop-types */
 const Drawer = (props) => {
   const classes = useStyles();
-  const { history, window, type, status, handleDrawerToggle, match, location } =
-    props;
+  const { history, window, type, status, handleDrawerToggle, match, location } = props;
   const theme = useTheme();
   const isDesktop = useMediaQuery(theme.breakpoints.up('lg'));
   const container = window !== undefined ? () => window().document.body : undefined;
@@ -85,28 +83,46 @@ const Drawer = (props) => {
       onClick: () => handleClick(`${match.path}`),
     },
     {
-      text: 'Inventory',
-      path: `${match.path}/inventory`,
-      icon: <StoreRoundedIcon fontSize="large" />,
+      text: 'Sales',
+      path: `${match.path}/sales`,
+      icon: <Icon className="fas fa-cash-register" style={{ fontSize: 30, margin: 3 }} />,
+      onClick: () => handleClick(`${match.path}/sales`),
+    },
+    {
+      text: 'Item',
+      path: `${match.path}/item`,
+      icon: <LocalOfferRoundedIcon fontSize="large" />,
       onClick: () => setOpen(!open),
       itemListDetails: [
         {
           _text: 'List',
-          _path: `${match.path}/inventory/List`,
-          _onClick: () => handleClick(`${match.path}/inventory/list`),
+          _path: `${match.path}/item/List`,
+          _onClick: () => handleClick(`${match.path}/item/list`),
         },
         {
           _text: 'Create',
-          _path: `${match.path}/inventory/Create`,
-          _onClick: () => handleClick(`${match.path}/inventory/create`),
+          _path: `${match.path}/item/Create`,
+          _onClick: () => handleClick(`${match.path}/item/create`),
         },
       ],
     },
     {
-      text: 'Sales',
-      path: `${match.path}/sales`,
-      icon: <MonetizationOnIcon fontSize="large" />,
-      onClick: () => handleClick(`${match.path}/sales`),
+      text: 'Store Layout',
+      path: `${match.path}/store-layout`,
+      icon: <Icon className="fas fa-map-pin" style={{ fontSize: 30, marginLeft: 8 }} />,
+      onClick: () => handleClick(`${match.path}/store-layout`),
+    },
+    {
+      text: 'Supplier',
+      path: `${match.path}/supplier`,
+      icon: <LocalShippingRoundedIcon fontSize="large" />,
+      onClick: () => handleClick(`${match.path}/supplier`),
+    },
+    {
+      text: 'Employees',
+      path: `${match.path}/employees`,
+      icon: <SupervisorAccountRoundedIcon fontSize="large" />,
+      onClick: () => handleClick(`${match.path}/employees`),
     },
   ];
 
@@ -141,8 +157,7 @@ const Drawer = (props) => {
           <MUIDrawer
             container={type === 'Mobile' ? container : null}
             classes={{
-              paper:
-                type === 'Mobile' ? classes.drawerPaper : classes.drawerPaperCurve,
+              paper: type === 'Mobile' ? classes.drawerPaper : classes.drawerPaperCurve,
             }}
             variant={type === 'Mobile' ? 'temporary' : 'permanent'}
             anchor="left"
@@ -152,58 +167,56 @@ const Drawer = (props) => {
             {/* <div className={classes.toolbar} /> */}
             {/* <Divider /> */}
             <List>
-              {itemsList.map(
-                ({ text, path, icon, onClick, itemListDetails = [] }) => {
-                  const isExpandable = itemListDetails && itemListDetails.length > 0;
-                  return (
-                    <div key={text}>
-                      <ListItem
-                        button
-                        classes={{ selected: classes.selected }}
-                        selected={location.pathname === path}
-                        onClick={onClick}
-                      >
-                        <ListItemIcon className={classes.listItemIcons}>
-                          {icon}
-                        </ListItemIcon>
-                        <ListItemText className={classes.listItemTexts}>
-                          {text}
-                        </ListItemText>
-                        {/* {isExpandable && open ? <ExpandLess /> : <ExpandMore />} */}
-                        {isExpandable && !open && (
-                          <ExpandMore style={{ transform: 'rotate(-90deg)' }} />
-                        )}
-                        {isExpandable && open && (
-                          <ExpandLess style={{ transform: 'rotate(180deg)' }} />
-                        )}
-                      </ListItem>
-                      {isExpandable && (
-                        <Collapse in={open} timeout="auto" unmountOnExit>
-                          <List component="div" disablePadding>
-                            {itemListDetails.map(({ _text, _path, _onClick }) => (
-                              <ListItem
-                                button
-                                key={_text}
-                                className={classes.nested}
-                                onClick={_onClick}
-                                selected={location.pathname === _path}
-                              >
-                                <ListItemIcon>
-                                  <Icon
-                                    className="fas fa-circle"
-                                    style={{ fontSize: 5 }}
-                                  />
-                                </ListItemIcon>
-                                <ListItemText>{_text}</ListItemText>
-                              </ListItem>
-                            ))}
-                          </List>
-                        </Collapse>
+              {itemsList.map(({ text, path, icon, onClick, itemListDetails = [] }) => {
+                const isExpandable = itemListDetails && itemListDetails.length > 0;
+                return (
+                  <div key={text}>
+                    <ListItem
+                      button
+                      classes={{ selected: classes.selected }}
+                      selected={location.pathname === path}
+                      onClick={onClick}
+                    >
+                      <ListItemIcon className={classes.listItemIcons}>
+                        {icon}
+                      </ListItemIcon>
+                      <ListItemText className={classes.listItemTexts}>
+                        {text}
+                      </ListItemText>
+                      {/* {isExpandable && open ? <ExpandLess /> : <ExpandMore />} */}
+                      {isExpandable && !open && (
+                        <ExpandMore style={{ transform: 'rotate(-90deg)' }} />
                       )}
-                    </div>
-                  );
-                }
-              )}
+                      {isExpandable && open && (
+                        <ExpandLess style={{ transform: 'rotate(180deg)' }} />
+                      )}
+                    </ListItem>
+                    {isExpandable && (
+                      <Collapse in={open} timeout="auto" unmountOnExit>
+                        <List component="div" disablePadding>
+                          {itemListDetails.map(({ _text, _path, _onClick }) => (
+                            <ListItem
+                              button
+                              key={_text}
+                              className={classes.nested}
+                              onClick={_onClick}
+                              selected={location.pathname === _path}
+                            >
+                              <ListItemIcon>
+                                <Icon
+                                  className="fas fa-circle"
+                                  style={{ fontSize: 5, marginLeft: 30 }}
+                                />
+                              </ListItemIcon>
+                              <ListItemText>{_text}</ListItemText>
+                            </ListItem>
+                          ))}
+                        </List>
+                      </Collapse>
+                    )}
+                  </div>
+                );
+              })}
             </List>
           </MUIDrawer>
         </PerfectScrollbar>

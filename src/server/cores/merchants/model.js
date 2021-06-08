@@ -15,7 +15,7 @@ class Merchant extends Model {
       type: 'object',
       title: 'Merchant',
       description: 'The merchant schema',
-      required: ['UUID', 'email', 'password'],
+      required: ['UUID', 'full_name', 'email', 'password'],
       properties: {
         UUID: {
           $id: '#/properties/UUID',
@@ -24,6 +24,13 @@ class Merchant extends Model {
           title: 'The UUID schema',
           description: 'The merchant UUID.',
           examples: ['1dafa876-7f8c-45f8-a39a-a43d3d7774c3'],
+        },
+        full_name: {
+          $id: '#/properties/full_name',
+          type: 'string',
+          title: 'The full_name schema',
+          description: 'The customer first name.',
+          examples: ['Muhammad Asyraf'],
         },
         email: {
           $id: '#/properties/email',

@@ -1,4 +1,5 @@
 const getLogger = require('../utils/logger');
+const stringUtil = require('../utils/string');
 
 const errorLogger = getLogger(__filename, 'server');
 const errorTypes = {
@@ -6,8 +7,11 @@ const errorTypes = {
   UniqueViolationError: 409,
 };
 const errorMessages = {
-  UniqueViolationError:
-    'The email address is already in use by another account.',
+  UniqueViolationError: {
+    customer_username_unique: stringUtil.getUniqueViolationError('username'),
+    customer_email_unique: stringUtil.getUniqueViolationError('email address'),
+    merchant_email_unique: stringUtil.getUniqueViolationError('email address'),
+  },
 };
 
 const endpointNotFound = (req, res, next) => {
@@ -26,7 +30,9 @@ const errorHandler = (error, req, res, next) => {
   res.status(statusCode);
   const response = {
     status: statusCode,
-    message: errorMessages[error.name] || error.message,
+    message: error.nativeError
+      ? errorMessages[error.name][error.nativeError.constraint]
+      : error.message,
     stack: process.env.NODE_ENV === 'production' ? '🥞' : error.stack,
     errors: error.errors || undefined,
   };

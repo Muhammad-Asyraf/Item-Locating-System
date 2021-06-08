@@ -60,10 +60,10 @@ export const login = createAsyncThunk(
 
 export const signup = createAsyncThunk(
   'auth/signup',
-  async ({ firebase, email, password }, { rejectWithValue, dispatch }) => {
+  async ({ firebase, fullName, email, password }, { rejectWithValue, dispatch }) => {
     try {
       const endpointURL = '/api/backoffice/merchant-service/signup/email';
-      const payload = { email, password };
+      const payload = { fullName, email, password };
 
       await axios.post(endpointURL, payload);
       await dispatch(login({ firebase, email, password }));

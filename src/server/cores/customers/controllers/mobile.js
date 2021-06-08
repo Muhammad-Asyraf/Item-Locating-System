@@ -20,7 +20,7 @@ exports.signup = async (req, res, next) => {
     });
     customerLogger.info(`New customer in postgresDB created: ${customer.UUID}`);
 
-    const { password, ...data } = customer;
+    const { password: psw, ...data } = customer;
 
     const customerFirebase = await admin.auth().createUser({
       uid: customerUUID,

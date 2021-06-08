@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { StyleSheet, ScrollView, View, Text } from "react-native";
 import { TextInput, Title, Paragraph, Button } from "react-native-paper";
-import Icon from "react-native-vector-icons/AntDesign";
 import auth from "@react-native-firebase/auth";
 
 export default function Login() {
@@ -34,9 +33,18 @@ export default function Login() {
         if (error.code === "auth/email-already-in-use") {
           console.log("That email address is already in use!");
         }
+      })
+      .catch((error) => {
+        if (error.code === "auth/email-already-in-use") {
+          console.log("That email address is already in use!");
+        }
 
         if (error.code === "auth/invalid-email") {
           console.log("That email address is invalid!");
+        }
+
+        if (error.code === "auth/user-not-found") {
+          // Error handling here
         }
 
         console.error(error);

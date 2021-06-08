@@ -33,11 +33,6 @@ export default function Login() {
         if (error.code === "auth/email-already-in-use") {
           console.log("That email address is already in use!");
         }
-      })
-      .catch((error) => {
-        if (error.code === "auth/email-already-in-use") {
-          console.log("That email address is already in use!");
-        }
 
         if (error.code === "auth/invalid-email") {
           console.log("That email address is invalid!");
@@ -53,7 +48,7 @@ export default function Login() {
 
   const validateEmail = (text) => {
     let reg =
-      /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+    /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     if (reg.test(text) === false) {
       console.log("Email is Not Correct");
       return false;

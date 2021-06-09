@@ -33,6 +33,7 @@ src/server/components/auth/firebase/service_acount_key.json
 
 .env
 
+# App ignores
 src/app/node_modules/
 src/app/.expo/
 src/app/npm-debug.*
@@ -43,8 +44,13 @@ src/app/*.key
 src/app/*.mobileprovision
 src/app/*.orig.*
 src/app/web-build/
-
-# macOS
 src/app/.DS_Store
 
 src/app/android/local.properties
+src/app/android/.gradle/
+src/app/android/build/
+src/app/android/app/build/
+
+src/app/ios/Pods
+src/app/ios/app.xcodeproj
+src/app/ios/app.xcworkspace

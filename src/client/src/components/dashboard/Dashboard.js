@@ -8,7 +8,7 @@ import Container from '@material-ui/core/Container';
 import Drawer from './Drawer';
 import AppBars from './AppBars';
 
-import Inventory from '../Inventory';
+import Item from '../Item';
 import Sales from '../Sales';
 import Home from '../Home';
 
@@ -63,7 +63,7 @@ const Dashboard = (props) => {
       <Container maxWidth="xl" className={classes.container}>
         <Switch>
           <Route path={`${match.path}`} exact component={Home} />
-          <Route path={`${match.path}/inventory`} component={Inventory} />
+          <Route path={`${match.path}/item`} component={Item} />
           <Route path={`${match.path}/sales`} component={Sales} />
         </Switch>
       </Container>

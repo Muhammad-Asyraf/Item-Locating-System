@@ -6,15 +6,13 @@ exports.seed = async (knex) => {
   await knex('customer').insert([
     {
       UUID: uuidv4(),
-      first_name: 'Muhammad',
-      last_name: 'Asyraf',
+      username: 'asyraf131',
       email: 'asyraf.rmc@gmail.com',
       password: await bcrypt.hash('password123', 10),
     },
     {
       UUID: uuidv4(),
-      first_name: 'Muhammad',
-      last_name: 'Danish',
+      username: 'danish131',
       email: 'danish@gmail.com',
       password: await bcrypt.hash('password123', 10),
     },

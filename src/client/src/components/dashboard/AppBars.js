@@ -19,14 +19,10 @@ import SearchRoundedIcon from '@material-ui/icons/SearchRounded';
 import LockIcon from '@material-ui/icons/Lock';
 import { makeStyles } from '@material-ui/core/styles';
 
-import {
-  clearActiveUser,
-  verifying,
-  verified,
-} from '../../redux/features/authSlice';
+import { clearActiveUser, verifying, verified } from '../../redux/features/authSlice';
 import { auth } from '../../firebase';
 
-const drawerWidth = 280;
+const drawerWidth = 240;
 const useStyles = makeStyles((theme) => ({
   appBar: {
     [theme.breakpoints.up('lg')]: {

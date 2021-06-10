@@ -14,7 +14,7 @@ import Home from '../Home';
 
 import { clearState } from '../../redux/features/authSlice';
 
-const drawerWidth = 280;
+const drawerWidth = 240;
 const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',

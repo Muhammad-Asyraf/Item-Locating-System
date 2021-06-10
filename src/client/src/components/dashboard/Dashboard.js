@@ -1,39 +1,74 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { useHistory } from 'react-router-dom';
+import { withRouter, Switch, Route } from 'react-router-dom';
 
-import Button from '@material-ui/core/Button';
+import { makeStyles } from '@material-ui/core/styles';
+import Container from '@material-ui/core/Container';
 
-import {
-  clearActiveUser,
-  verifying,
-  verified,
-  clearState,
-} from '../../redux/features/authSlice';
-import { auth } from '../../firebase';
+import Drawer from './Drawer';
+import AppBars from './AppBars';
 
-export default function Dashboard() {
+import Item from '../Item';
+import Sales from '../Sales';
+import Home from '../Home';
+
+import { clearState } from '../../redux/features/authSlice';
+
+const drawerWidth = 240;
+const useStyles = makeStyles((theme) => ({
+  root: {
+    display: 'flex',
+  },
+  drawer: {
+    [theme.breakpoints.up('lg')]: {
+      width: drawerWidth,
+      flexShrink: 0,
+    },
+  },
+  toolbar: theme.mixins.toolbar,
+  container: {
+    // flexGrow: 1,
+    // padding: theme.spacing(3),
+    padding: '70px 30px 10px 30px',
+    backgroundColor: 'rgb(248, 248, 248)',
+  },
+}));
+
+/* eslint-disable react/prop-types */
+const Dashboard = (props) => {
+  const [mobileOpen, setMobileOpen] = useState(false);
   const dispatch = useDispatch();
-  const history = useHistory();
+  const classes = useStyles();
+  const { match } = props;
 
   useEffect(() => {
     dispatch(clearState());
   }, []);
 
-  const handleSignOut = async () => {
-    dispatch(verifying());
-    await auth.signOut();
-    dispatch(clearActiveUser());
-    dispatch(verified());
-    history.push('/auth/login');
+  const handleDrawerToggle = () => {
+    setMobileOpen(!mobileOpen);
   };
 
   return (
-    <div>
-      Dashboard Page
-      <Button variant="text" color="primary" onClick={handleSignOut}>
-        Sign Out
-      </Button>
+    <div className={classes.root}>
+      <AppBars handleDrawerToggle={handleDrawerToggle} />
+      <nav className={classes.drawer}>
+        <Drawer
+          type="Mobile"
+          status={mobileOpen}
+          handleDrawerToggle={handleDrawerToggle}
+        />
+        <Drawer type="Desktop" />
+      </nav>
+      <Container maxWidth="xl" className={classes.container}>
+        <Switch>
+          <Route path={`${match.path}`} exact component={Home} />
+          <Route path={`${match.path}/item`} component={Item} />
+          <Route path={`${match.path}/sales`} component={Sales} />
+        </Switch>
+      </Container>
     </div>
   );
-}
+};
+
+export default withRouter(Dashboard);

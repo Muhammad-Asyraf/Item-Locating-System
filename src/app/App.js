@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { StyleSheet, StatusBar, Text } from "react-native";
 import { Provider as PaperProvider } from "react-native-paper";
-import Theme from "./styles/theme";
+import { Theme } from "./styles/theme";
 import {
   useFonts,
   Inter_500Medium as interMedium,
+  Inter_600SemiBold as interSemiBold,
   Inter_700Bold as interBold,
   Inter_800ExtraBold as interBoldExtra,
 } from "@expo-google-fonts/inter";
@@ -12,7 +13,7 @@ import { NavigationContainer } from "@react-navigation/native";
 
 // Navigation
 import AuthTabsNavigator from "./navigation/AuthTabsNavigator";
-import MainTabsNavigator from "./navigation/MainTabsNavigator";
+import MainStackNavigator from "./navigation/MainStackNavigator";
 
 // Auth modules
 import auth from "@react-native-firebase/auth";
@@ -36,6 +37,7 @@ export default function App() {
   // Fonts to be used
   let [fontsLoaded] = useFonts({
     interMedium,
+    interSemiBold,
     interBold,
     interBoldExtra,
   });
@@ -46,9 +48,9 @@ export default function App() {
     if (!user) {
       return (
         // Use NavigationContainer to implement navigation throughout the app
-        <NavigationContainer>
+        <NavigationContainer >
           {/* PaperProvider for global theming */}
-          <PaperProvider theme={Theme()}>
+          <PaperProvider theme={Theme}>
             <AuthTabsNavigator />
           </PaperProvider>
         </NavigationContainer>
@@ -57,18 +59,13 @@ export default function App() {
 
     return (
       // Use NavigationContainer to implement navigation throughout the app
-      <NavigationContainer>
+      <NavigationContainer >
         {/* PaperProvider for global theming */}
-        <PaperProvider theme={Theme()}>
-          <MainTabsNavigator />
+        <PaperProvider theme={Theme}>
+          <MainStackNavigator />
         </PaperProvider>
       </NavigationContainer>
     );
   }
 }
 
-const styles = StyleSheet.create({
-  container: {
-    marginTop: StatusBar.currentHeight,
-  },
-});

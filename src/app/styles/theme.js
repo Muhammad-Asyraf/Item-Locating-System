@@ -18,15 +18,18 @@ export const GlobalStyle = StyleSheet.create({
     backgroundColor: "#F5F5F5",
   },
   searchBar: {
-    marginHorizontal: 24,
-    marginBottom: 18,
-    elevation: 0,
-    height: 40,
-    backgroundColor: "#F5F5F5",
+    marginHorizontal: 18,
+    marginVertical: 24,
+    flexGrow: 1,
+    elevation: 1,
   },
   scrollView:{
-    paddingHorizontal: 24,
+    paddingHorizontal: 22,
     paddingVertical: 18,
+  },
+  flatGrid: {
+    marginHorizontal: 8,
+    paddingVertical: 20
   }
 })
 

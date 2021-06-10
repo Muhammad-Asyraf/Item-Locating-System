@@ -1,7 +1,12 @@
 import React, {useState} from "react";
-import { ScrollView, Text, View } from "react-native";
-import { Appbar, Button, Searchbar } from "react-native-paper";
 import auth from "@react-native-firebase/auth";
+import { ScrollView, Text, View } from "react-native";
+import { Appbar, Button, Searchbar } from "react-native-paper"
+
+// Component imports
+import CartListItem from "../components/CartListItem"
+
+// Styling
 import { GlobalStyle } from "../styles/theme";
 import { appBarStyles } from "../styles/appBarStyles"
 
@@ -30,20 +35,16 @@ export default function Home({ navigation }) {
 
   return (
     <View style={GlobalStyle.screenContainer}>
-      <Appbar.Header style={[appBarStyles.appBarContainer,{elevation:0}]}>
-        <Text style={appBarStyles.appBarTitle}>LOKETLA</Text>
-      </Appbar.Header>
-      <View style={appBarStyles.appBarContainer}>
+      <Appbar.Header style={{backgroundColor: "transparent"}}>
           <Searchbar
             style={GlobalStyle.searchBar}
             placeholder="Search for something"
             onChangeText={handleQueryChange}
             onSubmitEditing={search}
           />
-        </View>
-        
+      </Appbar.Header>
       <ScrollView style={GlobalStyle.scrollView}>
-        <Text>Logged in</Text>
+        <CartListItem />
       </ScrollView>
     </View>
   );

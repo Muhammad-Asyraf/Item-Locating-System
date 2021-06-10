@@ -1,6 +1,7 @@
 import React, {useEffect} from "react";
 import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
 import Icon from 'react-native-vector-icons/MaterialIcons'
+
 // Screens
 import Home from "../screens/Home";
 import Cart from "../screens/Cart";

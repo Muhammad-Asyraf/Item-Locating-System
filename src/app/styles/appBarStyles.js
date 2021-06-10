@@ -16,6 +16,6 @@ export const appBarStyles = StyleSheet.create({
     fontFamily: "interSemiBold",
     fontSize: 18,
     color: "#007AFF",
-    marginLeft: 24,
+    marginLeft: 18,
   },
 });

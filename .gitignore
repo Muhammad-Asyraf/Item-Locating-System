@@ -51,6 +51,6 @@ src/app/android/.gradle/
 src/app/android/build/
 src/app/android/app/build/
 
-src/app/ios/Pods
-src/app/ios/app.xcodeproj
-src/app/ios/app.xcworkspace
+src/app/ios/Pods/
+src/app/ios/app.xcodeproj/
+src/app/ios/app.xcworkspace/

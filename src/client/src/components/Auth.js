@@ -38,7 +38,13 @@ const Auth = ({ children }) => {
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
       if (user) {
-        dispatch(setActiveUser(user.toJSON()));
+        dispatch(
+          setActiveUser({
+            user: user.toJSON(),
+            message: 'Successfully logged in',
+            status: 'ok',
+          })
+        );
         await dispatch(setHeader(auth));
         if (history.location.pathname === '/auth/login') {
           history.push('/dashboard');

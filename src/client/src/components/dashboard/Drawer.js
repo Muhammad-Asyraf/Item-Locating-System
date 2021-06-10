@@ -242,7 +242,7 @@ const Drawer = (props) => {
             {/* <Divider /> */}
             <List>
               {drawerList.map(({ header, items }) => (
-                <>
+                <div key={header}>
                   <ListSubheader
                     disableSticky
                     style={{
@@ -308,7 +308,7 @@ const Drawer = (props) => {
                       </div>
                     );
                   })}
-                </>
+                </div>
               ))}
             </List>
           </PerfectScrollbar>

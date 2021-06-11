@@ -14,7 +14,6 @@ import MenuItem from '@material-ui/core/MenuItem';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import MenuOpenRoundedIcon from '@material-ui/icons/MenuOpenRounded';
 import NotificationsIcon from '@material-ui/icons/Notifications';
-import MailIcon from '@material-ui/icons/Mail';
 import SearchRoundedIcon from '@material-ui/icons/SearchRounded';
 import LockIcon from '@material-ui/icons/Lock';
 import { makeStyles } from '@material-ui/core/styles';
@@ -22,7 +21,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { clearActiveUser, verifying, verified } from '../../redux/features/authSlice';
 import { auth } from '../../firebase';
 
-const drawerWidth = 240;
+const drawerWidth = 260;
 const useStyles = makeStyles((theme) => ({
   appBar: {
     [theme.breakpoints.up('lg')]: {
@@ -96,11 +95,7 @@ const AppBars = (props) => {
             </Badge>
           </IconButton>
           <div className={classes.search} />
-          <IconButton aria-label="show 4 new mails" color="inherit">
-            <Badge badgeContent={4} color="error">
-              <MailIcon color="primary" fontSize="large" />
-            </Badge>
-          </IconButton>
+
           <IconButton aria-label="show 17 new notifications" color="inherit">
             <Badge badgeContent={17} color="error">
               <NotificationsIcon color="primary" fontSize="large" />

@@ -15,18 +15,24 @@ import ListSubheader from '@material-ui/core/ListSubheader';
 import SvgIcon from '@material-ui/core/SvgIcon';
 
 import Icon from '@material-ui/core/Icon';
-import SupervisorAccountRoundedIcon from '@material-ui/icons/SupervisorAccountRounded';
+import SupervisorAccountTwoToneIcon from '@material-ui/icons/SupervisorAccountTwoTone';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
-import DashboardRoundedIcon from '@material-ui/icons/DashboardRounded';
-import LocalOfferRoundedIcon from '@material-ui/icons/LocalOfferRounded';
+import DashboardTwoToneIcon from '@material-ui/icons/DashboardTwoTone';
+import LocalOfferTwoToneIcon from '@material-ui/icons/LocalOfferTwoTone';
+import SupervisedUserCircleTwoToneIcon from '@material-ui/icons/SupervisedUserCircleTwoTone';
+import LocalMallTwoToneIcon from '@material-ui/icons/LocalMallTwoTone';
+import BusinessCenterTwoToneIcon from '@material-ui/icons/BusinessCenterTwoTone';
+import RoomTwoToneIcon from '@material-ui/icons/RoomTwoTone';
+import DomainTwoToneIcon from '@material-ui/icons/DomainTwoTone';
+import LocalAtmTwoToneIcon from '@material-ui/icons/LocalAtmTwoTone';
 
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 
 import { ReactComponent as Megaphone } from '../../assets/megaphone.svg';
 
-const drawerWidth = 240;
+const drawerWidth = 260;
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -70,8 +76,10 @@ const Drawer = (props) => {
   const isDesktop = useMediaQuery(theme.breakpoints.up('lg'));
   const container = window !== undefined ? () => window().document.body : undefined;
   const [open, setOpen] = useState({
+    products: false,
     items: false,
     users: false,
+    businessRules: false,
   });
 
   const handleClick = (path) => {
@@ -84,65 +92,72 @@ const Drawer = (props) => {
   const drawerList = [
     {
       header: 'GENERAL',
+      key: 'general',
       items: [
         {
           text: 'Dashboard',
+          itemKey: 'dashboard',
           path: `${match.path}`,
-          icon: <DashboardRoundedIcon color="primary" fontSize="large" />,
+          icon: <DashboardTwoToneIcon color="primary" fontSize="large" />,
           onClick: () => handleClick(`${match.path}`),
         },
         {
           text: 'Sales',
+          itemKey: 'sales',
           path: `${match.path}/sales`,
-          icon: (
-            <Icon
-              className="fas fa-cash-register"
-              style={{ fontSize: 30, margin: 3, color: '#007AFF' }}
-            />
-          ),
+          icon: <LocalAtmTwoToneIcon color="primary" fontSize="large" />,
           onClick: () => handleClick(`${match.path}/sales`),
+        },
+        {
+          text: 'Customers',
+          itemKey: 'customers',
+          path: `${match.path}/customers`,
+          icon: <SupervisedUserCircleTwoToneIcon color="primary" fontSize="large" />,
+          onClick: () => handleClick(`${match.path}/customers`),
         },
       ],
     },
     {
-      header: 'INVENTORY',
+      header: 'CATALOGUE',
+      key: 'catalogue',
       items: [
         {
-          text: 'Items',
-          path: `${match.path}/item`,
-          icon: <LocalOfferRoundedIcon color="primary" fontSize="large" />,
-          onClick: () => setOpen({ ...open, items: !open.items }),
+          text: 'Products',
+          itemKey: 'products',
+          path: `${match.path}/product`,
+          icon: <LocalMallTwoToneIcon color="primary" fontSize="large" />,
+          onClick: () => setOpen({ ...open, products: !open.products }),
           itemSubList: [
             {
               _text: 'List',
-              _path: `${match.path}/item/List`,
-              _onClick: () => handleClick(`${match.path}/item/list`),
+              _key: 'product-list',
+              _path: `${match.path}/product/list`,
+              _onClick: () => handleClick(`${match.path}/product/list`),
             },
             {
               _text: 'Create',
-              _path: `${match.path}/item/Create`,
-              _onClick: () => handleClick(`${match.path}/item/create`),
+              _key: 'product-create',
+              _path: `${match.path}/product/create`,
+              _onClick: () => handleClick(`${match.path}/product/create`),
             },
           ],
         },
         {
-          text: 'Item Mapping',
-          path: `${match.path}/item-mapping`,
-          icon: (
-            <Icon
-              className="fas fa-map-pin"
-              style={{ fontSize: 30, marginLeft: 8, color: '#007AFF' }}
-            />
-          ),
-          onClick: () => handleClick(`${match.path}/item-mapping`),
+          text: 'Product Mapping',
+          itemKey: 'productMapping',
+          path: `${match.path}/product-mapping`,
+          icon: <RoomTwoToneIcon color="primary" fontSize="large" />,
+          // icon: (
+          //   <Icon
+          //     className="fas fa-map-pin"
+          //     style={{ fontSize: 30, marginLeft: 8, color: '#007AFF' }}
+          //   />
+          // ),
+          onClick: () => handleClick(`${match.path}/product-mapping`),
         },
-      ],
-    },
-    {
-      header: 'CATALOG',
-      items: [
         {
           text: 'Promotions',
+          itemKey: 'promotions',
           path: `${match.path}/promotions`,
           icon: (
             <SvgIcon style={{ fontSize: 33, marginLeft: 3, color: '#007AFF' }}>
@@ -153,6 +168,7 @@ const Drawer = (props) => {
         },
         {
           text: 'Advertisements',
+          itemKey: 'advertisements',
           path: `${match.path}/advertisements`,
           icon: (
             <Icon
@@ -165,35 +181,90 @@ const Drawer = (props) => {
       ],
     },
     {
+      header: 'INVENTORY',
+      key: 'inventory',
+      items: [
+        {
+          text: 'Items',
+          itemKey: 'items',
+          path: `${match.path}/item`,
+          icon: <LocalOfferTwoToneIcon color="primary" fontSize="large" />,
+          onClick: () => setOpen({ ...open, items: !open.items }),
+          itemSubList: [
+            {
+              _text: 'List',
+              _key: 'item-list',
+              _path: `${match.path}/item/list`,
+              _onClick: () => handleClick(`${match.path}/item/list`),
+            },
+            {
+              _text: 'Create',
+              _key: 'item-create',
+              _path: `${match.path}/item/create`,
+              _onClick: () => handleClick(`${match.path}/item/create`),
+            },
+          ],
+        },
+      ],
+    },
+    {
       header: 'CONFIG',
+      key: 'config',
       items: [
         {
           text: 'Users',
-          path: `${match.path}/users`,
-          icon: <SupervisorAccountRoundedIcon color="primary" fontSize="large" />,
+          itemKey: 'users',
+          path: `${match.path}/user`,
+          icon: <SupervisorAccountTwoToneIcon color="primary" fontSize="large" />,
           onClick: () => setOpen({ ...open, users: !open.users }),
           itemSubList: [
             {
               _text: 'List',
-              _path: `${match.path}/users/list`,
-              _onClick: () => handleClick(`${match.path}/users/list`),
+              _key: 'user-list',
+              _path: `${match.path}/user/list`,
+              _onClick: () => handleClick(`${match.path}/user/list`),
             },
             {
               _text: 'Roles',
-              _path: `${match.path}/roles/list`,
-              _onClick: () => handleClick(`${match.path}/roles/list`),
+              _key: 'role-list',
+              _path: `${match.path}/role/list`,
+              _onClick: () => handleClick(`${match.path}/role/list`),
+            },
+          ],
+        },
+
+        {
+          text: 'Business Rules',
+          itemKey: 'businessRules',
+          path: `${match.path}/business-rules`,
+          icon: <BusinessCenterTwoToneIcon color="primary" fontSize="large" />,
+          onClick: () => setOpen({ ...open, businessRules: !open.businessRules }),
+          itemSubList: [
+            {
+              _text: 'List',
+              _key: 'business-rules-list',
+              _path: `${match.path}/business-rules/List`,
+              _onClick: () => handleClick(`${match.path}/business-rules/list`),
+            },
+            {
+              _text: 'Create',
+              _key: 'business-rules-create',
+              _path: `${match.path}/business-rules/Create`,
+              _onClick: () => handleClick(`${match.path}/business-rules/create`),
             },
           ],
         },
         {
           text: 'Office',
+          itemKey: 'office',
           path: `${match.path}/office`,
-          icon: (
-            <Icon
-              className="fas fa-building"
-              style={{ fontSize: 33, marginLeft: 3, color: '#007AFF' }}
-            />
-          ),
+          icon: <DomainTwoToneIcon color="primary" fontSize="large" />,
+          // icon: (
+          //   <Icon
+          //     className="fas fa-building"
+          //     style={{ fontSize: 33, marginLeft: 3, color: '#007AFF' }}
+          //   />
+          // ),
           onClick: () => handleClick(`${match.path}/office`),
         },
       ],
@@ -241,8 +312,8 @@ const Drawer = (props) => {
           <PerfectScrollbar>
             {/* <Divider /> */}
             <List>
-              {drawerList.map(({ header, items }) => (
-                <div key={header}>
+              {drawerList.map(({ header, key, items }) => (
+                <div key={key}>
                   <ListSubheader
                     disableSticky
                     style={{
@@ -254,60 +325,59 @@ const Drawer = (props) => {
                   >
                     {header}
                   </ListSubheader>
-                  {items.map(({ text, path, icon, onClick, itemSubList = [] }) => {
-                    const isExpandable = itemSubList && itemSubList.length > 0;
-                    return (
-                      <div key={text}>
-                        <ListItem
-                          button
-                          classes={{ selected: classes.selected }}
-                          selected={location.pathname === path}
-                          onClick={onClick}
-                        >
-                          <ListItemIcon className={classes.listItemIcons}>
-                            {icon}
-                          </ListItemIcon>
-                          <ListItemText className={classes.listItemTexts}>
-                            {text}
-                          </ListItemText>
-                          {/* {isExpandable && open ? <ExpandLess /> : <ExpandMore />} */}
-                          {isExpandable && !open[text.toLowerCase()] && (
-                            <ExpandMore style={{ transform: 'rotate(-90deg)' }} />
-                          )}
-                          {isExpandable && open[text.toLowerCase()] && (
-                            <ExpandLess style={{ transform: 'rotate(180deg)' }} />
-                          )}
-                        </ListItem>
-                        {isExpandable && (
-                          <Collapse
-                            in={open[text.toLowerCase()]}
-                            timeout="auto"
-                            unmountOnExit
+                  {items.map(
+                    ({ text, itemKey, path, icon, onClick, itemSubList = [] }) => {
+                      const isExpandable = itemSubList && itemSubList.length > 0;
+                      return (
+                        <div key={itemKey}>
+                          <ListItem
+                            button
+                            classes={{ selected: classes.selected }}
+                            selected={location.pathname === path}
+                            onClick={onClick}
                           >
-                            <List component="div" disablePadding>
-                              {itemSubList.map(({ _text, _path, _onClick }) => (
-                                <ListItem
-                                  button
-                                  key={_text}
-                                  className={classes.nested}
-                                  onClick={_onClick}
-                                  selected={location.pathname === _path}
-                                >
-                                  <ListItemIcon>
-                                    <Icon
-                                      className="fas fa-circle"
-                                      style={{ fontSize: 5, marginLeft: 30 }}
-                                    />
-                                  </ListItemIcon>
-                                  <ListItemText>{_text}</ListItemText>
-                                </ListItem>
-                              ))}
-                            </List>
-                          </Collapse>
-                        )}
-                      </div>
-                    );
-                  })}
+                            <ListItemIcon className={classes.listItemIcons}>
+                              {icon}
+                            </ListItemIcon>
+                            <ListItemText className={classes.listItemTexts}>
+                              {text}
+                            </ListItemText>
+                            {/* {isExpandable && open ? <ExpandLess /> : <ExpandMore />} */}
+                            {isExpandable && !open[itemKey] && (
+                              <ExpandMore style={{ transform: 'rotate(-90deg)' }} />
+                            )}
+                            {isExpandable && open[itemKey] && (
+                              <ExpandLess style={{ transform: 'rotate(180deg)' }} />
+                            )}
+                          </ListItem>
+                          {isExpandable && (
+                            <Collapse in={open[itemKey]} timeout="auto" unmountOnExit>
+                              <List component="div" disablePadding>
+                                {itemSubList.map(({ _text, _key, _path, _onClick }) => (
+                                  <ListItem
+                                    button
+                                    key={_key}
+                                    className={classes.nested}
+                                    onClick={_onClick}
+                                    classes={{ selected: classes.selected }}
+                                    selected={location.pathname === _path}
+                                  >
+                                    <ListItemIcon>
+                                      <Icon
+                                        className="fas fa-circle"
+                                        style={{ fontSize: 5, marginLeft: 30 }}
+                                      />
+                                    </ListItemIcon>
+                                    <ListItemText>{_text}</ListItemText>
+                                  </ListItem>
+                                ))}
+                              </List>
+                            </Collapse>
+                          )}
+                        </div>
+                      );
+                    }
+                  )}
                 </div>
               ))}
             </List>

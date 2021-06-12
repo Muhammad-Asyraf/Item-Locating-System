@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const customerController = require('../controllers/backoffice');
+// const customerController = require('../controllers/backoffice');
 
 // router.get('/customers', customerController.getAllCustomers);
 // router.post('/customers', customerController.register);

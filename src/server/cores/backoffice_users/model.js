@@ -1,28 +1,28 @@
 const { Model } = require('objection');
-const tableNames = require('../../utils/table_names');
+const tableNames = require('../../database/table_names');
 
-class Merchant extends Model {
+class BackofficeUser extends Model {
   static get tableName() {
-    return tableNames.merchant;
+    return tableNames.backoffice_user;
   }
 
   static get idColumn() {
-    return 'UUID';
+    return 'uuid';
   }
 
   static get jsonSchema() {
     return {
       type: 'object',
-      title: 'Merchant',
-      description: 'The merchant schema',
-      required: ['UUID', 'full_name', 'email', 'password'],
+      title: 'Backoffice',
+      description: 'The backoffice schema',
+      required: ['uuid', 'full_name', 'email', 'password'],
       properties: {
-        UUID: {
-          $id: '#/properties/UUID',
+        uuid: {
+          $id: '#/properties/uuid',
           type: 'string',
           format: 'uuid',
-          title: 'The UUID schema',
-          description: 'The merchant UUID.',
+          title: 'The uuid schema',
+          description: 'The backoffice uuid.',
           examples: ['1dafa876-7f8c-45f8-a39a-a43d3d7774c3'],
         },
         full_name: {
@@ -36,7 +36,7 @@ class Merchant extends Model {
           $id: '#/properties/email',
           type: 'string',
           title: 'The email schema',
-          description: 'The merchant email. must be unique',
+          description: 'The backoffice email. must be unique',
           examples: ['asyraf.rmc@gmail.com'],
         },
         password: {
@@ -47,12 +47,12 @@ class Merchant extends Model {
         created_at: {
           $id: '#/properties/created_at',
           type: 'string',
-          title: 'The creation date of the merchant.',
+          title: 'The creation date of the backoffice.',
         },
         updated_at: {
           $id: '#/properties/updated_at',
           type: 'string',
-          title: 'The date the merchant was last updated.',
+          title: 'The date the backoffice was last updated.',
         },
       },
       additionalProperties: false,
@@ -60,4 +60,4 @@ class Merchant extends Model {
   }
 }
 
-module.exports = Merchant;
+module.exports = BackofficeUser;

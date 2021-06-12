@@ -9,7 +9,7 @@ import {
 } from "react-native-paper";
 import auth from "@react-native-firebase/auth";
 import axios from "axios";
-import {environment} from "../environment"
+import { environment } from "../environment";
 
 export default function Registration() {
   const [credentials, setCredentials] = useState({
@@ -63,17 +63,14 @@ export default function Registration() {
   };
 
   const handleSignUp = () => {
-    console.log(credentials)
+    console.log(credentials);
     if (isPasswordConfirmed) {
       axios
-        .post(
-          environment.host + "/api/mobile/customer-service/signup/email",
-          {
-            username: credentials.username,
-            email: credentials.email,
-            password: credentials.password,
-          }
-        )
+        .post(environment.host + "/api/mobile/app-user-service/signup/email", {
+          username: credentials.username,
+          email: credentials.email,
+          password: credentials.password,
+        })
         .then((res) => {
           console.log(res.data);
           // Authenticate
@@ -99,7 +96,7 @@ export default function Registration() {
             });
         })
         .catch((err) => {
-          console.log(err)
+          console.log(err);
         });
     }
   };

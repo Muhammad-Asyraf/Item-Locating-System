@@ -62,7 +62,7 @@ export const signup = createAsyncThunk(
   'auth/signup',
   async ({ firebase, fullName, email, password }, { rejectWithValue, dispatch }) => {
     try {
-      const endpointURL = '/api/backoffice/merchant-service/signup/email';
+      const endpointURL = '/api/backoffice/backoffice-user-service/signup/email';
       const payload = { fullName, email, password };
 
       await axios.post(endpointURL, payload);
@@ -72,6 +72,7 @@ export const signup = createAsyncThunk(
       return true;
     } catch (err) {
       const { data } = err.response;
+      console.log(data);
       return rejectWithValue({
         message: data.message,
         status: 'Error!',

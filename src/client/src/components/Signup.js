@@ -269,11 +269,7 @@ const Login = () => {
                               onClick={handleShowPassword}
                               onMouseDown={handleShowPassword}
                             >
-                              {password.showPassword ? (
-                                <Visibility />
-                              ) : (
-                                <VisibilityOff />
-                              )}
+                              {password.showPassword ? <Visibility /> : <VisibilityOff />}
                             </IconButton>
                           </InputAdornment>
                         ),

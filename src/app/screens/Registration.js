@@ -9,9 +9,18 @@ import {
 } from "react-native-paper";
 import auth from "@react-native-firebase/auth";
 import axios from "axios";
+
+// Environment configs
 import { environment } from "../environment";
 
+// Redux
+import { useSelector, useDispatch } from "react-redux";
+import { setToken, setUuid } from "../redux/user/userSlice";
+
 export default function Registration() {
+  const dispatch = useDispatch();
+  const { token } = useSelector((state) => state.user);
+
   const [credentials, setCredentials] = useState({
     username: "",
     email: "",
@@ -72,12 +81,20 @@ export default function Registration() {
           password: credentials.password,
         })
         .then((res) => {
-          console.log(res.data);
+          console.log(res.data.user.uuid);
+          dispatch(setUuid(res.data.user.uuid))
           // Authenticate
           auth()
             .signInWithEmailAndPassword(credentials.email, credentials.password)
             .then(() => {
-              console.log("Signed in");
+              auth()
+                .currentUser.getIdToken(true)
+                .then((idToken) => {
+                  dispatch(setToken(idToken));
+                })
+                .finally(() => {
+                  console.log("Signed in : " + token);
+                })
             })
             .catch((error) => {
               if (error.code === "auth/email-already-in-use") {

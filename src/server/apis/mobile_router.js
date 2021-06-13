@@ -1,6 +1,6 @@
 const router = require('express').Router();
-const customerService = require('../cores/customers/api/mobile');
+const appUserService = require('../cores/app_users/apis/mobile');
 
-router.use('/customer-service', customerService);
+router.use('/app-user-service', appUserService);
 
 module.exports = router;

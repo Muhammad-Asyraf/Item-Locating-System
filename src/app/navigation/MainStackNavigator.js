@@ -11,6 +11,7 @@ export default function MainStackNavigator() {
     <Stack.Navigator
       headerMode="screen"
       initialRouteName="Main"
+      headerMode="none"
       screenOptions={{
         header: (props) => <StackAppBar {...props} />,
       }}
@@ -18,15 +19,11 @@ export default function MainStackNavigator() {
       <Stack.Screen 
       name="LOKETLA" 
       component={MainTabsNavigator}
-      options={{
-          headerShown: false
-      }} />
+      />
       <Stack.Screen 
       name="Search Result" 
       component={SearchResult}
-      options={{
-          header: (props) => <StackAppBar {...props} type="searchbar"/>,
-      }} />
+      />
     </Stack.Navigator>
   );
 }

@@ -4,6 +4,7 @@ export const appBarStyles = StyleSheet.create({
   appBarContainer: {
     backgroundColor: "white",
     padding: 0,
+    zIndex: 1,
   },
   appBarSearchbar: {
     elevation: 0,

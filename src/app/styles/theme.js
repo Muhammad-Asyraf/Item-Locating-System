@@ -15,6 +15,7 @@ export const GlobalStyle = StyleSheet.create({
   
   screenContainer: {
     flexGrow: 1,
+    height: "100%",
     backgroundColor: "#F5F5F5",
   },
   searchBar: {
@@ -29,7 +30,6 @@ export const GlobalStyle = StyleSheet.create({
   },
   flatGrid: {
     marginHorizontal: 8,
-    paddingVertical: 20
   }
 })
 

@@ -24,37 +24,38 @@ export default function ItemCardSmall({
   quantityLeft,
   imageUrl,
 }) {
-
   const cart = useSelector((state) => state.cart);
   const dispatch = useDispatch();
 
-  const [productInCart, setProductInCart] = useState(false)
+  const [productInCart, setProductInCart] = useState(false);
 
   const addToCart = () => {
-    console.log('Add product #' + itemId + ' to cart')
-    dispatch(addProduct(itemId))
-    setProductInCart(true)
-  }
+    console.log("Add product #" + itemId + " to cart");
+    dispatch(addProduct(itemId));
+    setProductInCart(true);
+  };
 
   const handleQuantityChange = (value) => {
-    dispatch(updateQuantity({
-      productId: itemId,
-      quantity: value
-    }))
-    if(value === 0) {
-      setProductInCart(false)
+    dispatch(
+      updateQuantity({
+        productId: itemId,
+        quantity: value,
+      })
+    );
+    if (value === 0) {
+      setProductInCart(false);
     }
-  }
+  };
+
 
   let itemIndex = 0;
-  itemIndex = cart.products.indexOf(itemId)
+  itemIndex = cart.products.indexOf(itemId);
 
   useEffect(() => {
-    if(cart.products.includes(itemId)){
-    setProductInCart(true)
-  }
-
-  },)
+    if (cart.products.includes(itemId)) {
+      setProductInCart(true);
+    }
+  });
 
   return (
     <View style={styles.itemContainer}>
@@ -93,16 +94,21 @@ export default function ItemCardSmall({
       </Card>
       {productInCart ? (
         <NumericInput
-        containerStyle={styles.quantityInput}
-        totalHeight={36}
-        editable={false}
-        initValue={cart.quantity[itemIndex]}
-        minValue={0}
-        onChange={handleQuantityChange}
-        rounded={true}
-      />
+          containerStyle={styles.quantityInput}
+          totalHeight={36}
+          editable={false}
+          initValue={cart.quantity[itemIndex]}
+          minValue={0}
+          onChange={handleQuantityChange}
+          rounded={true}
+        />
       ) : (
-        <Button style={styles.addToCartButton} mode="outlined" compact="true" onPress={addToCart}>
+        <Button
+          style={styles.addToCartButton}
+          mode="outlined"
+          compact="true"
+          onPress={addToCart}
+        >
           Add To Cart
         </Button>
       )}
@@ -153,12 +159,11 @@ const styles = StyleSheet.create({
   },
   addToCartButton: {
     marginTop: 8,
-    height: 36
+    height: 36,
   },
   quantityInput: {
     marginTop: 8,
     alignSelf: "center",
-    width: "100%",
     borderRadius: 4,
-  }
+  },
 });

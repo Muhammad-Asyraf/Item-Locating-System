@@ -41,10 +41,12 @@ export default function Home({ navigation }) {
             placeholder="Search for something"
             onChangeText={handleQueryChange}
             onSubmitEditing={search}
+            autoCorrect={false}
+            autoCapitalize="none"
           />
       </Appbar.Header>
       <ScrollView style={GlobalStyle.scrollView}>
-        <CartListItem />
+        
       </ScrollView>
     </View>
   );

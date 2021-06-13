@@ -1,6 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, StyleSheet } from "react-native";
 import { Card, Text, Button } from "react-native-paper";
+import NumericInput from "react-native-numeric-input";
+
+// Redux
+import { useSelector, useDispatch } from "react-redux";
+import { addProduct, updateQuantity } from "../redux/cart/cartSlice";
 
 // Component imports
 import SmallTextChip from "./SmallTextChip";
@@ -11,22 +16,56 @@ import { Theme } from "../styles/theme";
 
 export default function ItemCardSmall({
   style,
-  title,
+  itemId,
+  itemName,
   merchant,
   normalPrice,
   sellingPrice,
   quantityLeft,
+  imageUrl,
 }) {
+
+  const cart = useSelector((state) => state.cart);
+  const dispatch = useDispatch();
+
+  const [productInCart, setProductInCart] = useState(false)
+
+  const addToCart = () => {
+    console.log('Add product #' + itemId + ' to cart')
+    dispatch(addProduct(itemId))
+    setProductInCart(true)
+  }
+
+  const handleQuantityChange = (value) => {
+    dispatch(updateQuantity({
+      productId: itemId,
+      quantity: value
+    }))
+    if(value === 0) {
+      setProductInCart(false)
+    }
+  }
+
+  let itemIndex = 0;
+  itemIndex = cart.products.indexOf(itemId)
+
+  useEffect(() => {
+    if(cart.products.includes(itemId)){
+    setProductInCart(true)
+  }
+
+  },)
+
   return (
     <View style={styles.itemContainer}>
       <Card>
         <Card.Cover
           style={styles.image}
           // TODO: Change uri
-          source={{ uri: "https://tinyurl.com/cddseanu" }}
+          source={{ uri: imageUrl }}
         />
         <Card.Content style={styles.content}>
-          <Text style={styles.title}>{title}</Text>
+          <Text style={styles.title}>{itemName}</Text>
           <View style={[styles.horizontalContainer, {}]}>
             {quantityLeft == 0 ? (
               <SmallTextChip text="OUT OF STOCK" color="#FF6F00" />
@@ -52,7 +91,21 @@ export default function ItemCardSmall({
           />
         </Card.Content>
       </Card>
-      <Button style={styles.addToCartButton} mode="outlined" compact="true">Add To Cart</Button>
+      {productInCart ? (
+        <NumericInput
+        containerStyle={styles.quantityInput}
+        totalHeight={36}
+        editable={false}
+        initValue={cart.quantity[itemIndex]}
+        minValue={0}
+        onChange={handleQuantityChange}
+        rounded={true}
+      />
+      ) : (
+        <Button style={styles.addToCartButton} mode="outlined" compact="true" onPress={addToCart}>
+          Add To Cart
+        </Button>
+      )}
     </View>
   );
 }
@@ -64,7 +117,7 @@ const styles = StyleSheet.create({
     paddingTop: 14,
   },
   itemContainer: {
-    flexDirection: 'column',
+    flexDirection: "column",
   },
   horizontalContainer: {
     flexDirection: "row",
@@ -80,6 +133,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 12,
     fontFamily: "interSemiBold",
+    height: 32,
   },
   text: {
     fontSize: 12,
@@ -99,5 +153,12 @@ const styles = StyleSheet.create({
   },
   addToCartButton: {
     marginTop: 8,
+    height: 36
+  },
+  quantityInput: {
+    marginTop: 8,
+    alignSelf: "center",
+    width: "100%",
+    borderRadius: 4,
   }
 });

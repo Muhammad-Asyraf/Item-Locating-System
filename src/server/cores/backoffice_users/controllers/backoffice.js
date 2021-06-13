@@ -32,12 +32,31 @@ exports.signup = async (req, res, next) => {
       `New user at Firebase created: ${backofficeUserFirebase.uid}`
     );
 
-    res.status(201).json({ status: 'ok' });
+    res.status(201).json({
+      status: 'successful',
+      msg: 'New backoffice user in Postgres & Firebase created.',
+      user: backofficeUser,
+    });
   } catch (error) {
     if (backofficeUser) {
-      await backofficeUser.query().deleteById(backofficeUser.uuid);
+      await BackofficeUser.query().deleteById(backofficeUser.uuid);
     }
     backofficeUserLogger.warn(`Error creating new backofficeUser: ${error}`);
     next(error);
+  }
+};
+
+exports.findBackofficeUser = async (req, res, next) => {
+  try {
+    const { uuid } = req.params;
+    const backofficeUser = await BackofficeUser.query().findById(uuid);
+    backofficeUserLogger.info(
+      `Successfully retrieved the backoffice user: ${backofficeUser.uuid}`
+    );
+
+    res.json(backofficeUser);
+  } catch (err) {
+    backofficeUserLogger.warn(`Error retrieving backoffice user`);
+    next(err);
   }
 };

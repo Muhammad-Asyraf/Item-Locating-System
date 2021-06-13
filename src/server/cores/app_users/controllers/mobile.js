@@ -20,8 +20,6 @@ exports.signup = async (req, res, next) => {
     });
     appUserLogger.info(`New appUser in postgresDB created: ${appUser.uuid}`);
 
-    const { password: psw, ...data } = appUser;
-
     const appUserFirebase = await admin.auth().createUser({
       uid: appUserUUID,
       email,
@@ -32,11 +30,11 @@ exports.signup = async (req, res, next) => {
     res.status(201).json({
       status: 'successful',
       msg: 'New appUser in Postgres & Firebase created.',
-      data,
+      user: appUser,
     });
   } catch (error) {
     if (appUser) {
-      await appUser.query().deleteById(appUser.UUID);
+      await AppUser.query().deleteById(appUser.uuid);
     }
     appUserLogger.warn(`Error creating new merchant: ${error}`);
     next(error);

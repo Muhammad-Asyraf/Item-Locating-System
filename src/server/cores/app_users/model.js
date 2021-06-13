@@ -10,6 +10,12 @@ class AppUser extends Model {
     return 'uuid';
   }
 
+  $formatJson(json) {
+    json = super.$formatJson(json);
+    delete json.password;
+    return json;
+  }
+
   static get jsonSchema() {
     return {
       type: 'object',

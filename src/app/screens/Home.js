@@ -1,10 +1,7 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import auth from "@react-native-firebase/auth";
 import { ScrollView, Text, View } from "react-native";
 import { Appbar, Button, Searchbar } from "react-native-paper"
-
-// Component imports
-import CartListItem from "../components/CartListItem"
 
 // Styling
 import { GlobalStyle } from "../styles/theme";
@@ -13,14 +10,6 @@ import { appBarStyles } from "../styles/appBarStyles"
 export default function Home({ navigation }) {
 
   const [searchQuery, setSearchQuery] = useState("")
-
-  function logout() {
-    auth()
-      .signOut()
-      .then(() => {
-        console.log("Signed out");
-      });
-  }
 
   // Handle query state changes
   const handleQueryChange = (query) => setSearchQuery(query)
@@ -46,7 +35,6 @@ export default function Home({ navigation }) {
           />
       </Appbar.Header>
       <ScrollView style={GlobalStyle.scrollView}>
-        
       </ScrollView>
     </View>
   );

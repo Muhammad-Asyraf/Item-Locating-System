@@ -51,13 +51,6 @@ export default function ItemCardSmall({
   let itemIndex = 0;
   itemIndex = cart.products.indexOf(itemId);
 
-  let buttonWidth = 0;
-
-  const getButtonWidth = (event) => {
-    buttonWidth = event.nativeEvent.layout.width
-    console.log(buttonWidth)
-  }
-
   useEffect(() => {
     if (cart.products.includes(itemId)) {
       setProductInCart(true);
@@ -65,7 +58,7 @@ export default function ItemCardSmall({
   });
 
   return (
-    <View style={styles.itemContainer} onLayout={getButtonWidth}>
+    <View style={styles.itemContainer} >
       <Card>
         <Card.Cover
           style={styles.image}

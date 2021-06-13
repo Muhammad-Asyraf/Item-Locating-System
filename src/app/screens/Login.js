@@ -48,8 +48,6 @@ export default function Login() {
           dispatch(setToken(idToken))
           dispatch(setUuid(data.uuid))
 
-          console.log('User : \n' + token + '\n' + uuid)
-
         } catch (err) {
           console.log(err)
         }

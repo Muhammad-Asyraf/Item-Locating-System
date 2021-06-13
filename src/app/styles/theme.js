@@ -24,7 +24,7 @@ export const GlobalStyle = StyleSheet.create({
     flexGrow: 1,
     elevation: 1,
   },
-  scrollView:{
+  contentContainer:{
     paddingHorizontal: 22,
     paddingVertical: 18,
   },

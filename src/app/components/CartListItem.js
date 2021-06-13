@@ -11,20 +11,21 @@ import LocationText from "./LocationText";
 import { Theme } from "../styles/theme";
 
 export default function CartListItem({
-  image,
-  merchant,
-  itemName,
-  quantity,
-  sellingPrice,
+  style,
+  imageUrl = "https://tinyurl.com/cddseanu",
+  merchant = "Test Industries",
+  itemName = "test item",
+  quantity = 14,
+  sellingPrice = 30.00,
 }) {
   const handleQuantityChange = () => {};
 
   return (
-    <Surface style={{ borderRadius: 5, elevation: 2 }}>
+    <Surface style={[style,{ borderRadius: 5, elevation: 2 }]}>
       <View style={styles.listItemContainer}>
         <Image
           style={styles.itemImage}
-          source={{ uri: "https://tinyurl.com/cddseanu" }}
+          source={{ uri: imageUrl }}
         ></Image>
         <View style={styles.itemDetailsContainer}>
           <LocationText
@@ -35,7 +36,7 @@ export default function CartListItem({
           />
           <View style={styles.horizontalContainer}>
             <Text style={styles.itemName}>{itemName}</Text>
-            <Text style={styles.itemPrice}>{sellingPrice + "/pc"}</Text>
+            <Text style={styles.itemPrice}>{"RM" + sellingPrice + "/pc"}</Text>
           </View>
           <View style={styles.horizontalContainer}>
             <NumericInput
@@ -44,7 +45,7 @@ export default function CartListItem({
               totalHeight={30}
               onChange={handleQuantityChange}
             />
-            <SmallTextChip text={quantity * sellingPrice} />
+            <SmallTextChip text={"RM" + quantity * sellingPrice} />
           </View>
         </View>
       </View>

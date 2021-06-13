@@ -13,8 +13,12 @@ export const userSlice = createSlice({
         setUuid: (state, action) => {
             state.uuid = action.payload
         },
+        removeUser: (state) => {
+            state.token = ""
+            state.uuid = ""
+        }
     }
 })
-export const { setToken, setUuid } = userSlice.actions
+export const { setToken, setUuid, removeUser} = userSlice.actions
 
 export default userSlice.reducer

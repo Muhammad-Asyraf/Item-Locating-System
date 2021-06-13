@@ -1,23 +1,23 @@
 const { Model } = require('objection');
 const tableNames = require('../../utils/table_names');
 
-class ItemProduct extends Model {
+class PlanningCartProduct extends Model {
   static get tableName() {
-    return tableNames.item_product;
+    return tableNames.planning_cart_product;
   }
 
   static get idColumn() {
-    return ['item_uuid', 'product_uuid'];
+    return ['card_uuid', 'product_uuid'];
   }
 
   static get relationMappings() {
     return {
-      item: {
+      planning_cart: {
         relation: Model.BelongsToOneRelation,
-        modelClass: require('../items/model'),
+        modelClass: require('../planning_carts/model'),
         join: {
-          from: 'item_product.item_uuid',
-          to: 'item.uuid',
+          from: 'planning_cart_product.cart_uuid',
+          to: 'planning_card.uuid',
         },
       },
 
@@ -25,7 +25,7 @@ class ItemProduct extends Model {
         relation: Model.BelongsToOneRelation,
         modelClass: require('../products/model'),
         join: {
-          from: 'item_product.product_uuid',
+          from: 'planning_card_product.product_uuid',
           to: 'product.uuid',
         },
       },
@@ -33,4 +33,4 @@ class ItemProduct extends Model {
   }
 }
 
-module.exports = ItemProduct;
+module.exports = PlanningCartProduct;

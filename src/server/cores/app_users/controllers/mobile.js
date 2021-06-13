@@ -76,7 +76,7 @@ exports.findAppUserByEmail = async (req, res, next) => {
     const appUser = await AppUser.query().where({
       email: email
     })
-    appUserLogger.info(`Successfully retrieved the appUser: ${appUser.email}`);
+    appUserLogger.info(`Successfully retrieved the appUser: ${appUser[0].email}`);
 
     res.json(appUser[0]);
   } catch (err) {

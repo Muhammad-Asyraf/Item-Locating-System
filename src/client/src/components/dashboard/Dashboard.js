@@ -11,6 +11,7 @@ import AppBars from './AppBars';
 import Item from '../Item';
 import Sales from '../Sales';
 import Home from '../Home';
+import Product from '../Product';
 
 import { clearState } from '../../redux/features/authSlice';
 
@@ -65,6 +66,7 @@ const Dashboard = (props) => {
           <Route path={`${match.path}`} exact component={Home} />
           <Route path={`${match.path}/item`} component={Item} />
           <Route path={`${match.path}/sales`} component={Sales} />
+          <Route path={`${match.path}/product`} component={Product} />
         </Switch>
       </Container>
     </div>

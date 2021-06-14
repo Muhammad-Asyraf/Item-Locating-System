@@ -21,7 +21,12 @@ import EnhancedTableHead from './EnhancedTableHead';
 import EnhancedTableToolbar from './EnhancedTableToolbar';
 import RowOptions from './RowOptions';
 
-import { selectItems, selectIsLoading, processed } from '../../redux/features/itemSlice';
+import {
+  selectItems,
+  selectIsLoading,
+  // processingRequest,
+  processed,
+} from '../../redux/features/itemSlice';
 import { getItems, deleteItem, deleteMultipleItems } from '../../redux/thunks/itemThunk';
 
 function descendingComparator(a, b, orderBy) {
@@ -117,13 +122,11 @@ const ItemList = () => {
   }, []);
 
   useEffect(() => {
-    (async () => {
+    if (itemData.length > 0) {
       setItems(itemData);
       dispatch(processed());
-    })();
+    }
   }, [itemData]);
-
-  console.log(selected);
 
   const handleDelete = async (uuid) => {
     const newItemList = items.filter((item) => item.uuid !== uuid);

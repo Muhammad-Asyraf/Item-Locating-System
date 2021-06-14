@@ -13,7 +13,7 @@ import {
 } from '../thunks/itemThunk';
 
 const initialState = {
-  isLoading: false,
+  isLoading: true,
   items: [],
   status: null,
   message: [],

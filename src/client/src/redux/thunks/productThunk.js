@@ -26,11 +26,11 @@ export const getProducts = createAsyncThunk(
   }
 );
 
-export const addItem = createAsyncThunk(
-  'item/addItem',
+export const addProduct = createAsyncThunk(
+  'product/addProduct',
   async (payload, { rejectWithValue }) => {
     try {
-      const endpointURL = '/api/backoffice/item-service/item';
+      const endpointURL = '/api/backoffice/product-service/product';
       await axios.post(endpointURL, payload);
 
       return true;
@@ -46,65 +46,65 @@ export const addItem = createAsyncThunk(
   }
 );
 
-// export const deleteItem = createAsyncThunk(
-//   'item/deleteItem',
-//   async ({ uuid }, { rejectWithValue }) => {
-//     try {
-//       const endpointURL = `/api/backoffice/item-service/item/${uuid}`;
-//       await axios.delete(endpointURL);
+export const deleteProduct = createAsyncThunk(
+  'product/deleteProduct',
+  async ({ uuid }, { rejectWithValue }) => {
+    try {
+      const endpointURL = `/api/backoffice/product-service/product/${uuid}`;
+      await axios.delete(endpointURL);
 
-//       return true;
-//     } catch (err) {
-//       console.log('error', err);
-//       const { data } = err.response;
+      return true;
+    } catch (err) {
+      console.log('error', err);
+      const { data } = err.response;
 
-//       return rejectWithValue({
-//         message: data.message,
-//         status: 'Error!',
-//         error: data.code,
-//       });
-//     }
-//   }
-// );
+      return rejectWithValue({
+        message: data.message,
+        status: 'Error!',
+        error: data.code,
+      });
+    }
+  }
+);
 
-// export const deleteMultipleItems = createAsyncThunk(
-//   'item/deleteMultipleItems',
-//   async (listToDelete, { rejectWithValue }) => {
-//     try {
-//       const endpointURL = '/api/backoffice/item-service/item/delete';
-//       await axios.post(endpointURL, listToDelete);
+export const deleteMultipleProducts = createAsyncThunk(
+  'product/deleteMultipleProducts',
+  async (listToDelete, { rejectWithValue }) => {
+    try {
+      const endpointURL = '/api/backoffice/product-service/product/delete';
+      await axios.post(endpointURL, listToDelete);
 
-//       return true;
-//     } catch (err) {
-//       console.log('error', err);
-//       const { data } = err.response;
+      return true;
+    } catch (err) {
+      console.log('error', err);
+      const { data } = err.response;
 
-//       return rejectWithValue({
-//         message: data.message,
-//         status: 'Error!',
-//         error: data.code,
-//       });
-//     }
-//   }
-// );
+      return rejectWithValue({
+        message: data.message,
+        status: 'Error!',
+        error: data.code,
+      });
+    }
+  }
+);
 
-// export const updateItem = createAsyncThunk(
-//   'item/updateItem',
-//   async ({ uuid, payload }, { rejectWithValue }) => {
-//     try {
-//       const endpointURL = `/api/backoffice/item-service/item/${uuid}`;
-//       await axios.put(endpointURL, payload);
+export const updateProduct = createAsyncThunk(
+  'product/updateProduct',
+  async ({ uuid, payload }, { rejectWithValue }) => {
+    try {
+      const endpointURL = `/api/backoffice/product-service/product/${uuid}`;
+      await axios.put(endpointURL, payload);
 
-//       return true;
-//     } catch (err) {
-//       console.log('error', err);
-//       const { data } = err.response;
+      return true;
+    } catch (err) {
+      console.log('error', err);
+      const { data } = err.response;
 
-//       return rejectWithValue({
-//         message: data.message,
-//         status: 'Error!',
-//         error: data.code,
-//       });
-//     }
-//   }
-// );
+      return rejectWithValue({
+        message: data.message,
+        status: 'Error!',
+        error: data.code,
+      });
+    }
+  }
+);

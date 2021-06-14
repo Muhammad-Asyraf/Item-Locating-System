@@ -28,7 +28,11 @@ import {
   selectIsLoading,
   processed,
 } from '../../redux/features/productSlice';
-import { getProducts } from '../../redux/thunks/productThunk';
+import {
+  getProducts,
+  deleteProduct,
+  deleteMultipleProducts,
+} from '../../redux/thunks/productThunk';
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -120,13 +124,13 @@ const ProductList = () => {
   useEffect(() => {
     (async () => {
       await dispatch(getProducts());
+      dispatch(processed());
     })();
   }, []);
 
   useEffect(() => {
     if (productData.length > 0) {
       setProducts(productData);
-      dispatch(processed());
     }
   }, [productData]);
 
@@ -134,14 +138,14 @@ const ProductList = () => {
 
   const handleDelete = async (uuid) => {
     const newProductList = products.filter((item) => item.uuid !== uuid);
-    // await dispatch(deleteItem({ uuid }));
+    await dispatch(deleteProduct({ uuid }));
     setProducts(newProductList);
   };
 
   const handleMultipleDelete = async () => {
     const newProductList = products.filter(({ uuid }) => !selected.includes(uuid));
 
-    // await dispatch(deleteMultipleItems({ listToDelete: selected }));
+    await dispatch(deleteMultipleProducts({ listToDelete: selected }));
     setProducts(newProductList);
     setSelected([]);
   };
@@ -217,6 +221,11 @@ const ProductList = () => {
 
   const isSelected = (uuid) => selected.indexOf(uuid) !== -1;
 
+  const displayDate = (date) => {
+    const createdDate = new Date(date);
+    return createdDate.toDateString();
+  };
+
   const emptyRows =
     rowsPerPage - Math.min(rowsPerPage, products.length - page * rowsPerPage);
 
@@ -241,7 +250,7 @@ const ProductList = () => {
             type="button"
             className={classes.addButton}
             component={Link}
-            to="/dashboard/item/create"
+            to="/dashboard/product/create"
           >
             <AddIcon style={{ marginRight: 10 }} /> Add Product
           </Button>
@@ -280,7 +289,7 @@ const ProductList = () => {
                       role="checkbox"
                       aria-checked={isItemSelected}
                       tabIndex={-1}
-                      key={product.name}
+                      key={product.uuid}
                       selected={isItemSelected}
                     >
                       <TableCell padding="checkbox">
@@ -304,7 +313,9 @@ const ProductList = () => {
                       </TableCell>
                       <TableCell align="right">{product.retail_price}</TableCell>
                       <TableCell align="right">{product.selling_price}</TableCell>
-                      <TableCell align="right">{product.created_at}</TableCell>
+                      <TableCell align="right">
+                        {displayDate(product.created_at)}
+                      </TableCell>
                       <TableCell align="right">
                         <RowOptions
                           product={product}

@@ -6,6 +6,7 @@ import { receivedProductState } from '../states/productState';
 
 import {
   getProducts,
+  addProduct,
   // addItem,
   // deleteItem,
   // deleteMultipleItems,
@@ -32,8 +33,8 @@ const productSlice = createSlice({
     [getProducts.fulfilled]: receivedProductState,
     [getProducts.pending]: loadingState,
     [getProducts.rejected]: errorState,
-    // [addItem.pending]: loadingState,
-    // [addItem.rejected]: errorState,
+    [addProduct.pending]: loadingState,
+    [addProduct.rejected]: errorState,
     // [deleteItem.rejected]: errorState,
     // [deleteMultipleItems.rejected]: errorState,
     // [updateItem.pending]: loadingState,

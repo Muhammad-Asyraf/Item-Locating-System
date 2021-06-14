@@ -2,9 +2,8 @@ import React from 'react';
 import { Switch, Route } from 'react-router-dom';
 
 import ProductList from './ProductList/ProductList';
-// import ItemDetail from './ItemDetail';
-// import ItemCreate from './ItemCreate';
-// import ItemEdit from './ItemEdit';
+import ProductCreate from './ProductCreate';
+import ProductEdit from './ProductEdit';
 
 const Product = (props) => {
   const { match } = props;
@@ -13,9 +12,8 @@ const Product = (props) => {
     <>
       <Switch>
         <Route path={`${match.path}/list`} exact component={ProductList} />
-        {/* <Route path={`${match.path}/item`} exact component={ItemDetail} />
-        <Route path={`${match.path}/create`} exact component={ItemCreate} />
-        <Route path={`${match.path}/edit/:uuid`} exact component={ItemEdit} /> */}
+        <Route path={`${match.path}/create`} exact component={ProductCreate} />
+        <Route path={`${match.path}/edit/:uuid`} exact component={ProductEdit} />
       </Switch>
     </>
   );

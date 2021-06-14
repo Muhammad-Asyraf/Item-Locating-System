@@ -1,6 +1,7 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
+import axios from 'axios';
 
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
@@ -10,8 +11,13 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 
 import { makeStyles } from '@material-ui/core/styles';
 
-import { selectIsLoading, processed } from '../redux/features/itemSlice';
-import { addItem } from '../redux/thunks/itemThunk';
+import {
+  // selectItems,
+  selectIsLoading,
+  processingRequest,
+  processed,
+} from '../redux/features/itemSlice';
+import { updateItem } from '../redux/thunks/itemThunk';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -49,13 +55,30 @@ const useStyles = makeStyles((theme) => ({
   inputFields: {
     width: '100%',
   },
+  circular: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: '80vh',
+    width: '80vw',
+  },
 }));
 
-const ItemCreate = () => {
+const ItemEdit = (props) => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const history = useHistory();
   const isLoading = useSelector(selectIsLoading);
+  // const items = useSelector(selectItems);
+  const [currentItem, setCurrentItem] = useState({
+    name: '',
+    barcode_number: '',
+    quantity: '',
+    descriptions: '',
+    wholesale_price: '',
+  });
+
+  const { match } = props;
 
   const nameRef = useRef();
   const barcodeNumberRef = useRef();
@@ -63,16 +86,35 @@ const ItemCreate = () => {
   const descriptionRef = useRef();
   const wholesalePriceRef = useRef();
 
+  const getItemByUUID = async (uuid) => {
+    try {
+      const endpointURL = `/api/backoffice/item-service/item/${uuid}`;
+      const res = await axios.get(endpointURL);
+      setCurrentItem(res.data);
+      dispatch(processed());
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  useEffect(() => {
+    dispatch(processingRequest());
+    getItemByUUID(match.params.uuid);
+  }, []);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const payload = {
-      name: nameRef.current.value,
-      barcode_number: barcodeNumberRef.current.value,
-      quantity: quantityRef.current.value,
-      descriptions: descriptionRef.current.value,
-      wholesale_price: wholesalePriceRef.current.value,
+    const data = {
+      uuid: match.params.uuid,
+      payload: {
+        name: nameRef.current.value,
+        barcode_number: barcodeNumberRef.current.value,
+        quantity: quantityRef.current.value,
+        descriptions: descriptionRef.current.value,
+        wholesale_price: wholesalePriceRef.current.value,
+      },
     };
-    const { type } = await dispatch(addItem(payload));
+    const { type } = await dispatch(updateItem(data));
 
     if (type.includes('fulfilled')) {
       history.push('/dashboard/item/list');
@@ -80,11 +122,19 @@ const ItemCreate = () => {
     dispatch(processed());
   };
 
+  if (isLoading) {
+    return (
+      <div className={classes.circular}>
+        <CircularProgress size={70} color="secondary" />
+      </div>
+    );
+  }
+
   return (
     <div className={classes.root}>
       <Grid container spacing={2} style={{ marginTop: '30px' }}>
         <Grid item sm={12} md={10}>
-          <h1>Add new item </h1>
+          <h1>Edit item </h1>
         </Grid>
       </Grid>
       <Paper className={classes.paper}>
@@ -102,6 +152,7 @@ const ItemCreate = () => {
                 variant="outlined"
                 // error={fullName.error !== false}
                 // helperText={fullName.error}
+                defaultValue={currentItem.name}
                 inputRef={nameRef}
                 className={classes.inputFields}
               />
@@ -115,6 +166,7 @@ const ItemCreate = () => {
                 // onChange={validateEmail}
                 // error={email.error !== false}
                 // helperText={email.error}
+                defaultValue={currentItem.barcode_number}
                 inputRef={barcodeNumberRef}
                 className={classes.inputFields}
               />
@@ -128,6 +180,7 @@ const ItemCreate = () => {
                 // onChange={validateEmail}
                 // error={email.error !== false}
                 // helperText={email.error}
+                defaultValue={currentItem.quantity}
                 inputRef={quantityRef}
                 className={classes.inputFields}
               />
@@ -141,6 +194,7 @@ const ItemCreate = () => {
                 // onChange={validateEmail}
                 // error={email.error !== false}
                 // helperText={email.error}
+                defaultValue={currentItem.descriptions}
                 inputRef={descriptionRef}
                 className={classes.inputFields}
               />
@@ -154,6 +208,7 @@ const ItemCreate = () => {
                 // onChange={validateEmail}
                 // error={email.error !== false}
                 // helperText={email.error}
+                defaultValue={currentItem.wholesale_price}
                 inputRef={wholesalePriceRef}
                 className={classes.inputFields}
               />
@@ -169,7 +224,7 @@ const ItemCreate = () => {
                 {isLoading ? (
                   <CircularProgress size={20}> </CircularProgress>
                 ) : (
-                  <>Add Item</>
+                  <>Update Item</>
                 )}
               </Button>
             </Grid>
@@ -180,4 +235,4 @@ const ItemCreate = () => {
   );
 };
 
-export default ItemCreate;
+export default ItemEdit;

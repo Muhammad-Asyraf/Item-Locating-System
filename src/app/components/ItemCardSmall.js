@@ -58,7 +58,7 @@ export default function ItemCardSmall({
   });
 
   return (
-    <View style={styles.itemContainer}>
+    <View style={styles.itemContainer} onLayout={getButtonWidth}>
       <Card>
         <Card.Cover
           style={styles.image}

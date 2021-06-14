@@ -5,6 +5,7 @@ exports.up = async (knex) => {
     table.uuid('uuid').primary();
     table.uuid('app_user_uuid').references('app_user.uuid').onDelete('CASCADE');
     table.string('name').notNullable();
+    table.boolean('is_default').notNullable()
     table.timestamps(true, true);
   });
 };

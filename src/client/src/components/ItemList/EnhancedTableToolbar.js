@@ -14,18 +14,22 @@ import { lighten, makeStyles } from '@material-ui/core/styles';
 const useToolbarStyles = makeStyles((theme) => ({
   root: {
     paddingLeft: theme.spacing(2),
-    paddingRight: theme.spacing(1),
+    paddingRight: theme.spacing(2),
+    paddingTop: 15,
+    paddingBottom: 15,
+    borderRadius: '16px 16px 0px 0px',
   },
   highlight:
     theme.palette.type === 'light'
       ? {
-          color: theme.palette.secondary.main,
-          backgroundColor: lighten(theme.palette.secondary.light, 0.85),
+          color: theme.palette.primary.main,
+          backgroundColor: lighten(theme.palette.primary.light, 0.85),
         }
       : {
           color: theme.palette.text.primary,
-          backgroundColor: theme.palette.secondary.dark,
+          backgroundColor: theme.palette.primary.dark,
         },
+
   title: {
     flex: '1 1 100%',
   },
@@ -33,7 +37,7 @@ const useToolbarStyles = makeStyles((theme) => ({
 
 const EnhancedTableToolbar = (props) => {
   const classes = useToolbarStyles();
-  const { numSelected } = props;
+  const { numSelected, handleMultipleDelete } = props;
 
   return (
     <Toolbar
@@ -57,13 +61,13 @@ const EnhancedTableToolbar = (props) => {
           id="tableTitle"
           component="div"
         >
-          Nutrition
+          Item
         </Typography>
       )}
 
       {numSelected > 0 ? (
         <Tooltip title="Delete">
-          <IconButton aria-label="delete">
+          <IconButton aria-label="delete" onClick={handleMultipleDelete}>
             <DeleteIcon />
           </IconButton>
         </Tooltip>

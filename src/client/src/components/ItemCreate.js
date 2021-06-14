@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
@@ -62,6 +62,10 @@ const ItemCreate = () => {
   const quantityRef = useRef();
   const descriptionRef = useRef();
   const wholesalePriceRef = useRef();
+
+  useEffect(() => {
+    dispatch(processed());
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

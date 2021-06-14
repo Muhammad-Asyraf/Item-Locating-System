@@ -1,14 +1,14 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-import { loadingState, loadedState } from '../reducers/loadState';
-import { errorState, noErrorState } from '../reducers/errorState';
+import { loadingState, loadedState } from '../states/loadState';
+import { errorState, noErrorState } from '../states/errorState';
 import {
   activeUserState,
   noUserState,
   withHeaderState,
   loginSuccessState,
-} from '../reducers/authState';
+} from '../states/authState';
 
 export const initialState = {
   isLoading: true,

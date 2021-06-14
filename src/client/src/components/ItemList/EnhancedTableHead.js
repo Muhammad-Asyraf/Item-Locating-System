@@ -7,11 +7,20 @@ import Checkbox from '@material-ui/core/Checkbox';
 import TableSortLabel from '@material-ui/core/TableSortLabel';
 
 const headCells = [
-  { id: 'name', numeric: false, disablePadding: true, label: 'Dessert' },
-  { id: 'calories', numeric: true, disablePadding: false, label: 'Calories' },
-  { id: 'fat', numeric: true, disablePadding: false, label: 'Fat (g)' },
-  { id: 'carbs', numeric: true, disablePadding: false, label: 'Carbs (g)' },
-  { id: 'protein', numeric: true, disablePadding: false, label: 'Protein (g)' },
+  { id: 'name', numeric: false, disablePadding: true, label: 'Name' },
+  { id: 'barcode_number', numeric: true, disablePadding: false, label: 'Barcode' },
+  { id: 'quantity', numeric: true, disablePadding: false, label: 'Quantity' },
+  {
+    id: 'wholesale_price',
+    numeric: true,
+    disablePadding: false,
+    label: 'Wholesale Price',
+  },
+  {
+    id: 'action',
+    numeric: false,
+    disablePadding: false,
+  },
 ];
 
 const EnhancedTableHead = (props) => {

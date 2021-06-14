@@ -59,9 +59,9 @@ const useStyles = makeStyles((theme) => ({
     // fontWeight: 900,
   },
   selected: {
-    backgroundColor: 'rgba(0, 122, 255, 0.08) !important',
-    color: '#007AFF !important',
-    fontWeight: 600,
+    // backgroundColor: 'rgba(0, 122, 255, 0.08) !important',
+    // color: '#007AFF !important',
+    fontWeight: 900,
   },
   nested: {
     paddingLeft: theme.spacing(4),
@@ -98,21 +98,26 @@ const Drawer = (props) => {
           text: 'Dashboard',
           itemKey: 'dashboard',
           path: `${match.path}`,
-          icon: <DashboardTwoToneIcon color="primary" fontSize="large" />,
+          icon: <DashboardTwoToneIcon style={{ color: '#0984e3' }} fontSize="large" />,
           onClick: () => handleClick(`${match.path}`),
         },
         {
           text: 'Sales',
           itemKey: 'sales',
           path: `${match.path}/sales`,
-          icon: <LocalAtmTwoToneIcon color="primary" fontSize="large" />,
+          icon: <LocalAtmTwoToneIcon style={{ color: '#218c74' }} fontSize="large" />,
           onClick: () => handleClick(`${match.path}/sales`),
         },
         {
           text: 'Customers',
           itemKey: 'customers',
           path: `${match.path}/customers`,
-          icon: <SupervisedUserCircleTwoToneIcon color="primary" fontSize="large" />,
+          icon: (
+            <SupervisedUserCircleTwoToneIcon
+              style={{ color: '#ff7675' }}
+              fontSize="large"
+            />
+          ),
           onClick: () => handleClick(`${match.path}/customers`),
         },
       ],
@@ -125,7 +130,7 @@ const Drawer = (props) => {
           text: 'Products',
           itemKey: 'products',
           path: `${match.path}/product`,
-          icon: <LocalMallTwoToneIcon color="primary" fontSize="large" />,
+          icon: <LocalMallTwoToneIcon style={{ color: '#00cec9' }} fontSize="large" />,
           onClick: () => setOpen({ ...open, products: !open.products }),
           itemSubList: [
             {
@@ -146,7 +151,7 @@ const Drawer = (props) => {
           text: 'Product Mapping',
           itemKey: 'productMapping',
           path: `${match.path}/product-mapping`,
-          icon: <RoomTwoToneIcon color="primary" fontSize="large" />,
+          icon: <RoomTwoToneIcon style={{ color: '#e84393' }} fontSize="large" />,
           // icon: (
           //   <Icon
           //     className="fas fa-map-pin"
@@ -160,7 +165,7 @@ const Drawer = (props) => {
           itemKey: 'promotions',
           path: `${match.path}/promotions`,
           icon: (
-            <SvgIcon style={{ fontSize: 33, marginLeft: 3, color: '#007AFF' }}>
+            <SvgIcon style={{ fontSize: 33, marginLeft: 3, color: '#54a0ff' }}>
               <Megaphone />
             </SvgIcon>
           ),
@@ -173,7 +178,7 @@ const Drawer = (props) => {
           icon: (
             <Icon
               className="fas fa-ad"
-              style={{ fontSize: 33, marginLeft: 3, color: '#007AFF' }}
+              style={{ fontSize: 33, marginLeft: 3, color: '#341f97' }}
             />
           ),
           onClick: () => handleClick(`${match.path}/advertisements`),
@@ -188,7 +193,7 @@ const Drawer = (props) => {
           text: 'Items',
           itemKey: 'items',
           path: `${match.path}/item`,
-          icon: <LocalOfferTwoToneIcon color="primary" fontSize="large" />,
+          icon: <LocalOfferTwoToneIcon style={{ color: '#0fbcf9' }} fontSize="large" />,
           onClick: () => setOpen({ ...open, items: !open.items }),
           itemSubList: [
             {
@@ -215,7 +220,9 @@ const Drawer = (props) => {
           text: 'Users',
           itemKey: 'users',
           path: `${match.path}/user`,
-          icon: <SupervisorAccountTwoToneIcon color="primary" fontSize="large" />,
+          icon: (
+            <SupervisorAccountTwoToneIcon style={{ color: '#01a3a4' }} fontSize="large" />
+          ),
           onClick: () => setOpen({ ...open, users: !open.users }),
           itemSubList: [
             {
@@ -237,7 +244,9 @@ const Drawer = (props) => {
           text: 'Business Rules',
           itemKey: 'businessRules',
           path: `${match.path}/business-rules`,
-          icon: <BusinessCenterTwoToneIcon color="primary" fontSize="large" />,
+          icon: (
+            <BusinessCenterTwoToneIcon style={{ color: '#ffc048' }} fontSize="large" />
+          ),
           onClick: () => setOpen({ ...open, businessRules: !open.businessRules }),
           itemSubList: [
             {
@@ -258,7 +267,7 @@ const Drawer = (props) => {
           text: 'Office',
           itemKey: 'office',
           path: `${match.path}/office`,
-          icon: <DomainTwoToneIcon color="primary" fontSize="large" />,
+          icon: <DomainTwoToneIcon style={{ color: '#3c40c6' }} fontSize="large" />,
           // icon: (
           //   <Icon
           //     className="fas fa-building"

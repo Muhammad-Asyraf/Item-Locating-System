@@ -118,13 +118,13 @@ const ItemList = () => {
   useEffect(() => {
     (async () => {
       await dispatch(getItems());
+      dispatch(processed());
     })();
   }, []);
 
   useEffect(() => {
     if (itemData.length > 0) {
       setItems(itemData);
-      dispatch(processed());
     }
   }, [itemData]);
 

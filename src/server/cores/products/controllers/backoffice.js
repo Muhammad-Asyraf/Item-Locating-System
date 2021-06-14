@@ -42,11 +42,29 @@ exports.removeProduct = async (req, res, next) => {
   }
 };
 
+exports.removeMultipleProduct = async (req, res, next) => {
+  try {
+    const { listToDelete } = req.body;
+    await Product.query().delete().whereIn('uuid', listToDelete);
+
+    const logMessage = `Successfully deleted following products: ${listToDelete}`;
+    res.json({ message: logMessage });
+  } catch (err) {
+    itemLogger.warn(`Error deleting products`);
+    next(err);
+  }
+};
+
 exports.createProduct = async (req, res, next) => {
   try {
-    const payload = req.body;
+    const { retail_price, selling_price } = req.body;
     const product = await Product.query().insertGraph(
-      { ...payload, uuid: uuidv4() },
+      {
+        ...req.body,
+        uuid: uuidv4(),
+        retail_price: parseFloat(retail_price),
+        selling_price: parseFloat(selling_price),
+      },
       { relate: true }
     );
     productLogger.info(
@@ -62,9 +80,15 @@ exports.createProduct = async (req, res, next) => {
 exports.editProduct = async (req, res, next) => {
   try {
     const { uuid } = req.params;
+    const { retail_price, selling_price } = req.body;
     const product = await Product.query().upsertGraph(
-      { uuid, ...req.body },
-      { unrelate: true }
+      {
+        uuid,
+        ...req.body,
+        retail_price: parseFloat(retail_price),
+        selling_price: parseFloat(selling_price),
+      },
+      { relate: true, unrelate: true }
     );
     productLogger.info(`product successfully update: ${product.uuid}`);
     res.json(product);

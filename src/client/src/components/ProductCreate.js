@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
@@ -10,8 +10,17 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 
 import { makeStyles } from '@material-ui/core/styles';
 
-import { selectIsLoading, processed } from '../redux/features/itemSlice';
-import { addItem } from '../redux/thunks/itemThunk';
+import {
+  selectIsLoading,
+  processingRequest,
+  processed,
+} from '../redux/features/productSlice';
+import { addProduct } from '../redux/thunks/productThunk';
+
+import { selectItems } from '../redux/features/itemSlice';
+import { getItems } from '../redux/thunks/itemThunk';
+
+import MultiChipSelect from './MultiChipSelect';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -51,44 +60,112 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const ItemCreate = () => {
+const ProductCreate = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const history = useHistory();
   const isLoading = useSelector(selectIsLoading);
+  const reduxItem = useSelector(selectItems);
 
   const nameRef = useRef();
-  const barcodeNumberRef = useRef();
-  const quantityRef = useRef();
   const descriptionRef = useRef();
-  const wholesalePriceRef = useRef();
+  const retailPriceRef = useRef();
+  const sellingPriceRef = useRef();
+  const [productItems, setProductItems] = useState({
+    items: [],
+    inputValue: '',
+    selectedItems: [],
+  });
 
   useEffect(() => {
-    dispatch(processed());
+    (async () => {
+      dispatch(processingRequest());
+      await dispatch(getItems());
+      dispatch(processed());
+    })();
   }, []);
+
+  useEffect(() => {
+    setProductItems({
+      ...productItems,
+      items: reduxItem,
+    });
+  }, [reduxItem]);
+
+  console.log(productItems);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     const payload = {
       name: nameRef.current.value,
-      barcode_number: barcodeNumberRef.current.value,
-      quantity: quantityRef.current.value,
-      descriptions: descriptionRef.current.value,
-      wholesale_price: wholesalePriceRef.current.value,
+      description: descriptionRef.current.value,
+      is_active: true,
+      retail_price: retailPriceRef.current.value,
+      selling_price: sellingPriceRef.current.value,
+      items: productItems.selectedItems.map((item) => ({ uuid: item.uuid })),
     };
-    const { type } = await dispatch(addItem(payload));
+
+    console.log(payload);
+    const { type } = await dispatch(addProduct(payload));
 
     if (type.includes('fulfilled')) {
-      history.push('/dashboard/item/list');
+      history.push('/dashboard/product/list');
     }
     dispatch(processed());
   };
+
+  console.log(history);
+  console.log(addProduct);
+
+  const addSelectedItem = (item) => {
+    setProductItems({
+      items: productItems.items.filter((i) => i.uuid !== item.uuid),
+      inputValue: '',
+      selectedItems: [...productItems.selectedItems, item],
+    });
+  };
+
+  const removeSelectedItem = (item) => {
+    setProductItems({
+      items: [...productItems.items, item],
+      inputValue: '',
+      selectedItems: productItems.selectedItems.filter((i) => i !== item),
+    });
+  };
+
+  const handleChange = (selectedItem) => {
+    if (productItems.selectedItems.includes(selectedItem)) {
+      removeSelectedItem(selectedItem);
+    } else {
+      addSelectedItem(selectedItem);
+    }
+  };
+
+  const handleChangeInput = (inputVal) => {
+    setProductItems({
+      ...productItems,
+      inputValue: inputVal,
+    });
+    // const t = inputVal.split(',');
+    // if (JSON.stringify(t) !== JSON.stringify(selectedItems)) {
+    //   setInputValue(inputVal);
+    // }
+  };
+
+  if (isLoading) {
+    return (
+      <div className={classes.circular}>
+        <CircularProgress size={70} color="secondary" />
+      </div>
+    );
+  }
 
   return (
     <div className={classes.root}>
       <Grid container spacing={2} style={{ marginTop: '30px' }}>
         <Grid item sm={12} md={10}>
-          <h1>Add new item </h1>
+          <h1>Add new product </h1>
         </Grid>
       </Grid>
       <Paper className={classes.paper}>
@@ -110,36 +187,10 @@ const ItemCreate = () => {
                 className={classes.inputFields}
               />
             </Grid>
-            <Grid item xs={9}>
-              <TextField
-                id="barcode_number"
-                label="Barcode"
-                variant="outlined"
-                // onBlur={() => validateEmail(true)}
-                // onChange={validateEmail}
-                // error={email.error !== false}
-                // helperText={email.error}
-                inputRef={barcodeNumberRef}
-                className={classes.inputFields}
-              />
-            </Grid>
-            <Grid item xs={3}>
-              <TextField
-                id="quantity"
-                label="Quantity"
-                variant="outlined"
-                // onBlur={() => validateEmail(true)}
-                // onChange={validateEmail}
-                // error={email.error !== false}
-                // helperText={email.error}
-                inputRef={quantityRef}
-                className={classes.inputFields}
-              />
-            </Grid>
             <Grid item xs={12}>
               <TextField
-                id="descriptions"
-                label="Descriptions"
+                id="description"
+                label="Description"
                 variant="outlined"
                 // onBlur={() => validateEmail(true)}
                 // onChange={validateEmail}
@@ -149,17 +200,40 @@ const ItemCreate = () => {
                 className={classes.inputFields}
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid item xs={12} md={6}>
               <TextField
-                id="wholesale_price"
-                label="Wholesale Price"
+                id="retail_price"
+                label="Retail Price"
                 variant="outlined"
                 // onBlur={() => validateEmail(true)}
                 // onChange={validateEmail}
                 // error={email.error !== false}
                 // helperText={email.error}
-                inputRef={wholesalePriceRef}
+                inputRef={retailPriceRef}
                 className={classes.inputFields}
+              />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <TextField
+                id="selling_price"
+                label="Selling Price"
+                variant="outlined"
+                // onBlur={() => validateEmail(true)}
+                // onChange={validateEmail}
+                // error={email.error !== false}
+                // helperText={email.error}
+                inputRef={sellingPriceRef}
+                className={classes.inputFields}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <MultiChipSelect
+                onInputValueChange={handleChangeInput}
+                inputValue={productItems.inputValue}
+                availableItems={productItems.items}
+                selectedItem={productItems.selectedItems}
+                onChange={handleChange}
+                onRemoveItem={removeSelectedItem}
               />
             </Grid>
             <Grid item xs={12}>
@@ -173,7 +247,7 @@ const ItemCreate = () => {
                 {isLoading ? (
                   <CircularProgress size={20}> </CircularProgress>
                 ) : (
-                  <>Add Item</>
+                  <>Add Product</>
                 )}
               </Button>
             </Grid>
@@ -184,4 +258,4 @@ const ItemCreate = () => {
   );
 };
 
-export default ItemCreate;
+export default ProductCreate;

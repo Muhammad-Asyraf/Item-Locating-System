@@ -61,7 +61,7 @@ const EnhancedTableToolbar = (props) => {
           id="tableTitle"
           component="div"
         >
-          Item
+          List
         </Typography>
       )}
 

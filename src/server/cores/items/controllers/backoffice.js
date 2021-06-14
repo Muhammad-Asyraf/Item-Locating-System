@@ -40,9 +40,29 @@ exports.removeItem = async (req, res, next) => {
   }
 };
 
+exports.removeMultipleItem = async (req, res, next) => {
+  try {
+    const { listToDelete } = req.body;
+    await Item.query().delete().whereIn('uuid', listToDelete);
+
+    const logMessage = `Successfully deleted following items: ${listToDelete}`;
+    res.json({ message: logMessage });
+  } catch (err) {
+    itemLogger.warn(`Error deleting item`);
+    next(err);
+  }
+};
+
 exports.createItem = async (req, res, next) => {
   try {
-    const item = await Item.query().insert({ ...req.body, uuid: uuidv4() });
+    const { barcode_number, quantity, wholesale_price } = req.body;
+    const item = await Item.query().insert({
+      ...req.body,
+      uuid: uuidv4(),
+      barcode_number: parseInt(barcode_number),
+      wholesale_price: parseFloat(wholesale_price),
+      quantity: parseInt(quantity),
+    });
     itemLogger.info(`item successfully created with [UUID -${item.uuid}]`);
     res.json(item);
   } catch (err) {
@@ -54,10 +74,12 @@ exports.createItem = async (req, res, next) => {
 exports.editItem = async (req, res, next) => {
   try {
     const { uuid } = req.params;
-    // const { uuid, ...patchData } = req.body;
+    const { barcode_number, quantity, wholesale_price } = req.body;
     const item = await Item.query().patchAndFetchById(uuid, {
-      uuid,
       ...req.body,
+      barcode_number: parseInt(barcode_number),
+      wholesale_price: parseFloat(wholesale_price),
+      quantity: parseInt(quantity),
     });
     itemLogger.info(`item successfully update: ${item.uuid}`);
     res.json(item);

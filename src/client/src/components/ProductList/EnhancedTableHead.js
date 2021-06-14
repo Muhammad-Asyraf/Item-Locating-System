@@ -7,14 +7,25 @@ import Checkbox from '@material-ui/core/Checkbox';
 import TableSortLabel from '@material-ui/core/TableSortLabel';
 
 const headCells = [
-  { id: 'name', numeric: false, disablePadding: true, label: 'Name' },
-  { id: 'barcode_number', numeric: true, disablePadding: false, label: 'Barcode' },
-  { id: 'quantity', numeric: true, disablePadding: false, label: 'Quantity' },
+  { id: 'name', numeric: false, disablePadding: false, label: 'Product' },
+  { id: 'is_active', numeric: true, disablePadding: false, label: 'Active' },
   {
-    id: 'wholesale_price',
+    id: 'retail_price',
     numeric: true,
     disablePadding: false,
-    label: 'Wholesale Price',
+    label: 'Retail Price',
+  },
+  {
+    id: 'selling_price',
+    numeric: true,
+    disablePadding: false,
+    label: 'Selling Price',
+  },
+  {
+    id: 'created_at',
+    numeric: true,
+    disablePadding: false,
+    label: 'Created',
   },
   {
     id: 'action',

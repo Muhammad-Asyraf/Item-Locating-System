@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
@@ -13,6 +14,7 @@ import TablePagination from '@material-ui/core/TablePagination';
 import Checkbox from '@material-ui/core/Checkbox';
 import Button from '@material-ui/core/Button';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import Switch from '@material-ui/core/Switch';
 import { makeStyles } from '@material-ui/core/styles';
 
 import AddIcon from '@material-ui/icons/Add';
@@ -22,12 +24,15 @@ import EnhancedTableToolbar from './EnhancedTableToolbar';
 import RowOptions from './RowOptions';
 
 import {
-  selectItems,
+  selectProducts,
   selectIsLoading,
-  // processingRequest,
   processed,
-} from '../../redux/features/itemSlice';
-import { getItems, deleteItem, deleteMultipleItems } from '../../redux/thunks/itemThunk';
+} from '../../redux/features/productSlice';
+import {
+  getProducts,
+  deleteProduct,
+  deleteMultipleProducts,
+} from '../../redux/thunks/productThunk';
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -92,23 +97,24 @@ const useStyles = makeStyles((theme) => ({
     color: 'red !important',
   },
   addButton: {
-    height: '40px',
+    height: '50px',
     color: 'white',
     fontSize: 18,
     marginTop: 20,
-    marginLeft: '20% !important',
+    marginLeft: '50% !important',
+    paddingRight: 20,
     borderRadius: '8px',
     boxShadow: 'rgb(30 136 229 / 24%) 0px 8px 16px 0px',
     textTransform: 'none',
   },
 }));
 
-const ItemList = () => {
+const ProductList = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
-  const itemData = useSelector(selectItems);
+  const productData = useSelector(selectProducts);
   const isLoading = useSelector(selectIsLoading);
-  const [items, setItems] = React.useState([]);
+  const [products, setProducts] = React.useState([]);
   const [order, setOrder] = React.useState('asc');
   const [orderBy, setOrderBy] = React.useState('calories');
   const [selected, setSelected] = React.useState([]);
@@ -117,30 +123,58 @@ const ItemList = () => {
 
   useEffect(() => {
     (async () => {
-      await dispatch(getItems());
+      await dispatch(getProducts());
       dispatch(processed());
     })();
   }, []);
 
   useEffect(() => {
-    if (itemData.length > 0) {
-      setItems(itemData);
+    if (productData.length > 0) {
+      setProducts(productData);
     }
-  }, [itemData]);
+  }, [productData]);
+
+  console.log(productData);
 
   const handleDelete = async (uuid) => {
-    const newItemList = items.filter((item) => item.uuid !== uuid);
-    await dispatch(deleteItem({ uuid }));
-    setItems(newItemList);
+    const newProductList = products.filter((item) => item.uuid !== uuid);
+    await dispatch(deleteProduct({ uuid }));
+    setProducts(newProductList);
   };
 
   const handleMultipleDelete = async () => {
-    const newItemList = items.filter(({ uuid }) => !selected.includes(uuid));
+    const newProductList = products.filter(({ uuid }) => !selected.includes(uuid));
 
-    await dispatch(deleteMultipleItems({ listToDelete: selected }));
-    setItems(newItemList);
+    await dispatch(deleteMultipleProducts({ listToDelete: selected }));
+    setProducts(newProductList);
     setSelected([]);
   };
+
+  const handleToggleStatus = async (uuid, status) => {
+    console.log(uuid);
+    console.log(status);
+    try {
+      const payload = {
+        is_active: !status,
+      };
+      const endpointURL = `/api/backoffice/product-service/product/${uuid}`;
+      await axios.patch(endpointURL, payload);
+
+      const newProductList = products.map((product) => {
+        if (product.uuid === uuid) {
+          return {
+            ...product,
+            is_active: !status,
+          };
+        }
+        return product;
+      });
+      setProducts(newProductList);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+  console.log(axios);
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -150,7 +184,7 @@ const ItemList = () => {
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelecteds = items.map((n) => n.uuid);
+      const newSelecteds = products.map((n) => n.uuid);
       setSelected(newSelecteds);
       return;
     }
@@ -187,8 +221,13 @@ const ItemList = () => {
 
   const isSelected = (uuid) => selected.indexOf(uuid) !== -1;
 
+  const displayDate = (date) => {
+    const createdDate = new Date(date);
+    return createdDate.toDateString();
+  };
+
   const emptyRows =
-    rowsPerPage - Math.min(rowsPerPage, items.length - page * rowsPerPage);
+    rowsPerPage - Math.min(rowsPerPage, products.length - page * rowsPerPage);
 
   if (isLoading) {
     return (
@@ -200,19 +239,20 @@ const ItemList = () => {
   return (
     <div className={classes.root}>
       <Grid container spacing={2} style={{ marginTop: '30px' }}>
-        <Grid item sm={12} md={10}>
-          <h1>Inventory Items</h1>
+        <Grid item sm={12} md={8}>
+          <h1>Products</h1>
+          <p>Add, view and edit your products all in one place.</p>
         </Grid>
-        <Grid item sm={12} md={2}>
+        <Grid item sm={12} md={4}>
           <Button
             variant="contained"
             color="primary"
             type="button"
             className={classes.addButton}
             component={Link}
-            to="/dashboard/item/create"
+            to="/dashboard/product/create"
           >
-            <AddIcon style={{ marginRight: 10 }} /> New Item
+            <AddIcon style={{ marginRight: 10 }} /> Add Product
           </Button>
         </Grid>
       </Grid>
@@ -234,13 +274,13 @@ const ItemList = () => {
               orderBy={orderBy}
               onSelectAllClick={handleSelectAllClick}
               onRequestSort={handleRequestSort}
-              rowCount={items.length}
+              rowCount={products.length}
             />
             <TableBody>
-              {stableSort(items, getComparator(order, orderBy))
+              {stableSort(products, getComparator(order, orderBy))
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((item, index) => {
-                  const isItemSelected = isSelected(item.uuid);
+                .map((product, index) => {
+                  const isItemSelected = isSelected(product.uuid);
                   const labelId = `enhanced-table-checkbox-${index}`;
 
                   return (
@@ -249,24 +289,39 @@ const ItemList = () => {
                       role="checkbox"
                       aria-checked={isItemSelected}
                       tabIndex={-1}
-                      key={item.name}
+                      key={product.uuid}
                       selected={isItemSelected}
                     >
                       <TableCell padding="checkbox">
                         <Checkbox
                           checked={isItemSelected}
-                          onClick={(event) => handleClick(event, item.uuid)}
+                          onClick={(event) => handleClick(event, product.uuid)}
                           inputProps={{ 'aria-labelledby': labelId }}
                         />
                       </TableCell>
-                      <TableCell component="th" id={labelId} scope="row" padding="none">
-                        {item.name}
+                      <TableCell component="th" id={labelId} scope="row">
+                        {product.name}
                       </TableCell>
-                      <TableCell align="right">{item.barcode_number}</TableCell>
-                      <TableCell align="right">{item.quantity}</TableCell>
-                      <TableCell align="right">{item.wholesale_price}</TableCell>
                       <TableCell align="right">
-                        <RowOptions item={item} Link={Link} handleDelete={handleDelete} />
+                        <Switch
+                          checked={product.is_active}
+                          color="primary"
+                          onChange={() => {
+                            handleToggleStatus(product.uuid, product.is_active);
+                          }}
+                        />
+                      </TableCell>
+                      <TableCell align="right">{product.retail_price}</TableCell>
+                      <TableCell align="right">{product.selling_price}</TableCell>
+                      <TableCell align="right">
+                        {displayDate(product.created_at)}
+                      </TableCell>
+                      <TableCell align="right">
+                        <RowOptions
+                          product={product}
+                          Link={Link}
+                          handleDelete={handleDelete}
+                        />
                       </TableCell>
                     </TableRow>
                   );
@@ -282,7 +337,7 @@ const ItemList = () => {
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
-          count={items.length}
+          count={products.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onChangePage={handleChangePage}
@@ -293,4 +348,4 @@ const ItemList = () => {
   );
 };
 
-export default ItemList;
+export default ProductList;

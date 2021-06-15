@@ -24,6 +24,19 @@ class Product extends Model {
           to: 'item.uuid',
         },
       },
+      planning_carts: {
+        relation: Model.ManyToManyRelation,
+        modelClass: require('../planning_carts/model'),
+        join: {
+          from: 'product.uuid',
+          through: {
+            from: 'planning_cart_product.product_uuid',
+            to: 'planning_cart_product.cart_uuid',
+            extra: ["quantity","total_price"]
+          },
+          to: 'planning_cart.uuid',
+        },
+      }
     };
   }
 

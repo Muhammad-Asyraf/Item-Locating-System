@@ -55,7 +55,7 @@ exports.getAllAppUsers = async (req, res, next) => {
   }
 };
 
-exports.findAppUser = async (req, res, next) => {
+exports.findAppUserByUuid = async (req, res, next) => {
   try {
     const { uuid } = req.params;
 
@@ -63,6 +63,22 @@ exports.findAppUser = async (req, res, next) => {
     appUserLogger.info(`Successfully retrieved the appUser: ${appUser.uuid}`);
 
     res.json(appUser);
+  } catch (err) {
+    appUserLogger.warn(`Error retrieving appUser`);
+    next(err);
+  }
+};
+
+exports.findAppUserByEmail = async (req, res, next) => {
+  try {
+    const { email } = req.params;
+
+    const appUser = await AppUser.query().where({
+      email: email
+    })
+    appUserLogger.info(`Successfully retrieved the appUser: ${appUser[0].email}`);
+
+    res.json(appUser[0]);
   } catch (err) {
     appUserLogger.warn(`Error retrieving appUser`);
     next(err);

@@ -16,6 +16,19 @@ class AppUser extends Model {
     return json;
   }
 
+  static get relationMappings() {
+    return {
+      planning_carts: {
+        relation: Model.HasManyRelation,
+        modelClass: require('../planning_carts/model'),
+        join: {
+          from: 'app_user.uuid',
+          to: 'planning_cart.app_user_uuid',
+        },
+      },
+    }
+  }
+
   static get jsonSchema() {
     return {
       type: 'object',

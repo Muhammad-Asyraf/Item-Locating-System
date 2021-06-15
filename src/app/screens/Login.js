@@ -1,12 +1,19 @@
 import React, { useState } from "react";
 import { StyleSheet, ScrollView, View, Text } from "react-native";
 import { TextInput, Title, Paragraph, Button } from "react-native-paper";
+import axios from "axios";
+
+// Environment configs
+import { environment } from "../environment";
+
+// Authentication
 import auth from "@react-native-firebase/auth";
 
 export default function Login() {
+
   const [credentials, setCredentials] = useState({
-    email: "default",
-    password: "default",
+    email: "danishrashidin@gmail.com",
+    password: "danish123",
   });
 
   const handleEmailChange = (email) => {
@@ -26,9 +33,7 @@ export default function Login() {
     // Authenticate
     auth()
       .signInWithEmailAndPassword(credentials.email, credentials.password)
-      .then(() => {
-        console.log("Signed in");
-      })
+      .then()
       .catch((error) => {
         if (error.code === "auth/email-already-in-use") {
           console.log("That email address is already in use!");
@@ -48,7 +53,7 @@ export default function Login() {
 
   const validateEmail = (text) => {
     let reg =
-    /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+      /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     if (reg.test(text) === false) {
       console.log("Email is Not Correct");
       return false;

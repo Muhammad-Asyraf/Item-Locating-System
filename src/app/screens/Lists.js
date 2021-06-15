@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { StyleSheet, View, Text, FlatList } from "react-native";
-import { Appbar, Portal, Dialog, Button } from "react-native-paper";
+import { Appbar, Portal, Dialog, Button, TextInput } from "react-native-paper";
 import axios from "axios";
 
 // Redux
@@ -27,6 +27,9 @@ export default function Lists() {
   // Dialog functions
   const showDialog = () => setVisible(true);
   const closeDialog = () => setVisible(false);
+
+  // Dialog states
+  const [listName, setListName] = useState("")
 
   useEffect(() => {
     const fetchLoketlists = async () => {
@@ -61,10 +64,24 @@ export default function Lists() {
     }
   }, [isLoading]);
 
+  // Dialog handlers
+  const handleNameChange = (text) => {
+    setListName(text)
+  }
+
   const refresh = () => {
     setLoading(true);
   };
-  const addList = () => {};
+  const addList = async () => {
+    // Add cart to back end
+    const { data } = await axios.post(environment.host + '/api/mobile/planning-cart-service/cart/create',{
+      app_user_uuid: user.uuid,
+      name: listName
+    })
+    closeDialog()
+    // Refresh the page
+    setLoading(true)
+  };
 
   return (
     <View>
@@ -88,7 +105,7 @@ export default function Lists() {
             onRefresh={refresh}
             refreshing={isLoading}
             renderItem={({ item }) => (
-              <LoketlistListItem item={item} store_count={"[ALPHA]"} />
+              <LoketlistListItem item={item} store_count={1} />
             )}
           />
         )}
@@ -96,7 +113,7 @@ export default function Lists() {
       <Dialog visible={visible} onDismiss={closeDialog}>
         <Dialog.Title>Add a new list</Dialog.Title>
         <Dialog.Content>
-          <Text value="this is a dialog" />
+          <TextInput label="Name" onChangeText={handleNameChange}/>
         </Dialog.Content>
         <Dialog.Actions>
           <Button onPress={closeDialog}>Cancel</Button>

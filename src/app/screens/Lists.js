@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, View, Text, FlatList } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Text,
+  FlatList,
+  TouchableOpacity,
+} from "react-native";
 import { Appbar, Portal, Dialog, Button, TextInput } from "react-native-paper";
 import axios from "axios";
 
@@ -19,17 +25,26 @@ import { appBarStyles } from "../styles/appBarStyles";
 
 export default function Lists() {
   const [isLoading, setLoading] = useState(true);
-  const [visible, setVisible] = useState(false);
+  const [addVisible, setAddVisible] = useState(false);
+  const [editVisible, setEditVisible] = useState(false);
   const [loketlists, setLoketlists] = useState();
+
+  const [controlCartUuid, setControlCartUuid] = useState("");
 
   const user = useSelector((state) => state.user);
 
-  // Dialog functions
-  const showDialog = () => setVisible(true);
-  const closeDialog = () => setVisible(false);
-
   // Dialog states
-  const [listName, setListName] = useState("")
+  const [listName, setListName] = useState("");
+
+  // Dialog functions
+  const showAddDialog = () => setAddVisible(true);
+  const closeAddDialog = () => setAddVisible(false);
+  const showEditDialog = ({ uuid, name }) => {
+    setControlCartUuid(uuid);
+    setListName(name);
+    setEditVisible(true);
+  };
+  const closeEditDialog = () => setEditVisible(false);
 
   useEffect(() => {
     const fetchLoketlists = async () => {
@@ -65,22 +80,56 @@ export default function Lists() {
   }, [isLoading]);
 
   // Dialog handlers
+  const submitEdit = async () => {
+    // Add cart to back end
+    const { data } = await axios.patch(
+      environment.host + "/api/mobile/planning-cart-service/cart/update",
+      {
+        app_user_uuid: user.uuid,
+        cart_uuid: controlCartUuid,
+        name: listName,
+      }
+    );
+    closeEditDialog();
+    // Refresh
+    setLoading(true);
+  };
+
+  const submitDelete = async () => {
+    // Add cart to back end
+    const { data } = await axios.delete(
+      environment.host + "/api/mobile/planning-cart-service/cart/delete",
+      {
+        data: {
+          app_user_uuid: user.uuid,
+          cart_uuid: controlCartUuid,
+        }
+      }
+    );
+    closeEditDialog();
+    // Refresh
+    setLoading(true);
+  };
+
   const handleNameChange = (text) => {
-    setListName(text)
-  }
+    setListName(text);
+  };
 
   const refresh = () => {
     setLoading(true);
   };
   const addList = async () => {
     // Add cart to back end
-    const { data } = await axios.post(environment.host + '/api/mobile/planning-cart-service/cart/create',{
-      app_user_uuid: user.uuid,
-      name: listName
-    })
-    closeDialog()
+    const { data } = await axios.post(
+      environment.host + "/api/mobile/planning-cart-service/cart/create",
+      {
+        app_user_uuid: user.uuid,
+        name: listName,
+      }
+    );
+    closeAddDialog();
     // Refresh the page
-    setLoading(true)
+    setLoading(true);
   };
 
   return (
@@ -92,7 +141,7 @@ export default function Lists() {
             icon="plus"
             onPress={() => {
               console.log("Open add new list dialog");
-              showDialog();
+              showAddDialog();
             }}
           />
         </Appbar.Header>
@@ -105,19 +154,45 @@ export default function Lists() {
             onRefresh={refresh}
             refreshing={isLoading}
             renderItem={({ item }) => (
-              <LoketlistListItem item={item} store_count={1} />
+              <TouchableOpacity
+                onPress={null}
+                onLongPress={() => showEditDialog(item)}
+              >
+                <LoketlistListItem item={item} store_count={1} />
+              </TouchableOpacity>
             )}
           />
         )}
       </View>
-      <Dialog visible={visible} onDismiss={closeDialog}>
+      <Dialog visible={addVisible} onDismiss={closeAddDialog}>
         <Dialog.Title>Add a new list</Dialog.Title>
         <Dialog.Content>
-          <TextInput label="Name" onChangeText={handleNameChange}/>
+          <TextInput label="Name" onChangeText={handleNameChange} />
         </Dialog.Content>
         <Dialog.Actions>
-          <Button onPress={closeDialog}>Cancel</Button>
+          <Button onPress={closeAddDialog}>Cancel</Button>
           <Button onPress={addList}>Add</Button>
+        </Dialog.Actions>
+      </Dialog>
+      <Dialog visible={editVisible} onDismiss={closeEditDialog}>
+        <Dialog.Title>Manage {listName}</Dialog.Title>
+        <Dialog.Content>
+          <TextInput
+            label="Name"
+            value={listName}
+            onChangeText={handleNameChange}
+          />
+          <Button
+            style={{ marginTop: 24 }}
+            mode="contained"
+            onPress={submitDelete}
+          >
+            Delete
+          </Button>
+        </Dialog.Content>
+        <Dialog.Actions>
+          <Button onPress={closeEditDialog}>Cancel</Button>
+          <Button onPress={submitEdit}>Save</Button>
         </Dialog.Actions>
       </Dialog>
     </View>

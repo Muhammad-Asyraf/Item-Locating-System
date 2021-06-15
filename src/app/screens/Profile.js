@@ -27,12 +27,10 @@ export default function Profile() {
 
   return (
     <View style={GlobalStyle.screenContainer}>
-      <Appbar.Header style={[appBarStyles.appBarContainer, { elevation: 0 }]}>
-        <Text style={appBarStyles.appBarTitle}>YOUR PROFILE</Text>
+      <Appbar.Header style={[appBarStyles.appBarContainer,]}>
+        <Text style={appBarStyles.appBarTitle}>Hello, (username)</Text>
       </Appbar.Header>
       <ScrollView style={GlobalStyle.scrollView}>
-        <Text>Profile</Text>
-        <Text>{JSON.stringify(userData)}</Text>
         <Button onPress={() => logout()}>Log Out</Button>
       </ScrollView>
     </View>

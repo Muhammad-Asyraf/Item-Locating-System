@@ -1,5 +1,53 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import axios from "axios";
 
+// Environment configs
+import { environment } from "../../environment";
+
+export const loadAllItems = createAsyncThunk(
+  "cart/loadAllItems",
+  async (params, thunkAPI) => {
+    const { data } = await axios.get(
+      environment.host + "/api/mobile/planning-cart-service/cart/" + params
+    );
+    return data.products;
+  }
+);
+
+export const addItem = createAsyncThunk(
+  "cart/addItem",
+  async (params, thunkAPI) => {
+    
+    const { data } = await axios.post(
+      environment.host + "/api/mobile/planning-cart-service/cart/items/add",
+      {
+        cart_uuid: params.cart_uuid,
+        product_uuid: params.product_uuid,
+        quantity: params.quantity,
+      }
+    );
+    if (data === 1) console.log("Database updated");
+
+    return params;
+  }
+)
+
+export const changeItemQuantity = createAsyncThunk(
+  "cart/changeItemQuantity",
+  async (params, thunkAPI) => {
+    const { data } = await axios.post(
+      environment.host + "/api/mobile/planning-cart-service/cart/items/update",
+      {
+        cart_uuid: params.cart_uuid,
+        product_uuid: params.product_uuid,
+        quantity: params.quantity,
+      }
+    );
+    if (data === 1) console.log("Database updated");
+
+    return params;
+  }
+);
 export const cartSlice = createSlice({
   name: "cart",
   initialState: {
@@ -35,10 +83,10 @@ export const cartSlice = createSlice({
       console.log(state);
     },
     updateQuantity: (state, { payload }) => {
-      // payload: {productId,quantity}
+      // payload: {product_uuid,quantity}
 
       // Place productId to a variable
-      let product = payload.productId;
+      let product = payload.product_uuid;
       let quantity = payload.quantity;
 
       // Copy state
@@ -80,6 +128,86 @@ export const cartSlice = createSlice({
         state.quantity.splice(index, 1);
       }
     },
+  },
+  extraReducers: {
+    [loadAllItems.fulfilled]: (state, { payload }) => {
+      let productArr = [];
+      let quantityArr = [];
+
+      payload.forEach((product) => {
+        productArr.push(product.uuid);
+        quantityArr.push(product.quantity);
+      });
+
+      state.products = productArr;
+      state.quantity = quantityArr;
+      console.log(state);
+    },
+    [changeItemQuantity.fulfilled]: (state, { payload }) => {
+      // addProduct and updateQuantity algo
+      // Place productId to a variable
+      let product = payload.product_uuid;
+      let quantity = payload.quantity;
+
+      console.log("Product uuid: " + product + ` (${quantity})`);
+
+      // Copy state
+      let productArr = [...state.products];
+      let quantityArr = [...state.quantity];
+
+      // Get the index of the product
+      let index = state.products.indexOf(product);
+
+      // If quantity == 0, remove product from array
+      if (quantity === 0) {
+        console.log("Quantity is zero, removing records");
+        productArr.splice(index, 1);
+        quantityArr.splice(index, 1);
+      } else {
+        console.log("Product quantity exist, updating it");
+        quantityArr[index] = quantity;
+      }
+
+      // Set states
+      state.products = productArr;
+      state.quantity = quantityArr;
+
+      console.log(state);
+    },
+    [changeItemQuantity.rejected]: (state, { payload }) => {
+      console.log("changeItemQuantity rejected");
+    },
+    [addItem.fulfilled]: (state, { payload }) => {
+      // Place productId to a variable
+      let product = payload.product_uuid;
+
+      // Copy state
+      let productArr = [...state.products];
+      let quantityArr = [...state.quantity];
+
+      // Get the index of the product
+      let index = state.products.indexOf(product);
+
+      if(index == -1){
+        productArr.push(product)
+        index = state.products.indexOf(product);
+      }
+
+      // Check of the array index exists
+      if (quantityArr[index] == null) {
+        console.log("Product quantity not exist, creating one");
+        quantityArr.push(1);
+      } else {
+        console.log("Product quantity exist, updating it");
+        quantityArr[index] += 1;
+      }
+
+      // Set states
+      state.products = productArr;
+      state.quantity = quantityArr;
+
+      console.log(state);
+    }
   },
 });
 export const { addProduct, updateQuantity, removeProduct } = cartSlice.actions;

@@ -7,6 +7,7 @@ const Product = require('../../products/model');
 const planningCartLogger = getLogger(__filename, 'auth');
 
 // Get default planning cart by app_user_uuid, else create one
+// TODO: improve on the temporary solution
 exports.getDefaultCart = async (req, res, next) => {
   try {
     const { app_user_uuid } = req.params;
@@ -32,6 +33,10 @@ exports.getDefaultCart = async (req, res, next) => {
           name: app_user_uuid + 'default',
           is_default: true,
         });
+      planningCarts = await AppUser.relatedQuery('planning_carts')
+        .for(app_user_uuid)
+        .where('is_default', true)
+        .withGraphFetched('products');
       planningCartLogger.info(
         `Successfully created default planningCart for user ${app_user_uuid}: ${planningCarts.length} carts`
       );
@@ -48,11 +53,11 @@ exports.getDefaultCart = async (req, res, next) => {
 exports.getCart = async (req, res, next) => {
   try {
     const { uuid } = req.params;
-    const planningCarts = await PlanningCart.query().where({uuid}).withGraphFetched('products')
+    const planningCarts = await PlanningCart.query()
+      .where({ uuid })
+      .withGraphFetched('products');
 
-    planningCartLogger.info(
-      `Successfully get planning cart ${uuid}`
-    );
+    planningCartLogger.info(`Successfully get planning cart ${uuid}`);
 
     res.json(planningCarts[0]);
   } catch (err) {
@@ -223,17 +228,19 @@ exports.updateCartItem = async (req, res, next) => {
       .unrelate()
       .where({ uuid: product_uuid });
 
-    const select = await Product.query()
-      .findById(product_uuid)
-      .select('selling_price');
+    if (quantity !== 0) {
+      const select = await Product.query()
+        .findById(product_uuid)
+        .select('selling_price');
 
-    planningCarts = await PlanningCart.relatedQuery('products')
-      .for(cart_uuid)
-      .relate({
-        uuid: product_uuid,
-        quantity,
-        total_price: quantity * select.selling_price,
-      });
+      planningCarts = await PlanningCart.relatedQuery('products')
+        .for(cart_uuid)
+        .relate({
+          uuid: product_uuid,
+          quantity,
+          total_price: quantity * select.selling_price,
+        });
+    }
 
     planningCartLogger.info(
       `Successfully modified product ${product_uuid} in cart ${cart_uuid}`

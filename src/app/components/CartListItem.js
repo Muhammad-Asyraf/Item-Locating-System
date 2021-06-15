@@ -1,7 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import { StyleSheet, View, Image } from "react-native";
 import { Text, Button, TextInput, Surface } from "react-native-paper";
 import NumericInput from "react-native-numeric-input";
+
+// Redux
+import { useSelector, useDispatch } from "react-redux";
+import { changeItemQuantity } from "../redux/cart/cartSlice";
 
 // Component imports
 import SmallTextChip from "./SmallTextChip";
@@ -10,42 +14,48 @@ import LocationText from "./LocationText";
 // Theme imports
 import { Theme } from "../styles/theme";
 
-export default function CartListItem({
-  style,
-  imageUrl = "https://tinyurl.com/cddseanu",
-  merchant = "Test Industries",
-  itemName = "test item",
-  quantity = 14,
-  sellingPrice = 30.00,
-}) {
-  const handleQuantityChange = () => {};
+export default function CartListItem({ style, item, update }) {
+
+  const dispatch = useDispatch();
+  const [itemDetails, setItemDetails] = useState(item)
+
+  const handleQuantityChange = (value) => {
+    dispatch(changeItemQuantity({
+      cart_uuid: item.cart_uuid,
+      product_uuid: item.product_uuid,
+      quantity: value,
+    }))
+    setItemDetails({
+      ...itemDetails,
+      quantity: value
+    })
+  };
 
   return (
-    <Surface style={[style,{ borderRadius: 5, elevation: 2 }]}>
+    <Surface style={[style, { borderRadius: 5, elevation: 2 }]}>
       <View style={styles.listItemContainer}>
-        <Image
-          style={styles.itemImage}
-          source={{ uri: imageUrl }}
-        ></Image>
+        <Image style={styles.itemImage} source={{ uri: itemDetails.imageUrl }}></Image>
         <View style={styles.itemDetailsContainer}>
           <LocationText
-            text={merchant}
+            text={"General Store"}
             size={10}
             color="#707070"
             style={[styles.itemLocation, { flexDirection: "row-reverse" }]}
           />
           <View style={styles.horizontalContainer}>
-            <Text style={styles.itemName}>{itemName}</Text>
-            <Text style={styles.itemPrice}>{"RM" + sellingPrice + "/pc"}</Text>
+            <Text style={styles.itemName}>{item.name}</Text>
+            <Text style={styles.itemPrice}>
+              {"RM" + itemDetails.selling_price + "/pc"}
+            </Text>
           </View>
           <View style={styles.horizontalContainer}>
             <NumericInput
-              initValue={quantity}
+              initValue={itemDetails.quantity}
               minValue={0}
               totalHeight={30}
               onChange={handleQuantityChange}
             />
-            <SmallTextChip text={"RM" + quantity * sellingPrice} />
+            <SmallTextChip text={"RM" + itemDetails.quantity * itemDetails.selling_price} />
           </View>
         </View>
       </View>

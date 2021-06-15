@@ -1,10 +1,15 @@
-import React, { useEffect } from "react";
-import { StyleSheet, View, Text, SectionList } from "react-native";
-import { Appbar, Title } from "react-native-paper";
+import React, { useEffect, useState} from "react";
+import { StyleSheet, View, Text, FlatList } from "react-native";
+import { Appbar, Title, Dialog } from "react-native-paper";
+import axios from "axios";
+
+// Environment configs
+import { environment } from "../environment";
 
 // Component imports
 import CartListItem from "../components/CartListItem";
 import CartHeader from "../components/CartHeader";
+import Loading from "../components/Loading";
 
 // Redux
 import { useSelector, useDispatch } from "react-redux";
@@ -19,26 +24,73 @@ import { GlobalStyle } from "../styles/theme";
 import { appBarStyles } from "../styles/appBarStyles";
 
 export default function Cart({ navigation }) {
-  const dispatch = useDispatch();
-  const { products, quantity } = useSelector((state) => state.cart);
-  const DATA = [
-    {
-      title: "Main dishes",
-      data: ["Pizza", "Burger", "Risotto"],
-    },
-    {
-      title: "Sides",
-      data: ["French Fries", "Onion Rings", "Fried Shrimps"],
-    },
-  ];
+  const [isLoading, setLoading] = useState(true);
+  const [totalPrice, setTotalPrice] = useState(0)
 
-  if (products.length === 0) {
+  const cart = useSelector((state) => state.cart);
+  const { default_cart_uuid } = useSelector((state) => state.user);
+
+  // Create a data list
+  const [DATA,setData] = useState([]);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      const { data } = await axios.get(
+        environment.host +
+          "/api/mobile/planning-cart-service/cart/" +
+          default_cart_uuid
+      );
+      let totalPrice = 0
+      let DATA = [];
+      for (i = 0; i < cart.products.length; i++) {
+        totalPrice += data.products[i].selling_price*data.products[i].quantity
+        DATA.push({
+          key: i,
+          cart_uuid: default_cart_uuid,
+          product_uuid: cart.products[i],
+          name: data.products[i].name,
+          quantity: data.products[i].quantity,
+          selling_price: data.products[i].selling_price,
+          imageUrl: "https://tinyurl.com/cu8nm69m",
+        });
+      }
+      console.log("Loaded all products into array");
+      setData(DATA)
+      setTotalPrice(totalPrice)
+      setLoading(false);
+    };
+    if (isLoading) {
+      fetchProducts();
+    }
+  },[isLoading]);
+
+  const refreshCart = () => {
+    setLoading(true)
+  }
+
+  if (isLoading) {
     return (
       <View style={GlobalStyle.screenContainer}>
         <Appbar.Header style={[appBarStyles.appBarContainer, { elevation: 0 }]}>
           <Text style={appBarStyles.appBarTitle}>CART</Text>
         </Appbar.Header>
-        <View style={[GlobalStyle.contentContainer,{justifyContent: 'center', alignItems: 'center' }]}>
+        <Loading />
+      </View>
+    );
+  }
+
+  if (cart.products.length === 0) {
+    return (
+      <View style={GlobalStyle.screenContainer}>
+        <Appbar.Header style={[appBarStyles.appBarContainer, { elevation: 0 }]}>
+          <Text style={appBarStyles.appBarTitle}>CART</Text>
+        </Appbar.Header>
+        <View
+          style={[
+            GlobalStyle.contentContainer,
+            { justifyContent: "center", alignItems: "center" },
+          ]}
+        >
           <Text>Your cart is empty!</Text>
         </View>
       </View>
@@ -50,22 +102,23 @@ export default function Cart({ navigation }) {
       <Appbar.Header
         style={[
           appBarStyles.appBarContainer,
-          { elevation: 0, borderBottomWidth: 0.5, borderBottomColor: "#CBCBCB" },
+          {
+            elevation: 0,
+            borderBottomWidth: 0.5,
+            borderBottomColor: "#CBCBCB",
+          },
         ]}
       >
         <Text style={appBarStyles.appBarTitle}>CART</Text>
       </Appbar.Header>
-      <CartHeader discount="RM45.00" price="RM300.00" />
-      <SectionList
+      <CartHeader  price={"RM"+totalPrice} />
+      <FlatList
         style={styles.sectionListView}
-        stickySectionHeadersEnabled={false}
-        sections={DATA}
-        keyExtractor={(item, index) => item + index}
-        renderItem={({ item }) => <CartListItem style={styles.listItem} />}
-        renderSectionHeader={({ section: { title } }) => (
-          <View style={styles.listSectionContainer}>
-            <Title style={styles.listSection}>{title}</Title>
-          </View>
+        onRefresh={refreshCart}
+        refreshing={isLoading}
+        data={DATA}
+        renderItem={({ item }) => (
+          <CartListItem item={item} style={styles.listItem} />
         )}
       />
     </View>

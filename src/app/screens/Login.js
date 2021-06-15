@@ -9,13 +9,7 @@ import { environment } from "../environment";
 // Authentication
 import auth from "@react-native-firebase/auth";
 
-// Redux
-import { useSelector, useDispatch } from "react-redux";
-import { setToken, setUuid } from "../redux/user/userSlice";
-
 export default function Login() {
-  const dispatch = useDispatch();
-  const {token, uuid} = useSelector((state) => state.user);
 
   const [credentials, setCredentials] = useState({
     email: "danishrashidin@gmail.com",
@@ -39,19 +33,7 @@ export default function Login() {
     // Authenticate
     auth()
       .signInWithEmailAndPassword(credentials.email, credentials.password)
-      .then(async () => {
-        try {
-          const { data } = await axios.get(
-            environment.host + "/api/mobile/app-user-service/app-user/email/" + credentials.email,
-          );
-          const idToken = await auth().currentUser.getIdToken(true);
-          dispatch(setToken(idToken))
-          dispatch(setUuid(data.uuid))
-
-        } catch (err) {
-          console.log(err)
-        }
-      })
+      .then()
       .catch((error) => {
         if (error.code === "auth/email-already-in-use") {
           console.log("That email address is already in use!");

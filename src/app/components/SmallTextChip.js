@@ -5,14 +5,22 @@ import { Text } from "react-native-paper";
 // Theme import
 import { Theme } from "../styles/theme";
 
-export default function SmallTextChip({ text, size = 10, color = Theme.colors.primary, marginEnd = true}) {
-
+export default function SmallTextChip({
+  text,
+  fill = false,
+  size = 10,
+  color = Theme.colors.primary,
+  marginEnd = true,
+}) {
   return (
     <Text
       style={[
         styles.text,
         styles.chip,
-        { borderColor: color, color: color, fontSize: size },
+        fill
+          ? { backgroundColor: color, color: "white", borderWidth: 0 }
+          : { borderColor: color, color: color },
+        { fontSize: size },
       ]}
     >
       {text}

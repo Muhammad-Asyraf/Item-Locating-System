@@ -5,7 +5,7 @@ import NumericInput from "react-native-numeric-input";
 
 // Redux
 import { useSelector, useDispatch } from "react-redux";
-import { addProduct, updateQuantity } from "../redux/cart/cartSlice";
+import { addItem, changeItemQuantity } from "../redux/cart/cartSlice";
 
 // Component imports
 import SmallTextChip from "./SmallTextChip";
@@ -25,28 +25,37 @@ export default function ItemCardSmall({
   imageUrl,
 }) {
   const cart = useSelector((state) => state.cart);
+  const user = useSelector((state) => state.user)
   const dispatch = useDispatch();
 
   const [productInCart, setProductInCart] = useState(false);
+  const [updated,setUpdated] = useState(false)
 
   const addToCart = () => {
     console.log("Add product #" + itemId + " to cart");
-    dispatch(addProduct(itemId));
+    dispatch(
+      addItem({
+        cart_uuid: user.default_cart_uuid,
+        product_uuid: itemId,
+        quantity: 1,
+      })
+    );
     setProductInCart(true);
   };
 
   const handleQuantityChange = (value) => {
     dispatch(
-      updateQuantity({
-        productId: itemId,
+      changeItemQuantity({
+        cart_uuid: user.default_cart_uuid,
+        product_uuid: itemId,
         quantity: value,
       })
     );
     if (value === 0) {
       setProductInCart(false);
+      setUpdated(false)
     }
   };
-
 
   let itemIndex = 0;
   itemIndex = cart.products.indexOf(itemId);
@@ -54,11 +63,14 @@ export default function ItemCardSmall({
   useEffect(() => {
     if (cart.products.includes(itemId)) {
       setProductInCart(true);
+    } else {
+      setProductInCart(false)
     }
+    setUpdated(true)
   });
 
   return (
-    <View style={styles.itemContainer} >
+    <View style={styles.itemContainer}>
       <Card>
         <Card.Cover
           style={styles.image}
@@ -71,15 +83,21 @@ export default function ItemCardSmall({
             {quantityLeft == 0 ? (
               <SmallTextChip text="OUT OF STOCK" color="#FF6F00" />
             ) : null}
-            <SmallTextChip text="-50%" />
+            {sellingPrice < normalPrice ? (
+              <SmallTextChip
+                text={((normalPrice - sellingPrice) / normalPrice) * 100 + "%"}
+              />
+            ) : null}
           </View>
           {quantityLeft != 0 ? (
             <Text style={[styles.text, {}]}>{quantityLeft + " left"}</Text>
           ) : null}
           <View style={[styles.horizontalContainer, { marginTop: 12 }]}>
-            <Text style={[styles.text, styles.normalPriceText]}>
-              {"RM" + normalPrice}
-            </Text>
+            {sellingPrice > normalPrice ? (
+              <Text style={[styles.text, styles.normalPriceText]}>
+                {"RM" + normalPrice}
+              </Text>
+            ) : null}
             <Text style={[styles.text, styles.sellingPriceText]}>
               {"RM" + sellingPrice}
             </Text>
@@ -108,6 +126,7 @@ export default function ItemCardSmall({
           mode="outlined"
           compact="true"
           onPress={addToCart}
+          disabled={quantityLeft == 0}
         >
           Add To Cart
         </Button>

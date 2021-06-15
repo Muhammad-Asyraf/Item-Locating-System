@@ -4,10 +4,15 @@ import StackAppBar from "../components/StackAppBar";
 import MainTabsNavigator from "./MainTabsNavigator";
 import SearchResult from "../screens/SearchResult";
 import auth from "@react-native-firebase/auth";
+import axios from "axios";
 
 // Redux
 import { useDispatch } from "react-redux";
-import { setToken, setUuid } from "../redux/user/userSlice";
+import { setToken, setUuid, setDefaultCart, setCurrentCart } from "../redux/user/userSlice";
+import { loadAllItems } from "../redux/cart/cartSlice";
+
+// Environment configs
+import { environment } from "../environment"
 
 const Stack = createStackNavigator();
 
@@ -24,10 +29,16 @@ export default function MainStackNavigator() {
     const fetch = async () => {
       const token = await auth().currentUser.getIdToken(true)
       const uuid = await auth().currentUser.uid
+      const { data } = await axios.get(environment.host + '/api/mobile/planning-cart-service/cart/default/' + uuid)
 
       dispatch(setToken(token))
       dispatch(setUuid(uuid))
+      dispatch(setDefaultCart(data.uuid))
+      dispatch(loadAllItems(data.uuid))
+      dispatch(setCurrentCart(data.uuid))
+
       console.log("Loaded! User uuid: " + uuid)
+      console.log("Default cart uuid: " + data.uuid)
       setLoaded(true)
     } 
 

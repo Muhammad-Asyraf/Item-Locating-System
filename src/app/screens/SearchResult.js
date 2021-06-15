@@ -81,7 +81,7 @@ export default function SearchResult({ navigation, route }) {
               normalPrice={item.retail_price}
               sellingPrice={item.selling_price}
               quantityLeft={item.quantity}
-              imageUrl="https://picsum.photos/200"
+              imageUrl="https://tinyurl.com/cu8nm69m"
             />
           )}
         />

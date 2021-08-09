@@ -98,6 +98,7 @@ const useStyles = makeStyles((theme) => ({
   },
   addButton: {
     height: '50px',
+    width: 200,
     color: 'white',
     fontSize: 18,
     marginTop: 20,

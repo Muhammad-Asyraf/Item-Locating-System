@@ -23,6 +23,8 @@ import {
   selectAuthIsLoading,
 } from '../redux/features/authSlice';
 
+import Image from '../assets/wp3537549.jpg';
+
 const useStyles = makeStyles((theme) => ({
   card: {
     '& > *': {
@@ -31,6 +33,7 @@ const useStyles = makeStyles((theme) => ({
     // minWidth: 275,
     width: 500,
     borderRadius: '8px',
+    position: 'absolute',
   },
   form: {
     '& > *': {
@@ -158,12 +161,15 @@ const Login = () => {
         justify="center"
         style={{
           minHeight: '100vh',
-          backgroundColor: 'rgb(246, 248, 251)',
-          // backgroundColor: '#007AFF',
+          // backgroundColor: 'rgb(246, 248, 251)',
+          backgroundImage: `url(${Image}), linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5))`,
+          backgroundBlendMode: 'overlay',
+          backgroundPosition: 'center center',
+          backgroundRepeat: 'no-repeat',
         }}
       >
-        <Card elevation={1} className={classes.card}>
-          <CardContent style={{ marginLeft: '20px', marginRight: '20px' }}>
+        <Card elevation={20} className={classes.card}>
+          <CardContent style={{ marginLeft: '40px', marginRight: '40px' }}>
             <Grid item xs={12}>
               <h1 style={{ marginTop: '30px', fontSize: '35px' }}>
                 <span style={{ color: '#007AFF' }}>LOKETLA</span> Login

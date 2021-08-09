@@ -1,5 +1,7 @@
 const { Model } = require('objection');
 const tableNames = require('../../database/table_names');
+const Item = require('../items/model');
+const PlanningCart = require('../planning_carts/model');
 
 class Product extends Model {
   static get tableName() {
@@ -14,7 +16,7 @@ class Product extends Model {
     return {
       items: {
         relation: Model.ManyToManyRelation,
-        modelClass: require('../items/model'),
+        modelClass: Item,
         join: {
           from: 'product.uuid',
           through: {
@@ -26,17 +28,17 @@ class Product extends Model {
       },
       planning_carts: {
         relation: Model.ManyToManyRelation,
-        modelClass: require('../planning_carts/model'),
+        modelClass: PlanningCart,
         join: {
           from: 'product.uuid',
           through: {
             from: 'planning_cart_product.product_uuid',
             to: 'planning_cart_product.cart_uuid',
-            extra: ["quantity","total_price"]
+            extra: ['quantity', 'total_price'],
           },
           to: 'planning_cart.uuid',
         },
-      }
+      },
     };
   }
 

@@ -106,7 +106,6 @@ const ProductCreate = () => {
       items: productItems.selectedItems.map((item) => ({ uuid: item.uuid })),
     };
 
-    console.log(payload);
     const { type } = await dispatch(addProduct(payload));
 
     if (type.includes('fulfilled')) {
@@ -114,9 +113,6 @@ const ProductCreate = () => {
     }
     dispatch(processed());
   };
-
-  console.log(history);
-  console.log(addProduct);
 
   const addSelectedItem = (item) => {
     setProductItems({

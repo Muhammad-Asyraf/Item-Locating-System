@@ -24,6 +24,8 @@ import {
   selectAuthIsLoading,
 } from '../redux/features/authSlice';
 
+import Image from '../assets/wp3537549.jpg';
+
 const useStyles = makeStyles((theme) => ({
   card: {
     '& > *': {
@@ -36,8 +38,8 @@ const useStyles = makeStyles((theme) => ({
   },
   cardContent: {
     flexGrow: 1,
-    marginLeft: '20px',
-    marginRight: '20px',
+    marginLeft: '40px',
+    marginRight: '40px',
   },
   form: {
     '& > *': {
@@ -191,7 +193,11 @@ const Login = () => {
         style={{
           minHeight: '100vh',
           minWidth: '100vw',
-          backgroundColor: 'rgb(246, 248, 251)',
+          // backgroundColor: 'rgb(246, 248, 251)',
+          backgroundImage: `url(${Image}), linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5))`,
+          backgroundBlendMode: 'overlay',
+          backgroundPosition: 'center center',
+          backgroundRepeat: 'no-repeat',
           // backgroundColor: '#0984e3',
         }}
       >

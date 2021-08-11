@@ -35,6 +35,7 @@ export default function Lists() {
 
   // Dialog states
   const [listName, setListName] = useState("");
+  let name = listName
 
   // Dialog functions
   const showAddDialog = () => setAddVisible(true);
@@ -57,6 +58,7 @@ export default function Lists() {
       for (i = 0; i < data.length; i++) {
         if (data[i].is_default == true) {
           loketlists.push({
+            key: i,
             uuid: data[i].uuid,
             app_user_uuid: data[i].app_user_uuid,
             name: "General Cart",
@@ -64,6 +66,7 @@ export default function Lists() {
           });
         } else {
           loketlists.push({
+            key: i,
             uuid: data[i].uuid,
             app_user_uuid: data[i].app_user_uuid,
             name: data[i].name,
@@ -175,7 +178,7 @@ export default function Lists() {
         </Dialog.Actions>
       </Dialog>
       <Dialog visible={editVisible} onDismiss={closeEditDialog}>
-        <Dialog.Title>Manage {listName}</Dialog.Title>
+        <Dialog.Title>Manage {name}</Dialog.Title>
         <Dialog.Content>
           <TextInput
             label="Name"

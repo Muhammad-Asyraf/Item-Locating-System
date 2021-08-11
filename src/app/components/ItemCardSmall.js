@@ -5,7 +5,7 @@ import NumericInput from "react-native-numeric-input";
 
 // Redux
 import { useSelector, useDispatch } from "react-redux";
-import { addItem, changeItemQuantity } from "../redux/cart/cartSlice";
+import { addItem, changeItemQuantity, update } from "../redux/cart/cartSlice";
 
 // Component imports
 import SmallTextChip from "./SmallTextChip";
@@ -29,7 +29,6 @@ export default function ItemCardSmall({
   const dispatch = useDispatch();
 
   const [productInCart, setProductInCart] = useState(false);
-  const [updated,setUpdated] = useState(false)
 
   const addToCart = () => {
     console.log("Add product #" + itemId + " to cart");
@@ -53,7 +52,6 @@ export default function ItemCardSmall({
     );
     if (value === 0) {
       setProductInCart(false);
-      setUpdated(false)
     }
   };
 
@@ -66,7 +64,6 @@ export default function ItemCardSmall({
     } else {
       setProductInCart(false)
     }
-    setUpdated(true)
   });
 
   return (

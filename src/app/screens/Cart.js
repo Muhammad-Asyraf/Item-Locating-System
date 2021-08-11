@@ -1,7 +1,8 @@
-import React, { useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, View, Text, FlatList } from "react-native";
 import { Appbar, Title, Dialog } from "react-native-paper";
 import axios from "axios";
+import { useFocusEffect } from "@react-navigation/native";
 
 // Environment configs
 import { environment } from "../environment";
@@ -13,11 +14,7 @@ import Loading from "../components/Loading";
 
 // Redux
 import { useSelector, useDispatch } from "react-redux";
-import {
-  addProduct,
-  updateQuantity,
-  removeProduct,
-} from "../redux/cart/cartSlice";
+import { update } from "../redux/cart/cartSlice";
 
 // Styling
 import { GlobalStyle } from "../styles/theme";
@@ -25,48 +22,66 @@ import { appBarStyles } from "../styles/appBarStyles";
 
 export default function Cart({ navigation }) {
   const [isLoading, setLoading] = useState(true);
-  const [totalPrice, setTotalPrice] = useState(0)
+  const [totalPrice, setTotalPrice] = useState(0);
 
   const cart = useSelector((state) => state.cart);
+  const dispatch = useDispatch();
   const { default_cart_uuid } = useSelector((state) => state.user);
 
   // Create a data list
-  const [DATA,setData] = useState([]);
+  const [DATA, setData] = useState([]);
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      const { data } = await axios.get(
-        environment.host +
-          "/api/mobile/planning-cart-service/cart/" +
-          default_cart_uuid
-      );
-      let totalPrice = 0
-      let DATA = [];
-      for (i = 0; i < cart.products.length; i++) {
-        totalPrice += data.products[i].selling_price*data.products[i].quantity
-        DATA.push({
-          key: i,
-          cart_uuid: default_cart_uuid,
-          product_uuid: cart.products[i],
-          name: data.products[i].name,
-          quantity: data.products[i].quantity,
-          selling_price: data.products[i].selling_price,
-          imageUrl: "https://tinyurl.com/cu8nm69m",
-        });
+  useFocusEffect(
+    React.useCallback(() => {
+      setLoading(cart.update)
+      console.log("Reload? : " + isLoading);
+
+      const fetchProducts = async () => {
+        const { data } = await axios.get(
+          environment.host +
+            "/api/mobile/planning-cart-service/cart/" +
+            default_cart_uuid
+        );
+        let DATA = [];
+        for (i = 0; i < cart.products.length; i++) {
+          DATA.push({
+            key: i,
+            cart_uuid: default_cart_uuid,
+            product_uuid: cart.products[i],
+            name: data.products[i].name,
+            quantity: data.products[i].quantity,
+            selling_price: data.products[i].selling_price,
+            imageUrl: "https://tinyurl.com/cu8nm69m",
+          });
+        }
+        console.log("Loaded all products into array");
+
+        // Update redux states
+        dispatch(update(false));
+
+        // Update local states
+        setData(DATA);
+        setTotalPrice(totalPrice);
+        setLoading(false);
+      };
+
+      if (isLoading) {
+        fetchProducts();
       }
-      console.log("Loaded all products into array");
-      setData(DATA)
-      setTotalPrice(totalPrice)
-      setLoading(false);
-    };
-    if (isLoading) {
-      fetchProducts();
-    }
-  },[isLoading]);
+
+      // Update the totalPrice
+      let totalPrice = 0;
+      for (i = 0; i < DATA.length; i++) {
+        totalPrice += DATA[i].selling_price * DATA[i].quantity;
+      }
+      console.log(totalPrice)
+      setTotalPrice(totalPrice);
+    }, [isLoading, cart.quantity])
+  );
 
   const refreshCart = () => {
-    setLoading(true)
-  }
+    setLoading(true);
+  };
 
   if (isLoading) {
     return (
@@ -111,7 +126,7 @@ export default function Cart({ navigation }) {
       >
         <Text style={appBarStyles.appBarTitle}>CART</Text>
       </Appbar.Header>
-      <CartHeader  price={"RM"+totalPrice} />
+      <CartHeader price={"RM" + totalPrice} />
       <FlatList
         style={styles.sectionListView}
         onRefresh={refreshCart}

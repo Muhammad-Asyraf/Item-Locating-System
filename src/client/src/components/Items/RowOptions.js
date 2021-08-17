@@ -45,7 +45,7 @@ const RowMenu = (props) => {
           <DeleteRoundedIcon style={{ padding: 5, fontSize: 30 }} />
           Delete
         </MenuItem>
-        <MenuItem component={Link} to={`/dashboard/item/edit/${item.uuid}`}>
+        <MenuItem component={Link} to={`/store-slug/item/edit/${item.uuid}`}>
           <EditRoundedIcon style={{ padding: 5, fontSize: 30 }} />
           Edit
         </MenuItem>

@@ -1,6 +1,5 @@
 const { Model } = require('objection');
 const tableNames = require('../../database/table_names');
-const Product = require('../products/model');
 
 class Item extends Model {
   static get tableName() {
@@ -15,7 +14,7 @@ class Item extends Model {
     return {
       products: {
         relation: Model.ManyToManyRelation,
-        modelClass: Product,
+        modelClass: require('../products/model'),
         join: {
           from: 'item.uuid',
           through: {

@@ -13,10 +13,11 @@ import LoginForm from '../components/Login/LoginForm';
 import { auth } from '../firebase';
 import {
   verified,
-  login,
+  clearState,
   selectAuthMessage,
   selectAuthIsLoading,
 } from '../redux/features/authSlice';
+import { login } from '../redux/thunks/authThunk';
 
 const useStyles = makeStyles((theme) => ({
   card: {
@@ -41,7 +42,8 @@ const Login = () => {
     const { type } = await dispatch(login({ firebase: auth, email, password }));
 
     if (type.includes('fulfilled')) {
-      history.push('/dashboard');
+      dispatch(clearState());
+      history.push('/store-slug/dashboard');
     }
     dispatch(verified());
   };

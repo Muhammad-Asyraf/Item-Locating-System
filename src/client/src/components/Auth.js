@@ -9,10 +9,10 @@ import LinearProgress from '@material-ui/core/LinearProgress';
 import { auth } from '../firebase';
 import {
   setActiveUser,
-  setHeader,
   verified,
   selectAuthIsLoading,
 } from '../redux/features/authSlice';
+import { setHeader } from '../redux/thunks/authThunk';
 
 const useStyles = makeStyles({
   root: {

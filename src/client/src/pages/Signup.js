@@ -13,10 +13,10 @@ import SignupForm from '../components/Signup/SignupForm';
 import {
   // setHeader,
   verified,
-  signup,
   selectAuthMessage,
   selectAuthIsLoading,
 } from '../redux/features/authSlice';
+import { signup } from '../redux/thunks/authThunk';
 
 const useStyles = makeStyles((theme) => ({
   card: {

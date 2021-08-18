@@ -59,9 +59,9 @@ exports.createItem = async (req, res, next) => {
     const item = await Item.query().insert({
       ...req.body,
       uuid: uuidv4(),
-      barcode_number: parseInt(barcode_number),
+      barcode_number: parseInt(barcode_number, 10),
       wholesale_price: parseFloat(wholesale_price),
-      quantity: parseInt(quantity),
+      quantity: parseInt(quantity, 10),
     });
     itemLogger.info(`item successfully created with [UUID -${item.uuid}]`);
     res.json(item);
@@ -77,9 +77,9 @@ exports.editItem = async (req, res, next) => {
     const { barcode_number, quantity, wholesale_price } = req.body;
     const item = await Item.query().patchAndFetchById(uuid, {
       ...req.body,
-      barcode_number: parseInt(barcode_number),
+      barcode_number: parseInt(barcode_number, 10),
       wholesale_price: parseFloat(wholesale_price),
-      quantity: parseInt(quantity),
+      quantity: parseInt(quantity, 10),
     });
     itemLogger.info(`item successfully update: ${item.uuid}`);
     res.json(item);

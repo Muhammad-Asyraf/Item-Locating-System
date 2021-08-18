@@ -10,6 +10,7 @@ class BackofficeUser extends Model {
     return 'uuid';
   }
 
+  /* eslint-disable no-param-reassign */
   $formatJson(json) {
     json = super.$formatJson(json);
     delete json.password;

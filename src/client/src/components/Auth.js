@@ -3,16 +3,16 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
 import { makeStyles } from '@material-ui/core/styles';
-// import CircularProgress from '@material-ui/core/CircularProgress';
 import LinearProgress from '@material-ui/core/LinearProgress';
+// import CircularProgress from '@material-ui/core/CircularProgress';
 
 import { auth } from '../firebase';
 import {
   setActiveUser,
-  setHeader,
   verified,
   selectAuthIsLoading,
 } from '../redux/features/authSlice';
+import { setHeader } from '../redux/thunks/authThunk';
 
 const useStyles = makeStyles({
   root: {
@@ -29,8 +29,8 @@ const useStyles = makeStyles({
 
 /* eslint-disable react/prop-types */
 const Auth = ({ children }) => {
-  const classes = useStyles();
   const dispatch = useDispatch();
+  const classes = useStyles();
   const authLoading = useSelector(selectAuthIsLoading);
   const history = useHistory();
   const [firstRender, setFirstRender] = useState(true);
@@ -47,7 +47,7 @@ const Auth = ({ children }) => {
         );
         await dispatch(setHeader(auth));
         if (history.location.pathname === '/auth/login') {
-          history.push('/dashboard');
+          history.push('/store-slug/dashboard');
         }
       }
       dispatch(verified());
@@ -61,8 +61,8 @@ const Auth = ({ children }) => {
       <div className={classes.root}>
         <LinearProgress color="secondary" />
         {/* <div className={classes.circular}>
-          <CircularProgress size={70} color="secondary" />
-        </div> */}
+        <CircularProgress size={70} color="secondary" />
+      </div> */}
       </div>
     );
   }

@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { StyleSheet, View, Text, FlatList } from "react-native";
 import { Appbar, Title, Dialog } from "react-native-paper";
 import axios from "axios";
-import { useFocusEffect } from "@react-navigation/native";
 
 // Environment configs
 import { environment } from "../environment";
@@ -14,70 +13,59 @@ import Loading from "../components/Loading";
 
 // Redux
 import { useSelector, useDispatch } from "react-redux";
-import { update } from "../redux/cart/cartSlice";
+import {
+  addProduct,
+  updateQuantity,
+  removeProduct,
+} from "../redux/cart/cartSlice";
 
 // Styling
 import { GlobalStyle } from "../styles/theme";
 import { appBarStyles } from "../styles/appBarStyles";
 
-export default function Cart({ navigation }) {
+export default function Loketlist({ navigation, route }) {
   const [isLoading, setLoading] = useState(true);
   const [totalPrice, setTotalPrice] = useState(0);
 
+  const cartUuid = route.params.query
+
   const cart = useSelector((state) => state.cart);
-  const dispatch = useDispatch();
   const { default_cart_uuid } = useSelector((state) => state.user);
 
   // Create a data list
   const [DATA, setData] = useState([]);
 
-  useFocusEffect(
-    React.useCallback(() => {
-      setLoading(cart.update)
-      console.log("Reload? : " + isLoading);
-
-      const fetchProducts = async () => {
-        const { data } = await axios.get(
-          environment.host +
-            "/api/mobile/planning-cart-service/cart/" +
-            default_cart_uuid
-        );
-        let DATA = [];
-        for (i = 0; i < cart.products.length; i++) {
-          DATA.push({
-            key: i,
-            cart_uuid: default_cart_uuid,
-            product_uuid: cart.products[i],
-            name: data.products[i].name,
-            quantity: data.products[i].quantity,
-            selling_price: data.products[i].selling_price,
-            imageUrl: "https://tinyurl.com/cu8nm69m",
-          });
-        }
-        console.log("Loaded all products into array");
-
-        // Update redux states
-        dispatch(update(false));
-
-        // Update local states
-        setData(DATA);
-        setTotalPrice(totalPrice);
-        setLoading(false);
-      };
-
-      if (isLoading) {
-        fetchProducts();
-      }
-
-      // Update the totalPrice
+  useEffect(() => {
+    const fetchProducts = async () => {
+      const { data } = await axios.get(
+        environment.host +
+          "/api/mobile/planning-cart-service/cart/" +
+          cartUuid
+      );
       let totalPrice = 0;
-      for (i = 0; i < DATA.length; i++) {
-        totalPrice += DATA[i].selling_price * DATA[i].quantity;
+      let DATA = [];
+      for (i = 0; i < cart.products.length; i++) {
+        totalPrice +=
+          data.products[i].selling_price * data.products[i].quantity;
+        DATA.push({
+          key: i,
+          cart_uuid: default_cart_uuid,
+          product_uuid: cart.products[i],
+          name: data.products[i].name,
+          quantity: data.products[i].quantity,
+          selling_price: data.products[i].selling_price,
+          imageUrl: "https://tinyurl.com/cu8nm69m",
+        });
       }
-      console.log(totalPrice)
+      console.log("Loaded all products into array");
+      setData(DATA);
       setTotalPrice(totalPrice);
-    }, [isLoading, cart.quantity])
-  );
+      setLoading(false);
+    };
+    if (isLoading) {
+      fetchProducts();
+    }
+  }, [isLoading]);
 
   const refreshCart = () => {
     setLoading(true);
@@ -87,6 +75,9 @@ export default function Cart({ navigation }) {
     return (
       <View style={GlobalStyle.screenContainer}>
         <Appbar.Header style={[appBarStyles.appBarContainer, { elevation: 0 }]}>
+          {navigation.canGoBack() ? (
+            <Appbar.BackAction color="#007AFF" onPress={navigation.goBack} />
+          ) : null}
           <Text style={appBarStyles.appBarTitle}>CART</Text>
         </Appbar.Header>
         <Loading />
@@ -98,6 +89,9 @@ export default function Cart({ navigation }) {
     return (
       <View style={GlobalStyle.screenContainer}>
         <Appbar.Header style={[appBarStyles.appBarContainer, { elevation: 0 }]}>
+          {navigation.canGoBack() ? (
+            <Appbar.BackAction color="#007AFF" onPress={navigation.goBack} />
+          ) : null}
           <Text style={appBarStyles.appBarTitle}>CART</Text>
         </Appbar.Header>
         <View
@@ -124,6 +118,9 @@ export default function Cart({ navigation }) {
           },
         ]}
       >
+        {navigation.canGoBack() ? (
+          <Appbar.BackAction color="#007AFF" onPress={navigation.goBack} />
+        ) : null}
         <Text style={appBarStyles.appBarTitle}>CART</Text>
       </Appbar.Header>
       <CartHeader price={"RM" + totalPrice} />

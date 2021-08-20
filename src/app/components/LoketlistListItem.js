@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
-import { StyleSheet, View, ImageBackground } from "react-native";
-import { Text } from "react-native-paper";
+import { StyleSheet, View, ImageBackground, TouchableOpacity } from "react-native";
+import { Text, TextInput,} from "react-native-paper";
 
 // Component imports
 import SmallTextChip from "./SmallTextChip";
@@ -10,11 +10,11 @@ export default function LoketlistListItem({
   store_count,
 }) {
 
-
-
   const image = { uri: 'https://tinyurl.com/cu8nm69m'}
+  
+  
   return (
-    <ImageBackground source={image} style={styles.listItemContainer}>
+      <ImageBackground source={image} style={styles.listItemContainer} >
       <View style={styles.horizontalContainer}>
         <Text style={styles.title}>{item.name}</Text>
         <Text style={styles.storeCount}>{store_count} stores in route</Text>

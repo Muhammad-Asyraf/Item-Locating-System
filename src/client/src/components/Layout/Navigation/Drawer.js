@@ -30,7 +30,7 @@ import LocalAtmTwoToneIcon from '@material-ui/icons/LocalAtmTwoTone';
 
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 
-import { ReactComponent as Megaphone } from '../../assets/megaphone.svg';
+import { ReactComponent as Megaphone } from '../../../assets/megaphone.svg';
 
 const drawerWidth = 260;
 

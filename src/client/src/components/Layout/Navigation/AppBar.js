@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { withRouter } from 'react-router-dom';
-
 import { useDispatch } from 'react-redux';
+
 import { AppBar as MUIAppBar } from '@material-ui/core';
 import IconButton from '@material-ui/core/IconButton';
 import Badge from '@material-ui/core/Badge';
@@ -18,8 +18,8 @@ import SearchRoundedIcon from '@material-ui/icons/SearchRounded';
 import LockIcon from '@material-ui/icons/Lock';
 import { makeStyles } from '@material-ui/core/styles';
 
-import { clearActiveUser, verifying, verified } from '../../redux/features/authSlice';
-import { auth } from '../../firebase';
+import { clearActiveUser, verifying, verified } from '../../../redux/features/authSlice';
+import { auth } from '../../../firebase';
 
 const drawerWidth = 260;
 const useStyles = makeStyles((theme) => ({
@@ -51,7 +51,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const AppBars = (props) => {
+const AppBar = (props) => {
   const dispatch = useDispatch();
   const classes = useStyles();
   // const { handleDrawerToggle } = props;
@@ -128,4 +128,4 @@ const AppBars = (props) => {
   );
 };
 
-export default withRouter(AppBars);
+export default withRouter(AppBar);

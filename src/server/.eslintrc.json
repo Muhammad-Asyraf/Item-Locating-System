@@ -17,6 +17,8 @@
       "warn",
       { "onlyFunctionsWithAsyncKeyword": true }
     ],
-    "arrow-body-style": ["error", "always"]
+    "arrow-body-style": ["error", "always"],
+    "camelcase": "off",
+    "global-require": "off"
   }
 }

@@ -1,19 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { withRouter, Switch, Route } from 'react-router-dom';
+import React, { useState } from 'react';
+import { withRouter } from 'react-router-dom';
 
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 
-import Drawer from './Drawer';
-import AppBars from './AppBars';
-
-import Item from '../Item';
-import Sales from '../Sales';
-import Home from '../Home';
-import Product from '../Product';
-
-import { clearState } from '../../redux/features/authSlice';
+import Drawer from './Navigation/Drawer';
+import AppBar from './Navigation/AppBar';
 
 const drawerWidth = 260;
 const useStyles = makeStyles((theme) => ({
@@ -36,15 +28,10 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 /* eslint-disable react/prop-types */
-const Dashboard = (props) => {
+const Layout = (props) => {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const dispatch = useDispatch();
   const classes = useStyles();
-  const { match } = props;
-
-  useEffect(() => {
-    dispatch(clearState());
-  }, []);
+  const { children } = props;
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -52,7 +39,7 @@ const Dashboard = (props) => {
 
   return (
     <div className={classes.root}>
-      <AppBars handleDrawerToggle={handleDrawerToggle} />
+      <AppBar handleDrawerToggle={handleDrawerToggle} />
       <nav className={classes.drawer}>
         <Drawer
           type="Mobile"
@@ -62,15 +49,10 @@ const Dashboard = (props) => {
         <Drawer type="Desktop" />
       </nav>
       <Container maxWidth="xl" className={classes.container}>
-        <Switch>
-          <Route path={`${match.path}`} exact component={Home} />
-          <Route path={`${match.path}/item`} component={Item} />
-          <Route path={`${match.path}/sales`} component={Sales} />
-          <Route path={`${match.path}/product`} component={Product} />
-        </Switch>
+        {children}
       </Container>
     </div>
   );
 };
 
-export default withRouter(Dashboard);
+export default withRouter(Layout);

@@ -50,7 +50,7 @@ exports.removeMultipleProduct = async (req, res, next) => {
     const logMessage = `Successfully deleted following products: ${listToDelete}`;
     res.json({ message: logMessage });
   } catch (err) {
-    itemLogger.warn(`Error deleting products`);
+    productLogger.warn(`Error deleting products`);
     next(err);
   }
 };

@@ -1,8 +1,8 @@
 const { v4: uuidv4 } = require('uuid');
 const PlanningCart = require('../model');
 const AppUser = require('../../app_users/model');
-const getLogger = require('../../../utils/logger');
 const Product = require('../../products/model');
+const getLogger = require('../../../utils/logger');
 
 const planningCartLogger = getLogger(__filename, 'auth');
 

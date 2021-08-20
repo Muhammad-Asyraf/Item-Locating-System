@@ -3,6 +3,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import StackAppBar from "../components/StackAppBar";
 import MainTabsNavigator from "./MainTabsNavigator";
 import SearchResult from "../screens/SearchResult";
+import Loketlist from "../screens/Loketlist"
 import auth from "@react-native-firebase/auth";
 import axios from "axios";
 
@@ -65,6 +66,10 @@ export default function MainStackNavigator() {
       <Stack.Screen 
       name="Search Result" 
       component={SearchResult}
+      />
+      <Stack.Screen 
+      name="Loketlist" 
+      component={Loketlist}
       />
     </Stack.Navigator>
   );

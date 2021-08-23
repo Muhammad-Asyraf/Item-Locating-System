@@ -16,7 +16,7 @@ exports.getDefaultCart = async (req, res, next) => {
       .where('is_default', true)
       .withGraphFetched('products');
 
-    if (planningCarts.length != 0) {
+    if (planningCarts.length !== 0) {
       planningCartLogger.info(
         `Successfully retrieved default planningCart for user ${app_user_uuid}: ${planningCarts.length} carts`
       );
@@ -30,7 +30,7 @@ exports.getDefaultCart = async (req, res, next) => {
         .insert({
           uuid: uuidv4(),
           app_user_uuid,
-          name: app_user_uuid + 'default',
+          name: `${app_user_uuid} default`,
           is_default: true,
         });
       planningCarts = await AppUser.relatedQuery('planning_carts')
@@ -75,7 +75,7 @@ exports.createNewCart = async (req, res, next) => {
       .insert({
         uuid: uuidv4(),
         app_user_uuid,
-        name: name,
+        name,
         is_default: false,
       });
 
@@ -97,7 +97,7 @@ exports.modifyCart = async (req, res, next) => {
     const planningCarts = await AppUser.relatedQuery('planning_carts')
       .for(app_user_uuid)
       .patch({
-        name: name,
+        name,
       })
       .where({
         uuid: cart_uuid,

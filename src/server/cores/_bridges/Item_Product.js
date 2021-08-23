@@ -1,5 +1,5 @@
 const { Model } = require('objection');
-const tableNames = require('../../utils/table_names');
+const tableNames = require('../../database/table_names');
 
 class ItemProduct extends Model {
   static get tableName() {

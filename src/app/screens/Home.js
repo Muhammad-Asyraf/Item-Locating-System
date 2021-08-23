@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import auth from "@react-native-firebase/auth";
 import {
   StyleSheet,
   Dimensions,
@@ -13,7 +12,6 @@ import Carousel, { ParallaxImage } from "react-native-snap-carousel";
 
 // Styling
 import { GlobalStyle } from "../styles/theme";
-import { appBarStyles } from "../styles/appBarStyles";
 
 const { width: screenWidth } = Dimensions.get("window");
 export default function Home({ navigation }) {

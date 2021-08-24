@@ -9,6 +9,7 @@ import { selectIsLoading, processed } from '../../redux/features/itemSlice';
 import { addItem } from '../../redux/thunks/itemThunk';
 
 import ItemForm from '../../components/Items/ItemForm';
+import { selectAuthHeader } from '../../redux/features/authSlice';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -21,13 +22,14 @@ const ItemCreate = () => {
   const dispatch = useDispatch();
   const history = useHistory();
   const isLoading = useSelector(selectIsLoading);
+  const authHeader = useSelector(selectAuthHeader);
 
   useEffect(() => {
     dispatch(processed());
   }, []);
 
   const handleSubmit = async (payload) => {
-    const { type } = await dispatch(addItem(payload));
+    const { type } = await dispatch(addItem({ payload, authHeader }));
 
     if (type.includes('fulfilled')) {
       history.push('/store-slug/item/list');

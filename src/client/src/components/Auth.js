@@ -10,6 +10,7 @@ import { auth } from '../firebase';
 import {
   setActiveUser,
   verified,
+  clearState,
   selectAuthIsLoading,
 } from '../redux/features/authSlice';
 import { setHeader } from '../redux/thunks/authThunk';
@@ -38,10 +39,11 @@ const Auth = ({ children }) => {
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
       if (user) {
+        console.log('im in');
         dispatch(
           setActiveUser({
             user: user.toJSON(),
-            message: 'Successfully logged in',
+            message: 'Successfully set active user',
             status: 'ok',
           })
         );
@@ -50,6 +52,7 @@ const Auth = ({ children }) => {
           history.push('/store-slug/dashboard');
         }
       }
+      dispatch(clearState());
       dispatch(verified());
       setFirstRender(false);
       unsubscribe();

@@ -3,10 +3,10 @@ import axios from 'axios';
 
 export const getProducts = createAsyncThunk(
   'product/getProducts',
-  async (arg, { rejectWithValue }) => {
+  async (authHeader, { rejectWithValue }) => {
     try {
       const endpointURL = '/api/backoffice/product-service/products';
-      const res = await axios.get(endpointURL);
+      const res = await axios.get(endpointURL, authHeader);
 
       return {
         products: res.data,
@@ -28,10 +28,10 @@ export const getProducts = createAsyncThunk(
 
 export const addProduct = createAsyncThunk(
   'product/addProduct',
-  async (payload, { rejectWithValue }) => {
+  async ({ payload, authHeader }, { rejectWithValue }) => {
     try {
       const endpointURL = '/api/backoffice/product-service/product';
-      await axios.post(endpointURL, payload);
+      await axios.post(endpointURL, payload, authHeader);
 
       return true;
     } catch (err) {
@@ -48,10 +48,10 @@ export const addProduct = createAsyncThunk(
 
 export const deleteProduct = createAsyncThunk(
   'product/deleteProduct',
-  async ({ uuid }, { rejectWithValue }) => {
+  async ({ uuid, authHeader }, { rejectWithValue }) => {
     try {
       const endpointURL = `/api/backoffice/product-service/product/${uuid}`;
-      await axios.delete(endpointURL);
+      await axios.delete(endpointURL, authHeader);
 
       return true;
     } catch (err) {
@@ -69,10 +69,12 @@ export const deleteProduct = createAsyncThunk(
 
 export const deleteMultipleProducts = createAsyncThunk(
   'product/deleteMultipleProducts',
-  async (listToDelete, { rejectWithValue }) => {
+  async ({ payload, authHeader }, { rejectWithValue }) => {
+    console.log(payload);
+    console.log(authHeader);
     try {
       const endpointURL = '/api/backoffice/product-service/product/delete';
-      await axios.post(endpointURL, listToDelete);
+      await axios.post(endpointURL, payload, authHeader);
 
       return true;
     } catch (err) {
@@ -90,10 +92,10 @@ export const deleteMultipleProducts = createAsyncThunk(
 
 export const updateProduct = createAsyncThunk(
   'product/updateProduct',
-  async ({ uuid, payload }, { rejectWithValue }) => {
+  async ({ uuid, payload, authHeader }, { rejectWithValue }) => {
     try {
       const endpointURL = `/api/backoffice/product-service/product/${uuid}`;
-      await axios.put(endpointURL, payload);
+      await axios.put(endpointURL, payload, authHeader);
 
       return true;
     } catch (err) {

@@ -15,6 +15,7 @@ import {
   processed,
 } from '../../redux/features/itemSlice';
 import { updateItem } from '../../redux/thunks/itemThunk';
+import { selectAuthHeader } from '../../redux/features/authSlice';
 
 import ItemEditForm from '../../components/Items/ItemEditForm';
 
@@ -36,6 +37,7 @@ const ItemEdit = (props) => {
   const dispatch = useDispatch();
   const history = useHistory();
   const isLoading = useSelector(selectIsLoading);
+  const authHeader = useSelector(selectAuthHeader);
   const [currentItem, setCurrentItem] = useState({
     name: '',
     barcode_number: '',
@@ -49,7 +51,7 @@ const ItemEdit = (props) => {
   const getItemByUUID = async (uuid) => {
     try {
       const endpointURL = `/api/backoffice/item-service/item/${uuid}`;
-      const res = await axios.get(endpointURL);
+      const res = await axios.get(endpointURL, authHeader);
       setCurrentItem(res.data);
       dispatch(processed());
     } catch (err) {
@@ -62,8 +64,8 @@ const ItemEdit = (props) => {
     getItemByUUID(match.params.uuid);
   }, []);
 
-  const handleSubmit = async (payload) => {
-    const { type } = await dispatch(updateItem(payload));
+  const handleSubmit = async ({ uuid, payload }) => {
+    const { type } = await dispatch(updateItem({ uuid, payload, authHeader }));
 
     if (type.includes('fulfilled')) {
       history.push('/store-slug/item/list');

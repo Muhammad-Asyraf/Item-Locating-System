@@ -1,7 +1,10 @@
+// Components
 import React from "react";
-import auth from "@react-native-firebase/auth";
 import { ScrollView, View, Text } from "react-native";
 import { Appbar, Button } from "react-native-paper";
+
+// Utilities
+import auth from "@react-native-firebase/auth";
 
 // Redux
 import { useSelector, useDispatch } from "react-redux";

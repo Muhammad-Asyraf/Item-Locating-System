@@ -1,11 +1,10 @@
+// Components
 import React from "react";
 import { StyleSheet, View } from "react-native";
 import { Text } from "react-native-paper";
-
-// Component imports
 import SmallTextChip from "./SmallTextChip";
 
-// Theme imports
+// Styling
 import { Theme } from "../styles/theme";
 
 export default function CartHeader({ discount, price }) {

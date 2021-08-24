@@ -1,3 +1,4 @@
+// Components
 import React from 'react'
 import { View } from "react-native";
 import { ActivityIndicator, Text } from "react-native-paper";

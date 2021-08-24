@@ -1,8 +1,9 @@
+// Components
 import React from "react";
 import { StyleSheet } from "react-native";
 import { Text } from "react-native-paper";
 
-// Theme import
+// Styling
 import { Theme } from "../styles/theme";
 
 export default function SmallTextChip({

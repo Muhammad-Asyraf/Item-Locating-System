@@ -1,17 +1,16 @@
+// Components
 import React, { useState, useEffect } from "react";
 import { View, StyleSheet } from "react-native";
 import { Card, Text, Button } from "react-native-paper";
 import NumericInput from "react-native-numeric-input";
+import SmallTextChip from "./SmallTextChip";
+import LocationText from "./LocationText";
 
 // Redux
 import { useSelector, useDispatch } from "react-redux";
 import { addItem, changeItemQuantity, update } from "../redux/cart/cartSlice";
 
-// Component imports
-import SmallTextChip from "./SmallTextChip";
-import LocationText from "./LocationText";
-
-// Theme import
+// Styling
 import { Theme } from "../styles/theme";
 
 export default function ItemCardSmall({

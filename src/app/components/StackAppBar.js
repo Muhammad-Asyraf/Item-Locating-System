@@ -1,3 +1,4 @@
+// Components
 import React, { useState } from "react";
 import { Appbar, Searchbar, Title } from "react-native-paper";
 

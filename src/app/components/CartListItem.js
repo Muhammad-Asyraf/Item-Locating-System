@@ -1,17 +1,16 @@
+// Components
 import React, { useState } from "react";
 import { StyleSheet, View, Image } from "react-native";
 import { Text, Button, TextInput, Surface } from "react-native-paper";
 import NumericInput from "react-native-numeric-input";
+import SmallTextChip from "./SmallTextChip";
+import LocationText from "./LocationText";
 
 // Redux
 import { useSelector, useDispatch } from "react-redux";
 import { changeItemQuantity } from "../redux/cart/cartSlice";
 
-// Component imports
-import SmallTextChip from "./SmallTextChip";
-import LocationText from "./LocationText";
-
-// Theme imports
+// Styling
 import { Theme } from "../styles/theme";
 
 export default function CartListItem({ style, item, update }) {

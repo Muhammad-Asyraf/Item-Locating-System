@@ -1,13 +1,14 @@
+// Components
 import React, { useState } from "react";
-import { StyleSheet, ScrollView, View, Text } from "react-native";
+import { StyleSheet, ScrollView, View, } from "react-native";
 import { TextInput, Title, Paragraph, Button } from "react-native-paper";
-import axios from "axios";
+
+// Utilities
+import auth from "@react-native-firebase/auth";
 
 // Environment configs
 import { environment } from "../environment";
 
-// Authentication
-import auth from "@react-native-firebase/auth";
 
 export default function Login() {
 

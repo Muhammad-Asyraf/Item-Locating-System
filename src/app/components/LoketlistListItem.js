@@ -1,8 +1,7 @@
-import React, { useEffect } from "react";
+// Components
+import React from "react";
 import { StyleSheet, View, ImageBackground, TouchableOpacity } from "react-native";
-import { Text, TextInput,} from "react-native-paper";
-
-// Component imports
+import { Text } from "react-native-paper";
 import SmallTextChip from "./SmallTextChip";
 
 export default function LoketlistListItem({

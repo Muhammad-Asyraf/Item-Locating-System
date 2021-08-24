@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+// Components
+import React, { useState } from "react";
 import {
   StyleSheet,
   Dimensions,
@@ -7,7 +8,7 @@ import {
   View,
   Image,
 } from "react-native";
-import { Appbar, Title, Searchbar, Surface } from "react-native-paper";
+import { Appbar, Title, Searchbar } from "react-native-paper";
 import Carousel, { ParallaxImage } from "react-native-snap-carousel";
 
 // Styling

@@ -8,8 +8,9 @@ import { environment } from "../../environment";
 export const loadAllItems = createAsyncThunk(
   "cart/loadAllItems",
   async (params, thunkAPI) => {
+    const auth = thunkAPI.getState().auth
     const { data } = await axios.get(
-      environment.host + "/api/mobile/planning-cart-service/cart/" + params
+      environment.host + "/api/mobile/planning-cart-service/cart/" + params, auth.authHeader
     );
     return data.products;
   }
@@ -18,14 +19,15 @@ export const loadAllItems = createAsyncThunk(
 export const addItem = createAsyncThunk(
   "cart/addItem",
   async (params, thunkAPI) => {
-    
+    const auth = thunkAPI.getState().auth
     const { data } = await axios.post(
       environment.host + "/api/mobile/planning-cart-service/cart/items/add",
       {
         cart_uuid: params.cart_uuid,
         product_uuid: params.product_uuid,
         quantity: params.quantity,
-      }
+      },
+      auth.authHeader
     );
     if (data === 1) console.log("Database updated");
 
@@ -36,13 +38,15 @@ export const addItem = createAsyncThunk(
 export const changeItemQuantity = createAsyncThunk(
   "cart/changeItemQuantity",
   async (params, thunkAPI) => {
+    const auth = thunkAPI.getState().auth
     const { data } = await axios.post(
       environment.host + "/api/mobile/planning-cart-service/cart/items/update",
       {
         cart_uuid: params.cart_uuid,
         product_uuid: params.product_uuid,
         quantity: params.quantity,
-      }
+      },
+      auth.authHeader
     );
     if (data === 1) console.log("Database updated");
 

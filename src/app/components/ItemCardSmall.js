@@ -26,6 +26,7 @@ export default function ItemCardSmall({
 }) {
   const cart = useSelector((state) => state.cart);
   const user = useSelector((state) => state.user)
+  const auth = useSelector((state) => state.auth)
   const dispatch = useDispatch();
 
   const [productInCart, setProductInCart] = useState(false);

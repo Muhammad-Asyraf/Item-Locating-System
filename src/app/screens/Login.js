@@ -1,15 +1,20 @@
 import React, { useState } from "react";
 import { StyleSheet, ScrollView, View, Text } from "react-native";
 import { TextInput, Title, Paragraph, Button } from "react-native-paper";
-import axios from "axios";
 
-// Environment configs
-import { environment } from "../environment";
+// Redux
+import { useSelector, useDispatch } from "react-redux";
+import { login } from "../redux/auth/authThunk";
 
 // Authentication
 import auth from "@react-native-firebase/auth";
 
+// Environment configs
+import { environment } from "../environment";
 export default function Login() {
+
+  const dispatch = useDispatch();
+  const authState = useSelector((state) => state.auth);
 
   const [credentials, setCredentials] = useState({
     email: "danishrashidin@gmail.com",
@@ -28,27 +33,28 @@ export default function Login() {
   };
 
   const handleLogIn = () => {
-    console.log(credentials);
 
-    // Authenticate
-    auth()
-      .signInWithEmailAndPassword(credentials.email, credentials.password)
-      .then()
-      .catch((error) => {
-        if (error.code === "auth/email-already-in-use") {
-          console.log("That email address is already in use!");
-        }
+    dispatch(login(credentials))
 
-        if (error.code === "auth/invalid-email") {
-          console.log("That email address is invalid!");
-        }
+    // // Authenticate
+    // auth()
+    //   .signInWithEmailAndPassword(credentials.email, credentials.password)
+    //   .then()
+    //   .catch((error) => {
+    //     if (error.code === "auth/email-already-in-use") {
+    //       console.log("That email address is already in use!");
+    //     }
 
-        if (error.code === "auth/user-not-found") {
-          // Error handling here
-        }
+    //     if (error.code === "auth/invalid-email") {
+    //       console.log("That email address is invalid!");
+    //     }
 
-        console.error(error);
-      });
+    //     if (error.code === "auth/user-not-found") {
+    //       // Error handling here
+    //     }
+
+    //     console.error(error);
+    //   });
   };
 
   const validateEmail = (text) => {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { View } from "react-native";
-import { Appbar, Searchbar, ActivityIndicator, Text } from "react-native-paper";
+import { Appbar, Searchbar, Text } from "react-native-paper";
 import axios from "axios";
 
 // Environment configs

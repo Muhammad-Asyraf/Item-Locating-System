@@ -2,13 +2,15 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
-import Card from '@material-ui/core/Card';
-import CardContent from '@material-ui/core/CardContent';
-import Grid from '@material-ui/core/Grid';
-import Alert from '@material-ui/lab/Alert';
-import { makeStyles } from '@material-ui/core/styles';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import Grid from '@mui/material/Grid';
+import Alert from '@mui/lab/Alert';
+import Snackbar from '@mui/material/Snackbar';
+import Slide from '@mui/material/Slide';
+import { makeStyles } from '@mui/styles';
 
-import SignupForm from '../components/Signup/SignupForm';
+import Stepper from '../components/Signup/Stepper';
 
 import {
   // setHeader,
@@ -19,38 +21,60 @@ import {
 import { signup } from '../redux/thunks/authThunk';
 
 const useStyles = makeStyles((theme) => ({
+  root: {
+    minHeight: '100vh',
+    minWidth: '100vw',
+    backgroundImage: 'linear-gradient(-225deg, #473B7B 0%, #3584A7 51%, #30D2BE 100%)',
+  },
   card: {
     '& > *': {
       margin: theme.spacing(1),
     },
-    width: '40%',
-    minWidth: '376px',
-    maxHeight: '650px',
-    borderRadius: '8px',
+    maxWidth: '90vw',
+    minHeight: '65vh',
+    minWidth: '60vw',
+    borderRadius: '20px !important',
+    marginTop: '60px',
+    marginBottom: '60px',
   },
   cardContent: {
     flexGrow: 1,
-    marginLeft: '20px',
-    marginRight: '20px',
+    marginLeft: '50px',
+    marginRight: '50px',
+    marginTop: '20px',
+    marginBottom: '20px',
   },
 }));
 
-const Login = () => {
+const SignUp = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const history = useHistory();
 
   const authErrors = useSelector(selectAuthMessage);
   const authLoading = useSelector(selectAuthIsLoading);
+  // const [state, setState] = useState({
+  //   open: true,
+  // });
 
   const signupHandler = async (data) => {
     const { type } = await dispatch(signup(data));
 
     if (type.includes('fulfilled')) {
-      history.push('/dashboard');
+      const storeUrl = localStorage.getItem('storeUrl');
+      history.push(`/${storeUrl}/dashboard`);
     }
     dispatch(verified());
   };
+
+  // const handleClose = () => {
+  //   setState({
+  //     ...state,
+  //     open: false,
+  //   });
+  // };
+
+  console.log(authErrors);
 
   return (
     <div>
@@ -59,36 +83,36 @@ const Login = () => {
         spacing={0}
         direction="column"
         alignItems="center"
-        justify="center"
-        style={{
-          minHeight: '100vh',
-          minWidth: '100vw',
-          backgroundColor: 'rgb(246, 248, 251)',
-          // backgroundColor: '#0984e3',
-        }}
+        justifyContent="center"
+        className={classes.root}
       >
-        <Card elevation={2} className={classes.card}>
+        <Card elevation={6} className={classes.card}>
           <CardContent className={classes.cardContent}>
             <Grid container spacing={0}>
-              <Grid item xs={12}>
-                <h1
-                  style={{
-                    marginTop: '30px',
-                    marginBottom: '10px',
-                    fontSize: '35px',
-                  }}
-                >
-                  <span style={{ color: '#007AFF' }}>LOKETLA</span> Sign Up
-                </h1>
-              </Grid>
               <Grid item xs={12} style={{ marginBottom: '10px' }}>
                 {authErrors.length !== 0 && (
-                  <Alert style={{ borderRadius: '8px' }} severity="error">
-                    {authErrors}
-                  </Alert>
+                  <Snackbar
+                    open={authErrors}
+                    // onClose={handleClose}
+                    TransitionComponent={(props) => <Slide {...props} direction="up" />}
+                  >
+                    <Alert
+                      variant="filled"
+                      severity="error"
+                      elevation={6}
+                      sx={{
+                        width: '100%',
+                        backgroundColor: 'rgb(211, 47, 47)',
+                      }}
+                    >
+                      {authErrors}
+                    </Alert>
+                  </Snackbar>
                 )}
               </Grid>
-              <SignupForm onSignup={signupHandler} authLoading={authLoading} />
+              <Grid item xs={12}>
+                <Stepper onSignup={signupHandler} authLoading={authLoading} />
+              </Grid>
             </Grid>
           </CardContent>
         </Card>
@@ -96,4 +120,4 @@ const Login = () => {
     </div>
   );
 };
-export default Login;
+export default SignUp;

@@ -2,15 +2,15 @@ import React from 'react';
 
 import { Link } from 'react-router-dom';
 
-import Paper from '@material-ui/core/Paper';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableRow from '@material-ui/core/TableRow';
-import TableContainer from '@material-ui/core/TableContainer';
-import TablePagination from '@material-ui/core/TablePagination';
-import Checkbox from '@material-ui/core/Checkbox';
-import { makeStyles } from '@material-ui/core/styles';
+import Paper from '@mui/material/Paper';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableRow from '@mui/material/TableRow';
+import TableContainer from '@mui/material/TableContainer';
+import TablePagination from '@mui/material/TablePagination';
+import Checkbox from '@mui/material/Checkbox';
+import { makeStyles } from '@mui/styles';
 
 import EnhancedTableHead from './EnhancedTableHead';
 import EnhancedTableToolbar from './EnhancedTableToolbar';
@@ -28,7 +28,7 @@ const useStyles = makeStyles((theme) => ({
     marginBottom: theme.spacing(2),
     boxShadow:
       'rgba(145, 158, 171, 0.24) 0px 0px 2px 0px, rgba(145, 158, 171, 0.24) 0px 16px 32px -4px',
-    borderRadius: '16px',
+    borderRadius: '16px !important',
   },
   table: {
     minWidth: 750,
@@ -111,7 +111,7 @@ const ItemListTable = (props) => {
     rowsPerPage - Math.min(rowsPerPage, items.length - page * rowsPerPage);
 
   return (
-    <Paper className={classes.paper}>
+    <Paper className={classes.paper} elevation={2}>
       <EnhancedTableToolbar
         numSelected={selected.length}
         handleMultipleDelete={handleMultipleDelete}

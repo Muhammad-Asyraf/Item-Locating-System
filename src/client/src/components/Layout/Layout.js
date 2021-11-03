@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { withRouter } from 'react-router-dom';
 
-import { makeStyles } from '@material-ui/core/styles';
-import Container from '@material-ui/core/Container';
+import { makeStyles } from '@mui/styles';
+import Container from '@mui/material/Container';
 
 import Drawer from './Navigation/Drawer';
 import AppBar from './Navigation/AppBar';
 
-const drawerWidth = 260;
+const drawerWidth = 228;
 const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
@@ -16,6 +16,7 @@ const useStyles = makeStyles((theme) => ({
     [theme.breakpoints.up('lg')]: {
       width: drawerWidth,
       flexShrink: 0,
+      scrollBehavior: 'smooth',
     },
   },
   toolbar: theme.mixins.toolbar,

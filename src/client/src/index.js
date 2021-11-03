@@ -2,20 +2,22 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 
-import { MuiThemeProvider } from '@material-ui/core/styles';
-import CssBaseline from '@material-ui/core/CssBaseline';
+import { ThemeProvider } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
+import 'mapbox-gl/dist/mapbox-gl.css';
+import 'react-map-gl-geocoder/dist/mapbox-gl-geocoder.css';
 
 import theme from './assets/theme';
 import App from './components/App';
 import store from './redux/store';
 
 ReactDOM.render(
-  <MuiThemeProvider theme={theme}>
+  <ThemeProvider theme={theme}>
     <CssBaseline />
     <Provider store={store}>
       <App />
     </Provider>
-  </MuiThemeProvider>,
+  </ThemeProvider>,
   document.getElementById('root')
 );
 

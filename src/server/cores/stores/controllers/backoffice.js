@@ -1,5 +1,6 @@
 const { v4: uuidv4 } = require('uuid');
 const Store = require('../model');
+const BackofficeUser = require('../../backoffice_users/model');
 const getLogger = require('../../../utils/logger');
 
 const storeLogger = getLogger(__filename, 'store');
@@ -18,9 +19,31 @@ exports.getAllStores = async (req, res, next) => {
 exports.findStore = async (req, res, next) => {
   try {
     const { uuid } = req.params;
-    const store = await Store.query().findById(uuid);
-    storeLogger.info(`Successfully retrieve store: ${store.uuid}`);
-    res.json(store);
+    const { stores } = await BackofficeUser.query()
+      .findById(uuid)
+      .withGraphFetched('stores');
+
+    storeLogger.info(`Successfully retrieve store: ${stores.uuid}`);
+
+    res.json(stores);
+  } catch (err) {
+    storeLogger.warn(`Error retrieving store`);
+    next(err);
+  }
+};
+
+exports.findStoreByUrl = async (req, res, next) => {
+  try {
+    const { url } = req.params;
+    const stores = await Store.query().where('store_url', url);
+
+    if (stores.length > 0) {
+      storeLogger.info(`Store with url[${url}] found: ${stores[0].uuid}`);
+    } else {
+      storeLogger.info(`No store was found`);
+    }
+
+    res.json(stores);
   } catch (err) {
     storeLogger.warn(`Error retrieving store`);
     next(err);
@@ -42,7 +65,11 @@ exports.removeStore = async (req, res, next) => {
 
 exports.createStore = async (req, res, next) => {
   try {
-    const store = await Store.query().insert({ ...req.body, uuid: uuidv4() });
+    const store = await Store.query().insert({
+      ...req.body,
+      uuid: uuidv4(),
+    });
+
     storeLogger.info(`store successfully created with [UUID -${store.uuid}]`);
     res.json(store);
   } catch (err) {

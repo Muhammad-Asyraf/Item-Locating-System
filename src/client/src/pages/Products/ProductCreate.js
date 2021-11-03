@@ -2,10 +2,10 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
-import Grid from '@material-ui/core/Grid';
-import CircularProgress from '@material-ui/core/CircularProgress';
+import Grid from '@mui/material/Grid';
+import CircularProgress from '@mui/material/CircularProgress';
 
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles } from '@mui/styles';
 
 import {
   selectIsLoading,
@@ -28,6 +28,7 @@ const ProductCreate = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const history = useHistory();
+  const storeUrl = localStorage.getItem('storeUrl');
   const isLoading = useSelector(selectIsLoading);
   const reduxItem = useSelector(selectItems);
 
@@ -43,7 +44,7 @@ const ProductCreate = () => {
     const { type } = await dispatch(addProduct(payload));
 
     if (type.includes('fulfilled')) {
-      history.push('/store-slug/product/list');
+      history.push(`/${storeUrl}/product/list`);
     }
 
     dispatch(processed());

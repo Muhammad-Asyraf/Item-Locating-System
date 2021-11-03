@@ -10,7 +10,9 @@ const errorMessages = {
   UniqueViolationError: {
     customer_username_unique: stringUtil.getUniqueViolationError('username'),
     customer_email_unique: stringUtil.getUniqueViolationError('email address'),
-    merchant_email_unique: stringUtil.getUniqueViolationError('email address'),
+    store_store_url_unique: stringUtil.getUniqueViolationError('store url'),
+    backoffice_user_email_unique:
+      stringUtil.getUniqueViolationError('email address'),
   },
 };
 

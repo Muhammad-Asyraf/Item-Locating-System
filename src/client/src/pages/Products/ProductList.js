@@ -3,12 +3,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 
-import Grid from '@material-ui/core/Grid';
-import Button from '@material-ui/core/Button';
-import CircularProgress from '@material-ui/core/CircularProgress';
-import { makeStyles } from '@material-ui/core/styles';
+import Grid from '@mui/material/Grid';
+import Button from '@mui/material/Button';
+import CircularProgress from '@mui/material/CircularProgress';
+import { makeStyles } from '@mui/styles';
 
-import AddIcon from '@material-ui/icons/Add';
+import AddIcon from '@mui/icons-material/Add';
 
 import ProductListTable from '../../components/Products/ProductListTable';
 
@@ -68,6 +68,7 @@ const ProductList = () => {
   const dispatch = useDispatch();
   const productData = useSelector(selectProducts);
   const isLoading = useSelector(selectIsLoading);
+  const storeUrl = localStorage.getItem('storeUrl');
   const [products, setProducts] = React.useState([]);
 
   useEffect(() => {
@@ -141,7 +142,7 @@ const ProductList = () => {
             type="button"
             className={classes.addButton}
             component={Link}
-            to="/store-slug/product/create"
+            to={`/${storeUrl}/product/create`}
           >
             <AddIcon style={{ marginRight: 10 }} /> Add Product
           </Button>

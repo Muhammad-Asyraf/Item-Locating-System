@@ -1,14 +1,14 @@
 import React from 'react';
 import clsx from 'clsx';
 
-import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography';
-import Tooltip from '@material-ui/core/Tooltip';
+import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
+import Tooltip from '@mui/material/Tooltip';
 
-import IconButton from '@material-ui/core/IconButton';
-import DeleteIcon from '@material-ui/icons/Delete';
-import FilterListIcon from '@material-ui/icons/FilterList';
-import { lighten, makeStyles } from '@material-ui/core/styles';
+import IconButton from '@mui/material/IconButton';
+import DeleteIcon from '@mui/icons-material/Delete';
+import FilterListIcon from '@mui/icons-material/FilterList';
+import { makeStyles } from '@mui/styles';
 
 /* eslint-disable indent */
 const useToolbarStyles = makeStyles((theme) => ({
@@ -23,7 +23,7 @@ const useToolbarStyles = makeStyles((theme) => ({
     theme.palette.type === 'light'
       ? {
           color: theme.palette.primary.main,
-          backgroundColor: lighten(theme.palette.primary.light, 0.85),
+          backgroundColor: theme.palette.primary.light,
         }
       : {
           color: theme.palette.text.primary,
@@ -32,6 +32,10 @@ const useToolbarStyles = makeStyles((theme) => ({
 
   title: {
     flex: '1 1 100%',
+  },
+  selected: {
+    flex: '1 1 100%',
+    color: 'white !important',
   },
 }));
 
@@ -47,7 +51,7 @@ const EnhancedTableToolbar = (props) => {
     >
       {numSelected > 0 ? (
         <Typography
-          className={classes.title}
+          className={classes.selected}
           color="inherit"
           variant="subtitle1"
           component="div"
@@ -67,7 +71,11 @@ const EnhancedTableToolbar = (props) => {
 
       {numSelected > 0 ? (
         <Tooltip title="Delete">
-          <IconButton aria-label="delete" onClick={handleMultipleDelete}>
+          <IconButton
+            className={classes.selected}
+            aria-label="delete"
+            onClick={handleMultipleDelete}
+          >
             <DeleteIcon />
           </IconButton>
         </Tooltip>

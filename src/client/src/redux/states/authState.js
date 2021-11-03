@@ -2,7 +2,7 @@ export const activeUserState = (state, { payload }) => ({
   ...state,
   isAuthenticated: true,
   user: payload.user,
-  message: payload.message,
+  message: '',
   status: payload.status,
 });
 
@@ -23,6 +23,6 @@ export const loginSuccessState = (state) => ({
 export const withHeaderState = (state, { payload }) => ({
   ...state,
   authHeader: payload.payloadHeader,
-  message: payload.message,
+  message: '',
   status: payload.status,
 });

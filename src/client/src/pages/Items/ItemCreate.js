@@ -2,8 +2,8 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
-import Grid from '@material-ui/core/Grid';
-import { makeStyles } from '@material-ui/core/styles';
+import Grid from '@mui/material/Grid';
+import { makeStyles } from '@mui/styles';
 
 import { selectIsLoading, processed } from '../../redux/features/itemSlice';
 import { addItem } from '../../redux/thunks/itemThunk';
@@ -20,6 +20,7 @@ const ItemCreate = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const history = useHistory();
+  const storeUrl = localStorage.getItem('storeUrl');
   const isLoading = useSelector(selectIsLoading);
 
   useEffect(() => {
@@ -30,7 +31,7 @@ const ItemCreate = () => {
     const { type } = await dispatch(addItem(payload));
 
     if (type.includes('fulfilled')) {
-      history.push('/store-slug/item/list');
+      history.push(`/${storeUrl}/item/list`);
     }
     dispatch(processed());
   };

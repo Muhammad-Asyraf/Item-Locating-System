@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 
-import Menu from '@material-ui/core/Menu';
-import MenuItem from '@material-ui/core/MenuItem';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
 
-import IconButton from '@material-ui/core/IconButton';
-import MoreVertRoundedIcon from '@material-ui/icons/MoreVertRounded';
-import DeleteRoundedIcon from '@material-ui/icons/DeleteRounded';
-import EditRoundedIcon from '@material-ui/icons/EditRounded';
+import IconButton from '@mui/material/IconButton';
+import MoreVertRoundedIcon from '@mui/icons-material/MoreVertRounded';
+import DeleteRoundedIcon from '@mui/icons-material/DeleteRounded';
+import EditRoundedIcon from '@mui/icons-material/EditRounded';
 
 const RowMenu = (props) => {
   const [anchorEl, setAnchorEl] = useState();
-
+  const storeUrl = localStorage.getItem('storeUrl');
   const handleClickOption = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -45,7 +45,7 @@ const RowMenu = (props) => {
           <DeleteRoundedIcon style={{ padding: 5, fontSize: 30 }} />
           Delete
         </MenuItem>
-        <MenuItem component={Link} to={`/store-slug/product/edit/${product.uuid}`}>
+        <MenuItem component={Link} to={`/${storeUrl}/product/edit/${product.uuid}`}>
           <EditRoundedIcon style={{ padding: 5, fontSize: 30 }} />
           Edit
         </MenuItem>

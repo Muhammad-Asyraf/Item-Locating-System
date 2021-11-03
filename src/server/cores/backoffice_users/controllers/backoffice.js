@@ -2,6 +2,7 @@ const { v4: uuidv4 } = require('uuid');
 const bcrypt = require('bcrypt');
 const admin = require('../../../firebase');
 const BackofficeUser = require('../model');
+const Store = require('../../stores/model');
 const getLogger = require('../../../utils/logger');
 
 const backofficeUserLogger = getLogger(__filename, 'backofficeUser');
@@ -9,16 +10,21 @@ const backofficeUserLogger = getLogger(__filename, 'backofficeUser');
 exports.signup = async (req, res, next) => {
   let backofficeUser;
   const backofficeUserUUID = uuidv4();
-  const { fullName, email, password } = req.body;
+  const { email, password } = req.body;
   const encryptedPassword = await bcrypt.hash(password, 10);
 
   try {
-    backofficeUser = await BackofficeUser.query().insert({
-      uuid: backofficeUserUUID,
-      full_name: fullName,
-      email,
-      password: encryptedPassword,
-    });
+    const backofficeUser = await BackofficeUser.query()
+      .insertGraph(
+        {
+          ...req.body,
+          uuid: backofficeUserUUID,
+          password: encryptedPassword,
+        },
+        { relate: true }
+      )
+      .returning();
+
     backofficeUserLogger.info(
       `New backofficeUser in postgresDB created: ${backofficeUser.uuid}`
     );
@@ -53,6 +59,26 @@ exports.findBackofficeUser = async (req, res, next) => {
     backofficeUserLogger.info(
       `Successfully retrieved the backoffice user: ${backofficeUser.uuid}`
     );
+
+    res.json(backofficeUser);
+  } catch (err) {
+    backofficeUserLogger.warn(`Error retrieving backoffice user`);
+    next(err);
+  }
+};
+
+exports.findBackofficeUserByEmail = async (req, res, next) => {
+  try {
+    const { email } = req.params;
+    const backofficeUser = await BackofficeUser.query().where('email', email);
+
+    if (backofficeUser.length > 0) {
+      backofficeUserLogger.info(
+        `Backoffice user found: ${backofficeUser[0].uuid}`
+      );
+    } else {
+      backofficeUserLogger.info(`No Backoffice user was found`);
+    }
 
     res.json(backofficeUser);
   } catch (err) {

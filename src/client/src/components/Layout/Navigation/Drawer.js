@@ -2,37 +2,42 @@ import React, { useEffect, useState } from 'react';
 import { withRouter } from 'react-router-dom';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import 'react-perfect-scrollbar/dist/css/styles.css';
-import { loadCSS } from 'fg-loadcss';
+// import { loadCSS } from 'fg-loadcss';
 
-import { Drawer as MUIDrawer, useMediaQuery } from '@material-ui/core';
-// import Divider from '@material-ui/core/Divider';
-import Hidden from '@material-ui/core/Hidden';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
-import Collapse from '@material-ui/core/Collapse';
-import ListSubheader from '@material-ui/core/ListSubheader';
-import SvgIcon from '@material-ui/core/SvgIcon';
+import { Drawer as MUIDrawer, useMediaQuery } from '@mui/material';
+// import Divider from '@mui/material/Divider';
+import Hidden from '@mui/material/Hidden';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemText from '@mui/material/ListItemText';
+import Collapse from '@mui/material/Collapse';
+import ListSubheader from '@mui/material/ListSubheader';
+import SvgIcon from '@mui/material/SvgIcon';
+import Divider from '@mui/material/Divider';
 
-import Icon from '@material-ui/core/Icon';
-import SupervisorAccountTwoToneIcon from '@material-ui/icons/SupervisorAccountTwoTone';
-import ExpandLess from '@material-ui/icons/ExpandLess';
-import ExpandMore from '@material-ui/icons/ExpandMore';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import DashboardTwoToneIcon from '@material-ui/icons/DashboardTwoTone';
-import LocalOfferTwoToneIcon from '@material-ui/icons/LocalOfferTwoTone';
-import SupervisedUserCircleTwoToneIcon from '@material-ui/icons/SupervisedUserCircleTwoTone';
-import LocalMallTwoToneIcon from '@material-ui/icons/LocalMallTwoTone';
-import BusinessCenterTwoToneIcon from '@material-ui/icons/BusinessCenterTwoTone';
-import RoomTwoToneIcon from '@material-ui/icons/RoomTwoTone';
-import DomainTwoToneIcon from '@material-ui/icons/DomainTwoTone';
-import LocalAtmTwoToneIcon from '@material-ui/icons/LocalAtmTwoTone';
+// import Icon from '@mui/material/Icon';
+import SupervisorAccountTwoToneIcon from '@mui/icons-material/SupervisorAccountTwoTone';
+import ExpandLess from '@mui/icons-material/ExpandLess';
+import ExpandMore from '@mui/icons-material/ExpandMore';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import DashboardTwoToneIcon from '@mui/icons-material/DashboardTwoTone';
+import LocalOfferTwoToneIcon from '@mui/icons-material/LocalOfferTwoTone';
+import SupervisedUserCircleTwoToneIcon from '@mui/icons-material/SupervisedUserCircleTwoTone';
+import LocalMallTwoToneIcon from '@mui/icons-material/LocalMallTwoTone';
+import BusinessCenterTwoToneIcon from '@mui/icons-material/BusinessCenterTwoTone';
+import RoomTwoToneIcon from '@mui/icons-material/RoomTwoTone';
+import DomainTwoToneIcon from '@mui/icons-material/DomainTwoTone';
+import LocalAtmTwoToneIcon from '@mui/icons-material/LocalAtmTwoTone';
+import FormatListBulletedRoundedIcon from '@mui/icons-material/FormatListBulletedRounded';
+import AddCircleTwoToneIcon from '@mui/icons-material/AddCircleTwoTone';
+import AccountCircleTwoToneIcon from '@mui/icons-material/AccountCircleTwoTone';
+import DeveloperBoardRoundedIcon from '@mui/icons-material/DeveloperBoardRounded';
 
-import { makeStyles, useTheme } from '@material-ui/core/styles';
+import { makeStyles, useTheme } from '@mui/styles';
 
 import { ReactComponent as Megaphone } from '../../../assets/megaphone.svg';
 
-const drawerWidth = 260;
+const drawerWidth = 228;
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -41,7 +46,8 @@ const useStyles = makeStyles((theme) => ({
   toolbar: theme.mixins.toolbar,
   drawerPaper: {
     width: drawerWidth,
-    boxShadow: 'rgb(159 162 191 / 18%) 2px 0px 3px, rgb(159 162 191 / 32%) 1px 0px 1px',
+    boxShadow:
+      'rgb(159 162 191 / 18%) 2px 0px 3px, rgb(159 162 191 / 32%) 1px 0px 1px !important',
   },
   drawerPaperCurve: {
     width: drawerWidth,
@@ -55,13 +61,15 @@ const useStyles = makeStyles((theme) => ({
     minWidth: '60px !important',
   },
   listItemTexts: {
-    fontSize: '1.1rem !important',
-    // fontWeight: 900,
+    fontSize: '10px !important',
+    color: 'rgba(0, 0, 0, 0.9) !important',
   },
   selected: {
-    // backgroundColor: 'rgba(0, 122, 255, 0.08) !important',
-    // color: '#007AFF !important',
+    backgroundColor: 'rgba(53,132,167, 0.15) !important',
     fontWeight: 900,
+    '&::before': {
+      display: 'block !important',
+    },
   },
   nested: {
     paddingLeft: theme.spacing(4),
@@ -88,7 +96,7 @@ const Drawer = (props) => {
       handleDrawerToggle();
     }
   };
-
+  // linear-gradient(-225deg, #473B7B 0%, #3584A7 51%, #30D2BE 100%)
   const drawerList = [
     {
       header: 'GENERAL',
@@ -97,15 +105,23 @@ const Drawer = (props) => {
         {
           text: 'Dashboard',
           itemKey: 'dashboard',
-          path: `${match.path}`,
-          icon: <DashboardTwoToneIcon style={{ color: '#0984e3' }} fontSize="large" />,
-          onClick: () => handleClick(`${match.path}`),
+          path: `${match.path}/dashboard`,
+          icon: (
+            <DashboardTwoToneIcon
+              // style={{ color: '#3584A7' }}
+              sx={{ fill: 'url(#linearColors)' }}
+              fontSize="large"
+            />
+          ),
+          onClick: () => handleClick(`${match.path}/dashboard`),
         },
         {
           text: 'Sales',
           itemKey: 'sales',
           path: `${match.path}/sales`,
-          icon: <LocalAtmTwoToneIcon style={{ color: '#218c74' }} fontSize="large" />,
+          icon: (
+            <LocalAtmTwoToneIcon sx={{ fill: 'url(#linearColors)' }} fontSize="large" />
+          ),
           onClick: () => handleClick(`${match.path}/sales`),
         },
         {
@@ -114,7 +130,7 @@ const Drawer = (props) => {
           path: `${match.path}/customers`,
           icon: (
             <SupervisedUserCircleTwoToneIcon
-              style={{ color: '#ff7675' }}
+              sx={{ fill: 'url(#linearColors)' }}
               fontSize="large"
             />
           ),
@@ -130,18 +146,32 @@ const Drawer = (props) => {
           text: 'Products',
           itemKey: 'products',
           path: `${match.path}/product`,
-          icon: <LocalMallTwoToneIcon style={{ color: '#00cec9' }} fontSize="large" />,
+          icon: (
+            <LocalMallTwoToneIcon sx={{ fill: 'url(#linearColors)' }} fontSize="large" />
+          ),
           onClick: () => setOpen({ ...open, products: !open.products }),
           itemSubList: [
             {
               _text: 'List',
               _key: 'product-list',
+              _icon: (
+                <FormatListBulletedRoundedIcon
+                  sx={{ fill: 'url(#linearColors)' }}
+                  fontSize="medium"
+                />
+              ),
               _path: `${match.path}/product/list`,
               _onClick: () => handleClick(`${match.path}/product/list`),
             },
             {
               _text: 'Create',
               _key: 'product-create',
+              _icon: (
+                <AddCircleTwoToneIcon
+                  sx={{ fill: 'url(#linearColors)' }}
+                  fontSize="medium"
+                />
+              ),
               _path: `${match.path}/product/create`,
               _onClick: () => handleClick(`${match.path}/product/create`),
             },
@@ -151,7 +181,7 @@ const Drawer = (props) => {
           text: 'Product Mapping',
           itemKey: 'productMapping',
           path: `${match.path}/product-mapping`,
-          icon: <RoomTwoToneIcon style={{ color: '#e84393' }} fontSize="large" />,
+          icon: <RoomTwoToneIcon sx={{ fill: 'url(#linearColors)' }} fontSize="large" />,
           // icon: (
           //   <Icon
           //     className="fas fa-map-pin"
@@ -165,7 +195,10 @@ const Drawer = (props) => {
           itemKey: 'promotions',
           path: `${match.path}/promotions`,
           icon: (
-            <SvgIcon style={{ fontSize: 33, marginLeft: 3, color: '#54a0ff' }}>
+            <SvgIcon
+              style={{ fontSize: 33, marginLeft: 3 }}
+              sx={{ fill: 'url(#linearColors)' }}
+            >
               <Megaphone />
             </SvgIcon>
           ),
@@ -176,11 +209,21 @@ const Drawer = (props) => {
           itemKey: 'advertisements',
           path: `${match.path}/advertisements`,
           icon: (
-            <Icon
-              className="fas fa-ad"
-              style={{ fontSize: 33, marginLeft: 3, color: '#341f97' }}
+            <DeveloperBoardRoundedIcon
+              sx={{ fill: 'url(#linearColors)' }}
+              fontSize="large"
             />
           ),
+          // icon: (
+          //   <Icon
+          //     className="fab fa-adversal"
+          //     style={{
+          //       fontSize: 33,
+          //       marginLeft: 3,
+          //       fill: 'url(#linearColors) !important',
+          //     }}
+          //   />
+          // ),
           onClick: () => handleClick(`${match.path}/advertisements`),
         },
       ],
@@ -193,18 +236,32 @@ const Drawer = (props) => {
           text: 'Items',
           itemKey: 'items',
           path: `${match.path}/item`,
-          icon: <LocalOfferTwoToneIcon style={{ color: '#0fbcf9' }} fontSize="large" />,
+          icon: (
+            <LocalOfferTwoToneIcon sx={{ fill: 'url(#linearColors)' }} fontSize="large" />
+          ),
           onClick: () => setOpen({ ...open, items: !open.items }),
           itemSubList: [
             {
               _text: 'List',
               _key: 'item-list',
+              _icon: (
+                <FormatListBulletedRoundedIcon
+                  sx={{ fill: 'url(#linearColors)' }}
+                  fontSize="medium"
+                />
+              ),
               _path: `${match.path}/item/list`,
               _onClick: () => handleClick(`${match.path}/item/list`),
             },
             {
               _text: 'Create',
               _key: 'item-create',
+              _icon: (
+                <AddCircleTwoToneIcon
+                  sx={{ fill: 'url(#linearColors)' }}
+                  fontSize="medium"
+                />
+              ),
               _path: `${match.path}/item/create`,
               _onClick: () => handleClick(`${match.path}/item/create`),
             },
@@ -221,19 +278,34 @@ const Drawer = (props) => {
           itemKey: 'users',
           path: `${match.path}/user`,
           icon: (
-            <SupervisorAccountTwoToneIcon style={{ color: '#01a3a4' }} fontSize="large" />
+            <SupervisorAccountTwoToneIcon
+              sx={{ fill: 'url(#linearColors)' }}
+              fontSize="large"
+            />
           ),
           onClick: () => setOpen({ ...open, users: !open.users }),
           itemSubList: [
             {
               _text: 'List',
               _key: 'user-list',
+              _icon: (
+                <FormatListBulletedRoundedIcon
+                  sx={{ fill: 'url(#linearColors)' }}
+                  fontSize="medium"
+                />
+              ),
               _path: `${match.path}/user/list`,
               _onClick: () => handleClick(`${match.path}/user/list`),
             },
             {
               _text: 'Roles',
               _key: 'role-list',
+              _icon: (
+                <AccountCircleTwoToneIcon
+                  sx={{ fill: 'url(#linearColors)' }}
+                  fontSize="medium"
+                />
+              ),
               _path: `${match.path}/role/list`,
               _onClick: () => handleClick(`${match.path}/role/list`),
             },
@@ -245,19 +317,34 @@ const Drawer = (props) => {
           itemKey: 'businessRules',
           path: `${match.path}/business-rules`,
           icon: (
-            <BusinessCenterTwoToneIcon style={{ color: '#ffc048' }} fontSize="large" />
+            <BusinessCenterTwoToneIcon
+              sx={{ fill: 'url(#linearColors)' }}
+              fontSize="large"
+            />
           ),
           onClick: () => setOpen({ ...open, businessRules: !open.businessRules }),
           itemSubList: [
             {
               _text: 'List',
               _key: 'business-rules-list',
+              _icon: (
+                <FormatListBulletedRoundedIcon
+                  sx={{ fill: 'url(#linearColors)' }}
+                  fontSize="medium"
+                />
+              ),
               _path: `${match.path}/business-rules/List`,
               _onClick: () => handleClick(`${match.path}/business-rules/list`),
             },
             {
               _text: 'Create',
               _key: 'business-rules-create',
+              _icon: (
+                <AddCircleTwoToneIcon
+                  sx={{ fill: 'url(#linearColors)' }}
+                  fontSize="medium"
+                />
+              ),
               _path: `${match.path}/business-rules/Create`,
               _onClick: () => handleClick(`${match.path}/business-rules/create`),
             },
@@ -267,7 +354,9 @@ const Drawer = (props) => {
           text: 'Office',
           itemKey: 'office',
           path: `${match.path}/office`,
-          icon: <DomainTwoToneIcon style={{ color: '#3c40c6' }} fontSize="large" />,
+          icon: (
+            <DomainTwoToneIcon sx={{ fill: 'url(#linearColors)' }} fontSize="large" />
+          ),
           // icon: (
           //   <Icon
           //     className="fas fa-building"
@@ -289,16 +378,16 @@ const Drawer = (props) => {
     }
   }, [isDesktop]);
 
-  useEffect(() => {
-    const node = loadCSS(
-      'https://use.fontawesome.com/releases/v5.12.0/css/all.css',
-      document.querySelector('#font-awesome-css')
-    );
+  // useEffect(() => {
+  //   const node = loadCSS(
+  //     'https://use.fontawesome.com/releases/v5.12.0/css/all.css',
+  //     document.querySelector('#font-awesome-css')
+  //   );
 
-    return () => {
-      node.parentNode.removeChild(node);
-    };
-  }, []);
+  //   return () => {
+  //     node.parentNode.removeChild(node);
+  //   };
+  // }, []);
 
   return (
     <Hidden
@@ -308,6 +397,7 @@ const Drawer = (props) => {
     >
       <MUIDrawer
         container={type === 'Mobile' ? container : null}
+        PaperProps={{ elevation: 2.5 }}
         classes={{
           paper: type === 'Mobile' ? classes.drawerPaper : classes.drawerPaperCurve,
         }}
@@ -317,8 +407,12 @@ const Drawer = (props) => {
         onClose={type === 'Mobile' ? handleDrawerToggle : null}
       >
         {/* <div style={{ height: '2000px', overflow: 'hidden' }}> */}
-        <div>
-          <PerfectScrollbar>
+        <>
+          <PerfectScrollbar
+            options={{
+              wheelPropagation: false,
+            }}
+          >
             {/* <Divider /> */}
             <List>
               {drawerList.map(({ header, key, items }) => (
@@ -326,6 +420,7 @@ const Drawer = (props) => {
                   <ListSubheader
                     disableSticky
                     style={{
+                      letterSpacing: 1.8,
                       fontSize: 12,
                       color: 'black',
                       fontWeight: 'bold',
@@ -344,8 +439,38 @@ const Drawer = (props) => {
                             classes={{ selected: classes.selected }}
                             selected={location.pathname === path}
                             onClick={onClick}
+                            sx={{
+                              '&:before': {
+                                top: '0px',
+                                right: '0px',
+                                width: '3px',
+                                bottom: '0px',
+                                content: '""',
+                                display: 'none',
+                                position: 'absolute',
+                                borderTopLeftRadius: '4px',
+                                borderBottomLeftRadius: '4px',
+                                backgroundColor: '#3584A7',
+                              },
+                            }}
                           >
-                            <ListItemIcon className={classes.listItemIcons}>
+                            <ListItemIcon
+                              className={classes.listItemIcons}
+                              sx={{ mr: -1.5 }}
+                            >
+                              <svg width={0} height={0}>
+                                <linearGradient
+                                  id="linearColors"
+                                  x1={0}
+                                  y1={0}
+                                  x2={1.5}
+                                  y2={1}
+                                >
+                                  <stop offset="0%" stopColor="#473B7B" />
+                                  <stop offset="51%" stopColor="#3584A7" />
+                                  <stop offset="100%" stopColor="#30D2BE" />
+                                </linearGradient>
+                              </svg>
                               {icon}
                             </ListItemIcon>
                             <ListItemText className={classes.listItemTexts}>
@@ -362,24 +487,43 @@ const Drawer = (props) => {
                           {isExpandable && (
                             <Collapse in={open[itemKey]} timeout="auto" unmountOnExit>
                               <List component="div" disablePadding>
-                                {itemSubList.map(({ _text, _key, _path, _onClick }) => (
-                                  <ListItem
-                                    button
-                                    key={_key}
-                                    className={classes.nested}
-                                    onClick={_onClick}
-                                    classes={{ selected: classes.selected }}
-                                    selected={location.pathname === _path}
-                                  >
-                                    <ListItemIcon>
-                                      <Icon
+                                {itemSubList.map(
+                                  ({ _text, _key, _path, _onClick, _icon }) => (
+                                    <ListItem
+                                      button
+                                      key={_key}
+                                      className={classes.nested}
+                                      onClick={_onClick}
+                                      classes={{ selected: classes.selected }}
+                                      selected={location.pathname === _path}
+                                      sx={{
+                                        '&:before': {
+                                          top: '0px',
+                                          right: '0px',
+                                          width: '3px',
+                                          bottom: '0px',
+                                          content: '""',
+                                          display: 'none',
+                                          position: 'absolute',
+                                          borderTopLeftRadius: '4px',
+                                          borderBottomLeftRadius: '4px',
+                                          backgroundColor: '#3584A7',
+                                        },
+                                      }}
+                                    >
+                                      <ListItemIcon sx={{ ml: 2 }}>
+                                        {_icon}
+                                        {/* <Icon
                                         className="fas fa-circle"
                                         style={{ fontSize: 5, marginLeft: 30 }}
-                                      />
-                                    </ListItemIcon>
-                                    <ListItemText>{_text}</ListItemText>
-                                  </ListItem>
-                                ))}
+                                      /> */}
+                                      </ListItemIcon>
+                                      <ListItemText sx={{ ml: -1.5 }}>
+                                        {_text}
+                                      </ListItemText>
+                                    </ListItem>
+                                  )
+                                )}
                               </List>
                             </Collapse>
                           )}
@@ -387,11 +531,13 @@ const Drawer = (props) => {
                       );
                     }
                   )}
+                  <br />
+                  <Divider />
                 </div>
               ))}
             </List>
           </PerfectScrollbar>
-        </div>
+        </>
       </MUIDrawer>
     </Hidden>
   );

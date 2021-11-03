@@ -2,12 +2,12 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 
-import Grid from '@material-ui/core/Grid';
-import Button from '@material-ui/core/Button';
-import CircularProgress from '@material-ui/core/CircularProgress';
-import { makeStyles } from '@material-ui/core/styles';
+import Grid from '@mui/material/Grid';
+import Button from '@mui/material/Button';
+import CircularProgress from '@mui/material/CircularProgress';
+import { makeStyles } from '@mui/styles';
 
-import AddIcon from '@material-ui/icons/Add';
+import AddIcon from '@mui/icons-material/Add';
 
 import { selectItems, selectIsLoading, processed } from '../../redux/features/itemSlice';
 import { getItems, deleteItem, deleteMultipleItems } from '../../redux/thunks/itemThunk';
@@ -32,6 +32,7 @@ const ItemList = () => {
   const dispatch = useDispatch();
   const itemData = useSelector(selectItems);
   const isLoading = useSelector(selectIsLoading);
+  const storeUrl = localStorage.getItem('storeUrl');
   const [items, setItems] = React.useState([]);
 
   useEffect(() => {
@@ -81,7 +82,7 @@ const ItemList = () => {
             type="button"
             className={classes.addButton}
             component={Link}
-            to="/store-slug/item/create"
+            to={`/${storeUrl}/item/create`}
           >
             <AddIcon style={{ marginRight: 10 }} /> New Item
           </Button>

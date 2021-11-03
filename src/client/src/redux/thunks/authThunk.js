@@ -1,6 +1,8 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
+import getStore from './storeThunk';
+
 export const setHeader = createAsyncThunk('auth/setHeader', async (firebase) => {
   const user = firebase.currentUser;
   const token = user && (await user.getIdToken());
@@ -23,6 +25,7 @@ export const login = createAsyncThunk(
     try {
       const { user } = await firebase.signInWithEmailAndPassword(email, password);
       await dispatch(setHeader(firebase));
+      await dispatch(getStore({ userUUID: user.toJSON().uid }));
 
       return {
         user: user.toJSON(),
@@ -41,19 +44,27 @@ export const login = createAsyncThunk(
 
 export const signup = createAsyncThunk(
   'auth/signup',
-  async ({ firebase, fullName, email, password }, { rejectWithValue, dispatch }) => {
+  async ({ firebase, storePayload, userPayload }, { rejectWithValue, dispatch }) => {
     try {
-      const endpointURL = '/api/backoffice/backoffice-user-service/signup/email';
-      const payload = { fullName, email, password };
+      const storeEndpointURL = '/api/backoffice/store-service/store';
+      const userEndpointURL = '/api/backoffice/backoffice-user-service/signup/email';
 
-      await axios.post(endpointURL, payload);
-      await dispatch(login({ firebase, email, password }));
-      await dispatch(setHeader(firebase));
+      const { data: store } = await axios.post(storeEndpointURL, storePayload);
+      await axios.post(userEndpointURL, {
+        ...userPayload,
+        stores: {
+          uuid: store.uuid,
+        },
+      });
+
+      await dispatch(
+        login({ firebase, email: userPayload.email, password: userPayload.password })
+      );
 
       return true;
     } catch (err) {
       const { data } = err.response;
-      console.log(data);
+
       return rejectWithValue({
         message: data.message,
         status: 'Error!',

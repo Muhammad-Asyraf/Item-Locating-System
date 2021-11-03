@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
 
-import Menu from '@material-ui/core/Menu';
-import MenuItem from '@material-ui/core/MenuItem';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import ListItemIcon from '@mui/material/ListItemIcon';
 
-import IconButton from '@material-ui/core/IconButton';
-import MoreVertRoundedIcon from '@material-ui/icons/MoreVertRounded';
-import DeleteRoundedIcon from '@material-ui/icons/DeleteRounded';
-import EditRoundedIcon from '@material-ui/icons/EditRounded';
+import IconButton from '@mui/material/IconButton';
+import MoreVertRoundedIcon from '@mui/icons-material/MoreVertRounded';
+import DeleteRoundedIcon from '@mui/icons-material/DeleteRounded';
+import EditRoundedIcon from '@mui/icons-material/EditRounded';
 
 const RowMenu = (props) => {
+  const storeUrl = localStorage.getItem('storeUrl');
   const [anchorEl, setAnchorEl] = useState();
 
   const handleClickOption = (event) => {
@@ -32,22 +34,44 @@ const RowMenu = (props) => {
         open={Boolean(anchorEl)}
         onClose={handleCloseOption}
         PaperProps={{
-          style: {
-            boxShadow:
-              'rgba(145, 158, 171, 0.15) 0px 0px 2px 0px, rgba(145, 158, 171, 0.15) 0px 16px 32px -4px',
-            borderRadius: '10px',
-            outline: '0px',
-            top: '10px !important',
+          elevation: 2,
+          sx: {
+            overflow: 'visible',
+            mt: -0.5,
+            ml: -3,
+            '& .MuiAvatar-root': {
+              width: 99,
+              height: 32,
+              ml: -2,
+              mr: 9,
+            },
+            '&:before': {
+              content: '""',
+              display: 'block',
+              position: 'absolute',
+              top: 0,
+              right: 31,
+              width: 10,
+              height: 10,
+
+              bgcolor: 'background.paper',
+              transform: 'translateY(-50%) rotate(45deg)',
+              zIndex: 0,
+            },
           },
         }}
       >
         <MenuItem onClick={() => handleDelete(item.uuid)}>
-          <DeleteRoundedIcon style={{ padding: 5, fontSize: 30 }} />
-          Delete
+          <ListItemIcon sx={{ mr: 1.5 }}>
+            <DeleteRoundedIcon fontSize="small" sx={{ ml: 1, mr: 1.5, mt: 0.1 }} />
+            Delete
+          </ListItemIcon>
         </MenuItem>
-        <MenuItem component={Link} to={`/store-slug/item/edit/${item.uuid}`}>
-          <EditRoundedIcon style={{ padding: 5, fontSize: 30 }} />
-          Edit
+        <MenuItem component={Link} to={`/${storeUrl}/item/edit/${item.uuid}`}>
+          <ListItemIcon sx={{ mr: 1.5 }}>
+            <EditRoundedIcon fontSize="small" sx={{ ml: 1, mr: 1.5, mt: 0.1 }} />
+            Edit
+          </ListItemIcon>
         </MenuItem>
       </Menu>
     </>

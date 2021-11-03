@@ -2,16 +2,17 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
-import { makeStyles } from '@material-ui/core/styles';
-import LinearProgress from '@material-ui/core/LinearProgress';
-// import CircularProgress from '@material-ui/core/CircularProgress';
+import { makeStyles } from '@mui/styles';
+import LinearProgress from '@mui/material/LinearProgress';
+// import CircularProgress from '@mui/material/CircularProgress';
 
-import { auth } from '../firebase';
+import { auth } from '../services/firebase';
 import {
   setActiveUser,
   verified,
   selectAuthIsLoading,
 } from '../redux/features/authSlice';
+import getStore from '../redux/thunks/storeThunk';
 import { setHeader } from '../redux/thunks/authThunk';
 
 const useStyles = makeStyles({
@@ -38,16 +39,19 @@ const Auth = ({ children }) => {
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
       if (user) {
-        dispatch(
+        console.log('booooom shakalakal', user.toJSON().uid);
+        await dispatch(
           setActiveUser({
             user: user.toJSON(),
             message: 'Successfully logged in',
             status: 'ok',
           })
         );
+        await dispatch(getStore({ userUUID: user.toJSON().uid }));
         await dispatch(setHeader(auth));
         if (history.location.pathname === '/auth/login') {
-          history.push('/store-slug/dashboard');
+          const storeUrl = localStorage.getItem('storeUrl');
+          history.push(`/${storeUrl}/dashboard`);
         }
       }
       dispatch(verified());
@@ -59,7 +63,12 @@ const Auth = ({ children }) => {
   if (authLoading && firstRender) {
     return (
       <div className={classes.root}>
-        <LinearProgress color="secondary" />
+        <LinearProgress
+          sx={{
+            backgroundImage:
+              'linear-gradient(-225deg, #473B7B 0%, #3584A7 51%, #30D2BE 100%)',
+          }}
+        />
         {/* <div className={classes.circular}>
         <CircularProgress size={70} color="secondary" />
       </div> */}

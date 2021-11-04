@@ -57,6 +57,7 @@ export const selectAuthIsLoading = (state) => state.auth.isLoading;
 export const selectIsAuthenticated = (state) => state.auth.isAuthenticated;
 export const selectAuthErrors = (state) => state.auth.errors;
 export const selectAuthMessage = (state) => state.auth.message;
-export const selectAuthStatus = (state) => state.auth.message;
+export const selectAuthStatus = (state) => state.auth.status;
+export const selectAuthHeader = (state) => state.auth.authHeader;
 
 export default auth.reducer;

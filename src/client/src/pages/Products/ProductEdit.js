@@ -16,6 +16,7 @@ import {
 import { updateProduct } from '../../redux/thunks/productThunk';
 import { selectItems } from '../../redux/features/itemSlice';
 import { getItems } from '../../redux/thunks/itemThunk';
+import { selectAuthHeader } from '../../redux/features/authSlice';
 
 import ProductEditForm from '../../components/Products/ProductEditForm';
 
@@ -38,6 +39,7 @@ const ProductEdit = (props) => {
   const history = useHistory();
   const isLoading = useSelector(selectIsLoading);
   const reduxItem = useSelector(selectItems);
+  const authHeader = useSelector(selectAuthHeader);
   const [productItems, setProductItems] = useState({
     items: [],
     inputValue: '',
@@ -56,7 +58,7 @@ const ProductEdit = (props) => {
   const getProductByUUID = async (uuid) => {
     try {
       const endpointURL = `/api/backoffice/product-service/product/${uuid}`;
-      const res = await axios.get(endpointURL);
+      const res = await axios.get(endpointURL, authHeader);
       setCurrentProduct(res.data);
     } catch (err) {
       console.log(err);
@@ -67,7 +69,7 @@ const ProductEdit = (props) => {
     (async () => {
       dispatch(processingRequest());
       await getProductByUUID(match.params.uuid);
-      await dispatch(getItems());
+      await dispatch(getItems(authHeader));
       dispatch(processed());
     })();
   }, []);
@@ -84,8 +86,8 @@ const ProductEdit = (props) => {
     });
   }, [reduxItem]);
 
-  const handleSubmit = async (payload) => {
-    const { type } = await dispatch(updateProduct(payload));
+  const handleSubmit = async ({ uuid, payload }) => {
+    const { type } = await dispatch(updateProduct({ uuid, payload, authHeader }));
 
     if (type.includes('fulfilled')) {
       history.push('/store-slug/product/list');

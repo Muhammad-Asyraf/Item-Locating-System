@@ -17,6 +17,7 @@ import {
   selectIsLoading,
   processed,
 } from '../../redux/features/productSlice';
+import { selectAuthHeader } from '../../redux/features/authSlice';
 
 import {
   getProducts,
@@ -68,11 +69,12 @@ const ProductList = () => {
   const dispatch = useDispatch();
   const productData = useSelector(selectProducts);
   const isLoading = useSelector(selectIsLoading);
+  const authHeader = useSelector(selectAuthHeader);
   const [products, setProducts] = React.useState([]);
 
   useEffect(() => {
     (async () => {
-      await dispatch(getProducts());
+      await dispatch(getProducts(authHeader));
       dispatch(processed());
     })();
   }, []);
@@ -85,14 +87,15 @@ const ProductList = () => {
 
   const handleDelete = async (uuid) => {
     const newProductList = products.filter((item) => item.uuid !== uuid);
-    await dispatch(deleteProduct({ uuid }));
+    await dispatch(deleteProduct({ uuid, authHeader }));
     setProducts(newProductList);
   };
 
   const handleMultipleDelete = async (selected, setSelected) => {
     const newProductList = products.filter(({ uuid }) => !selected.includes(uuid));
+    const payload = { listToDelete: selected };
 
-    await dispatch(deleteMultipleProducts({ listToDelete: selected }));
+    await dispatch(deleteMultipleProducts({ payload, authHeader }));
     setProducts(newProductList);
     setSelected([]);
   };
@@ -103,7 +106,7 @@ const ProductList = () => {
         is_active: !status,
       };
       const endpointURL = `/api/backoffice/product-service/product/${uuid}`;
-      await axios.patch(endpointURL, payload);
+      await axios.patch(endpointURL, payload, authHeader);
 
       const newProductList = products.map((product) => {
         if (product.uuid === uuid) {

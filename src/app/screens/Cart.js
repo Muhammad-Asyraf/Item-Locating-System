@@ -26,6 +26,7 @@ export default function Cart({ navigation }) {
   const [totalPrice, setTotalPrice] = useState(0);
 
   const cart = useSelector((state) => state.cart);
+  const { authHeader } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const { default_cart_uuid } = useSelector((state) => state.user);
 
@@ -41,7 +42,8 @@ export default function Cart({ navigation }) {
         const { data } = await axios.get(
           environment.host +
             "/api/mobile/planning-cart-service/cart/" +
-            default_cart_uuid
+            default_cart_uuid,
+            authHeader
         );
         let DATA = [];
         for (i = 0; i < cart.products.length; i++) {

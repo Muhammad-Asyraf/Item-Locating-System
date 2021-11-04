@@ -45,6 +45,7 @@ exports.removeProduct = async (req, res, next) => {
 exports.removeMultipleProduct = async (req, res, next) => {
   try {
     const { listToDelete } = req.body;
+    productLogger.debug(`Checking payload ${JSON.stringify(listToDelete)}`);
     await Product.query().delete().whereIn('uuid', listToDelete);
 
     const logMessage = `Successfully deleted following products: ${listToDelete}`;

@@ -97,9 +97,9 @@ const Drawer = (props) => {
         {
           text: 'Dashboard',
           itemKey: 'dashboard',
-          path: `${match.path}`,
+          path: `${match.path}/dashboard`,
           icon: <DashboardTwoToneIcon style={{ color: '#0984e3' }} fontSize="large" />,
-          onClick: () => handleClick(`${match.path}`),
+          onClick: () => handleClick(`${match.path}/dashboard`),
         },
         {
           text: 'Sales',

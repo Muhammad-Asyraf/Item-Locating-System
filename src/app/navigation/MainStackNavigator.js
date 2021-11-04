@@ -8,7 +8,7 @@ import auth from "@react-native-firebase/auth";
 import axios from "axios";
 
 // Redux
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setToken, setUuid, setDefaultCart, setCurrentCart } from "../redux/user/userSlice";
 import { loadAllItems } from "../redux/cart/cartSlice";
 
@@ -21,6 +21,7 @@ const Stack = createStackNavigator();
 export default function MainStackNavigator() {
 
   const dispatch = useDispatch();
+  const authState = useSelector((state) => state.auth)
 
   // State to rerender once async is fulfilled
   const [isLoaded,setLoaded] = useState(false)
@@ -28,9 +29,10 @@ export default function MainStackNavigator() {
   // Load all user stuffs into global stores once everything is loaded
   useEffect(() => {
     const fetch = async () => {
+      
       const token = await auth().currentUser.getIdToken(true)
       const uuid = await auth().currentUser.uid
-      const { data } = await axios.get(environment.host + '/api/mobile/planning-cart-service/cart/default/' + uuid)
+      const { data } = await axios.get(environment.host + '/api/mobile/planning-cart-service/cart/default/' + uuid,authState.authHeader)
 
       dispatch(setToken(token))
       dispatch(setUuid(uuid))

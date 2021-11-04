@@ -6,7 +6,11 @@ import {
   FlatList,
   TouchableOpacity,
 } from "react-native";
-import { Appbar, Portal, Dialog, Button, TextInput } from "react-native-paper";
+import { Appbar, Dialog, Button, TextInput } from "react-native-paper";
+import LoketlistListItem from "../components/LoketlistListItem";
+import Loading from "../components/Loading";
+
+// Utilities
 import axios from "axios";
 
 // Redux
@@ -14,10 +18,6 @@ import { useSelector, useDispatch } from "react-redux";
 
 // Environment configs
 import { environment } from "../environment";
-
-// Component imports
-import LoketlistListItem from "../components/LoketlistListItem";
-import Loading from "../components/Loading";
 
 // Styling
 import { GlobalStyle } from "../styles/theme";

@@ -7,15 +7,17 @@ import {
   Button,
   HelperText,
 } from "react-native-paper";
+
+// Utilites
 import auth from "@react-native-firebase/auth";
 import axios from "axios";
-
-// Environment configs
-import { environment } from "../environment";
 
 // Redux
 import { useSelector, useDispatch } from "react-redux";
 import { setToken, setUuid } from "../redux/user/userSlice";
+
+// Environment configs
+import { environment } from "../environment";
 
 export default function Registration() {
   const dispatch = useDispatch();

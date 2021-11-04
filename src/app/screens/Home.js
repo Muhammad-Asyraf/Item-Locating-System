@@ -7,12 +7,11 @@ import {
   View,
   Image,
 } from "react-native";
-import { Appbar, Title, Searchbar, Surface } from "react-native-paper";
+import { Appbar, Title, Searchbar } from "react-native-paper";
 import Carousel, { ParallaxImage } from "react-native-snap-carousel";
 
 // Styling
 import { GlobalStyle } from "../styles/theme";
-import { appBarStyles } from "../styles/appBarStyles";
 
 const { width: screenWidth } = Dimensions.get("window");
 export default function Home({ navigation }) {

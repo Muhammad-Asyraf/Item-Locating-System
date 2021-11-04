@@ -1,20 +1,21 @@
-import React, { useEffect, useState } from "react";
+// Components
+import React, { useState } from "react";
 import { StyleSheet, View, Text, FlatList } from "react-native";
 import { Appbar, Title, Dialog } from "react-native-paper";
-import axios from "axios";
 import { useFocusEffect } from "@react-navigation/native";
-
-// Environment configs
-import { environment } from "../environment";
-
-// Component imports
 import CartListItem from "../components/CartListItem";
 import CartHeader from "../components/CartHeader";
 import Loading from "../components/Loading";
 
+// Utilities
+import axios from "axios";
+
 // Redux
 import { useSelector, useDispatch } from "react-redux";
 import { update } from "../redux/cart/cartSlice";
+
+// Environment configs
+import { environment } from "../environment";
 
 // Styling
 import { GlobalStyle } from "../styles/theme";

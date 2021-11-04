@@ -1,15 +1,16 @@
+// Components
 import React, { useState, useEffect } from "react";
 import { View } from "react-native";
 import { Appbar, Searchbar, Text } from "react-native-paper";
+import ItemCardSmall from "../components/ItemCardSmall";
+import { FlatGrid } from "react-native-super-grid";
+import Loading from "../components/Loading";
+
+// Utilities
 import axios from "axios";
 
 // Environment configs
 import { environment } from "../environment";
-
-// Components
-import ItemCardSmall from "../components/ItemCardSmall";
-import { FlatGrid } from "react-native-super-grid";
-import Loading from "../components/Loading";
 
 // Style imports
 import { GlobalStyle } from "../styles/theme";

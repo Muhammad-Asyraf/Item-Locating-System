@@ -1,13 +1,15 @@
+// Components
 import React, { useState } from "react";
-import { StyleSheet, ScrollView, View, Text } from "react-native";
+import { StyleSheet, ScrollView, View, } from "react-native";
 import { TextInput, Title, Paragraph, Button } from "react-native-paper";
+
+// Utilities
+import auth from "@react-native-firebase/auth";
 
 // Redux
 import { useSelector, useDispatch } from "react-redux";
 import { login } from "../redux/auth/authThunk";
 
-// Authentication
-import auth from "@react-native-firebase/auth";
 
 // Environment configs
 import { environment } from "../environment";

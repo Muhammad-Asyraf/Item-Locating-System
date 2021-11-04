@@ -40,6 +40,7 @@ const Auth = ({ children }) => {
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
       if (user) {
+        console.log('booooom shakalakal', user.toJSON().uid);
         await dispatch(
           setActiveUser({
             user: user.toJSON(),

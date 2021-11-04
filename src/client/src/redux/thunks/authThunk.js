@@ -7,7 +7,7 @@ export const setHeader = createAsyncThunk('auth/setHeader', async (firebase) => 
   const payloadHeader = {
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
+      authorization: `Bearer ${token}`,
     },
   };
   return {

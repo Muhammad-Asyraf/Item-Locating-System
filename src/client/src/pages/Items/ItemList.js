@@ -11,6 +11,7 @@ import AddIcon from '@material-ui/icons/Add';
 
 import { selectItems, selectIsLoading, processed } from '../../redux/features/itemSlice';
 import { getItems, deleteItem, deleteMultipleItems } from '../../redux/thunks/itemThunk';
+import { selectAuthHeader } from '../../redux/features/authSlice';
 
 import ItemListTable from '../../components/Items/ItemListTable';
 
@@ -32,11 +33,12 @@ const ItemList = () => {
   const dispatch = useDispatch();
   const itemData = useSelector(selectItems);
   const isLoading = useSelector(selectIsLoading);
+  const authHeader = useSelector(selectAuthHeader);
   const [items, setItems] = React.useState([]);
 
   useEffect(() => {
     (async () => {
-      await dispatch(getItems());
+      await dispatch(getItems(authHeader));
       dispatch(processed());
     })();
   }, []);
@@ -49,14 +51,14 @@ const ItemList = () => {
 
   const handleDelete = async (uuid) => {
     const newItemList = items.filter((item) => item.uuid !== uuid);
-    await dispatch(deleteItem({ uuid }));
+    await dispatch(deleteItem({ uuid, authHeader }));
     setItems(newItemList);
   };
 
   const handleMultipleDelete = async (selected, setSelected) => {
     const newItemList = items.filter(({ uuid }) => !selected.includes(uuid));
 
-    await dispatch(deleteMultipleItems({ listToDelete: selected }));
+    await dispatch(deleteMultipleItems({ listToDelete: selected, authHeader }));
     setItems(newItemList);
     setSelected([]);
   };

@@ -15,6 +15,7 @@ import {
 import { addProduct } from '../../redux/thunks/productThunk';
 import { selectItems } from '../../redux/features/itemSlice';
 import { getItems } from '../../redux/thunks/itemThunk';
+import { selectAuthHeader } from '../../redux/features/authSlice';
 
 import ProductForm from '../../components/Products/ProductForm';
 
@@ -29,18 +30,19 @@ const ProductCreate = () => {
   const dispatch = useDispatch();
   const history = useHistory();
   const isLoading = useSelector(selectIsLoading);
+  const authHeader = useSelector(selectAuthHeader);
   const reduxItem = useSelector(selectItems);
 
   useEffect(() => {
     (async () => {
       dispatch(processingRequest());
-      await dispatch(getItems());
+      await dispatch(getItems(authHeader));
       dispatch(processed());
     })();
   }, []);
 
   const handleSubmit = async (payload) => {
-    const { type } = await dispatch(addProduct(payload));
+    const { type } = await dispatch(addProduct({ payload, authHeader }));
 
     if (type.includes('fulfilled')) {
       history.push('/store-slug/product/list');

@@ -3,10 +3,10 @@ import axios from 'axios';
 
 export const getItems = createAsyncThunk(
   'item/getItems',
-  async (arg, { rejectWithValue }) => {
+  async (authHeader, { rejectWithValue }) => {
     try {
       const endpointURL = '/api/backoffice/item-service/items';
-      const res = await axios.get(endpointURL);
+      const res = await axios.get(endpointURL, authHeader);
 
       return {
         items: res.data,
@@ -28,10 +28,11 @@ export const getItems = createAsyncThunk(
 
 export const addItem = createAsyncThunk(
   'item/addItem',
-  async (payload, { rejectWithValue }) => {
+  async ({ payload, authHeader }, { rejectWithValue }) => {
+    console.log('test', payload);
     try {
       const endpointURL = '/api/backoffice/item-service/item';
-      await axios.post(endpointURL, payload);
+      await axios.post(endpointURL, payload, authHeader);
 
       return true;
     } catch (err) {
@@ -48,10 +49,10 @@ export const addItem = createAsyncThunk(
 
 export const deleteItem = createAsyncThunk(
   'item/deleteItem',
-  async ({ uuid }, { rejectWithValue }) => {
+  async ({ uuid, authHeader }, { rejectWithValue }) => {
     try {
       const endpointURL = `/api/backoffice/item-service/item/${uuid}`;
-      await axios.delete(endpointURL);
+      await axios.delete(endpointURL, authHeader);
 
       return true;
     } catch (err) {
@@ -69,10 +70,10 @@ export const deleteItem = createAsyncThunk(
 
 export const deleteMultipleItems = createAsyncThunk(
   'item/deleteMultipleItems',
-  async (listToDelete, { rejectWithValue }) => {
+  async ({ listToDelete, authHeader }, { rejectWithValue }) => {
     try {
       const endpointURL = '/api/backoffice/item-service/item/delete';
-      await axios.post(endpointURL, listToDelete);
+      await axios.post(endpointURL, { listToDelete }, authHeader);
 
       return true;
     } catch (err) {
@@ -90,10 +91,10 @@ export const deleteMultipleItems = createAsyncThunk(
 
 export const updateItem = createAsyncThunk(
   'item/updateItem',
-  async ({ uuid, payload }, { rejectWithValue }) => {
+  async ({ uuid, payload, authHeader }, { rejectWithValue }) => {
     try {
       const endpointURL = `/api/backoffice/item-service/item/${uuid}`;
-      await axios.put(endpointURL, payload);
+      await axios.put(endpointURL, payload, authHeader);
 
       return true;
     } catch (err) {

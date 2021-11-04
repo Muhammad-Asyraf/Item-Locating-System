@@ -9,6 +9,7 @@ module.exports = async (req, res, next) => {
     req.headers.authorization.startsWith('Bearer ')
   ) {
     const authtoken = req.headers.authorization.split('Bearer ')[1];
+
     try {
       const currentUser = await admin.auth().verifyIdToken(authtoken);
       authLogger.info(

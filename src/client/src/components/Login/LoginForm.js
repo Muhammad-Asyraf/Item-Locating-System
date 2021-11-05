@@ -1,14 +1,14 @@
 import React, { useState, useRef } from 'react';
 
-import TextField from '@material-ui/core/TextField';
-import IconButton from '@material-ui/core/IconButton';
-import Button from '@material-ui/core/Button';
-import InputAdornment from '@material-ui/core/InputAdornment';
-import Visibility from '@material-ui/icons/Visibility';
-import Grid from '@material-ui/core/Grid';
-import VisibilityOff from '@material-ui/icons/VisibilityOff';
-import CircularProgress from '@material-ui/core/CircularProgress';
-import { makeStyles } from '@material-ui/core/styles';
+import TextField from '@mui/material/TextField';
+import IconButton from '@mui/material/IconButton';
+import Button from '@mui/material/Button';
+import InputAdornment from '@mui/material/InputAdornment';
+import Visibility from '@mui/icons-material/Visibility';
+import Grid from '@mui/material/Grid';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import CircularProgress from '@mui/material/CircularProgress';
+import { makeStyles } from '@mui/styles';
 
 const useStyles = makeStyles(() => ({
   form: {
@@ -25,6 +25,8 @@ const useStyles = makeStyles(() => ({
     height: '55px',
     width: '100%',
     color: 'white',
+    backgroundImage: 'linear-gradient(-225deg, #473B7B 0%, #3584A7 51%, #30D2BE 100%) ',
+
     marginTop: '15px',
     borderRadius: '10px',
     boxShadow: 'rgb(30 136 229 / 24%) 0px 8px 16px 0px',
@@ -117,58 +119,65 @@ const LoginForm = (props) => {
 
   return (
     <form className={classes.form} onSubmit={handleSubmit} autoComplete="on">
-      <Grid item xs={12}>
-        <TextField
-          id="email"
-          label="Email"
-          variant="outlined"
-          onBlur={() => validateEmail(true)}
-          onChange={validateEmail}
-          error={email.error !== false}
-          helperText={email.error}
-          inputRef={emailRef}
-          className={classes.inputFields}
-        />
-      </Grid>
-      <Grid item xs={12}>
-        <TextField
-          id="password"
-          label="Password"
-          variant="outlined"
-          type={password.showPassword ? 'text' : 'password'}
-          onBlur={validatePassword}
-          onChange={validatePassword}
-          error={password.error !== false}
-          helperText={password.error}
-          inputRef={passwordRef}
-          className={classes.inputFields}
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton
-                  aria-label="toggle password visibility"
-                  onClick={handleShowPassword}
-                  onMouseDown={handleShowPassword}
-                >
-                  {password.showPassword ? <Visibility /> : <VisibilityOff />}
-                </IconButton>
-              </InputAdornment>
-            ),
-          }}
-        />
-      </Grid>
-      <Grid item xs={12}>
-        <Button
-          variant="contained"
-          color="primary"
-          type="submit"
-          disabled={
-            authLoading === true || email.error !== false || password.error !== false
-          }
-          className={classes.submitButton}
-        >
-          {authLoading ? <CircularProgress size={20}> </CircularProgress> : <>Sign In</>}
-        </Button>
+      <Grid container spacing={2} style={{ marginTop: '0px' }}>
+        <Grid item xs={12}>
+          <TextField
+            id="email"
+            label="Email"
+            variant="outlined"
+            onBlur={() => validateEmail(true)}
+            onChange={validateEmail}
+            error={email.error !== false}
+            helperText={email.error}
+            inputRef={emailRef}
+            className={classes.inputFields}
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <TextField
+            id="password"
+            label="Password"
+            variant="outlined"
+            type={password.showPassword ? 'text' : 'password'}
+            onBlur={validatePassword}
+            onChange={validatePassword}
+            error={password.error !== false}
+            helperText={password.error}
+            inputRef={passwordRef}
+            className={classes.inputFields}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    aria-label="toggle password visibility"
+                    onClick={handleShowPassword}
+                    onMouseDown={handleShowPassword}
+                  >
+                    {password.showPassword ? <Visibility /> : <VisibilityOff />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <Button
+            variant="contained"
+            color="primary"
+            type="submit"
+            disabled={
+              authLoading === true || email.error !== false || password.error !== false
+            }
+            className={classes.submitButton}
+            sx={{ mt: 3 }}
+          >
+            {authLoading ? (
+              <CircularProgress size={20} sx={{ color: 'white' }} />
+            ) : (
+              <>Sign In</>
+            )}
+          </Button>
+        </Grid>
       </Grid>
     </form>
   );

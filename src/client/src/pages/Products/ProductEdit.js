@@ -3,10 +3,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import axios from 'axios';
 
-import Grid from '@material-ui/core/Grid';
-import CircularProgress from '@material-ui/core/CircularProgress';
+import Grid from '@mui/material/Grid';
+import CircularProgress from '@mui/material/CircularProgress';
 
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles } from '@mui/styles';
 
 import {
   selectIsLoading,
@@ -40,6 +40,7 @@ const ProductEdit = (props) => {
   const isLoading = useSelector(selectIsLoading);
   const reduxItem = useSelector(selectItems);
   const authHeader = useSelector(selectAuthHeader);
+  const storeUrl = localStorage.getItem('storeUrl');
   const [productItems, setProductItems] = useState({
     items: [],
     inputValue: '',
@@ -90,7 +91,7 @@ const ProductEdit = (props) => {
     const { type } = await dispatch(updateProduct({ uuid, payload, authHeader }));
 
     if (type.includes('fulfilled')) {
-      history.push('/store-slug/product/list');
+      history.push(`/${storeUrl}/product/list`);
     }
     dispatch(processed());
   };

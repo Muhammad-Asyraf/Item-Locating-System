@@ -72,7 +72,10 @@ const Layout = (props) => {
       ...openSnackBar,
       open: false,
     });
-    dispatch(clearNotification());
+
+    setTimeout(() => {
+      dispatch(clearNotification());
+    }, 1500);
   };
 
   return (

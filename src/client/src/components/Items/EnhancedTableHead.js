@@ -1,10 +1,10 @@
 import React from 'react';
 
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import TableCell from '@material-ui/core/TableCell';
-import Checkbox from '@material-ui/core/Checkbox';
-import TableSortLabel from '@material-ui/core/TableSortLabel';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import TableCell from '@mui/material/TableCell';
+import Checkbox from '@mui/material/Checkbox';
+import TableSortLabel from '@mui/material/TableSortLabel';
 
 const headCells = [
   { id: 'name', numeric: false, disablePadding: true, label: 'Name' },

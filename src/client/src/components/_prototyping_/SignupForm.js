@@ -1,16 +1,16 @@
 import React, { useState, useRef } from 'react';
 
-import TextField from '@material-ui/core/TextField';
-import IconButton from '@material-ui/core/IconButton';
-import Button from '@material-ui/core/Button';
-import InputAdornment from '@material-ui/core/InputAdornment';
-import Visibility from '@material-ui/icons/Visibility';
-import Grid from '@material-ui/core/Grid';
-import VisibilityOff from '@material-ui/icons/VisibilityOff';
-import CircularProgress from '@material-ui/core/CircularProgress';
-import { makeStyles } from '@material-ui/core/styles';
+import TextField from '@mui/material/TextField';
+import IconButton from '@mui/material/IconButton';
+import Button from '@mui/material/Button';
+import InputAdornment from '@mui/material/InputAdornment';
+import Visibility from '@mui/icons-material/Visibility';
+import Grid from '@mui/material/Grid';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import CircularProgress from '@mui/material/CircularProgress';
+import { makeStyles } from '@mui/styles';
 
-import { auth } from '../../firebase';
+import { auth } from '../../../services/firebase';
 
 const useStyles = makeStyles(() => ({
   form: {
@@ -100,6 +100,7 @@ const Login = (props) => {
       });
     }
   };
+
   const validatePassword = () => {
     if (!passwordRef.current.value) {
       setPassword({

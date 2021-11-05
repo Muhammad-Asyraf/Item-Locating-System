@@ -2,15 +2,15 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
-import Card from '@material-ui/core/Card';
-import CardContent from '@material-ui/core/CardContent';
-import Grid from '@material-ui/core/Grid';
-import Alert from '@material-ui/lab/Alert';
-import { makeStyles } from '@material-ui/core/styles';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import Grid from '@mui/material/Grid';
+import Alert from '@mui/lab/Alert';
+import { makeStyles } from '@mui/styles';
 
 import LoginForm from '../components/Login/LoginForm';
 
-import { auth } from '../firebase';
+import { auth } from '../services/firebase';
 import {
   verified,
   clearState,
@@ -26,7 +26,7 @@ const useStyles = makeStyles((theme) => ({
     },
     // minWidth: 275,
     width: 500,
-    borderRadius: '8px',
+    borderRadius: '20px !important',
   },
 }));
 
@@ -43,7 +43,8 @@ const Login = () => {
 
     if (type.includes('fulfilled')) {
       dispatch(clearState());
-      history.push('/store-slug/dashboard');
+      const storeUrl = localStorage.getItem('storeUrl');
+      history.push(`/${storeUrl}/dashboard`);
     }
     dispatch(verified());
   };
@@ -52,17 +53,19 @@ const Login = () => {
     <>
       <Grid
         container
-        spacing={0}
         direction="column"
         alignItems="center"
-        justify="center"
+        justifyContent="center"
         style={{
           minHeight: '100vh',
-          backgroundColor: 'rgb(246, 248, 251)',
+          backgroundImage:
+            'linear-gradient(-225deg, #473B7B 0%, #3584A7 51%, #30D2BE 100%) ',
+
+          // backgroundColor: 'rgb(246, 248, 251)',
           // backgroundColor: '#007AFF',
         }}
       >
-        <Card elevation={1} className={classes.card}>
+        <Card elevation={6} className={classes.card}>
           <CardContent style={{ marginLeft: '20px', marginRight: '20px' }}>
             <Grid item xs={12}>
               <h1 style={{ marginTop: '30px', fontSize: '35px' }}>

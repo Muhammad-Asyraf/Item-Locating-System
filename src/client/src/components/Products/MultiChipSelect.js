@@ -1,14 +1,14 @@
 import React from 'react';
 import Downshift from 'downshift';
 
-import Paper from '@material-ui/core/Paper';
-import TextField from '@material-ui/core/TextField';
-import MenuItem from '@material-ui/core/MenuItem';
+import Paper from '@mui/material/Paper';
+import TextField from '@mui/material/TextField';
+import MenuItem from '@mui/material/MenuItem';
 
-import Chip from '@material-ui/core/Chip';
-import CancelIcon from '@material-ui/icons/Cancel';
+import Chip from '@mui/material/Chip';
+import CancelIcon from '@mui/icons-material/Cancel';
 
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles } from '@mui/styles';
 
 /* eslint-disable implicit-arrow-linebreak */
 /* eslint-disable function-paren-newline */

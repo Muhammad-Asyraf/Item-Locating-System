@@ -40,7 +40,6 @@ const Auth = ({ children }) => {
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
       if (user) {
-        console.log('booooom shakalakal', user.toJSON().uid);
         await dispatch(
           setActiveUser({
             user: user.toJSON(),
@@ -48,8 +47,8 @@ const Auth = ({ children }) => {
             status: 'ok',
           })
         );
-        await dispatch(getStore({ userUUID: user.toJSON().uid }));
         await dispatch(setHeader(auth));
+        await dispatch(getStore({ userUUID: user.toJSON().uid }));
         if (history.location.pathname === '/auth/login') {
           const storeUrl = localStorage.getItem('storeUrl');
           history.push(`/${storeUrl}/dashboard`);

@@ -3,10 +3,12 @@ import axios from 'axios';
 
 const getStore = createAsyncThunk(
   'store/getStore',
-  async ({ userUUID }, { rejectWithValue }) => {
+  async ({ userUUID }, { rejectWithValue, getState }) => {
     try {
       const endpointURL = `/api/backoffice/store-service/store/user/${userUUID}`;
-      const res = await axios.get(endpointURL);
+      const { authHeader } = await getState().auth;
+
+      const res = await axios.get(endpointURL, authHeader);
 
       localStorage.setItem('storeUUID', res.data.uuid);
       localStorage.setItem('storeUrl', res.data.store_url);

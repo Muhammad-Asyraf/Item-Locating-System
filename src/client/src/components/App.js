@@ -17,7 +17,6 @@ const App = () => {
 
   useEffect(() => {
     setRootPath(`/${store.store_url}`);
-    console.log('im called');
   }, [store]);
 
   console.log('inside app', rootPath);

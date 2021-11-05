@@ -2,6 +2,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
 import getStore from './storeThunk';
+import { setNewNotification } from '../features/notificationSlice';
 
 export const setHeader = createAsyncThunk('auth/setHeader', async (firebase) => {
   const user = firebase.currentUser;
@@ -26,6 +27,15 @@ export const login = createAsyncThunk(
       const { user } = await firebase.signInWithEmailAndPassword(email, password);
       await dispatch(setHeader(firebase));
       await dispatch(getStore({ userUUID: user.toJSON().uid }));
+
+      await dispatch(
+        setNewNotification({
+          message: "Hello there! you've successfully logged in.",
+          severity: 'success',
+          backgroundColor: '',
+          color: '',
+        })
+      );
 
       return {
         user: user.toJSON(),

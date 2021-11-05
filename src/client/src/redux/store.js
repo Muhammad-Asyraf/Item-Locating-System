@@ -4,6 +4,7 @@ import itemReducer from './features/itemSlice';
 import productReducer from './features/productSlice';
 import mapBoxReducer from './features/mapBoxSlice';
 import storeReducer from './features/storeSlice';
+import notificationReducer from './features/notificationSlice';
 
 const store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ const store = configureStore({
     product: productReducer,
     mapbox: mapBoxReducer,
     store: storeReducer,
+    notification: notificationReducer,
   },
   devTools: true,
 });

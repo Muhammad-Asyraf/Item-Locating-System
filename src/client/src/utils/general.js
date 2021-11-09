@@ -24,3 +24,11 @@ export const stableSort = (array, comparator) => {
   });
   return stabilizedThis.map((el) => el[0]);
 };
+
+export const isSameDay = (a, b) => {
+  return (
+    a.getFullYear() === b.getFullYear() &&
+    a.getMonth() === b.getMonth() &&
+    a.getDate() === b.getDate()
+  );
+};

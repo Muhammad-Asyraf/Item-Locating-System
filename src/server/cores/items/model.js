@@ -10,6 +10,10 @@ class Item extends Model {
     return 'uuid';
   }
 
+  $beforeUpdate() {
+    this.updated_at = new Date().toISOString();
+  }
+
   static get relationMappings() {
     return {
       products: {

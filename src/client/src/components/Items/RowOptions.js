@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import ListItemIcon from '@mui/material/ListItemIcon';
-
 import IconButton from '@mui/material/IconButton';
+
+import ListItemIcon from '@mui/material/ListItemIcon';
 import MoreVertRoundedIcon from '@mui/icons-material/MoreVertRounded';
 import DeleteRoundedIcon from '@mui/icons-material/DeleteRounded';
 import EditRoundedIcon from '@mui/icons-material/EditRounded';
@@ -24,7 +24,7 @@ const RowMenu = (props) => {
 
   return (
     <>
-      <IconButton onClick={handleClickOption}>
+      <IconButton onClick={handleClickOption} sx={{ position: 'relative', right: 20 }}>
         <MoreVertRoundedIcon />
       </IconButton>
       <Menu
@@ -38,11 +38,11 @@ const RowMenu = (props) => {
           sx: {
             overflow: 'visible',
             mt: -0.5,
-            ml: -3,
+            ml: -11.5,
             '& .MuiAvatar-root': {
               width: 99,
               height: 32,
-              ml: -2,
+              ml: -1,
               mr: 9,
             },
             '&:before': {
@@ -50,7 +50,7 @@ const RowMenu = (props) => {
               display: 'block',
               position: 'absolute',
               top: 0,
-              right: 31,
+              right: 19,
               width: 10,
               height: 10,
 
@@ -62,14 +62,14 @@ const RowMenu = (props) => {
         }}
       >
         <MenuItem onClick={() => handleDelete(item.uuid)}>
-          <ListItemIcon sx={{ mr: 1.5 }}>
-            <DeleteRoundedIcon fontSize="small" sx={{ ml: 1, mr: 1.5, mt: 0.1 }} />
+          <ListItemIcon sx={{ mr: 5, fontSize: '0.875rem !important' }}>
+            <DeleteRoundedIcon fontSize="small" sx={{ ml: 1, mr: 3, mt: 0.1 }} />
             Delete
           </ListItemIcon>
         </MenuItem>
         <MenuItem component={Link} to={`/${storeUrl}/item/edit/${item.uuid}`}>
-          <ListItemIcon sx={{ mr: 1.5 }}>
-            <EditRoundedIcon fontSize="small" sx={{ ml: 1, mr: 1.5, mt: 0.1 }} />
+          <ListItemIcon sx={{ mr: 5, fontSize: '0.875rem !important' }}>
+            <EditRoundedIcon fontSize="small" sx={{ ml: 1, mr: 3, mt: 0.1 }} />
             Edit
           </ListItemIcon>
         </MenuItem>

@@ -19,7 +19,6 @@ const App = () => {
     setRootPath(`/${store.store_url}`);
   }, [store]);
 
-  console.log('inside app', rootPath);
   return (
     <Router>
       <Auth>

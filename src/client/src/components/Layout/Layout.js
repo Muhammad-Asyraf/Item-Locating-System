@@ -23,7 +23,7 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
   },
   drawer: {
-    [theme.breakpoints.up('lg')]: {
+    [theme.breakpoints.up('md')]: {
       width: drawerWidth,
       flexShrink: 0,
       scrollBehavior: 'smooth',
@@ -33,8 +33,12 @@ const useStyles = makeStyles((theme) => ({
   container: {
     // flexGrow: 1,
     // padding: theme.spacing(3),
-    padding: '70px 30px 10px 30px',
-    backgroundColor: 'rgb(248, 248, 248)',
+    padding: '60px 45px 35px 45px !important',
+    backgroundColor: 'rgb(250, 250, 250)',
+    // backgroundColor: 'rgb(248, 248, 248)',
+    height: '100% !important',
+    // backgroundColor: 'rgb(236, 245, 249)',
+    // backgroundColor: 'rgb(240, 245, 247)',
   },
 }));
 

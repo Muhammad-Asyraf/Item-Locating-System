@@ -61,8 +61,7 @@ const useStyles = makeStyles((theme) => ({
     minWidth: '60px !important',
   },
   listItemTexts: {
-    fontSize: '10px !important',
-    color: 'rgba(0, 0, 0, 0.9) !important',
+    fontSize: '1.5rem !important',
   },
   selected: {
     backgroundColor: 'rgba(53,132,167, 0.15) !important',
@@ -397,7 +396,7 @@ const Drawer = (props) => {
     >
       <MUIDrawer
         container={type === 'Mobile' ? container : null}
-        PaperProps={{ elevation: 2.5 }}
+        PaperProps={{ elevation: 3 }}
         classes={{
           paper: type === 'Mobile' ? classes.drawerPaper : classes.drawerPaperCurve,
         }}
@@ -476,7 +475,6 @@ const Drawer = (props) => {
                             <ListItemText className={classes.listItemTexts}>
                               {text}
                             </ListItemText>
-                            {/* {isExpandable && open ? <ExpandLess /> : <ExpandMore />} */}
                             {isExpandable && !open[itemKey] && (
                               <ExpandMore style={{ transform: 'rotate(-90deg)' }} />
                             )}
@@ -511,13 +509,7 @@ const Drawer = (props) => {
                                         },
                                       }}
                                     >
-                                      <ListItemIcon sx={{ ml: 2 }}>
-                                        {_icon}
-                                        {/* <Icon
-                                        className="fas fa-circle"
-                                        style={{ fontSize: 5, marginLeft: 30 }}
-                                      /> */}
-                                      </ListItemIcon>
+                                      <ListItemIcon sx={{ ml: 2 }}>{_icon}</ListItemIcon>
                                       <ListItemText sx={{ ml: -1.5 }}>
                                         {_text}
                                       </ListItemText>

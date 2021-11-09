@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
+import Breadcrumbs from '@mui/material/Breadcrumbs';
 import { makeStyles } from '@mui/styles';
 
 import AddIcon from '@mui/icons-material/Add';
@@ -28,15 +29,18 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const ItemList = () => {
+const ItemList = (props) => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const itemData = useSelector(selectItems);
   const isLoading = useSelector(selectIsLoading);
   const authHeader = useSelector(selectAuthHeader);
   const storeUrl = localStorage.getItem('storeUrl');
+  const storeName = localStorage.getItem('storeName');
   const [items, setItems] = React.useState([]);
+  const { history } = props;
 
+  console.log(history);
   useEffect(() => {
     (async () => {
       await dispatch(getItems(authHeader));
@@ -72,30 +76,59 @@ const ItemList = () => {
     );
   }
   return (
-    <div className={classes.root}>
-      <Grid container spacing={2} style={{ marginTop: '30px' }}>
-        <Grid item sm={12} md={10}>
-          <h1>Inventory Items</h1>
+    <Grid container spacing={2} style={{ marginTop: '30px' }}>
+      <Grid item xs={12} container>
+        <Grid item xs={8}>
+          <h1 style={{ marginBottom: 3, marginTop: 3 }}>Inventory Items</h1>
+          <Breadcrumbs separator="•" aria-label="breadcrumb">
+            <div style={{ fontSize: '0.875rem' }}>{storeName}&nbsp;&nbsp;</div>,
+            <div style={{ fontSize: '0.875rem' }}>&nbsp;&nbsp;Inventory&nbsp;&nbsp;</div>,
+            <div style={{ fontSize: '0.875rem' }}>&nbsp;&nbsp;Items&nbsp;&nbsp;</div>,
+            <div style={{ fontSize: '0.875rem' }}>&nbsp;&nbsp;List</div>
+          </Breadcrumbs>
         </Grid>
-        <Grid item sm={12} md={2}>
+        <Grid
+          item
+          sm={4}
+          container
+          direction="row"
+          justifyContent="flex-end"
+          alignItems="center"
+        >
           <Button
             variant="contained"
             color="primary"
             type="button"
-            className={classes.addButton}
+            sx={{
+              textTransform: 'none',
+              fontSize: '0.95rem',
+              borderRadius: 3,
+              height: 50,
+              paddingRight: 3,
+              boxShadow: 'rgba(53, 132, 167, 0.44) 0px 8px 16px 0px !important',
+            }}
             component={Link}
             to={`/${storeUrl}/item/create`}
           >
-            <AddIcon style={{ marginRight: 10 }} /> New Item
+            <AddIcon style={{ marginRight: 10 }} fontSize="small" /> New Item
           </Button>
         </Grid>
+        {/* <Grid item sm={12}>
+          <div style={{ fontSize: '0.875rem', marginTop: 30 }}>
+            <span>Add, view, edit and remove your inventory items all in one place.</span>
+          </div>
+        </Grid> */}
       </Grid>
-      <ItemListTable
-        items={items}
-        handleDelete={handleDelete}
-        onMultipleDelete={handleMultipleDelete}
-      />
-    </div>
+      <Grid item xs={12}>
+        <ItemListTable
+          itemData={itemData}
+          items={items}
+          setItems={setItems}
+          handleDelete={handleDelete}
+          onMultipleDelete={handleMultipleDelete}
+        />
+      </Grid>
+    </Grid>
   );
 };
 

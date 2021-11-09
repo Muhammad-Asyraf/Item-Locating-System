@@ -10,6 +10,10 @@ class Store extends Model {
     return 'uuid';
   }
 
+  $beforeUpdate() {
+    this.updated_at = new Date().toISOString();
+  }
+
   static get relationMappings() {
     return {
       backoffice_users: {

@@ -4,10 +4,14 @@ import clsx from 'clsx';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Tooltip from '@mui/material/Tooltip';
+import TextField from '@mui/material/TextField';
+import InputAdornment from '@mui/material/InputAdornment';
 
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
+import SearchIcon from '@mui/icons-material/Search';
+
 import { makeStyles } from '@mui/styles';
 
 /* eslint-disable indent */
@@ -15,9 +19,11 @@ const useToolbarStyles = makeStyles((theme) => ({
   root: {
     paddingLeft: theme.spacing(2),
     paddingRight: theme.spacing(2),
-    paddingTop: 15,
-    paddingBottom: 15,
+    paddingTop: 20,
+    paddingBottom: 20,
     borderRadius: '16px 16px 0px 0px',
+
+    marginBottom: 10,
   },
   highlight:
     theme.palette.type === 'light'
@@ -36,12 +42,20 @@ const useToolbarStyles = makeStyles((theme) => ({
   selected: {
     flex: '1 1 100%',
     color: 'white !important',
+    fontWeight: '600 !important',
+    fontSize: '20px !important',
+    marginBottom: '8px !important',
+    paddingTop: '8px !important',
+  },
+  input: {
+    borderRadius: '12px !important',
+    // backgroundColor: 'rgb(244, 246, 248) !important',
   },
 }));
 
 const EnhancedTableToolbar = (props) => {
   const classes = useToolbarStyles();
-  const { numSelected, handleMultipleDelete } = props;
+  const { numSelected, handleMultipleDelete, handleSearch } = props;
 
   return (
     <Toolbar
@@ -59,16 +73,25 @@ const EnhancedTableToolbar = (props) => {
           {numSelected} selected
         </Typography>
       ) : (
-        <Typography
-          className={classes.title}
-          variant="h6"
-          id="tableTitle"
-          component="div"
-        >
-          Item
-        </Typography>
+        <div style={{ flex: '1 1 100%', marginTop: 5, marginBottom: -10 }}>
+          <TextField
+            id="outlined-basic"
+            placeholder="Search for items ..."
+            // label="Search for Items"
+            variant="outlined"
+            style={{ width: '40%' }}
+            onChange={handleSearch}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+              className: classes.input,
+            }}
+          />
+        </div>
       )}
-
       {numSelected > 0 ? (
         <Tooltip title="Delete">
           <IconButton
@@ -80,11 +103,13 @@ const EnhancedTableToolbar = (props) => {
           </IconButton>
         </Tooltip>
       ) : (
-        <Tooltip title="Filter list">
-          <IconButton aria-label="filter list">
-            <FilterListIcon />
-          </IconButton>
-        </Tooltip>
+        <div style={{ paddingTop: 10 }}>
+          <Tooltip title="Search Filter">
+            <IconButton aria-label="filter list">
+              <FilterListIcon />
+            </IconButton>
+          </Tooltip>
+        </div>
       )}
     </Toolbar>
   );

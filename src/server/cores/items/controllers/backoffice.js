@@ -75,6 +75,7 @@ exports.editItem = async (req, res, next) => {
   try {
     const { uuid } = req.params;
     const { barcode_number, quantity, wholesale_price } = req.body;
+
     const item = await Item.query().patchAndFetchById(uuid, {
       ...req.body,
       barcode_number: parseInt(barcode_number, 10),

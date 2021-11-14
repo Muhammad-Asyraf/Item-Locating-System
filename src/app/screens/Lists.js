@@ -32,6 +32,7 @@ export default function Lists() {
   const [controlCartUuid, setControlCartUuid] = useState("");
 
   const user = useSelector((state) => state.user);
+  const auth = useSelector((state) => state.auth)
 
   // Dialog states
   const [listName, setListName] = useState("");
@@ -52,7 +53,8 @@ export default function Lists() {
       const { data } = await axios.get(
         environment.host +
           "/api/mobile/planning-cart-service/carts/" +
-          user.uuid
+          user.uuid,
+          auth.authHeader
       );
       let loketlists = [];
       for (i = 0; i < data.length; i++) {
@@ -91,7 +93,8 @@ export default function Lists() {
         app_user_uuid: user.uuid,
         cart_uuid: controlCartUuid,
         name: listName,
-      }
+      },
+      auth.authHeader
     );
     closeEditDialog();
     // Refresh
@@ -103,11 +106,12 @@ export default function Lists() {
     const { data } = await axios.delete(
       environment.host + "/api/mobile/planning-cart-service/cart/delete",
       {
+        headers: auth.authHeader.headers,
         data: {
           app_user_uuid: user.uuid,
           cart_uuid: controlCartUuid,
         }
-      }
+      },
     );
     closeEditDialog();
     // Refresh
@@ -128,7 +132,8 @@ export default function Lists() {
       {
         app_user_uuid: user.uuid,
         name: listName,
-      }
+      },
+      auth.authHeader
     );
     closeAddDialog();
     // Refresh the page

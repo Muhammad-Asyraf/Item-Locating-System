@@ -7,7 +7,6 @@ import Auth from './Auth';
 import LoginPage from '../pages/Login';
 import SignUpPage from '../pages/Signup';
 import BackOfficePage from '../pages/BackOffice';
-import NotFoundPage from '../pages/NotFound';
 
 import { selectStore } from '../redux/features/storeSlice';
 
@@ -27,7 +26,6 @@ const App = () => {
           <Route path="/auth/login" component={LoginPage} />
           <Route path="/auth/signup" component={SignUpPage} />
           <Redirect from="/" to={`${rootPath}/dashboard`} />
-          <Route path="*" component={NotFoundPage} />
         </Switch>
       </Auth>
     </Router>

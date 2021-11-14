@@ -9,6 +9,7 @@ export const setHeader = createAsyncThunk('auth/setHeader', async (firebase) => 
   const token = user && (await user.getIdToken());
   const payloadHeader = {
     headers: {
+      // 'Content-Type': 'multipart/form-data',
       'Content-Type': 'application/json',
       authorization: `Bearer ${token}`,
     },
@@ -30,10 +31,8 @@ export const login = createAsyncThunk(
 
       await dispatch(
         setNewNotification({
-          message: "Hello there! you've successfully logged in.",
-          severity: 'success',
-          backgroundColor: '',
-          color: '',
+          message: "Hello there! you've successfully logged in",
+          backgroundColor: '#202124',
         })
       );
 

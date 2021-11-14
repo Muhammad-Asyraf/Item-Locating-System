@@ -24,7 +24,6 @@ class ItemProduct extends Model {
           to: 'item.uuid',
         },
       },
-
       product: {
         relation: Model.BelongsToOneRelation,
         modelClass: require('../products/model'),

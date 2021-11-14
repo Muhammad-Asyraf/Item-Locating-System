@@ -25,15 +25,19 @@ const useStyles = makeStyles(() => ({
     height: '55px',
     width: '100%',
     color: 'white',
-    backgroundImage: 'linear-gradient(-225deg, #473B7B 0%, #3584A7 51%, #30D2BE 100%) ',
+    backgroundColor: '#3584A7',
 
     marginTop: '15px',
     borderRadius: '10px',
-    boxShadow: 'rgb(30 136 229 / 24%) 0px 8px 16px 0px',
+    boxShadow: 'rgb(30 136 229 / 24%) 0px 8px 16px 0px !important',
   },
   inputFields: {
     width: '100%',
   },
+  // noBorder: {
+  //   boxShadow: '0 1px 4px 0 rgba(35,35,35,.16) !important',
+  //   border: 'none !important',
+  // },
 }));
 
 const LoginForm = (props) => {
@@ -131,6 +135,9 @@ const LoginForm = (props) => {
             helperText={email.error}
             inputRef={emailRef}
             className={classes.inputFields}
+            InputProps={{
+              classes: { notchedOutline: classes.noBorder },
+            }}
           />
         </Grid>
         <Grid item xs={12}>
@@ -146,6 +153,7 @@ const LoginForm = (props) => {
             inputRef={passwordRef}
             className={classes.inputFields}
             InputProps={{
+              classes: { notchedOutline: classes.noBorder },
               endAdornment: (
                 <InputAdornment position="end">
                   <IconButton
@@ -172,7 +180,7 @@ const LoginForm = (props) => {
             sx={{ mt: 3 }}
           >
             {authLoading ? (
-              <CircularProgress size={20} sx={{ color: 'white' }} />
+              <CircularProgress size={20} sx={{ color: '#3584A7 !important' }} />
             ) : (
               <>Sign In</>
             )}

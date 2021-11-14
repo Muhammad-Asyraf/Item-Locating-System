@@ -24,6 +24,14 @@ class Store extends Model {
           to: 'backoffice_user.store_uuid',
         },
       },
+      items: {
+        relation: Model.HasManyRelation,
+        modelClass: require('../items/model '),
+        join: {
+          from: 'store.uuid',
+          to: 'item.store_uuid',
+        },
+      },
     };
   }
 

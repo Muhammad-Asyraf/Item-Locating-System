@@ -106,6 +106,7 @@ const EnhancedTableToolbar = (props) => {
         <div style={{ paddingTop: 10 }}>
           <Tooltip title="Search Filter">
             <IconButton aria-label="filter list">
+              Filter&nbsp;
               <FilterListIcon />
             </IconButton>
           </Tooltip>

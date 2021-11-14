@@ -1,23 +1,38 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
+
 import moment from 'moment';
 
+import SwiperCore, { Pagination, Navigation } from 'swiper';
+import { Swiper, SwiperSlide } from 'swiper/react/swiper-react';
+
+import '../../assets/css/swiper_override.css';
+import 'swiper/swiper-bundle.min.css';
+import 'swiper/swiper.min.css';
+
 import Box from '@mui/material/Box';
+import Paper from '@mui/material/Paper';
+import Grid from '@mui/material/Grid';
 import Checkbox from '@mui/material/Checkbox';
 import Collapse from '@mui/material/Collapse';
 import TableCell from '@mui/material/TableCell';
 import TableRow from '@mui/material/TableRow';
 import IconButton from '@mui/material/IconButton';
-import Paper from '@mui/material/Paper';
+import Chip from '@mui/material/Chip';
 
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import { makeStyles } from '@mui/styles';
 
 import RowOptions from './RowOptions';
+import ImageModal from '../Images/ImageModal';
 
 // import { isSameDay } from '../../utils/general';
+
+SwiperCore.use([Pagination, Navigation]);
 
 const useStyles = makeStyles(() => ({
   tableRow: {
@@ -35,6 +50,7 @@ const useStyles = makeStyles(() => ({
 const ItemTableRow = (props) => {
   const classes = useStyles();
   const [open, setOpen] = useState(false);
+  const [openModal, setOpenModal] = useState(false);
   const { item, isItemSelected, labelId, handleClick, handleDelete } = props;
 
   // const today = new Date();
@@ -52,6 +68,8 @@ const ItemTableRow = (props) => {
   // } else {
   //   updatedAt = moment(updatedAt).format('DD/MM/YYYY');
   // }
+  const handleOpenModal = () => setOpenModal(true);
+  const handleCloseModal = () => setOpenModal(false);
 
   return (
     <>
@@ -96,18 +114,45 @@ const ItemTableRow = (props) => {
         </TableCell>
         <TableCell
           style={{ borderBottom: 'none' }}
+          id={labelId}
+          scope="row"
+          // padding="none"
+          align="left"
+          sx={{
+            fontSize: '0.95rem !important',
+            // whiteSpace: 'nowrap',
+            // overflow: 'hidden',
+            paddingLeft: 0,
+          }}
+        >
+          {item.name}
+        </TableCell>
+        <TableCell
+          style={{ borderBottom: 'none' }}
+          align="left"
+          sx={{ fontSize: '0.95rem !important' }}
+        >
+          {item.barcode_number}
+        </TableCell>
+        <TableCell
+          style={{ borderBottom: 'none' }}
           component="th"
           id={labelId}
           scope="row"
           padding="none"
-          align="left"
+          align="center"
           sx={{
             fontSize: '0.95rem !important',
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
+            padding: '10px 0px 10px 20px',
           }}
         >
-          {item.name}
+          <Grid container spacing={0.5}>
+            {item.sub_categories.map((cat) => (
+              <Grid item key={cat.uuid}>
+                <Chip color="primary" size="small" label={cat.name} />
+              </Grid>
+            ))}
+          </Grid>
         </TableCell>
         <TableCell
           style={{ borderBottom: 'none' }}
@@ -139,25 +184,105 @@ const ItemTableRow = (props) => {
         </TableCell>
       </TableRow>
       <TableRow>
-        <TableCell
-          style={{ paddingBottom: 0, paddingTop: 0, borderBottom: 'none' }}
-          colSpan={6}
-        >
+        <TableCell style={{ padding: 0, borderBottom: 'none' }} colSpan={12}>
           <Collapse in={open} timeout="auto" unmountOnExit>
-            <Box>
-              <Paper variant="outlined">
-                <img
-                  src="https://cf.shopee.com.my/file/c3026716ba1d3421c5fa553c9ad3f74c"
-                  alt="Teset"
-                  style={{
-                    width: '30%',
-                    height: '30%',
-                  }}
-                />
-              </Paper>
-            </Box>
+            <Paper
+              sx={{
+                ml: 3,
+                mr: 3,
+              }}
+              elevation={0}
+            >
+              <Grid
+                container
+                direction="column"
+                alignItems="center"
+                justifyContent="center"
+                // sx={{ border: '1px solid red' }}
+              >
+                <Grid item sx={{ mt: 2, mb: 5 }}>
+                  <Paper
+                    elevation={0}
+                    style={{
+                      borderRadius: 20,
+                      boxShadow:
+                        'rgba(145, 158, 171, 0.24) 0px 0px 2px 0px, rgba(145, 158, 171, 0.24) 0px 16px 32px -4px ',
+                    }}
+                  >
+                    <Grid container>
+                      <Grid item xs={12}>
+                        <Box
+                          style={{
+                            backgroundColor: 'rgb(244, 246, 248)',
+                            padding: '20px 0px 20px 25px',
+                            borderRadius: '20px 20px 0px 0px',
+                          }}
+                        >
+                          Item Overview
+                        </Box>
+                      </Grid>
+                      <Grid item xs={3}>
+                        <Swiper
+                          pagination={{
+                            dynamicBullets: true,
+                            clickable: true,
+                          }}
+                          spaceBetween={30}
+                          loop
+                          className="mySwiper"
+                          style={{
+                            borderRadius: '0px 0px 0px 20px',
+                            marginRight: 10,
+                            width: 288,
+                            height: '100%',
+                            // border: '1px solid red',
+                          }}
+                          grabCursor
+                          centeredSlides
+                          slidesPerView={1}
+                        >
+                          {item.images.map(({ path }) => (
+                            <SwiperSlide key={path} onClick={handleOpenModal} style={{}}>
+                              <img
+                                src={path}
+                                alt="Teset"
+                                style={{
+                                  width: '100%',
+                                  height: '100%',
+                                  objectFit: 'cover',
+                                }}
+                              />
+                            </SwiperSlide>
+                          ))}
+                        </Swiper>
+                      </Grid>
+                      <Grid item xs={9}>
+                        <Box
+                          style={{
+                            padding: '20px 25px 20px 10px',
+                            // maxHeight: 300,
+                            // overflow: 'scroll',
+                            // overflowX: 'hidden',
+                            borderRadius: '0px 0px 20px 0px',
+                          }}
+                        >
+                          <ReactQuill value={item.note} readOnly theme="bubble" />
+                        </Box>
+                      </Grid>
+                    </Grid>
+                  </Paper>
+                </Grid>
+              </Grid>
+            </Paper>
           </Collapse>
         </TableCell>
+        <ImageModal
+          images={item.images}
+          Swiper={Swiper}
+          SwiperSlide={SwiperSlide}
+          openModal={openModal}
+          handleCloseModal={handleCloseModal}
+        />
       </TableRow>
     </>
   );

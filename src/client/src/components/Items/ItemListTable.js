@@ -67,8 +67,9 @@ const ItemListTable = (props) => {
     const filteredItems = itemData.filter((item) => {
       const firstCondi = item.name.toLowerCase().includes(filter);
       const secCondi = item.wholesale_price.includes(filter);
+      const thirdCondi = item.barcode_number.includes(filter);
 
-      if (firstCondi || secCondi) {
+      if (firstCondi || secCondi || thirdCondi) {
         return true;
       }
       return false;
@@ -146,8 +147,9 @@ const ItemListTable = (props) => {
             onRequestSort={handleRequestSort}
             rowCount={items.length}
           />
+          {/* <div style={{ height: '10px', width: '100%', clear: 'both' }} /> */}
           <TableBody>
-            <div style={{ height: '10px', width: '100%', clear: 'both' }} />
+            <TableRow style={{ height: '10px' }} />
             {stableSort(items, getComparator(order, orderBy))
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .map((item, index) => {
@@ -156,6 +158,7 @@ const ItemListTable = (props) => {
 
                 return (
                   <ItemTableRow
+                    key={labelId}
                     item={item}
                     isItemSelected={isItemSelected}
                     labelId={labelId}

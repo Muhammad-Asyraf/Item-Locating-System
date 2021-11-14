@@ -16,8 +16,8 @@ const initialState = {
   isLoading: true,
   items: [],
   status: null,
-  message: [],
-  errors: [],
+  message: null,
+  errors: null,
 };
 
 const itemSlice = createSlice({
@@ -45,5 +45,7 @@ export const { processingRequest, processed, clearError } = itemSlice.actions;
 
 export const selectItems = (state) => state.item.items;
 export const selectIsLoading = (state) => state.item.isLoading;
+export const selectItemError = (state) => state.item.errors;
+export const selectItemMsg = (state) => state.item.message;
 
 export default itemSlice.reducer;

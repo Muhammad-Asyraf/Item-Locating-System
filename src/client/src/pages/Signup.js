@@ -24,7 +24,9 @@ const useStyles = makeStyles((theme) => ({
   root: {
     minHeight: '100vh',
     minWidth: '100vw',
-    backgroundImage: 'linear-gradient(-225deg, #473B7B 0%, #3584A7 51%, #30D2BE 100%)',
+    position: 'relative',
+    // backgroundColor: '#3584A7',
+    // backgroundImage: 'linear-gradient(-225deg, #473B7B 0%, #3584A7 51%, #30D2BE 100%)',
   },
   card: {
     '& > *': {
@@ -86,6 +88,20 @@ const SignUp = () => {
         justifyContent="center"
         className={classes.root}
       >
+        <div
+          style={{
+            zIndex: '-10',
+            position: 'absolute',
+            width: '100%',
+            height: '100% ',
+            backgroundColor: '#3584A7',
+            // backgroundColor: '#dc3d4b',
+            // clipPath: 'polygon(54% 0, 100% 0%, 100% 100%, 0% 100%)',
+            // clipPath: 'ellipse(102% 100% at 102% 0%)',
+            // 'clip-path': 'ellipse(168% 100% at 138.5% 0%)',
+            clipPath: 'ellipse(162% 100% at 154.16% 0%)',
+          }}
+        />
         <Card elevation={6} className={classes.card}>
           <CardContent className={classes.cardContent}>
             <Grid container spacing={0}>

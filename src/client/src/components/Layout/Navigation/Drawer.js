@@ -35,7 +35,7 @@ import DeveloperBoardRoundedIcon from '@mui/icons-material/DeveloperBoardRounded
 
 import { makeStyles, useTheme } from '@mui/styles';
 
-import { ReactComponent as Megaphone } from '../../../assets/megaphone.svg';
+import { ReactComponent as Megaphone } from '../../../assets/svg/megaphone.svg';
 
 const drawerWidth = 228;
 
@@ -107,8 +107,8 @@ const Drawer = (props) => {
           path: `${match.path}/dashboard`,
           icon: (
             <DashboardTwoToneIcon
-              // style={{ color: '#3584A7' }}
-              sx={{ fill: 'url(#linearColors)' }}
+              style={{ color: '#3584A7' }}
+              // sx={{ fill: 'url(#linearColors)' }}
               fontSize="large"
             />
           ),
@@ -118,9 +118,7 @@ const Drawer = (props) => {
           text: 'Sales',
           itemKey: 'sales',
           path: `${match.path}/sales`,
-          icon: (
-            <LocalAtmTwoToneIcon sx={{ fill: 'url(#linearColors)' }} fontSize="large" />
-          ),
+          icon: <LocalAtmTwoToneIcon style={{ color: '#3584A7' }} fontSize="large" />,
           onClick: () => handleClick(`${match.path}/sales`),
         },
         {
@@ -129,7 +127,7 @@ const Drawer = (props) => {
           path: `${match.path}/customers`,
           icon: (
             <SupervisedUserCircleTwoToneIcon
-              sx={{ fill: 'url(#linearColors)' }}
+              style={{ color: '#3584A7' }}
               fontSize="large"
             />
           ),
@@ -145,9 +143,7 @@ const Drawer = (props) => {
           text: 'Products',
           itemKey: 'products',
           path: `${match.path}/product`,
-          icon: (
-            <LocalMallTwoToneIcon sx={{ fill: 'url(#linearColors)' }} fontSize="large" />
-          ),
+          icon: <LocalMallTwoToneIcon style={{ color: '#3584A7' }} fontSize="large" />,
           onClick: () => setOpen({ ...open, products: !open.products }),
           itemSubList: [
             {
@@ -155,7 +151,7 @@ const Drawer = (props) => {
               _key: 'product-list',
               _icon: (
                 <FormatListBulletedRoundedIcon
-                  sx={{ fill: 'url(#linearColors)' }}
+                  style={{ color: '#3584A7' }}
                   fontSize="medium"
                 />
               ),
@@ -166,10 +162,7 @@ const Drawer = (props) => {
               _text: 'Create',
               _key: 'product-create',
               _icon: (
-                <AddCircleTwoToneIcon
-                  sx={{ fill: 'url(#linearColors)' }}
-                  fontSize="medium"
-                />
+                <AddCircleTwoToneIcon style={{ color: '#3584A7' }} fontSize="medium" />
               ),
               _path: `${match.path}/product/create`,
               _onClick: () => handleClick(`${match.path}/product/create`),
@@ -180,7 +173,7 @@ const Drawer = (props) => {
           text: 'Product Mapping',
           itemKey: 'productMapping',
           path: `${match.path}/product-mapping`,
-          icon: <RoomTwoToneIcon sx={{ fill: 'url(#linearColors)' }} fontSize="large" />,
+          icon: <RoomTwoToneIcon style={{ color: '#3584A7' }} fontSize="large" />,
           // icon: (
           //   <Icon
           //     className="fas fa-map-pin"
@@ -194,10 +187,7 @@ const Drawer = (props) => {
           itemKey: 'promotions',
           path: `${match.path}/promotions`,
           icon: (
-            <SvgIcon
-              style={{ fontSize: 33, marginLeft: 3 }}
-              sx={{ fill: 'url(#linearColors)' }}
-            >
+            <SvgIcon style={{ fontSize: 33, marginLeft: 3, color: '#3584A7' }}>
               <Megaphone />
             </SvgIcon>
           ),
@@ -208,10 +198,7 @@ const Drawer = (props) => {
           itemKey: 'advertisements',
           path: `${match.path}/advertisements`,
           icon: (
-            <DeveloperBoardRoundedIcon
-              sx={{ fill: 'url(#linearColors)' }}
-              fontSize="large"
-            />
+            <DeveloperBoardRoundedIcon style={{ color: '#3584A7' }} fontSize="large" />
           ),
           // icon: (
           //   <Icon
@@ -235,9 +222,7 @@ const Drawer = (props) => {
           text: 'Items',
           itemKey: 'items',
           path: `${match.path}/item`,
-          icon: (
-            <LocalOfferTwoToneIcon sx={{ fill: 'url(#linearColors)' }} fontSize="large" />
-          ),
+          icon: <LocalOfferTwoToneIcon style={{ color: '#3584A7' }} fontSize="large" />,
           onClick: () => setOpen({ ...open, items: !open.items }),
           itemSubList: [
             {
@@ -245,7 +230,7 @@ const Drawer = (props) => {
               _key: 'item-list',
               _icon: (
                 <FormatListBulletedRoundedIcon
-                  sx={{ fill: 'url(#linearColors)' }}
+                  style={{ color: '#3584A7' }}
                   fontSize="medium"
                 />
               ),
@@ -256,10 +241,7 @@ const Drawer = (props) => {
               _text: 'Create',
               _key: 'item-create',
               _icon: (
-                <AddCircleTwoToneIcon
-                  sx={{ fill: 'url(#linearColors)' }}
-                  fontSize="medium"
-                />
+                <AddCircleTwoToneIcon style={{ color: '#3584A7' }} fontSize="medium" />
               ),
               _path: `${match.path}/item/create`,
               _onClick: () => handleClick(`${match.path}/item/create`),
@@ -277,10 +259,7 @@ const Drawer = (props) => {
           itemKey: 'users',
           path: `${match.path}/user`,
           icon: (
-            <SupervisorAccountTwoToneIcon
-              sx={{ fill: 'url(#linearColors)' }}
-              fontSize="large"
-            />
+            <SupervisorAccountTwoToneIcon style={{ color: '#3584A7' }} fontSize="large" />
           ),
           onClick: () => setOpen({ ...open, users: !open.users }),
           itemSubList: [
@@ -289,7 +268,7 @@ const Drawer = (props) => {
               _key: 'user-list',
               _icon: (
                 <FormatListBulletedRoundedIcon
-                  sx={{ fill: 'url(#linearColors)' }}
+                  style={{ color: '#3584A7' }}
                   fontSize="medium"
                 />
               ),
@@ -301,7 +280,7 @@ const Drawer = (props) => {
               _key: 'role-list',
               _icon: (
                 <AccountCircleTwoToneIcon
-                  sx={{ fill: 'url(#linearColors)' }}
+                  style={{ color: '#3584A7' }}
                   fontSize="medium"
                 />
               ),
@@ -316,10 +295,7 @@ const Drawer = (props) => {
           itemKey: 'businessRules',
           path: `${match.path}/business-rules`,
           icon: (
-            <BusinessCenterTwoToneIcon
-              sx={{ fill: 'url(#linearColors)' }}
-              fontSize="large"
-            />
+            <BusinessCenterTwoToneIcon style={{ color: '#3584A7' }} fontSize="large" />
           ),
           onClick: () => setOpen({ ...open, businessRules: !open.businessRules }),
           itemSubList: [
@@ -328,7 +304,7 @@ const Drawer = (props) => {
               _key: 'business-rules-list',
               _icon: (
                 <FormatListBulletedRoundedIcon
-                  sx={{ fill: 'url(#linearColors)' }}
+                  style={{ color: '#3584A7' }}
                   fontSize="medium"
                 />
               ),
@@ -339,10 +315,7 @@ const Drawer = (props) => {
               _text: 'Create',
               _key: 'business-rules-create',
               _icon: (
-                <AddCircleTwoToneIcon
-                  sx={{ fill: 'url(#linearColors)' }}
-                  fontSize="medium"
-                />
+                <AddCircleTwoToneIcon style={{ color: '#3584A7' }} fontSize="medium" />
               ),
               _path: `${match.path}/business-rules/Create`,
               _onClick: () => handleClick(`${match.path}/business-rules/create`),
@@ -353,9 +326,7 @@ const Drawer = (props) => {
           text: 'Office',
           itemKey: 'office',
           path: `${match.path}/office`,
-          icon: (
-            <DomainTwoToneIcon sx={{ fill: 'url(#linearColors)' }} fontSize="large" />
-          ),
+          icon: <DomainTwoToneIcon style={{ color: '#3584A7' }} fontSize="large" />,
           // icon: (
           //   <Icon
           //     className="fas fa-building"

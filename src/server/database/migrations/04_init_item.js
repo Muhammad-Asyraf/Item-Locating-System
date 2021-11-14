@@ -5,10 +5,14 @@ exports.up = async (knex) => {
     table.uuid('uuid').primary();
     table.string('name').notNullable();
     table.bigInteger('barcode_number').notNullable().unique();
-    table.integer('quantity').notNullable();
-    table.string('descriptions').notNullable();
     table.decimal('wholesale_price').notNullable();
+    table
+      .uuid('store_uuid')
+      .references('store.uuid')
+      .onDelete('CASCADE')
+      .notNullable();
     table.timestamps(true, true);
+    table.text('note');
   });
 };
 

@@ -31,12 +31,10 @@ const useStyles = makeStyles((theme) => ({
   },
   toolbar: theme.mixins.toolbar,
   container: {
-    // flexGrow: 1,
-    // padding: theme.spacing(3),
     padding: '60px 45px 35px 45px !important',
-    backgroundColor: 'rgb(250, 250, 250)',
-    // backgroundColor: 'rgb(248, 248, 248)',
     height: '100% !important',
+    // backgroundColor: 'rgb(250, 250, 250)',
+    // backgroundColor: 'rgb(248, 248, 248)',
     // backgroundColor: 'rgb(236, 245, 249)',
     // backgroundColor: 'rgb(240, 245, 247)',
   },
@@ -51,7 +49,7 @@ const Layout = (props) => {
   const classes = useStyles();
   const { children } = props;
   const dispatch = useDispatch();
-  const { message, severity, backgroundColor, color } = useSelector(selectNotification);
+  const { message, backgroundColor } = useSelector(selectNotification);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [openSnackBar, setOpenSnackBar] = useState({
     open: false,
@@ -106,13 +104,12 @@ const Layout = (props) => {
         >
           <Alert
             variant="filled"
-            severity={severity}
             elevation={6}
             onClose={handleCloseSnackBar}
             sx={{
               width: '100%',
-              backgroundColor: { backgroundColor },
-              color: { color },
+              backgroundColor,
+              // backgroundColor: '#202124',
             }}
           >
             {message}

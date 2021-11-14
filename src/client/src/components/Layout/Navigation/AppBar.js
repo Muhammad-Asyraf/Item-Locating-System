@@ -98,7 +98,8 @@ const AppBar = (props) => {
             edge="start"
             onClick={handleDrawerToggle}
             className={classes.menuButton}
-            sx={{ fill: 'url(#linearColors)' }}
+            // sx={{ fill: 'url(#linearColors)' }}
+            style={{ color: '#3584A7' }}
           >
             <MenuOpenRoundedIcon color="primary" fontSize="large" />
           </IconButton>
@@ -117,7 +118,8 @@ const AppBar = (props) => {
           <IconButton aria-label="show 17 new notifications" color="inherit">
             <Badge badgeContent={17} color="error">
               <NotificationsIcon
-                sx={{ fill: 'url(#linearColors)' }}
+                // sx={{ fill: 'url(#linearColors)' }}
+                style={{ color: '#3584A7' }}
                 color="primary"
                 fontSize="large"
               />
@@ -132,7 +134,8 @@ const AppBar = (props) => {
             onClick={handleClick}
           >
             <AccountCircle
-              sx={{ fill: 'url(#linearColors)' }}
+              // sx={{ fill: 'url(#linearColors)' }}
+              style={{ color: '#3584A7' }}
               color="primary"
               fontSize="large"
             />

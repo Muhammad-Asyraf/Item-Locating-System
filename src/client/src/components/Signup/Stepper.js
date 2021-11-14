@@ -30,12 +30,14 @@ const ColorlibConnector = withStyles({
   },
   active: {
     '& $line': {
-      backgroundImage: 'linear-gradient(-225deg, #473B7B 0%, #3584A7 51%, #30D2BE 100%)',
+      backgroundColor: '#3584A7',
+      // backgroundImage: 'linear-gradient(-225deg, #473B7B 0%, #3584A7 51%, #30D2BE 100%)',
     },
   },
   completed: {
     '& $line': {
-      backgroundImage: 'linear-gradient(-225deg, #473B7B 0%, #3584A7 51%, #30D2BE 100%)',
+      backgroundColor: '#3584A7',
+      // backgroundImage: 'linear-gradient(-225deg, #473B7B 0%, #3584A7 51%, #30D2BE 100%)',
     },
   },
   line: {
@@ -67,10 +69,13 @@ const useStyles = makeStyles((theme) => ({
     height: '45px',
     color: 'white',
     width: '140px !important',
-    backgroundImage: 'linear-gradient(-225deg, #473B7B 0%, #3584A7 51%, #30D2BE 100%)',
+    // backgroundColor: '#58c1b7 !important',
+    // color: 'black !important',
+    backgroundColor: '#3584A7 ',
+    // backgroundImage: 'linear-gradient(-225deg, #473B7B 0%, #3584A7 51%, #30D2BE 100%)',
     marginTop: '20px !important',
-    borderRadius: '10px',
-    boxShadow: 'rgb(30 136 229 / 24%) 0px 8px 16px 0px',
+    borderRadius: '8px !important',
+    boxShadow: 'rgb(30 136 229 / 24%) 0px 8px 16px 0px !important',
     '&:disabled': {
       backgroundImage: 'none',
     },
@@ -98,7 +103,7 @@ const useStyles = makeStyles((theme) => ({
     margin: '0px 20px 50px 20px',
   },
   circle: {
-    color: 'white !important',
+    color: '#3584A7 !important',
   },
   circleContainer: {
     padding: 10,
@@ -354,14 +359,14 @@ const Stepper = (props) => {
               </Grid>
             </Grid>
           ) : (
-            <Grid item sm={12} container>
-              <Grid item sm={4.93}>
+            <Grid item sm={12} container spacing={-1}>
+              <Grid item sm={5}>
                 <Button onClick={handleBack} className={classes.backButton}>
                   <KeyboardArrowLeftRoundedIcon /> Back
                 </Button>
               </Grid>
 
-              <Grid item sm={6}>
+              <Grid item sm={7}>
                 <Button
                   variant="contained"
                   onClick={validate}

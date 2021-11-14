@@ -29,7 +29,6 @@ export const getItems = createAsyncThunk(
 export const addItem = createAsyncThunk(
   'item/addItem',
   async ({ payload, authHeader }, { rejectWithValue }) => {
-    console.log('test', payload);
     try {
       const endpointURL = '/api/backoffice/item-service/item';
       await axios.post(endpointURL, payload, authHeader);
@@ -37,6 +36,8 @@ export const addItem = createAsyncThunk(
       return true;
     } catch (err) {
       const { data } = err.response;
+
+      console.log(err);
 
       return rejectWithValue({
         message: data.message,

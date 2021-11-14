@@ -29,7 +29,7 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const ItemList = (props) => {
+const ItemList = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const itemData = useSelector(selectItems);
@@ -38,9 +38,9 @@ const ItemList = (props) => {
   const storeUrl = localStorage.getItem('storeUrl');
   const storeName = localStorage.getItem('storeName');
   const [items, setItems] = React.useState([]);
-  const { history } = props;
+  // const { history } = props;
 
-  console.log(history);
+  // console.log(history);
   useEffect(() => {
     (async () => {
       await dispatch(getItems(authHeader));

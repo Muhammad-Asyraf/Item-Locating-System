@@ -9,23 +9,18 @@ import LinearProgress from '@mui/material/LinearProgress';
 import { auth } from '../services/firebase';
 import {
   setActiveUser,
+  verifying,
   verified,
   clearState,
   selectAuthIsLoading,
 } from '../redux/features/authSlice';
+import { processed as processedStore } from '../redux/features/storeSlice';
 import getStore from '../redux/thunks/storeThunk';
 import { setHeader } from '../redux/thunks/authThunk';
 
 const useStyles = makeStyles({
   root: {
     width: '100%',
-  },
-  circular: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: '100vh',
-    width: '100vw',
   },
 });
 
@@ -38,6 +33,7 @@ const Auth = ({ children }) => {
   const [firstRender, setFirstRender] = useState(true);
 
   useEffect(() => {
+    dispatch(verifying());
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
       if (user) {
         await dispatch(
@@ -48,7 +44,10 @@ const Auth = ({ children }) => {
           })
         );
         await dispatch(setHeader(auth));
+
         await dispatch(getStore({ userUUID: user.toJSON().uid }));
+        dispatch(processedStore());
+
         if (history.location.pathname === '/auth/login') {
           const storeUrl = localStorage.getItem('storeUrl');
           history.push(`/${storeUrl}/dashboard`);
@@ -57,8 +56,8 @@ const Auth = ({ children }) => {
       dispatch(clearState());
       dispatch(verified());
       setFirstRender(false);
-      unsubscribe();
     });
+    return unsubscribe;
   }, []);
 
   if (authLoading && firstRender) {
@@ -66,13 +65,11 @@ const Auth = ({ children }) => {
       <div className={classes.root}>
         <LinearProgress
           sx={{
+            height: 6,
             backgroundImage:
               'linear-gradient(-225deg, #473B7B 0%, #3584A7 51%, #30D2BE 100%)',
           }}
         />
-        {/* <div className={classes.circular}>
-        <CircularProgress size={70} color="secondary" />
-      </div> */}
       </div>
     );
   }

@@ -17,6 +17,8 @@ import {
   clearNotification,
 } from '../../redux/features/notificationSlice';
 
+import '../../assets/css/overrideSnackbar.css';
+
 const drawerWidth = 228;
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -49,7 +51,7 @@ const Layout = (props) => {
   const classes = useStyles();
   const { children } = props;
   const dispatch = useDispatch();
-  const { message, backgroundColor } = useSelector(selectNotification);
+  const { message, backgroundColor, severity } = useSelector(selectNotification);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [openSnackBar, setOpenSnackBar] = useState({
     open: false,
@@ -103,16 +105,29 @@ const Layout = (props) => {
           key={openSnackBar.transition.name}
         >
           <Alert
+            severity={severity}
             variant="filled"
             elevation={6}
             onClose={handleCloseSnackBar}
             sx={{
               width: '100%',
-              backgroundColor,
-              // backgroundColor: '#202124',
+              backgroundColor: '#202124',
+              borderRadius: 1,
+              '&:before': {
+                top: '0px',
+                left: '0px',
+                width: '11px',
+                bottom: '0px',
+                content: '""',
+                display: 'block',
+                position: 'absolute',
+                borderTopLeftRadius: '4px',
+                borderBottomLeftRadius: '4px',
+                backgroundColor,
+              },
             }}
           >
-            {message}
+            <span style={{ left: -2, position: 'relative' }}>{message}</span>
           </Alert>
         </Snackbar>
       </Container>

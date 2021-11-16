@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 
 import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
@@ -13,7 +14,10 @@ import EnhancedTableHead from './EnhancedTableHead';
 import EnhancedTableToolbar from './EnhancedTableToolbar';
 import ItemTableRow from './ItemTableRow';
 
+import { selectSubcategory } from '../../redux/features/categorySlice';
 import { getComparator, stableSort } from '../../utils/general';
+
+// import useFirstRender from '../../hooks/useFirstRender';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -47,14 +51,19 @@ const useStyles = makeStyles((theme) => ({
 
 const ItemListTable = (props) => {
   const classes = useStyles();
+  // const isFirstRender = useFirstRender();
   const [order, setOrder] = useState('asc');
   const [orderBy, setOrderBy] = useState('calories');
   const [selected, setSelected] = useState([]);
   const [page, setPage] = useState(0);
+  const [selectedCategory, setSelectedCategory] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
+  // const [selectedCategoryValue, setSelectedCategoryValue] = useState([]);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
 
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const categoriesOption = useSelector(selectSubcategory);
 
-  const { itemData, items, setItems, handleDelete, onMultipleDelete } = props;
+  const { itemData, items, setItems, handleDelete, onMultipleDelete, handleEdit } = props;
 
   const handleMultipleDelete = () => {
     onMultipleDelete(selected, setSelected);
@@ -62,12 +71,12 @@ const ItemListTable = (props) => {
 
   /* eslint-disable arrow-body-style */
   const handleSearch = (event) => {
-    const filter = event.target.value.toLowerCase();
+    const searchKeywords = event.target.value.toLowerCase();
 
-    const filteredItems = itemData.filter((item) => {
-      const firstCondi = item.name.toLowerCase().includes(filter);
-      const secCondi = item.wholesale_price.includes(filter);
-      const thirdCondi = item.barcode_number.includes(filter);
+    const filteredItems = filteredData.filter((item) => {
+      const firstCondi = item.name.toLowerCase().includes(searchKeywords);
+      const secCondi = item.wholesale_price.includes(searchKeywords);
+      const thirdCondi = item.barcode_number.includes(searchKeywords);
 
       if (firstCondi || secCondi || thirdCondi) {
         return true;
@@ -77,6 +86,22 @@ const ItemListTable = (props) => {
 
     setItems(filteredItems);
   };
+
+  useEffect(() => {
+    const selectedCatList = selectedCategory.map(({ uuid }) => uuid);
+    let filteredItem;
+
+    if (selectedCategory.length > 0) {
+      filteredItem = itemData.filter(({ sub_categories: subCat }) => {
+        return subCat.some(({ uuid }) => selectedCatList.includes(uuid));
+      });
+      setFilteredData(filteredItem);
+      setItems(filteredItem);
+    } else {
+      setFilteredData(itemData);
+      setItems(itemData);
+    }
+  }, [selectedCategory]);
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -132,6 +157,10 @@ const ItemListTable = (props) => {
         numSelected={selected.length}
         handleMultipleDelete={handleMultipleDelete}
         handleSearch={handleSearch}
+        setSelectedCategory={setSelectedCategory}
+        defaultValue={selectedCategory}
+        categoriesOption={categoriesOption}
+        filteredQuantity={items.length}
       />
       <TableContainer>
         <Table
@@ -164,6 +193,7 @@ const ItemListTable = (props) => {
                     labelId={labelId}
                     handleClick={handleClick}
                     handleDelete={handleDelete}
+                    handleEdit={handleEdit}
                   />
                 );
               })}

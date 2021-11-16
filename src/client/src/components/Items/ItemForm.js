@@ -160,7 +160,7 @@ const ItemCreate = (props) => {
   const quillFormats = getEditorFormat();
   const storeUUID = localStorage.getItem('storeUUID');
 
-  const { onSubmit, isLoading, categoryOptions } = props;
+  const { onSubmit, isItemLoading, categoryOptions } = props;
 
   const nameRef = useRef();
   const barcodeNumberRef = useRef();
@@ -440,7 +440,7 @@ const ItemCreate = (props) => {
                 />
               </Grid>
               <Grid item xs={12}>
-                <p className={classes.inputTiltle}>Note</p>
+                <p className={classes.inputTiltle}>Item Notes</p>
                 <ReactQuill
                   value={quillText.editorHtml}
                   onChange={handleChange}
@@ -479,7 +479,7 @@ const ItemCreate = (props) => {
                   <ReactLogo />
                   <div style={{ fontSize: '0.8rem' }}>Drop images here or click</div>
                   <div style={{ fontSize: '0.8rem' }}>
-                    <span style={{ color: '#3584A7', textDecoration: 'underline' }}>
+                    <span style={{ color: '#004C99', textDecoration: 'underline' }}>
                       browse
                     </span>
                     &nbsp; thorough your machine
@@ -549,14 +549,18 @@ const ItemCreate = (props) => {
             color="primary"
             type="submit"
             disabled={
-              isLoading === true ||
+              isItemLoading === true ||
               barcodeNumber.error !== false ||
               itemName.error !== false ||
               wholesalePrice.error !== false
             }
             className={classes.submitButton}
           >
-            {isLoading ? <CircularProgress size={20}> </CircularProgress> : <>Add Item</>}
+            {isItemLoading ? (
+              <CircularProgress size={20} style={{ color: 'white' }} />
+            ) : (
+              <>Add Item</>
+            )}
           </Button>
         </Grid>
       </Grid>

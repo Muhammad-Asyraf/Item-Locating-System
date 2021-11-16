@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import clsx from 'clsx';
 
+import Grid from '@mui/material/Grid';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Tooltip from '@mui/material/Tooltip';
@@ -14,16 +15,12 @@ import SearchIcon from '@mui/icons-material/Search';
 
 import { makeStyles } from '@mui/styles';
 
+import CategoryFilterDialog from '../Category/CategoryFilterDialog';
+
 /* eslint-disable indent */
 const useToolbarStyles = makeStyles((theme) => ({
   root: {
-    paddingLeft: theme.spacing(2),
-    paddingRight: theme.spacing(2),
-    paddingTop: 20,
-    paddingBottom: 20,
     borderRadius: '16px 16px 0px 0px',
-
-    marginBottom: 10,
   },
   highlight:
     theme.palette.type === 'light'
@@ -35,27 +32,33 @@ const useToolbarStyles = makeStyles((theme) => ({
           color: theme.palette.text.primary,
           backgroundColor: theme.palette.primary.dark,
         },
-
-  title: {
-    flex: '1 1 100%',
-  },
   selected: {
-    flex: '1 1 100%',
     color: 'white !important',
     fontWeight: '600 !important',
     fontSize: '20px !important',
-    marginBottom: '8px !important',
-    paddingTop: '8px !important',
   },
   input: {
     borderRadius: '12px !important',
-    // backgroundColor: 'rgb(244, 246, 248) !important',
   },
 }));
 
 const EnhancedTableToolbar = (props) => {
   const classes = useToolbarStyles();
-  const { numSelected, handleMultipleDelete, handleSearch } = props;
+  const {
+    numSelected,
+    handleMultipleDelete,
+    handleSearch,
+    setSelectedCategory,
+    defaultValue,
+    categoriesOption,
+    filteredQuantity,
+  } = props;
+
+  const [openFilter, setOpenFilter] = useState(false);
+
+  const handleClickOpen = () => setOpenFilter(true);
+
+  const handleClose = () => setOpenFilter(false);
 
   return (
     <Toolbar
@@ -63,54 +66,91 @@ const EnhancedTableToolbar = (props) => {
         [classes.highlight]: numSelected > 0,
       })}
     >
+      <CategoryFilterDialog
+        open={openFilter}
+        handleClose={handleClose}
+        categoryOptions={categoriesOption}
+        setSelectedCategory={setSelectedCategory}
+        defaultValue={defaultValue}
+        filteredQuantity={filteredQuantity}
+      />
       {numSelected > 0 ? (
-        <Typography
-          className={classes.selected}
-          color="inherit"
-          variant="subtitle1"
-          component="div"
-        >
-          {numSelected} selected
-        </Typography>
+        <Grid container sx={{ marginBottom: 3.5, marginTop: 3.5 }}>
+          <Grid item xs={6} container justifyContent="flex-start" alignItems="center">
+            <Typography
+              className={classes.selected}
+              color="inherit"
+              variant="subtitle1"
+              component="div"
+            >
+              {numSelected} selected
+            </Typography>
+          </Grid>
+          <Grid item xs={6} container justifyContent="flex-end" alignItems="center">
+            <Tooltip title="Delete">
+              <IconButton
+                className={classes.selected}
+                aria-label="delete"
+                onClick={handleMultipleDelete}
+              >
+                <DeleteIcon />
+              </IconButton>
+            </Tooltip>
+          </Grid>
+        </Grid>
       ) : (
-        <div style={{ flex: '1 1 100%', marginTop: 5, marginBottom: -10 }}>
-          <TextField
-            id="outlined-basic"
-            placeholder="Search for items ..."
-            // label="Search for Items"
-            variant="outlined"
-            style={{ width: '40%' }}
-            onChange={handleSearch}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon />
-                </InputAdornment>
-              ),
-              className: classes.input,
-            }}
-          />
-        </div>
-      )}
-      {numSelected > 0 ? (
-        <Tooltip title="Delete">
-          <IconButton
-            className={classes.selected}
-            aria-label="delete"
-            onClick={handleMultipleDelete}
+        <Grid container sx={{ marginBottom: 2.5, marginTop: 2.5 }}>
+          <Grid item xs={9}>
+            <TextField
+              id="outlined-basic"
+              placeholder="Search for items ..."
+              // label="Search for Items"
+              autoComplete="off"
+              variant="outlined"
+              style={{ width: '50%' }}
+              onChange={handleSearch}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon />
+                  </InputAdornment>
+                ),
+                className: classes.input,
+              }}
+            />
+          </Grid>
+          <Grid
+            item
+            sm={2}
+            container
+            justifyContent="flex-end"
+            alignItems="center"
+            sx={{ fontSize: '0.875rem' }}
           >
-            <DeleteIcon />
-          </IconButton>
-        </Tooltip>
-      ) : (
-        <div style={{ paddingTop: 10 }}>
-          <Tooltip title="Search Filter">
-            <IconButton aria-label="filter list">
-              Filter&nbsp;
-              <FilterListIcon />
+            {defaultValue.length > 0 ? (
+              <>
+                <b>{filteredQuantity}</b> &nbsp;&nbsp; <span>Items found</span>
+                &nbsp;&nbsp;
+              </>
+            ) : null}
+          </Grid>
+          <Grid item xs={1} container justifyContent="flex-end" alignItems="center">
+            <IconButton
+              onClick={handleClickOpen}
+              style={{
+                fontSize: '0.875rem',
+                fontWeight: 700,
+                color: 'black',
+                borderRadius: 11,
+                backgroundColor:
+                  defaultValue.length > 0 ? 'rgba(0, 0, 0, 0.04)' : 'white',
+              }}
+            >
+              &nbsp;Filters&nbsp;&nbsp;
+              <FilterListIcon fontSize="small" />
             </IconButton>
-          </Tooltip>
-        </div>
+          </Grid>
+        </Grid>
       )}
     </Toolbar>
   );

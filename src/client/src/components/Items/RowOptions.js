@@ -9,9 +9,12 @@ import MoreVertRoundedIcon from '@mui/icons-material/MoreVertRounded';
 import DeleteRoundedIcon from '@mui/icons-material/DeleteRounded';
 import EditRoundedIcon from '@mui/icons-material/EditRounded';
 
+import '../../assets/css/categorySelectOverride.css';
+
 const RowMenu = (props) => {
   const storeUrl = localStorage.getItem('storeUrl');
   const [anchorEl, setAnchorEl] = useState();
+  const { item, Link, handleDelete, handleEdit } = props;
 
   const handleClickOption = (event) => {
     setAnchorEl(event.currentTarget);
@@ -20,7 +23,6 @@ const RowMenu = (props) => {
   const handleCloseOption = () => {
     setAnchorEl(null);
   };
-  const { item, Link, handleDelete } = props;
 
   return (
     <>
@@ -38,7 +40,7 @@ const RowMenu = (props) => {
           sx: {
             overflow: 'visible',
             mt: -0.5,
-            ml: -11.5,
+            ml: -9.5,
             '& .MuiAvatar-root': {
               width: 99,
               height: 32,
@@ -67,7 +69,12 @@ const RowMenu = (props) => {
             Delete
           </ListItemIcon>
         </MenuItem>
-        <MenuItem component={Link} to={`/${storeUrl}/item/edit/${item.uuid}`}>
+        {/* <MenuItem component={Link} to={`/${storeUrl}/item/edit/${item.uuid}`}> */}
+        <MenuItem
+          onClick={handleEdit}
+          component={Link}
+          to={`/${storeUrl}/item/edit/${item.uuid}`}
+        >
           <ListItemIcon sx={{ mr: 5, fontSize: '0.875rem !important' }}>
             <EditRoundedIcon fontSize="small" sx={{ ml: 1, mr: 3, mt: 0.1 }} />
             Edit

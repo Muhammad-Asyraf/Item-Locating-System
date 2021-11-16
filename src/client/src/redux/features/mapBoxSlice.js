@@ -7,7 +7,7 @@ import receivedPayloadState from '../states/mapBoxState';
 import getLocation from '../thunks/mapBoxThunk';
 
 const initialState = {
-  isLoading: true,
+  isLoading: false,
   payload: {},
   status: null,
   message: [],

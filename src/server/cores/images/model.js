@@ -1,5 +1,6 @@
 const { Model } = require('objection');
 const tableNames = require('../../database/table_names');
+const { v4: uuidv4 } = require('uuid');
 
 class Image extends Model {
   static get tableName() {
@@ -12,6 +13,10 @@ class Image extends Model {
 
   $beforeUpdate() {
     this.updated_at = new Date().toISOString();
+  }
+
+  $beforeInsert() {
+    this.uuid = uuidv4();
   }
 
   static get relationMappings() {

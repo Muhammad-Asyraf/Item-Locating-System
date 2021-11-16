@@ -51,7 +51,7 @@ const ItemTableRow = (props) => {
   const classes = useStyles();
   const [open, setOpen] = useState(false);
   const [openModal, setOpenModal] = useState(false);
-  const { item, isItemSelected, labelId, handleClick, handleDelete } = props;
+  const { item, isItemSelected, labelId, handleClick, handleDelete, handleEdit } = props;
 
   // const today = new Date();
   // let createdAt = new Date(item.created_at);
@@ -180,7 +180,12 @@ const ItemTableRow = (props) => {
           align="left"
           sx={{ paddingLeft: '0px !important' }}
         >
-          <RowOptions item={item} Link={Link} handleDelete={handleDelete} />
+          <RowOptions
+            item={item}
+            Link={Link}
+            handleDelete={handleDelete}
+            handleEdit={handleEdit}
+          />
         </TableCell>
       </TableRow>
       <TableRow>
@@ -249,7 +254,7 @@ const ItemTableRow = (props) => {
                                 style={{
                                   width: '100%',
                                   height: '100%',
-                                  objectFit: 'cover',
+                                  objectFit: 'scale-down',
                                 }}
                               />
                             </SwiperSlide>

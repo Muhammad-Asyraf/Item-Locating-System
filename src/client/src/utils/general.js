@@ -32,3 +32,25 @@ export const isSameDay = (a, b) => {
     a.getDate() === b.getDate()
   );
 };
+
+export const getFileObject = (url) => {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', url);
+    xhr.responseType = 'blob';
+    xhr.onload = () => {
+      const { status } = xhr;
+      if (status === 200) {
+        const blob = xhr.response;
+
+        blob.lastModifiedDate = new Date();
+        blob.name = url.slice(65);
+
+        resolve(blob);
+      } else {
+        reject(status);
+      }
+    };
+    xhr.send();
+  });
+};

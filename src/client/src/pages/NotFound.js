@@ -25,14 +25,16 @@ const NotFound = () => {
         direction="column"
         alignItems="center"
         justifyContent="center"
-        style={{
-          minHeight: '100vh',
-        }}
+        // style={{
+        //   minHeight: '90vh',
+        // }}
       >
         <Grid item>
           <ReactLogo
             style={{
-              height: '100vh',
+              height: '86vh',
+              position: 'relative',
+              top: 20,
               // width: '100vw',
             }}
           />

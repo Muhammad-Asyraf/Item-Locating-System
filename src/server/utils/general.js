@@ -1,3 +1,5 @@
+const fs = require('fs');
+
 const getNamespace = (path) => {
   return path.replace(/[^a-zA-Z ]/g, '.').substring(1, path.length - 3);
 };

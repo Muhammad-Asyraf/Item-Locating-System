@@ -9,7 +9,9 @@ const itemLogger = getLogger(__filename, 'item');
 
 exports.getAllItems = async (req, res, next) => {
   try {
+    const { store_uuid } = req.params;
     const items = await Item.query()
+      .where('store_uuid', store_uuid)
       .withGraphFetched('[sub_categories.category, images]')
       .modifyGraph('images', (builder) => {
         builder.select('path');
@@ -32,7 +34,18 @@ exports.getAllItems = async (req, res, next) => {
 exports.findItem = async (req, res, next) => {
   try {
     const { uuid } = req.params;
-    const item = await Item.query().findById(uuid);
+    const item = await Item.query()
+      .findById(uuid)
+      .withGraphFetched('[sub_categories.category, images]')
+      .modifyGraph('images', (builder) => {
+        builder.select('path');
+      })
+      .modifyGraph('sub_categories.category', (builder) => {
+        builder.select('uuid', 'name');
+      })
+      .modifyGraph('sub_categories', (builder) => {
+        builder.select('uuid', 'name');
+      });
     itemLogger.info(`Successfully retrieve item: ${item.uuid}`);
     res.json(item);
   } catch (err) {
@@ -81,22 +94,17 @@ exports.createItem = async (req, res, next) => {
     const item_sub_category = JSON.parse(sub_category);
     const itemId = uuidv4();
 
-    const images = imgFiles.map(
+    const new_images = imgFiles.map(
       ({
         fieldname,
         originalname,
         encoding,
         mimetype,
         destination,
+        filename,
         size,
         ...keepAttrs
-      }) => {
-        return {
-          uuid: uuidv4(),
-          item_uuid: itemId,
-          path: keepAttrs.path,
-        };
-      }
+      }) => keepAttrs
     );
 
     // console.log(barcode_number);
@@ -105,8 +113,7 @@ exports.createItem = async (req, res, next) => {
     // console.log(note);
     // console.log(item_sub_category);
     // console.log(imgFiles);
-    // console.log(images);
-    // res.json('ss');
+    // console.log(new_images);
 
     const item = await Item.query().insertGraph(
       {
@@ -117,11 +124,10 @@ exports.createItem = async (req, res, next) => {
         barcode_number: parseInt(barcode_number, 10),
         wholesale_price: parseFloat(wholesale_price),
         sub_categories: item_sub_category,
+        images: new_images,
       },
-      { relate: true }
+      { relate: ['sub_categories'] }
     );
-
-    await Image.query().insert(images);
 
     itemLogger.info(`item successfully created with [UUID -${item.uuid}]`);
     res.json(item);
@@ -134,19 +140,74 @@ exports.createItem = async (req, res, next) => {
 
 exports.editItem = async (req, res, next) => {
   try {
+    const {
+      barcode_number,
+      name,
+      wholesale_price,
+      note,
+      sub_category,
+      store_uuid,
+      old_imgs,
+    } = req.body;
     const { uuid } = req.params;
-    const { barcode_number, quantity, wholesale_price } = req.body;
+    const { files: imgFiles } = req;
+    const item_sub_category = JSON.parse(sub_category);
+    const item_old_imgs = JSON.parse(old_imgs);
+
+    const new_images = imgFiles.map(
+      ({
+        fieldname,
+        originalname,
+        encoding,
+        mimetype,
+        destination,
+        filename,
+        size,
+        ...keepAttrs
+      }) => keepAttrs
+    );
+
+    // console.log('barcode', barcode_number);
+    // console.log('name', name);
+    // console.log('price', wholesale_price);
+    // console.log('note', note);
+    // console.log('category', item_sub_category);
+    // console.log('imgFile', imgFiles);
+    // console.log('imgs', new_images);
+    // console.log('storeid', store_uuid);
+    // console.log('itemid', uuid);
+    // console.log('oldImgs', old_imgs);
 
     const item = await Item.query().patchAndFetchById(uuid, {
-      ...req.body,
+      name,
+      note,
+      store_uuid,
       barcode_number: parseInt(barcode_number, 10),
       wholesale_price: parseFloat(wholesale_price),
-      quantity: parseInt(quantity, 10),
     });
+
+    // if no duplicates, then proceed with relationship query
+    await Item.query().upsertGraph(
+      {
+        uuid,
+        sub_categories: item_sub_category,
+        images: new_images,
+      },
+      {
+        relate: ['sub_categories'],
+        unrelate: ['sub_categories'],
+      }
+    );
+
+    if (item_old_imgs && item) {
+      await removeFiles(item_old_imgs);
+    }
+
     itemLogger.info(`item successfully update: ${item.uuid}`);
     res.json(item);
   } catch (err) {
-    itemLogger.warn(`Error creating item`);
+    itemLogger.warn(`Error editing item`);
+    await removeFiles(req.files);
     next(err);
   }
 };

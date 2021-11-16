@@ -1,18 +1,26 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 
+import LinearProgress from '@mui/material/LinearProgress';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
-import CircularProgress from '@mui/material/CircularProgress';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import { makeStyles } from '@mui/styles';
 
 import AddIcon from '@mui/icons-material/Add';
 
-import { selectItems, selectIsLoading, processed } from '../../redux/features/itemSlice';
-import { getItems, deleteItem, deleteMultipleItems } from '../../redux/thunks/itemThunk';
+import {
+  selectItems,
+  selectIsLoading,
+  processed,
+  processingRequest,
+} from '../../redux/features/itemSlice';
+import { processingRequest as processingCategory } from '../../redux/features/categorySlice';
 import { selectAuthHeader } from '../../redux/features/authSlice';
+
+import { getSubcategories } from '../../redux/thunks/categoryThunk';
+import { getItems, deleteItem, deleteMultipleItems } from '../../redux/thunks/itemThunk';
 
 import ItemListTable from '../../components/Items/ItemListTable';
 
@@ -20,30 +28,40 @@ const useStyles = makeStyles(() => ({
   root: {
     width: '100%',
   },
-  circular: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: '80vh',
-    width: '80vw',
+  linear: {
+    position: 'relative',
+    top: '10px !important',
+    left: '-45px !important',
+    width: '100vw',
+    height: '7px !important',
   },
+  // circular: {
+  //   display: 'flex',
+  //   alignItems: 'center',
+  //   justifyContent: 'center',
+  //   height: '80vh',
+  //   width: '100%',
+  // },
 }));
 
 const ItemList = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
+
   const itemData = useSelector(selectItems);
   const isLoading = useSelector(selectIsLoading);
   const authHeader = useSelector(selectAuthHeader);
+
   const storeUrl = localStorage.getItem('storeUrl');
   const storeName = localStorage.getItem('storeName');
-  const [items, setItems] = React.useState([]);
-  // const { history } = props;
 
-  // console.log(history);
+  const [items, setItems] = useState([]);
+
   useEffect(() => {
     (async () => {
-      await dispatch(getItems(authHeader));
+      dispatch(processingRequest());
+      await dispatch(getItems());
+      await dispatch(getSubcategories());
       dispatch(processed());
     })();
   }, []);
@@ -68,10 +86,20 @@ const ItemList = () => {
     setSelected([]);
   };
 
+  const handleEdit = () => {
+    dispatch(processingCategory());
+  };
+
   if (isLoading) {
     return (
-      <div className={classes.circular}>
-        <CircularProgress size={70} color="secondary" />
+      <div>
+        <LinearProgress
+          className={classes.linear}
+          sx={{
+            backgroundImage:
+              'linear-gradient(-225deg, #473B7B 0%, #003366 51%, #30D2BE 100%)',
+          }}
+        />
       </div>
     );
   }
@@ -113,11 +141,6 @@ const ItemList = () => {
             <AddIcon style={{ marginRight: 10 }} fontSize="small" /> New Item
           </Button>
         </Grid>
-        {/* <Grid item sm={12}>
-          <div style={{ fontSize: '0.875rem', marginTop: 30 }}>
-            <span>Add, view, edit and remove your inventory items all in one place.</span>
-          </div>
-        </Grid> */}
       </Grid>
       <Grid item xs={12}>
         <ItemListTable
@@ -126,6 +149,7 @@ const ItemList = () => {
           setItems={setItems}
           handleDelete={handleDelete}
           onMultipleDelete={handleMultipleDelete}
+          handleEdit={handleEdit}
         />
       </Grid>
     </Grid>

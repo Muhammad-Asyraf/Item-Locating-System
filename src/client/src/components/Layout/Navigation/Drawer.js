@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { withRouter } from 'react-router-dom';
+import { withRouter, Link } from 'react-router-dom';
+
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import 'react-perfect-scrollbar/dist/css/styles.css';
 // import { loadCSS } from 'fg-loadcss';
 
 import { Drawer as MUIDrawer, useMediaQuery } from '@mui/material';
-// import Divider from '@mui/material/Divider';
 import Hidden from '@mui/material/Hidden';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -14,6 +14,7 @@ import Collapse from '@mui/material/Collapse';
 import ListSubheader from '@mui/material/ListSubheader';
 import SvgIcon from '@mui/material/SvgIcon';
 import Divider from '@mui/material/Divider';
+import Grid from '@mui/material/Grid';
 
 // import Icon from '@mui/material/Icon';
 import SupervisorAccountTwoToneIcon from '@mui/icons-material/SupervisorAccountTwoTone';
@@ -78,9 +79,10 @@ const useStyles = makeStyles((theme) => ({
 /* eslint-disable react/prop-types */
 const Drawer = (props) => {
   const classes = useStyles();
-  const { history, window, type, status, handleDrawerToggle, match, location } = props;
+  const { window, type, status, handleDrawerToggle, location } = props;
   const theme = useTheme();
   const isDesktop = useMediaQuery(theme.breakpoints.up('lg'));
+  const storeUrl = localStorage.getItem('storeUrl');
   const container = window !== undefined ? () => window().document.body : undefined;
   const [open, setOpen] = useState({
     products: false,
@@ -89,13 +91,7 @@ const Drawer = (props) => {
     businessRules: false,
   });
 
-  const handleClick = (path) => {
-    history.push(path);
-    if (type === 'Mobile') {
-      handleDrawerToggle();
-    }
-  };
-  // linear-gradient(-225deg, #473B7B 0%, #3584A7 51%, #30D2BE 100%)
+  // linear-gradient(-225deg, #473B7B 0%, #003366 51%, #30D2BE 100%)
   const drawerList = [
     {
       header: 'GENERAL',
@@ -104,34 +100,31 @@ const Drawer = (props) => {
         {
           text: 'Dashboard',
           itemKey: 'dashboard',
-          path: `${match.path}/dashboard`,
+          path: '/dashboard',
           icon: (
             <DashboardTwoToneIcon
-              style={{ color: '#3584A7' }}
+              style={{ color: '#003366' }}
               // sx={{ fill: 'url(#linearColors)' }}
               fontSize="large"
             />
           ),
-          onClick: () => handleClick(`${match.path}/dashboard`),
         },
         {
           text: 'Sales',
           itemKey: 'sales',
-          path: `${match.path}/sales`,
-          icon: <LocalAtmTwoToneIcon style={{ color: '#3584A7' }} fontSize="large" />,
-          onClick: () => handleClick(`${match.path}/sales`),
+          path: '/sales',
+          icon: <LocalAtmTwoToneIcon style={{ color: '#003366' }} fontSize="large" />,
         },
         {
           text: 'Customers',
           itemKey: 'customers',
-          path: `${match.path}/customers`,
+          path: '/customers',
           icon: (
             <SupervisedUserCircleTwoToneIcon
-              style={{ color: '#3584A7' }}
+              style={{ color: '#003366' }}
               fontSize="large"
             />
           ),
-          onClick: () => handleClick(`${match.path}/customers`),
         },
       ],
     },
@@ -142,8 +135,8 @@ const Drawer = (props) => {
         {
           text: 'Products',
           itemKey: 'products',
-          path: `${match.path}/product`,
-          icon: <LocalMallTwoToneIcon style={{ color: '#3584A7' }} fontSize="large" />,
+          path: '/product',
+          icon: <LocalMallTwoToneIcon style={{ color: '#003366' }} fontSize="large" />,
           onClick: () => setOpen({ ...open, products: !open.products }),
           itemSubList: [
             {
@@ -151,54 +144,50 @@ const Drawer = (props) => {
               _key: 'product-list',
               _icon: (
                 <FormatListBulletedRoundedIcon
-                  style={{ color: '#3584A7' }}
+                  style={{ color: '#003366' }}
                   fontSize="medium"
                 />
               ),
-              _path: `${match.path}/product/list`,
-              _onClick: () => handleClick(`${match.path}/product/list`),
+              _path: '/product/list',
             },
             {
               _text: 'Create',
               _key: 'product-create',
               _icon: (
-                <AddCircleTwoToneIcon style={{ color: '#3584A7' }} fontSize="medium" />
+                <AddCircleTwoToneIcon style={{ color: '#003366' }} fontSize="medium" />
               ),
-              _path: `${match.path}/product/create`,
-              _onClick: () => handleClick(`${match.path}/product/create`),
+              _path: '/product/create',
             },
           ],
         },
         {
           text: 'Product Mapping',
           itemKey: 'productMapping',
-          path: `${match.path}/product-mapping`,
-          icon: <RoomTwoToneIcon style={{ color: '#3584A7' }} fontSize="large" />,
+          path: '/product-mapping',
+          icon: <RoomTwoToneIcon style={{ color: '#003366' }} fontSize="large" />,
           // icon: (
           //   <Icon
           //     className="fas fa-map-pin"
           //     style={{ fontSize: 30, marginLeft: 8, color: '#007AFF' }}
           //   />
           // ),
-          onClick: () => handleClick(`${match.path}/product-mapping`),
         },
         {
           text: 'Promotions',
           itemKey: 'promotions',
-          path: `${match.path}/promotions`,
+          path: '/promotions',
           icon: (
-            <SvgIcon style={{ fontSize: 33, marginLeft: 3, color: '#3584A7' }}>
+            <SvgIcon style={{ fontSize: 33, marginLeft: 3, color: '#003366' }}>
               <Megaphone />
             </SvgIcon>
           ),
-          onClick: () => handleClick(`${match.path}/promotions`),
         },
         {
           text: 'Advertisements',
           itemKey: 'advertisements',
-          path: `${match.path}/advertisements`,
+          path: '/advertisements',
           icon: (
-            <DeveloperBoardRoundedIcon style={{ color: '#3584A7' }} fontSize="large" />
+            <DeveloperBoardRoundedIcon style={{ color: '#003366' }} fontSize="large" />
           ),
           // icon: (
           //   <Icon
@@ -210,7 +199,6 @@ const Drawer = (props) => {
           //     }}
           //   />
           // ),
-          onClick: () => handleClick(`${match.path}/advertisements`),
         },
       ],
     },
@@ -221,8 +209,8 @@ const Drawer = (props) => {
         {
           text: 'Items',
           itemKey: 'items',
-          path: `${match.path}/item`,
-          icon: <LocalOfferTwoToneIcon style={{ color: '#3584A7' }} fontSize="large" />,
+          path: '/item',
+          icon: <LocalOfferTwoToneIcon style={{ color: '#003366' }} fontSize="large" />,
           onClick: () => setOpen({ ...open, items: !open.items }),
           itemSubList: [
             {
@@ -230,21 +218,19 @@ const Drawer = (props) => {
               _key: 'item-list',
               _icon: (
                 <FormatListBulletedRoundedIcon
-                  style={{ color: '#3584A7' }}
+                  style={{ color: '#003366' }}
                   fontSize="medium"
                 />
               ),
-              _path: `${match.path}/item/list`,
-              _onClick: () => handleClick(`${match.path}/item/list`),
+              _path: '/item/list',
             },
             {
               _text: 'Create',
               _key: 'item-create',
               _icon: (
-                <AddCircleTwoToneIcon style={{ color: '#3584A7' }} fontSize="medium" />
+                <AddCircleTwoToneIcon style={{ color: '#003366' }} fontSize="medium" />
               ),
-              _path: `${match.path}/item/create`,
-              _onClick: () => handleClick(`${match.path}/item/create`),
+              _path: '/item/create',
             },
           ],
         },
@@ -257,9 +243,9 @@ const Drawer = (props) => {
         {
           text: 'Users',
           itemKey: 'users',
-          path: `${match.path}/user`,
+          path: '/user',
           icon: (
-            <SupervisorAccountTwoToneIcon style={{ color: '#3584A7' }} fontSize="large" />
+            <SupervisorAccountTwoToneIcon style={{ color: '#003366' }} fontSize="large" />
           ),
           onClick: () => setOpen({ ...open, users: !open.users }),
           itemSubList: [
@@ -268,24 +254,22 @@ const Drawer = (props) => {
               _key: 'user-list',
               _icon: (
                 <FormatListBulletedRoundedIcon
-                  style={{ color: '#3584A7' }}
+                  style={{ color: '#003366' }}
                   fontSize="medium"
                 />
               ),
-              _path: `${match.path}/user/list`,
-              _onClick: () => handleClick(`${match.path}/user/list`),
+              _path: '/user/list',
             },
             {
               _text: 'Roles',
               _key: 'role-list',
               _icon: (
                 <AccountCircleTwoToneIcon
-                  style={{ color: '#3584A7' }}
+                  style={{ color: '#003366' }}
                   fontSize="medium"
                 />
               ),
-              _path: `${match.path}/role/list`,
-              _onClick: () => handleClick(`${match.path}/role/list`),
+              _path: '/role/list',
             },
           ],
         },
@@ -293,9 +277,9 @@ const Drawer = (props) => {
         {
           text: 'Business Rules',
           itemKey: 'businessRules',
-          path: `${match.path}/business-rules`,
+          path: '/business-rules',
           icon: (
-            <BusinessCenterTwoToneIcon style={{ color: '#3584A7' }} fontSize="large" />
+            <BusinessCenterTwoToneIcon style={{ color: '#003366' }} fontSize="large" />
           ),
           onClick: () => setOpen({ ...open, businessRules: !open.businessRules }),
           itemSubList: [
@@ -304,36 +288,33 @@ const Drawer = (props) => {
               _key: 'business-rules-list',
               _icon: (
                 <FormatListBulletedRoundedIcon
-                  style={{ color: '#3584A7' }}
+                  style={{ color: '#003366' }}
                   fontSize="medium"
                 />
               ),
-              _path: `${match.path}/business-rules/List`,
-              _onClick: () => handleClick(`${match.path}/business-rules/list`),
+              _path: '/business-rules/List',
             },
             {
               _text: 'Create',
               _key: 'business-rules-create',
               _icon: (
-                <AddCircleTwoToneIcon style={{ color: '#3584A7' }} fontSize="medium" />
+                <AddCircleTwoToneIcon style={{ color: '#003366' }} fontSize="medium" />
               ),
-              _path: `${match.path}/business-rules/Create`,
-              _onClick: () => handleClick(`${match.path}/business-rules/create`),
+              _path: '/business-rules/Create',
             },
           ],
         },
         {
           text: 'Office',
           itemKey: 'office',
-          path: `${match.path}/office`,
-          icon: <DomainTwoToneIcon style={{ color: '#3584A7' }} fontSize="large" />,
+          path: '/office',
+          icon: <DomainTwoToneIcon style={{ color: '#003366' }} fontSize="large" />,
           // icon: (
           //   <Icon
           //     className="fas fa-building"
           //     style={{ fontSize: 33, marginLeft: 3, color: '#007AFF' }}
           //   />
           // ),
-          onClick: () => handleClick(`${match.path}/office`),
         },
       ],
     },
@@ -385,6 +366,33 @@ const Drawer = (props) => {
           >
             {/* <Divider /> */}
             <List>
+              <Grid
+                container
+                direction="column"
+                alignItems="center"
+                justifyContent="center"
+              >
+                <Grid item xs={12}>
+                  <h1
+                    style={{
+                      fontSize: '30px',
+                      marginTop: 4,
+                      marginBottom: 10,
+                      // marginRight: 60,
+                    }}
+                  >
+                    <span
+                      style={{
+                        color: '#007FFF',
+                        textShadow: '1.1px 1.1px rgba(0,0,0,0.5)',
+                      }}
+                    >
+                      LOKETLA
+                    </span>
+                  </h1>
+                </Grid>
+              </Grid>
+              <Divider sx={{ position: 'relative', top: 2, width: '85%', left: 15 }} />
               {drawerList.map(({ header, key, items }) => (
                 <div key={key}>
                   <ListSubheader
@@ -408,7 +416,9 @@ const Drawer = (props) => {
                             button
                             classes={{ selected: classes.selected }}
                             selected={location.pathname === path}
-                            onClick={onClick}
+                            onClick={isExpandable ? onClick : null}
+                            component={!isExpandable ? Link : null}
+                            to={`/${storeUrl}${path}`}
                             sx={{
                               '&:before': {
                                 top: '0px',
@@ -420,7 +430,7 @@ const Drawer = (props) => {
                                 position: 'absolute',
                                 borderTopLeftRadius: '4px',
                                 borderBottomLeftRadius: '4px',
-                                backgroundColor: '#3584A7',
+                                backgroundColor: '#003366',
                               },
                             }}
                           >
@@ -437,7 +447,7 @@ const Drawer = (props) => {
                                   y2={1}
                                 >
                                   <stop offset="0%" stopColor="#473B7B" />
-                                  <stop offset="51%" stopColor="#3584A7" />
+                                  <stop offset="51%" stopColor="#003366" />
                                   <stop offset="100%" stopColor="#30D2BE" />
                                 </linearGradient>
                               </svg>
@@ -456,37 +466,34 @@ const Drawer = (props) => {
                           {isExpandable && (
                             <Collapse in={open[itemKey]} timeout="auto" unmountOnExit>
                               <List component="div" disablePadding>
-                                {itemSubList.map(
-                                  ({ _text, _key, _path, _onClick, _icon }) => (
-                                    <ListItem
-                                      button
-                                      key={_key}
-                                      className={classes.nested}
-                                      onClick={_onClick}
-                                      classes={{ selected: classes.selected }}
-                                      selected={location.pathname === _path}
-                                      sx={{
-                                        '&:before': {
-                                          top: '0px',
-                                          right: '0px',
-                                          width: '3px',
-                                          bottom: '0px',
-                                          content: '""',
-                                          display: 'none',
-                                          position: 'absolute',
-                                          borderTopLeftRadius: '4px',
-                                          borderBottomLeftRadius: '4px',
-                                          backgroundColor: '#3584A7',
-                                        },
-                                      }}
-                                    >
-                                      <ListItemIcon sx={{ ml: 2 }}>{_icon}</ListItemIcon>
-                                      <ListItemText sx={{ ml: -1.5 }}>
-                                        {_text}
-                                      </ListItemText>
-                                    </ListItem>
-                                  )
-                                )}
+                                {itemSubList.map(({ _text, _key, _path, _icon }) => (
+                                  <ListItem
+                                    button
+                                    key={_key}
+                                    className={classes.nested}
+                                    component={Link}
+                                    to={`/${storeUrl}${_path}`}
+                                    classes={{ selected: classes.selected }}
+                                    selected={location.pathname === _path}
+                                    sx={{
+                                      '&:before': {
+                                        top: '0px',
+                                        right: '0px',
+                                        width: '3px',
+                                        bottom: '0px',
+                                        content: '""',
+                                        display: 'none',
+                                        position: 'absolute',
+                                        borderTopLeftRadius: '4px',
+                                        borderBottomLeftRadius: '4px',
+                                        backgroundColor: '#003366',
+                                      },
+                                    }}
+                                  >
+                                    <ListItemIcon sx={{ ml: 2 }}>{_icon}</ListItemIcon>
+                                    <ListItemText sx={{ ml: -1.5 }}>{_text}</ListItemText>
+                                  </ListItem>
+                                ))}
                               </List>
                             </Collapse>
                           )}

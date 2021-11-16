@@ -30,14 +30,14 @@ const ColorlibConnector = withStyles({
   },
   active: {
     '& $line': {
-      backgroundColor: '#3584A7',
-      // backgroundImage: 'linear-gradient(-225deg, #473B7B 0%, #3584A7 51%, #30D2BE 100%)',
+      backgroundColor: '#003366',
+      // backgroundImage: 'linear-gradient(-225deg, #473B7B 0%, #003366 51%, #30D2BE 100%)',
     },
   },
   completed: {
     '& $line': {
-      backgroundColor: '#3584A7',
-      // backgroundImage: 'linear-gradient(-225deg, #473B7B 0%, #3584A7 51%, #30D2BE 100%)',
+      backgroundColor: '#003366',
+      // backgroundImage: 'linear-gradient(-225deg, #473B7B 0%, #003366 51%, #30D2BE 100%)',
     },
   },
   line: {
@@ -71,8 +71,8 @@ const useStyles = makeStyles((theme) => ({
     width: '140px !important',
     // backgroundColor: '#58c1b7 !important',
     // color: 'black !important',
-    backgroundColor: '#3584A7 ',
-    // backgroundImage: 'linear-gradient(-225deg, #473B7B 0%, #3584A7 51%, #30D2BE 100%)',
+    backgroundColor: '#003366 ',
+    // backgroundImage: 'linear-gradient(-225deg, #473B7B 0%, #003366 51%, #30D2BE 100%)',
     marginTop: '20px !important',
     borderRadius: '8px !important',
     boxShadow: 'rgb(30 136 229 / 24%) 0px 8px 16px 0px !important',
@@ -103,7 +103,7 @@ const useStyles = makeStyles((theme) => ({
     margin: '0px 20px 50px 20px',
   },
   circle: {
-    color: '#3584A7 !important',
+    color: '#003366 !important',
   },
   circleContainer: {
     padding: 10,

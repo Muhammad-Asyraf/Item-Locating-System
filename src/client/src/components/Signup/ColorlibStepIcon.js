@@ -21,13 +21,13 @@ const useColorlibStepIconStyles = makeStyles({
   },
 
   active: {
-    // backgroundImage: 'linear-gradient(-225deg, #473B7B 0%, #3584A7 51%, #30D2BE 100%)',
-    backgroundColor: '#3584A7',
+    // backgroundImage: 'linear-gradient(-225deg, #473B7B 0%, #003366 51%, #30D2BE 100%)',
+    backgroundColor: '#003366',
     boxShadow: '0 4px 10px 0 rgba(0,0,0,.25)',
   },
   completed: {
-    backgroundColor: '#3584A7',
-    // backgroundImage: 'linear-gradient(-225deg, #473B7B 0%, #3584A7 51%, #30D2BE 100%)',
+    backgroundColor: '#003366',
+    // backgroundImage: 'linear-gradient(-225deg, #473B7B 0%, #003366 51%, #30D2BE 100%)',
   },
 });
 

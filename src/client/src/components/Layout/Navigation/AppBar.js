@@ -19,7 +19,12 @@ import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
 import LockIcon from '@mui/icons-material/Lock';
 import { makeStyles } from '@mui/styles';
 
-import { clearActiveUser, verifying, verified } from '../../../redux/features/authSlice';
+import {
+  logout,
+  clearActiveUser,
+  verifying,
+  verified,
+} from '../../../redux/features/authSlice';
 import { auth } from '../../../services/firebase';
 
 const drawerWidth = 228;
@@ -78,6 +83,8 @@ const AppBar = (props) => {
     dispatch(verified());
     localStorage.removeItem('storeUUID');
     localStorage.removeItem('storeUrl');
+    localStorage.removeItem('storeName');
+    dispatch(logout());
     history.push('/auth/login');
   };
 
@@ -88,7 +95,7 @@ const AppBar = (props) => {
           <svg width={0} height={0}>
             <linearGradient id="linearColors" x1={0} y1={0} x2={1.5} y2={1}>
               <stop offset="0%" stopColor="#473B7B" />
-              <stop offset="51%" stopColor="#3584A7" />
+              <stop offset="51%" stopColor="#003366" />
               <stop offset="100%" stopColor="#30D2BE" />
             </linearGradient>
           </svg>
@@ -99,7 +106,7 @@ const AppBar = (props) => {
             onClick={handleDrawerToggle}
             className={classes.menuButton}
             // sx={{ fill: 'url(#linearColors)' }}
-            style={{ color: '#3584A7' }}
+            style={{ color: '#003366' }}
           >
             <MenuOpenRoundedIcon color="primary" fontSize="large" />
           </IconButton>
@@ -114,12 +121,11 @@ const AppBar = (props) => {
             </Badge>
           </IconButton>
           <div className={classes.search} />
-
           <IconButton aria-label="show 17 new notifications" color="inherit">
             <Badge badgeContent={17} color="error">
               <NotificationsIcon
                 // sx={{ fill: 'url(#linearColors)' }}
-                style={{ color: '#3584A7' }}
+                style={{ color: '#003366' }}
                 color="primary"
                 fontSize="large"
               />
@@ -135,7 +141,7 @@ const AppBar = (props) => {
           >
             <AccountCircle
               // sx={{ fill: 'url(#linearColors)' }}
-              style={{ color: '#3584A7' }}
+              style={{ color: '#003366' }}
               color="primary"
               fontSize="large"
             />

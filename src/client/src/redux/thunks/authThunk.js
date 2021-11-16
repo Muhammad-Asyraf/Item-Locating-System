@@ -2,6 +2,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
 import getStore from './storeThunk';
+import { processed } from '../features/storeSlice';
 import { setNewNotification } from '../features/notificationSlice';
 
 export const setHeader = createAsyncThunk('auth/setHeader', async (firebase) => {
@@ -9,7 +10,6 @@ export const setHeader = createAsyncThunk('auth/setHeader', async (firebase) => 
   const token = user && (await user.getIdToken());
   const payloadHeader = {
     headers: {
-      // 'Content-Type': 'multipart/form-data',
       'Content-Type': 'application/json',
       authorization: `Bearer ${token}`,
     },
@@ -28,11 +28,13 @@ export const login = createAsyncThunk(
       const { user } = await firebase.signInWithEmailAndPassword(email, password);
       await dispatch(setHeader(firebase));
       await dispatch(getStore({ userUUID: user.toJSON().uid }));
+      await dispatch(processed());
 
       await dispatch(
         setNewNotification({
           message: "Hello there! you've successfully logged in",
-          backgroundColor: '#202124',
+          backgroundColor: 'green',
+          severity: 'success',
         })
       );
 

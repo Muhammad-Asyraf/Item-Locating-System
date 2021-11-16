@@ -25,8 +25,8 @@ const useStyles = makeStyles((theme) => ({
     minHeight: '100vh',
     minWidth: '100vw',
     position: 'relative',
-    // backgroundColor: '#3584A7',
-    // backgroundImage: 'linear-gradient(-225deg, #473B7B 0%, #3584A7 51%, #30D2BE 100%)',
+    // backgroundColor: '#003366',
+    // backgroundImage: 'linear-gradient(-225deg, #473B7B 0%, #003366 51%, #30D2BE 100%)',
   },
   card: {
     '& > *': {
@@ -94,7 +94,7 @@ const SignUp = () => {
             position: 'absolute',
             width: '100%',
             height: '100% ',
-            backgroundColor: '#3584A7',
+            backgroundColor: '#003366',
             // backgroundColor: '#dc3d4b',
             // clipPath: 'polygon(54% 0, 100% 0%, 100% 100%, 0% 100%)',
             // clipPath: 'ellipse(102% 100% at 102% 0%)',

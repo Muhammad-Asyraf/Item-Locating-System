@@ -68,7 +68,7 @@ const Login = () => {
         justifyContent="center"
         style={{
           minHeight: '100vh',
-          // backgroundColor: '#3584A7',
+          // backgroundColor: '#003366',
         }}
       >
         <div
@@ -79,17 +79,17 @@ const Login = () => {
             boxSizing: 'border-box',
             height: '100%',
             width: '100%',
-            backgroundColor: '#3584A7',
+            backgroundColor: '#003366',
             // backgroundColor: '#dc3d4b',
             clipPath: 'ellipse(93% 100% at 82.25% 0%)',
           }}
         />
         <Grid item sm={3}>
-          <Card elevation={10} className={classes.card}>
+          <Card elevation={15} className={classes.card}>
             <CardContent className={classes.cardContent}>
               <Grid item xs={12}>
                 <h1 style={{ fontSize: '35px' }}>
-                  <span style={{ color: '#3584A7' }}>LOKETLA</span> Login
+                  <span style={{ color: '#007FFF' }}>LOKETLA</span> Login
                 </h1>
               </Grid>
               <Grid item xs={12}>

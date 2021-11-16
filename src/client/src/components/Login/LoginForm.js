@@ -25,7 +25,7 @@ const useStyles = makeStyles(() => ({
     height: '55px',
     width: '100%',
     color: 'white',
-    backgroundColor: '#3584A7',
+    backgroundColor: '#003366',
 
     marginTop: '15px',
     borderRadius: '10px',
@@ -180,7 +180,7 @@ const LoginForm = (props) => {
             sx={{ mt: 3 }}
           >
             {authLoading ? (
-              <CircularProgress size={20} sx={{ color: '#3584A7 !important' }} />
+              <CircularProgress size={20} sx={{ color: '#003366 !important' }} />
             ) : (
               <>Sign In</>
             )}

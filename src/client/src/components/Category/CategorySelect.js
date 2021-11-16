@@ -5,7 +5,7 @@ import TextField from '@mui/material/TextField';
 import Stack from '@mui/material/Stack';
 
 const CategorySelect = (props) => {
-  const { categoryOptions, setSelectedCategory } = props;
+  const { categoryOptions, setSelectedCategory, defaultValue } = props;
 
   const onChange = (e, value) => {
     const selectedCat = value.map(({ category, name, ...uuid }) => uuid);
@@ -17,6 +17,8 @@ const CategorySelect = (props) => {
       <Autocomplete
         id="tags-outlined"
         multiple
+        disableCloseOnSelect
+        defaultValue={defaultValue}
         onChange={onChange}
         options={categoryOptions}
         isOptionEqualToValue={(option, value) => option.uuid === value.uuid}

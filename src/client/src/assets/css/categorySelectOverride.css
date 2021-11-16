@@ -1,0 +1,29 @@
+.css-16awh2u-MuiAutocomplete-root .MuiAutocomplete-tag {
+  background-color: #003366;
+  color: white;
+}
+
+.css-5adnd6-MuiButtonBase-root-MuiChip-root .MuiChip-deleteIcon:hover {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.css-5adnd6-MuiButtonBase-root-MuiChip-root .MuiChip-deleteIcon {
+  color: white !important;
+}
+
+.css-16awh2u-MuiAutocomplete-root .MuiAutocomplete-tag::before {
+  top: 0px;
+  left: 0px;
+  width: 15px;
+  bottom: 0px;
+  content: '';
+  display: block;
+  position: absolute;
+  border-radius: 15px 0px 0px 15px;
+  background-color: blue;
+}
+
+.css-6od3lo-MuiChip-label {
+  z-index: 1;
+  margin-left: 10px;
+}

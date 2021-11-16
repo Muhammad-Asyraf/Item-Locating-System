@@ -7,7 +7,7 @@ import setStoreState from '../states/storeState';
 import setStore from '../thunks/storeThunk';
 
 const initialState = {
-  isLoading: true,
+  isLoading: false,
   storeData: {},
   status: null,
   message: [],

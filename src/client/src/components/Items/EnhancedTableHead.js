@@ -6,68 +6,134 @@ import TableCell from '@mui/material/TableCell';
 import Checkbox from '@mui/material/Checkbox';
 import TableSortLabel from '@mui/material/TableSortLabel';
 
+import AttachMoneyRoundedIcon from '@mui/icons-material/AttachMoneyRounded';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import CreditCardRoundedIcon from '@mui/icons-material/CreditCardRounded';
+import TodayIcon from '@mui/icons-material/Today';
+import CategoryIcon from '@mui/icons-material/Category';
+import QrCode2RoundedIcon from '@mui/icons-material/QrCode2Rounded';
+
 const headCells = [
-  { id: 'name', numeric: false, disablePadding: true, label: 'Name' },
-  { id: 'barcode_number', numeric: true, disablePadding: false, label: 'Barcode' },
-  { id: 'quantity', numeric: true, disablePadding: false, label: 'Quantity' },
+  {
+    id: 'name',
+    align: 'left',
+    disablePadding: true,
+    label: 'Name',
+    icon: <CreditCardRoundedIcon fontSize="medium" />,
+  },
+  {
+    id: 'barcode_number',
+    align: 'center',
+    disablePadding: true,
+    label: 'Barcode',
+    icon: <QrCode2RoundedIcon fontSize="medium" />,
+  },
+  {
+    id: 'category',
+    align: 'center',
+    disablePadding: true,
+    label: 'Categories',
+    icon: <CategoryIcon fontSize="medium" />,
+  },
   {
     id: 'wholesale_price',
-    numeric: true,
+    align: 'center',
     disablePadding: false,
-    label: 'Wholesale Price',
+    label: 'Supplier Price',
+    icon: <AttachMoneyRoundedIcon fontSize="medium" />,
+  },
+  {
+    id: 'updated_at',
+    align: 'center',
+    disablePadding: false,
+    label: 'Updated at',
+    icon: <CalendarTodayIcon fontSize="small" />,
+  },
+  {
+    id: 'created_at',
+    align: 'center',
+    disablePadding: false,
+    label: 'Added at',
+    icon: <TodayIcon fontSize="medium" />,
   },
   {
     id: 'action',
-    numeric: false,
+    align: 'left',
     disablePadding: false,
   },
 ];
 
 const EnhancedTableHead = (props) => {
-  const {
-    classes,
-    onSelectAllClick,
-    order,
-    orderBy,
-    numSelected,
-    rowCount,
-    onRequestSort,
-  } = props;
+  const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort } =
+    props;
 
   const createSortHandler = (property) => (event) => {
     onRequestSort(event, property);
   };
 
+  const curvy = {
+    borderBottom: 'none',
+    borderRadius: '0px 10px 10px 0px',
+    backgroundColor: 'rgb(244, 246, 248)',
+    boxShadow: 'rgb(255, 255, 255) -23px 0px 0px inset',
+    color: 'rgba(0, 0, 0, 0.54)',
+    paddingLeft: '0px !important',
+  };
+
+  const nonCurvy = {
+    borderBottom: 'none',
+    backgroundColor: 'rgb(244, 246, 248)',
+    color: 'rgba(0, 0, 0, 0.54)',
+    paddingLeft: '0px !important',
+    paddingRight: '20px !important',
+  };
+
   return (
     <TableHead>
       <TableRow>
-        <TableCell padding="checkbox">
+        <TableCell
+          style={{
+            borderBottom: 'none',
+            borderRadius: '10px 0px 0px 10px',
+            backgroundColor: 'rgb(244, 246, 248)',
+            boxShadow: 'rgb(255, 255, 255) 23px 0px 0px inset',
+            paddingTop: '16px !important',
+            paddingBottom: '16px !important',
+          }}
+          align="right"
+          padding="normal"
+        />
+        <TableCell style={nonCurvy} key="checkbox" align="left" padding="normal">
           <Checkbox
             indeterminate={numSelected > 0 && numSelected < rowCount}
             checked={rowCount > 0 && numSelected === rowCount}
             onChange={onSelectAllClick}
-            inputProps={{ 'aria-label': 'select all desserts' }}
+            inputProps={{ 'aria-label': 'select all' }}
           />
         </TableCell>
         {headCells.map((headCell) => (
           <TableCell
+            style={headCell.id === 'action' ? curvy : nonCurvy}
+            sx={{
+              fontSize: '0.95rem !important',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+            }}
             key={headCell.id}
-            align={headCell.numeric ? 'right' : 'left'}
-            padding={headCell.disablePadding ? 'none' : 'default'}
+            align={headCell.align}
+            padding={headCell.disablePadding ? 'none' : 'normal'}
             sortDirection={orderBy === headCell.id ? order : false}
           >
-            <TableSortLabel
-              active={orderBy === headCell.id}
-              direction={orderBy === headCell.id ? order : 'asc'}
-              onClick={createSortHandler(headCell.id)}
-            >
-              {headCell.label}
-              {orderBy === headCell.id ? (
-                <span className={classes.visuallyHidden}>
-                  {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
-                </span>
-              ) : null}
-            </TableSortLabel>
+            {headCell.id !== 'action' ? (
+              <TableSortLabel
+                active={orderBy === headCell.id}
+                direction={orderBy === headCell.id ? order : 'asc'}
+                onClick={createSortHandler(headCell.id)}
+              >
+                {headCell.icon} &nbsp;&nbsp;
+                {headCell.label}
+              </TableSortLabel>
+            ) : null}
           </TableCell>
         ))}
       </TableRow>

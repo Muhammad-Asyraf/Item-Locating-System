@@ -17,13 +17,15 @@ import {
   clearNotification,
 } from '../../redux/features/notificationSlice';
 
+import '../../assets/css/overrideSnackbar.css';
+
 const drawerWidth = 228;
 const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
   },
   drawer: {
-    [theme.breakpoints.up('lg')]: {
+    [theme.breakpoints.up('md')]: {
       width: drawerWidth,
       flexShrink: 0,
       scrollBehavior: 'smooth',
@@ -31,10 +33,12 @@ const useStyles = makeStyles((theme) => ({
   },
   toolbar: theme.mixins.toolbar,
   container: {
-    // flexGrow: 1,
-    // padding: theme.spacing(3),
-    padding: '70px 30px 10px 30px',
-    backgroundColor: 'rgb(248, 248, 248)',
+    padding: '60px 45px 35px 45px !important',
+    height: '100% !important',
+    // backgroundColor: 'rgb(250, 250, 250)',
+    // backgroundColor: 'rgb(248, 248, 248)',
+    // backgroundColor: 'rgb(236, 245, 249)',
+    // backgroundColor: 'rgb(240, 245, 247)',
   },
 }));
 
@@ -47,7 +51,7 @@ const Layout = (props) => {
   const classes = useStyles();
   const { children } = props;
   const dispatch = useDispatch();
-  const { message, severity, backgroundColor, color } = useSelector(selectNotification);
+  const { message, backgroundColor, severity } = useSelector(selectNotification);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [openSnackBar, setOpenSnackBar] = useState({
     open: false,
@@ -101,17 +105,29 @@ const Layout = (props) => {
           key={openSnackBar.transition.name}
         >
           <Alert
-            variant="filled"
             severity={severity}
+            variant="filled"
             elevation={6}
             onClose={handleCloseSnackBar}
             sx={{
               width: '100%',
-              backgroundColor: { backgroundColor },
-              color: { color },
+              backgroundColor: '#202124',
+              borderRadius: 1,
+              '&:before': {
+                top: '0px',
+                left: '0px',
+                width: '11px',
+                bottom: '0px',
+                content: '""',
+                display: 'block',
+                position: 'absolute',
+                borderTopLeftRadius: '4px',
+                borderBottomLeftRadius: '4px',
+                backgroundColor,
+              },
             }}
           >
-            {message}
+            <span style={{ left: -2, position: 'relative' }}>{message}</span>
           </Alert>
         </Snackbar>
       </Container>

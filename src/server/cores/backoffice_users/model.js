@@ -10,6 +10,10 @@ class BackofficeUser extends Model {
     return 'uuid';
   }
 
+  $beforeUpdate() {
+    this.updated_at = new Date().toISOString();
+  }
+
   /* eslint-disable no-param-reassign */
   $formatJson(json) {
     json = super.$formatJson(json);

@@ -5,19 +5,21 @@ import DashboardPage from './Dashboard';
 import ItemPages from './Items';
 import SalesPage from './Sales';
 import ProductPages from './Products';
+import NotFoundPage from './NotFound';
 
 import Layout from '../components/Layout/Layout';
 
-const BackOffice = (props) => {
-  const { match } = props;
+const BackOffice = () => {
+  const storeUrl = localStorage.getItem('storeUrl');
 
   return (
     <Layout>
       <Switch>
-        <Route path={`${match.path}/dashboard`} component={DashboardPage} />
-        <Route path={`${match.path}/item`} component={ItemPages} />
-        <Route path={`${match.path}/sales`} component={SalesPage} />
-        <Route path={`${match.path}/product`} component={ProductPages} />
+        <Route path={`/${storeUrl}/dashboard`} component={DashboardPage} />
+        <Route path={`/${storeUrl}/item`} component={ItemPages} />
+        <Route path={`/${storeUrl}/sales`} component={SalesPage} />
+        <Route path={`/${storeUrl}/product`} component={ProductPages} />
+        <Route path="*" component={NotFoundPage} />
       </Switch>
     </Layout>
   );

@@ -1,0 +1,33 @@
+.css-zw3mfo-MuiModal-root-MuiDialog-root {
+  backdrop-filter: blur(4px) !important;
+  background-color: rgba(22, 28, 36, 0.72);
+}
+
+.css-1t1j96h-MuiPaper-root-MuiDialog-paper {
+  max-width: 80vw !important;
+  width: 60vw !important;
+  /* height: 40vh !important; */
+  padding: 20px 40px 65px 40px;
+  border-radius: 10px !important;
+}
+
+.css-12kcds-MuiTypography-root-MuiDialogTitle-root {
+  padding-left: 0px !important;
+}
+
+.css-16awh2u-MuiAutocomplete-root .MuiAutocomplete-tag::before {
+  top: 0px;
+  left: 0px;
+  width: 15px;
+  bottom: 0px;
+  content: '';
+  display: block;
+  position: absolute;
+  border-radius: 15px 0px 0px 15px;
+  background-color: blue;
+}
+
+.css-6od3lo-MuiChip-label {
+  z-index: 1;
+  margin-left: 10px;
+}

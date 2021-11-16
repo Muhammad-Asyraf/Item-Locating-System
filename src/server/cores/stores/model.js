@@ -10,6 +10,10 @@ class Store extends Model {
     return 'uuid';
   }
 
+  $beforeUpdate() {
+    this.updated_at = new Date().toISOString();
+  }
+
   static get relationMappings() {
     return {
       backoffice_users: {
@@ -18,6 +22,14 @@ class Store extends Model {
         join: {
           from: 'store.uuid',
           to: 'backoffice_user.store_uuid',
+        },
+      },
+      items: {
+        relation: Model.HasManyRelation,
+        modelClass: require('../items/model '),
+        join: {
+          from: 'store.uuid',
+          to: 'item.store_uuid',
         },
       },
     };

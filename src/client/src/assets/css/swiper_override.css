@@ -1,0 +1,28 @@
+.swiper-pagination-bullet-active {
+  background-color: black !important ;
+  opacity: 0.55 !important;
+}
+
+.swiper-pagination-fraction {
+  color: white !important;
+  border-radius: 5px;
+  width: 50px !important;
+  text-align: center;
+  bottom: 25px !important;
+  left: 20px !important;
+  font-size: 0.95em !important;
+  font-weight: bold !important;
+}
+
+.swiper-button-next:after,
+.swiper-button-prev:after {
+  /* opacity: 1 !important; */
+  color: white !important;
+  font-size: 30px !important;
+  font-weight: bolder !important;
+}
+
+.css-79ws1d-MuiModal-root {
+  backdrop-filter: blur(8px) !important;
+  background-color: rgba(22, 28, 36, 0.72);
+}

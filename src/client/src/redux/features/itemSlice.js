@@ -2,9 +2,10 @@ import { createSlice } from '@reduxjs/toolkit';
 
 import { loadingState, loadedState } from '../states/loadState';
 import { errorState, noErrorState } from '../states/errorState';
-import { receivedItemState } from '../states/itemState';
+import { receivedItemState, receivedSingleItemState } from '../states/itemState';
 
 import {
+  getSingleItem,
   getItems,
   addItem,
   deleteItem,
@@ -15,9 +16,10 @@ import {
 const initialState = {
   isLoading: true,
   items: [],
+  item: {},
   status: null,
-  message: [],
-  errors: [],
+  message: null,
+  errors: null,
 };
 
 const itemSlice = createSlice({
@@ -29,6 +31,9 @@ const itemSlice = createSlice({
     clearError: noErrorState,
   },
   extraReducers: {
+    [getSingleItem.fulfilled]: receivedSingleItemState,
+    [getSingleItem.pending]: loadingState,
+    [getSingleItem.rejected]: errorState,
     [getItems.fulfilled]: receivedItemState,
     [getItems.pending]: loadingState,
     [getItems.rejected]: errorState,
@@ -44,6 +49,9 @@ const itemSlice = createSlice({
 export const { processingRequest, processed, clearError } = itemSlice.actions;
 
 export const selectItems = (state) => state.item.items;
+export const selectSingleItem = (state) => state.item.item;
 export const selectIsLoading = (state) => state.item.isLoading;
+export const selectItemError = (state) => state.item.errors;
+export const selectItemMsg = (state) => state.item.message;
 
 export default itemSlice.reducer;

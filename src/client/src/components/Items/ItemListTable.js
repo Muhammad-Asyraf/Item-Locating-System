@@ -1,6 +1,5 @@
-import React from 'react';
-
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 
 import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
@@ -9,14 +8,16 @@ import TableCell from '@mui/material/TableCell';
 import TableRow from '@mui/material/TableRow';
 import TableContainer from '@mui/material/TableContainer';
 import TablePagination from '@mui/material/TablePagination';
-import Checkbox from '@mui/material/Checkbox';
 import { makeStyles } from '@mui/styles';
 
 import EnhancedTableHead from './EnhancedTableHead';
 import EnhancedTableToolbar from './EnhancedTableToolbar';
-import RowOptions from './RowOptions';
+import ItemTableRow from './ItemTableRow';
 
+import { selectSubcategory } from '../../redux/features/categorySlice';
 import { getComparator, stableSort } from '../../utils/general';
+
+// import useFirstRender from '../../hooks/useFirstRender';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -24,10 +25,10 @@ const useStyles = makeStyles((theme) => ({
   },
   paper: {
     width: '100%',
-    marginTop: 40,
+    marginTop: 25,
     marginBottom: theme.spacing(2),
     boxShadow:
-      'rgba(145, 158, 171, 0.24) 0px 0px 2px 0px, rgba(145, 158, 171, 0.24) 0px 16px 32px -4px',
+      'rgba(145, 158, 171, 0.24) 0px 0px 2px 0px, rgba(145, 158, 171, 0.24) 0px 16px 32px -4px !important',
     borderRadius: '16px !important',
   },
   table: {
@@ -50,17 +51,57 @@ const useStyles = makeStyles((theme) => ({
 
 const ItemListTable = (props) => {
   const classes = useStyles();
-  const [order, setOrder] = React.useState('asc');
-  const [orderBy, setOrderBy] = React.useState('calories');
-  const [selected, setSelected] = React.useState([]);
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  // const isFirstRender = useFirstRender();
+  const [order, setOrder] = useState('asc');
+  const [orderBy, setOrderBy] = useState('calories');
+  const [selected, setSelected] = useState([]);
+  const [page, setPage] = useState(0);
+  const [selectedCategory, setSelectedCategory] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
+  // const [selectedCategoryValue, setSelectedCategoryValue] = useState([]);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
 
-  const { items, handleDelete, onMultipleDelete } = props;
+  const categoriesOption = useSelector(selectSubcategory);
+
+  const { itemData, items, setItems, handleDelete, onMultipleDelete, handleEdit } = props;
 
   const handleMultipleDelete = () => {
     onMultipleDelete(selected, setSelected);
   };
+
+  /* eslint-disable arrow-body-style */
+  const handleSearch = (event) => {
+    const searchKeywords = event.target.value.toLowerCase();
+
+    const filteredItems = filteredData.filter((item) => {
+      const firstCondi = item.name.toLowerCase().includes(searchKeywords);
+      const secCondi = item.wholesale_price.includes(searchKeywords);
+      const thirdCondi = item.barcode_number.includes(searchKeywords);
+
+      if (firstCondi || secCondi || thirdCondi) {
+        return true;
+      }
+      return false;
+    });
+
+    setItems(filteredItems);
+  };
+
+  useEffect(() => {
+    const selectedCatList = selectedCategory.map(({ uuid }) => uuid);
+    let filteredItem;
+
+    if (selectedCategory.length > 0) {
+      filteredItem = itemData.filter(({ sub_categories: subCat }) => {
+        return subCat.some(({ uuid }) => selectedCatList.includes(uuid));
+      });
+      setFilteredData(filteredItem);
+      setItems(filteredItem);
+    } else {
+      setFilteredData(itemData);
+      setItems(itemData);
+    }
+  }, [selectedCategory]);
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -111,10 +152,15 @@ const ItemListTable = (props) => {
     rowsPerPage - Math.min(rowsPerPage, items.length - page * rowsPerPage);
 
   return (
-    <Paper className={classes.paper} elevation={2}>
+    <Paper className={classes.paper} elevation={4}>
       <EnhancedTableToolbar
         numSelected={selected.length}
         handleMultipleDelete={handleMultipleDelete}
+        handleSearch={handleSearch}
+        setSelectedCategory={setSelectedCategory}
+        defaultValue={selectedCategory}
+        categoriesOption={categoriesOption}
+        filteredQuantity={items.length}
       />
       <TableContainer>
         <Table
@@ -123,7 +169,6 @@ const ItemListTable = (props) => {
           aria-label="enhanced table"
         >
           <EnhancedTableHead
-            classes={classes}
             numSelected={selected.length}
             order={order}
             orderBy={orderBy}
@@ -131,7 +176,9 @@ const ItemListTable = (props) => {
             onRequestSort={handleRequestSort}
             rowCount={items.length}
           />
+          {/* <div style={{ height: '10px', width: '100%', clear: 'both' }} /> */}
           <TableBody>
+            <TableRow style={{ height: '10px' }} />
             {stableSort(items, getComparator(order, orderBy))
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .map((item, index) => {
@@ -139,36 +186,20 @@ const ItemListTable = (props) => {
                 const labelId = `enhanced-table-checkbox-${index}`;
 
                 return (
-                  <TableRow
-                    hover
-                    role="checkbox"
-                    aria-checked={isItemSelected}
-                    tabIndex={-1}
-                    key={item.name}
-                    selected={isItemSelected}
-                  >
-                    <TableCell padding="checkbox">
-                      <Checkbox
-                        checked={isItemSelected}
-                        onClick={(event) => handleClick(event, item.uuid)}
-                        inputProps={{ 'aria-labelledby': labelId }}
-                      />
-                    </TableCell>
-                    <TableCell component="th" id={labelId} scope="row" padding="none">
-                      {item.name}
-                    </TableCell>
-                    <TableCell align="right">{item.barcode_number}</TableCell>
-                    <TableCell align="right">{item.quantity}</TableCell>
-                    <TableCell align="right">{item.wholesale_price}</TableCell>
-                    <TableCell align="right">
-                      <RowOptions item={item} Link={Link} handleDelete={handleDelete} />
-                    </TableCell>
-                  </TableRow>
+                  <ItemTableRow
+                    key={labelId}
+                    item={item}
+                    isItemSelected={isItemSelected}
+                    labelId={labelId}
+                    handleClick={handleClick}
+                    handleDelete={handleDelete}
+                    handleEdit={handleEdit}
+                  />
                 );
               })}
             {emptyRows > 0 && (
               <TableRow style={{ height: 53 * emptyRows }}>
-                <TableCell colSpan={6} />
+                <TableCell colSpan={6} style={{ borderBottom: 'none' }} />
               </TableRow>
             )}
           </TableBody>
@@ -180,8 +211,8 @@ const ItemListTable = (props) => {
         count={items.length}
         rowsPerPage={rowsPerPage}
         page={page}
-        onChangePage={handleChangePage}
-        onChangeRowsPerPage={handleChangeRowsPerPage}
+        onPageChange={handleChangePage}
+        onRowsPerPageChange={handleChangeRowsPerPage}
       />
     </Paper>
   );

@@ -1,3 +1,5 @@
+const fs = require('fs');
+
 const getNamespace = (path) => {
   return path.replace(/[^a-zA-Z ]/g, '.').substring(1, path.length - 3);
 };
@@ -16,7 +18,18 @@ const references = (table, tableName, notNullable = true, columnName = '') => {
   return definition;
 };
 
+const removeFiles = async (files) => {
+  for (const file of files) {
+    try {
+      await fs.unlinkSync(file.path);
+    } catch (err) {
+      console.error(err);
+    }
+  }
+};
+
 module.exports = {
   getNamespace,
   references,
+  removeFiles,
 };

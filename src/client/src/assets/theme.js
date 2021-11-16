@@ -4,9 +4,9 @@ const theme = createTheme({
   palette: {
     primary: {
       light: '#71a8c1',
-      main: '#3584A7',
+      main: '#003366',
       // main: '#007AFF',
-      dark: '#2f7696',
+      dark: '#001933',
     },
     secondary: {
       light: '#675eff',
@@ -14,7 +14,7 @@ const theme = createTheme({
       dark: '#0008ff',
     },
     gradient: {
-      main: '#3584A7',
+      main: '#003366',
     },
   },
   typography: {

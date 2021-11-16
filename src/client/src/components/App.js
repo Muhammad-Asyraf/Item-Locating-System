@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom';
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
 import ProtectedRoute from './ProtectedRoute';
@@ -7,19 +7,17 @@ import Auth from './Auth';
 import LoginPage from '../pages/Login';
 import SignUpPage from '../pages/Signup';
 import BackOfficePage from '../pages/BackOffice';
-import NotFoundPage from '../pages/NotFound';
 
 import { selectStore } from '../redux/features/storeSlice';
 
 const App = () => {
   const store = useSelector(selectStore);
-  const [rootPath, setRootPath] = useState('/default');
+  const [rootPath, setRootPath] = useState('/locating-store');
 
   useEffect(() => {
     setRootPath(`/${store.store_url}`);
   }, [store]);
 
-  console.log('inside app', rootPath);
   return (
     <Router>
       <Auth>
@@ -27,8 +25,7 @@ const App = () => {
           <ProtectedRoute path={rootPath} component={BackOfficePage} />
           <Route path="/auth/login" component={LoginPage} />
           <Route path="/auth/signup" component={SignUpPage} />
-          <Redirect from="/" to={`${rootPath}/dashboard`} />
-          <Route path="*" component={NotFoundPage} />
+          <Route path="*" component={BackOfficePage} />
         </Switch>
       </Auth>
     </Router>

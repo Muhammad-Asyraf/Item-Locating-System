@@ -10,6 +10,10 @@ class AppUser extends Model {
     return 'uuid';
   }
 
+  $beforeUpdate() {
+    this.updated_at = new Date().toISOString();
+  }
+
   /* eslint-disable no-param-reassign */
   $formatJson(json) {
     json = super.$formatJson(json);
@@ -27,7 +31,7 @@ class AppUser extends Model {
           to: 'planning_cart.app_user_uuid',
         },
       },
-    }
+    };
   }
 
   static get jsonSchema() {

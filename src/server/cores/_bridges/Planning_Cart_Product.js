@@ -10,6 +10,10 @@ class PlanningCartProduct extends Model {
     return ['card_uuid', 'product_uuid'];
   }
 
+  $beforeUpdate() {
+    this.updated_at = new Date().toISOString();
+  }
+
   static get relationMappings() {
     return {
       planning_cart: {

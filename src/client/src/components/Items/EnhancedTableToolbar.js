@@ -60,6 +60,7 @@ const EnhancedTableToolbar = (props) => {
 
   const handleClose = () => setOpenFilter(false);
 
+  console.log(filteredQuantity);
   return (
     <Toolbar
       className={clsx(classes.root, {
@@ -135,20 +136,22 @@ const EnhancedTableToolbar = (props) => {
             ) : null}
           </Grid>
           <Grid item xs={1} container justifyContent="flex-end" alignItems="center">
-            <IconButton
-              onClick={handleClickOpen}
-              style={{
-                fontSize: '0.875rem',
-                fontWeight: 700,
-                color: 'black',
-                borderRadius: 11,
-                backgroundColor:
-                  defaultValue.length > 0 ? 'rgba(0, 0, 0, 0.04)' : 'white',
-              }}
-            >
-              &nbsp;Filters&nbsp;&nbsp;
-              <FilterListIcon fontSize="small" />
-            </IconButton>
+            {filteredQuantity > 0 ? (
+              <IconButton
+                onClick={handleClickOpen}
+                style={{
+                  fontSize: '0.875rem',
+                  fontWeight: 700,
+                  color: 'black',
+                  borderRadius: 11,
+                  backgroundColor:
+                    defaultValue.length > 0 ? 'rgba(0, 0, 0, 0.04)' : 'white',
+                }}
+              >
+                &nbsp;Filters&nbsp;&nbsp;
+                <FilterListIcon fontSize="small" />
+              </IconButton>
+            ) : null}
           </Grid>
         </Grid>
       )}

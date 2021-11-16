@@ -7,7 +7,11 @@ import { makeStyles } from '@mui/styles';
 
 import LocationOnRoundedIcon from '@mui/icons-material/LocationOnRounded';
 
-import { selectLocation } from '../../redux/features/mapBoxSlice';
+import {
+  selectLocation,
+  processingRequest,
+  processed,
+} from '../../redux/features/mapBoxSlice';
 import getLocation from '../../redux/thunks/mapBoxThunk';
 
 import useFirstRender from '../../hooks/useFirstRender';
@@ -77,6 +81,7 @@ const StoreLocator = (props) => {
   };
 
   const forwardGeocode = async (longitude, latitude) => {
+    dispatch(processingRequest());
     await dispatch(
       getLocation({
         longitude,
@@ -84,6 +89,7 @@ const StoreLocator = (props) => {
         mapboxToken,
       })
     );
+    dispatch(processed());
   };
 
   const handleSearch = (e) => {

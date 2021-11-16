@@ -39,6 +39,7 @@
     "moment": "^2.29.1",
     "moment-timezone": "^0.5.33",
     "morgan": "^1.10.0",
+    "multer": "^1.4.3",
     "objection": "^2.2.15",
     "pg": "^8.6.0",
     "uuid": "^8.3.2",

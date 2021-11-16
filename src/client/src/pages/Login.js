@@ -5,7 +5,7 @@ import { useHistory } from 'react-router-dom';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Grid from '@mui/material/Grid';
-import Alert from '@mui/lab/Alert';
+import Alert from '@mui/material/Alert';
 import { makeStyles } from '@mui/styles';
 
 import LoginForm from '../components/Login/LoginForm';
@@ -25,8 +25,18 @@ const useStyles = makeStyles((theme) => ({
       margin: theme.spacing(1),
     },
     // minWidth: 275,
-    width: 500,
-    borderRadius: '20px !important',
+    [theme.breakpoints.up('sm')]: {
+      width: '70% !important',
+    },
+    width: '80%',
+    margin: 'auto',
+    borderRadius: '10px !important',
+  },
+  cardContent: {
+    margin: '20px 20px',
+    [theme.breakpoints.up('sm')]: {
+      padding: '20px 30px !important',
+    },
   },
 }));
 
@@ -58,32 +68,43 @@ const Login = () => {
         justifyContent="center"
         style={{
           minHeight: '100vh',
-          backgroundImage:
-            'linear-gradient(-225deg, #473B7B 0%, #3584A7 51%, #30D2BE 100%) ',
-
-          // backgroundColor: 'rgb(246, 248, 251)',
-          // backgroundColor: '#007AFF',
+          // backgroundColor: '#003366',
         }}
       >
-        <Card elevation={6} className={classes.card}>
-          <CardContent style={{ marginLeft: '20px', marginRight: '20px' }}>
-            <Grid item xs={12}>
-              <h1 style={{ marginTop: '30px', fontSize: '35px' }}>
-                <span style={{ color: '#007AFF' }}>LOKETLA</span> Login
-              </h1>
-            </Grid>
-            <Grid item xs={12}>
-              {authErrors.length !== 0 && (
-                <Alert style={{ borderRadius: '8px' }} severity="error">
-                  {authErrors}
-                </Alert>
-              )}
-            </Grid>
-            <Grid item xs={12}>
-              <LoginForm onLogin={loginHandler} authLoading={authLoading} />
-            </Grid>
-          </CardContent>
-        </Card>
+        <div
+          style={{
+            display: 'block',
+            position: 'absolute',
+            zIndex: '-10',
+            boxSizing: 'border-box',
+            height: '100%',
+            width: '100%',
+            backgroundColor: '#003366',
+            // backgroundColor: '#dc3d4b',
+            clipPath: 'ellipse(93% 100% at 82.25% 0%)',
+          }}
+        />
+        <Grid item sm={3}>
+          <Card elevation={15} className={classes.card}>
+            <CardContent className={classes.cardContent}>
+              <Grid item xs={12}>
+                <h1 style={{ fontSize: '35px' }}>
+                  <span style={{ color: '#007FFF' }}>LOKETLA</span> Login
+                </h1>
+              </Grid>
+              <Grid item xs={12}>
+                {authErrors.length !== 0 && (
+                  <Alert style={{ borderRadius: '8px' }} severity="error">
+                    {authErrors}
+                  </Alert>
+                )}
+              </Grid>
+              <Grid item xs={12}>
+                <LoginForm onLogin={loginHandler} authLoading={authLoading} />
+              </Grid>
+            </CardContent>
+          </Card>
+        </Grid>
       </Grid>
     </>
   );

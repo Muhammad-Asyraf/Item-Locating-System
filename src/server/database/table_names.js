@@ -6,5 +6,10 @@ module.exports = {
   item_product: 'item_product',
   store: 'store',
   planning_cart: 'planning_cart',
-  planning_cart_product: 'planning_cart_product'
+  planning_cart_product: 'planning_cart_product',
+  category: 'category',
+  sub_category: 'sub_category',
+  item_sub_category: 'item_sub_category',
+  product_sub_category: 'product_sub_category',
+  image: 'image',
 };

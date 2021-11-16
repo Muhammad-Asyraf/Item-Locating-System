@@ -31,6 +31,10 @@ const auth = createSlice({
     verified: loadedState,
     clearAuthError: noErrorState,
     clearState: loginSuccessState,
+    logout: (state) => ({
+      ...state,
+      isLoading: false,
+    }),
   },
   extraReducers: {
     [setHeader.fulfilled]: withHeaderState,
@@ -50,6 +54,7 @@ export const {
   verified,
   clearAuthError,
   clearState,
+  logout,
 } = auth.actions;
 
 export const selectUser = (state) => state.auth.user;

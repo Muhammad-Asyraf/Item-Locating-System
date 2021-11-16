@@ -2,7 +2,6 @@ const { v4: uuidv4 } = require('uuid');
 const bcrypt = require('bcrypt');
 const admin = require('../../../firebase');
 const BackofficeUser = require('../model');
-const Store = require('../../stores/model');
 const getLogger = require('../../../utils/logger');
 
 const backofficeUserLogger = getLogger(__filename, 'backofficeUser');

@@ -10,6 +10,10 @@ class ItemProduct extends Model {
     return ['item_uuid', 'product_uuid'];
   }
 
+  $beforeUpdate() {
+    this.updated_at = new Date().toISOString();
+  }
+
   static get relationMappings() {
     return {
       item: {
@@ -20,7 +24,6 @@ class ItemProduct extends Model {
           to: 'item.uuid',
         },
       },
-
       product: {
         relation: Model.BelongsToOneRelation,
         modelClass: require('../products/model'),

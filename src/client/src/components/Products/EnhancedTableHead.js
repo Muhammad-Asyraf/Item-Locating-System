@@ -75,7 +75,7 @@ const EnhancedTableHead = (props) => {
               {headCell.label}
               {orderBy === headCell.id ? (
                 <span className={classes.visuallyHidden}>
-                  {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
+                  {order === 'desc' ? '' : ''}
                 </span>
               ) : null}
             </TableSortLabel>

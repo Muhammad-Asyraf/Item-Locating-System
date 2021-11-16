@@ -1,21 +1,30 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useHistory } from 'react-router-dom';
-import axios from 'axios';
+import { useHistory, Link } from 'react-router-dom';
 
+import IconButton from '@mui/material/IconButton';
+import Breadcrumbs from '@mui/material/Breadcrumbs';
+import KeyboardReturnRoundedIcon from '@mui/icons-material/KeyboardReturnRounded';
 import Grid from '@mui/material/Grid';
-import CircularProgress from '@mui/material/CircularProgress';
+import LinearProgress from '@mui/material/LinearProgress';
 
 import { makeStyles } from '@mui/styles';
 
+import { updateItem, getSingleItem } from '../../redux/thunks/itemThunk';
+import { getSubcategories } from '../../redux/thunks/categoryThunk';
+
 import {
-  // selectItems,
-  selectIsLoading,
-  processingRequest,
+  selectSingleItem,
+  selectIsLoading as itemLoading,
   processed,
 } from '../../redux/features/itemSlice';
-import { updateItem } from '../../redux/thunks/itemThunk';
-import { selectAuthHeader } from '../../redux/features/authSlice';
+import {
+  // processingRequest as processingCatRequest,
+  processed as categoryProcessed,
+  selectIsLoading as categoryLoading,
+  selectSubcategory,
+} from '../../redux/features/categorySlice';
+import { setNewNotification } from '../../redux/features/notificationSlice';
 
 import ItemEditForm from '../../components/Items/ItemEditForm';
 
@@ -23,12 +32,12 @@ const useStyles = makeStyles(() => ({
   root: {
     width: '100%',
   },
-  circular: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: '80vh',
-    width: '80vw',
+  linear: {
+    position: 'relative',
+    top: '10px !important',
+    left: '-45px !important',
+    width: '100vw',
+    height: '7px !important',
   },
 }));
 
@@ -36,48 +45,58 @@ const ItemEdit = (props) => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const history = useHistory();
+
   const storeUrl = localStorage.getItem('storeUrl');
-  const isLoading = useSelector(selectIsLoading);
-  const authHeader = useSelector(selectAuthHeader);
-  const [currentItem, setCurrentItem] = useState({
-    name: '',
-    barcode_number: '',
-    quantity: '',
-    descriptions: '',
-    wholesale_price: '',
-  });
+  const storeName = localStorage.getItem('storeName');
+
+  const isItemLoading = useSelector(itemLoading);
+  const isCategoryLoading = useSelector(categoryLoading);
+  const currentItem = useSelector(selectSingleItem);
+  const categoryOptions = useSelector(selectSubcategory);
 
   const { match } = props;
 
-  const getItemByUUID = async (uuid) => {
-    try {
-      const endpointURL = `/api/backoffice/item-service/item/${uuid}`;
-      const res = await axios.get(endpointURL, authHeader);
-      setCurrentItem(res.data);
-      dispatch(processed());
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  useEffect(() => {
-    dispatch(processingRequest());
-    getItemByUUID(match.params.uuid);
+  useEffect(async () => {
+    await dispatch(getSubcategories());
+    await dispatch(getSingleItem({ uuid: match.params.uuid }));
+    dispatch(categoryProcessed());
+    dispatch(processed());
   }, []);
 
-  const handleSubmit = async ({ uuid, payload }) => {
-    const { type } = await dispatch(updateItem({ uuid, payload, authHeader }));
+  const handleSubmit = async ({ uuid, formData: payload }) => {
+    const { type, payload: resPayload } = await dispatch(updateItem({ uuid, payload }));
 
     if (type.includes('fulfilled')) {
+      await dispatch(
+        setNewNotification({
+          message: 'Item successfully edited',
+          backgroundColor: 'green',
+          severity: 'success',
+        })
+      );
       history.push(`/${storeUrl}/item/list`);
+    } else if (type.includes('rejected')) {
+      await dispatch(
+        setNewNotification({
+          message: resPayload.message,
+          backgroundColor: '#be0000',
+          severity: 'error',
+        })
+      );
     }
     dispatch(processed());
   };
 
-  if (isLoading) {
+  if (isCategoryLoading) {
     return (
-      <div className={classes.circular}>
-        <CircularProgress size={70} color="secondary" />
+      <div>
+        <LinearProgress
+          className={classes.linear}
+          sx={{
+            backgroundImage:
+              'linear-gradient(-225deg, #473B7B 0%, #003366 51%, #30D2BE 100%)',
+          }}
+        />
       </div>
     );
   }
@@ -85,16 +104,37 @@ const ItemEdit = (props) => {
   return (
     <div className={classes.root}>
       <Grid container spacing={2} style={{ marginTop: '30px' }}>
-        <Grid item sm={12} md={10}>
-          <h1>Edit item </h1>
+        <Grid item xs={12} container>
+          <Grid item xs={8}>
+            <h1 style={{ marginBottom: 1, marginTop: 3, fontSize: '2em' }}>
+              <span> Edit item </span>
+              <IconButton
+                component={Link}
+                to={`/${storeUrl}/item/list`}
+                sx={{ position: 'relative', top: -3 }}
+              >
+                <KeyboardReturnRoundedIcon fontSize="large" color="primary" />
+              </IconButton>
+            </h1>
+            <Breadcrumbs separator="•" aria-label="breadcrumb">
+              <div style={{ fontSize: '0.875rem' }}>{storeName}&nbsp;&nbsp;</div>,
+              <div style={{ fontSize: '0.875rem' }}>
+                &nbsp;&nbsp;Inventory&nbsp;&nbsp;
+              </div>
+              ,<div style={{ fontSize: '0.875rem' }}>&nbsp;&nbsp;{currentItem.uuid}</div>
+            </Breadcrumbs>
+          </Grid>
+        </Grid>
+        <Grid item xs={12}>
+          <ItemEditForm
+            match={match}
+            onSubmit={handleSubmit}
+            currentItem={currentItem}
+            categoryOptions={categoryOptions}
+            isItemLoading={isItemLoading}
+          />
         </Grid>
       </Grid>
-      <ItemEditForm
-        match={match}
-        onSubmit={handleSubmit}
-        currentItem={currentItem}
-        isLoading={isLoading}
-      />
     </div>
   );
 };

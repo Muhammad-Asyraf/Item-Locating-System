@@ -12,6 +12,7 @@ const getStore = createAsyncThunk(
 
       localStorage.setItem('storeUUID', res.data.uuid);
       localStorage.setItem('storeUrl', res.data.store_url);
+      localStorage.setItem('storeName', res.data.store_name);
 
       return {
         data: res.data,

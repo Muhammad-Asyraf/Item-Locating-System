@@ -5,9 +5,9 @@ export const receivedItemState = (state, { payload }) => ({
   status: payload.status,
 });
 
-export const noideaState = (state, { payload }) => ({
+export const receivedSingleItemState = (state, { payload }) => ({
   ...state,
-  items: payload.items,
+  item: payload.item,
   message: payload.message,
   status: payload.status,
 });

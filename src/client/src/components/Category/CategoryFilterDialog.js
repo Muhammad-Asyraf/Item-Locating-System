@@ -10,7 +10,7 @@ import Stack from '@mui/material/Stack';
 import '../../assets/css/dialogOverride.css';
 
 const Transition = React.forwardRef((props, ref) => (
-  <Slide direction="left" ref={ref} {...props} />
+  <Slide direction="up" ref={ref} {...props} />
 ));
 
 const CategoryFilterDialog = (props) => {

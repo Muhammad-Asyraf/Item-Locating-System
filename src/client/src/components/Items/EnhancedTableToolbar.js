@@ -136,7 +136,7 @@ const EnhancedTableToolbar = (props) => {
             ) : null}
           </Grid>
           <Grid item xs={1} container justifyContent="flex-end" alignItems="center">
-            {filteredQuantity > 0 ? (
+            {filteredQuantity > 0 || defaultValue.length > 0 ? (
               <IconButton
                 onClick={handleClickOpen}
                 style={{

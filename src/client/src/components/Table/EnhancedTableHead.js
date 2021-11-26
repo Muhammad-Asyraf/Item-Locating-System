@@ -6,66 +6,16 @@ import TableCell from '@mui/material/TableCell';
 import Checkbox from '@mui/material/Checkbox';
 import TableSortLabel from '@mui/material/TableSortLabel';
 
-import AttachMoneyRoundedIcon from '@mui/icons-material/AttachMoneyRounded';
-import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
-import CreditCardRoundedIcon from '@mui/icons-material/CreditCardRounded';
-import TodayIcon from '@mui/icons-material/Today';
-import CategoryIcon from '@mui/icons-material/Category';
-import QrCode2RoundedIcon from '@mui/icons-material/QrCode2Rounded';
-
-const headCells = [
-  {
-    id: 'name',
-    align: 'left',
-    disablePadding: true,
-    label: 'Name',
-    icon: <CreditCardRoundedIcon fontSize="medium" />,
-  },
-  {
-    id: 'barcode_number',
-    align: 'center',
-    disablePadding: true,
-    label: 'Barcode',
-    icon: <QrCode2RoundedIcon fontSize="medium" />,
-  },
-  {
-    id: 'category',
-    align: 'center',
-    disablePadding: true,
-    label: 'Categories',
-    icon: <CategoryIcon fontSize="medium" />,
-  },
-  {
-    id: 'wholesale_price',
-    align: 'center',
-    disablePadding: false,
-    label: 'Supplier Price',
-    icon: <AttachMoneyRoundedIcon fontSize="medium" />,
-  },
-  {
-    id: 'updated_at',
-    align: 'center',
-    disablePadding: false,
-    label: 'Updated at',
-    icon: <CalendarTodayIcon fontSize="small" />,
-  },
-  {
-    id: 'created_at',
-    align: 'center',
-    disablePadding: false,
-    label: 'Added at',
-    icon: <TodayIcon fontSize="medium" />,
-  },
-  {
-    id: 'action',
-    align: 'left',
-    disablePadding: false,
-  },
-];
-
 const EnhancedTableHead = (props) => {
-  const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort } =
-    props;
+  const {
+    headCells,
+    onSelectAllClick,
+    order,
+    orderBy,
+    numSelected,
+    rowCount,
+    onRequestSort,
+  } = props;
 
   const createSortHandler = (property) => (event) => {
     onRequestSort(event, property);
@@ -124,14 +74,14 @@ const EnhancedTableHead = (props) => {
             padding={headCell.disablePadding ? 'none' : 'normal'}
             sortDirection={orderBy === headCell.id ? order : false}
           >
-            {headCell.id !== 'action' ? (
+            {!['action'].includes(headCell.id) ? (
               <TableSortLabel
                 active={orderBy === headCell.id}
                 direction={orderBy === headCell.id ? order : 'asc'}
                 onClick={createSortHandler(headCell.id)}
+                // hideSortIcon={['is_active', 'stock_status'].includes(headCell.id)}
               >
-                {headCell.icon} &nbsp;&nbsp;
-                {headCell.label}
+                {headCell.icon}&nbsp; {headCell.label}
               </TableSortLabel>
             ) : null}
           </TableCell>
@@ -141,4 +91,5 @@ const EnhancedTableHead = (props) => {
   );
 };
 
+// 'is_active', 'stock_status'
 export default EnhancedTableHead;

@@ -4,7 +4,7 @@ import { newNotiState, noNotiState } from '../states/notificationState';
 
 const initialState = {
   message: '',
-  severity: '',
+  severity: 'success',
   backgroundColor: '',
   color: '',
 };

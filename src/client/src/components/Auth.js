@@ -36,6 +36,7 @@ const Auth = ({ children }) => {
     dispatch(verifying());
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
       if (user) {
+        console.log("I'm triggered and here's my ID:", user.toJSON().uid);
         await dispatch(
           setActiveUser({
             user: user.toJSON(),
@@ -57,6 +58,7 @@ const Auth = ({ children }) => {
       dispatch(verified());
       setFirstRender(false);
     });
+
     return unsubscribe;
   }, []);
 

@@ -15,9 +15,10 @@ import {
   selectIsLoading,
   processed,
   processingRequest,
+  quickUpdateItems,
 } from '../../redux/features/itemSlice';
 import { processingRequest as processingCategory } from '../../redux/features/categorySlice';
-import { selectAuthHeader } from '../../redux/features/authSlice';
+import { setNewNotification } from '../../redux/features/notificationSlice';
 
 import { getSubcategories } from '../../redux/thunks/categoryThunk';
 import { getItems, deleteItem, deleteMultipleItems } from '../../redux/thunks/itemThunk';
@@ -48,14 +49,14 @@ const ItemList = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
 
-  const itemData = useSelector(selectItems);
+  const initItem = useSelector(selectItems);
   const isLoading = useSelector(selectIsLoading);
-  const authHeader = useSelector(selectAuthHeader);
 
   const storeUrl = localStorage.getItem('storeUrl');
   const storeName = localStorage.getItem('storeName');
 
   const [items, setItems] = useState([]);
+  const [triggeredOnce, setTriggeredOnce] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -67,23 +68,51 @@ const ItemList = () => {
   }, []);
 
   useEffect(() => {
-    if (itemData.length > 0) {
-      setItems(itemData);
+    if (initItem.length > 0 && !triggeredOnce) {
+      setItems(initItem);
+      setTriggeredOnce(true);
     }
-  }, [itemData]);
+  }, [initItem]);
 
   const handleDelete = async (uuid) => {
-    const newItemList = items.filter((item) => item.uuid !== uuid);
-    await dispatch(deleteItem({ uuid, authHeader }));
-    setItems(newItemList);
+    const newInitItem = initItem.filter((item) => item.uuid !== uuid);
+    const newItems = items.filter((item) => item.uuid !== uuid);
+
+    const { type } = await dispatch(deleteItem({ uuid }));
+
+    if (type.includes('fulfilled')) {
+      dispatch(quickUpdateItems({ items: newInitItem }));
+      setItems(newItems);
+
+      await dispatch(
+        setNewNotification({
+          message: 'Item successfully deleted',
+          backgroundColor: 'green',
+          severity: 'success',
+        })
+      );
+    }
   };
 
   const handleMultipleDelete = async (selected, setSelected) => {
-    const newItemList = items.filter(({ uuid }) => !selected.includes(uuid));
+    const newInitItem = initItem.filter(({ uuid }) => !selected.includes(uuid));
+    const newItems = items.filter(({ uuid }) => !selected.includes(uuid));
 
-    await dispatch(deleteMultipleItems({ listToDelete: selected, authHeader }));
-    setItems(newItemList);
-    setSelected([]);
+    const { type } = await dispatch(deleteMultipleItems({ listToDelete: selected }));
+
+    if (type.includes('fulfilled')) {
+      dispatch(quickUpdateItems({ items: newInitItem }));
+      setItems(newItems);
+      setSelected([]);
+
+      await dispatch(
+        setNewNotification({
+          message: 'All selected items successfully deleted',
+          backgroundColor: 'green',
+          severity: 'success',
+        })
+      );
+    }
   };
 
   const handleEdit = () => {
@@ -103,6 +132,7 @@ const ItemList = () => {
       </div>
     );
   }
+
   return (
     <Grid container spacing={2} style={{ marginTop: '30px' }}>
       <Grid item xs={12} container>
@@ -144,7 +174,7 @@ const ItemList = () => {
       </Grid>
       <Grid item xs={12}>
         <ItemListTable
-          itemData={itemData}
+          initItem={initItem}
           items={items}
           setItems={setItems}
           handleDelete={handleDelete}

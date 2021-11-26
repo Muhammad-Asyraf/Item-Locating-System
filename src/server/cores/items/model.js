@@ -24,6 +24,9 @@ class Item extends Model {
           through: {
             from: 'item_product.item_uuid',
             to: 'item_product.product_uuid',
+            extra: {
+              quantity: 'item_quantity',
+            },
           },
           to: 'product.uuid',
         },

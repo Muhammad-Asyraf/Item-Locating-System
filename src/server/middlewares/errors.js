@@ -12,6 +12,7 @@ const errorMessages = {
     customer_email_unique: stringUtil.getUniqueViolationError('email address'),
     store_store_url_unique: stringUtil.getUniqueViolationError('store url'),
     item_barcode_number_unique: "Item's barcode already exist",
+    product_barcode_number_unique: "Product's barcode already exist",
     backoffice_user_email_unique:
       stringUtil.getUniqueViolationError('email address'),
   },

@@ -1,7 +1,5 @@
 const { v4: uuidv4 } = require('uuid');
 const Item = require('../model');
-const Image = require('../../images/model');
-const fs = require('fs');
 const getLogger = require('../../../utils/logger');
 const { removeFiles } = require('../../../utils/general');
 
@@ -107,14 +105,6 @@ exports.createItem = async (req, res, next) => {
       }) => keepAttrs
     );
 
-    // console.log(barcode_number);
-    // console.log(name);
-    // console.log(wholesale_price);
-    // console.log(note);
-    // console.log(item_sub_category);
-    // console.log(imgFiles);
-    // console.log(new_images);
-
     const item = await Item.query().insertGraph(
       {
         uuid: itemId,
@@ -167,17 +157,6 @@ exports.editItem = async (req, res, next) => {
       }) => keepAttrs
     );
 
-    // console.log('barcode', barcode_number);
-    // console.log('name', name);
-    // console.log('price', wholesale_price);
-    // console.log('note', note);
-    // console.log('category', item_sub_category);
-    // console.log('imgFile', imgFiles);
-    // console.log('imgs', new_images);
-    // console.log('storeid', store_uuid);
-    // console.log('itemid', uuid);
-    // console.log('oldImgs', old_imgs);
-
     const item = await Item.query().patchAndFetchById(uuid, {
       name,
       note,
@@ -211,3 +190,14 @@ exports.editItem = async (req, res, next) => {
     next(err);
   }
 };
+
+// console.log('barcode', barcode_number);
+// console.log('name', name);
+// console.log('price', wholesale_price);
+// console.log('note', note);
+// console.log('category', item_sub_category);
+// console.log('imgFile', imgFiles);
+// console.log('imgs', new_images);
+// console.log('storeid', store_uuid);
+// console.log('itemid', uuid);
+// console.log('oldImgs', old_imgs);

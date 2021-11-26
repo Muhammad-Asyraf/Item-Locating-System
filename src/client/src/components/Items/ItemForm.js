@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 
 import Barcoder from 'barcoder';
 
@@ -13,12 +13,9 @@ import IconButton from '@mui/material/IconButton';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
 import FormHelperText from '@mui/material/FormHelperText';
 import InputAdornment from '@mui/material/InputAdornment';
-import AttachMoneyRoundedIcon from '@mui/icons-material/AttachMoneyRounded';
-import CircularProgress from '@mui/material/CircularProgress';
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
 
@@ -42,7 +39,7 @@ const getEditorModules = () => ({
     [{ size: [] }],
     ['bold', 'italic', 'underline', 'strike', 'blockquote'],
     [{ list: 'ordered' }, { list: 'bullet' }, { indent: '-1' }, { indent: '+1' }],
-
+    [{ align: ['', 'center', 'right', 'justify'] }],
     ['link', 'clean'],
   ],
   clipboard: {
@@ -61,6 +58,7 @@ const getEditorFormat = () => [
   'list',
   'bullet',
   'indent',
+  'align',
   'link',
 ];
 
@@ -160,12 +158,13 @@ const ItemCreate = (props) => {
   const quillFormats = getEditorFormat();
   const storeUUID = localStorage.getItem('storeUUID');
 
-  const { onSubmit, isItemLoading, categoryOptions } = props;
+  const { onSubmit, categoryOptions } = props;
 
   const nameRef = useRef();
   const barcodeNumberRef = useRef();
   const wholesalePriceRef = useRef();
 
+  const [validationComplete, setValidationComplete] = useState(false);
   const [itemName, setItemName] = useState(defaultVal);
   const [barcodeNumber, setBarcodeNumber] = useState(defaultVal);
   const [wholesalePrice, setWholesalePrice] = useState(defaultVal);
@@ -177,6 +176,46 @@ const ItemCreate = (props) => {
     imgPreviews: [],
     error: false,
   });
+
+  // useEffect(() => {
+  //   if (
+  //     barcodeNumber.error !== false ||
+  //     itemName.error !== false ||
+  //     wholesalePrice.error !== false
+  //   ) {
+  //     setErrorFlag(true);
+  //   } else {
+  //     setErrorFlag(false);
+  //   }
+  // }, [barcodeNumber, itemName, wholesalePrice]);
+
+  useEffect(() => {
+    const reset = false;
+
+    if (
+      validationComplete === true &&
+      barcodeNumber.error === false &&
+      itemName.error === false &&
+      wholesalePrice.error === false
+    ) {
+      const formData = new FormData();
+
+      formData.append('barcode_number', barcodeNumber.value);
+      formData.append('name', itemName.value);
+      formData.append('wholesale_price', wholesalePrice.value);
+      formData.append('note', quillText.editorHtml);
+      formData.append('sub_category', JSON.stringify(selectedCategory));
+      formData.append('store_uuid', storeUUID);
+
+      for (const key of Object.keys(image.imgFiles)) {
+        formData.append('imgCollection', image.imgFiles[key]);
+      }
+
+      onSubmit(formData);
+    }
+
+    setValidationComplete(reset);
+  }, [validationComplete]);
 
   const handleOpenModal = (e) => {
     if (e.target.tagName === 'IMG') {
@@ -286,20 +325,7 @@ const ItemCreate = (props) => {
     validateName(nameRef.current.value);
     validatePrice(wholesalePriceRef.current.value);
 
-    const formData = new FormData();
-
-    formData.append('barcode_number', barcodeNumber.value);
-    formData.append('name', itemName.value);
-    formData.append('wholesale_price', wholesalePrice.value);
-    formData.append('note', quillText.editorHtml);
-    formData.append('sub_category', JSON.stringify(selectedCategory));
-    formData.append('store_uuid', storeUUID);
-
-    for (const key of Object.keys(image.imgFiles)) {
-      formData.append('imgCollection', image.imgFiles[key]);
-    }
-
-    onSubmit(formData);
+    setValidationComplete(true);
   };
 
   const handleChange = (value) => {
@@ -374,8 +400,10 @@ const ItemCreate = (props) => {
   //   }
   // };
 
+  /* eslint-disable react/jsx-no-duplicate-props */
   return (
     <form
+      id="item-form"
       className={classes.form}
       onSubmit={handleSubmit}
       autoComplete="off"
@@ -430,12 +458,9 @@ const ItemCreate = (props) => {
                   helperText={wholesalePrice.error}
                   inputRef={wholesalePriceRef}
                   className={classes.inputFields}
+                  // inputProps={{ style: { textAlign: 'right' } }}
                   InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <AttachMoneyRoundedIcon />
-                      </InputAdornment>
-                    ),
+                    startAdornment: <InputAdornment position="start">RM</InputAdornment>,
                   }}
                 />
               </Grid>
@@ -457,7 +482,9 @@ const ItemCreate = (props) => {
               categoryOptions={categoryOptions}
               setSelectedCategory={setSelectedCategory}
             />
-            <p className={classes.inputTiltle}>Add Images</p>
+            <p className={classes.inputTiltle} style={{ marginTop: 20 }}>
+              Add Images
+            </p>
             <Box style={{ marginBottom: 30 }}>
               <input
                 id="imgs"
@@ -544,7 +571,7 @@ const ItemCreate = (props) => {
               />
             </Grid>
           </Paper>
-          <Button
+          {/* <Button
             variant="contained"
             color="primary"
             type="submit"
@@ -561,7 +588,7 @@ const ItemCreate = (props) => {
             ) : (
               <>Add Item</>
             )}
-          </Button>
+          </Button> */}
         </Grid>
       </Grid>
     </form>

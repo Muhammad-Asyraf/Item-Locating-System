@@ -2,7 +2,11 @@ import { createSlice } from '@reduxjs/toolkit';
 
 import { loadingState, loadedState } from '../states/loadState';
 import { errorState, noErrorState } from '../states/errorState';
-import { receivedItemState, receivedSingleItemState } from '../states/itemState';
+import {
+  receivedItemState,
+  receivedSingleItemState,
+  updatedItemState,
+} from '../states/itemState';
 
 import {
   getSingleItem,
@@ -29,6 +33,7 @@ const itemSlice = createSlice({
     processingRequest: loadingState,
     processed: loadedState,
     clearError: noErrorState,
+    quickUpdateItems: updatedItemState,
   },
   extraReducers: {
     [getSingleItem.fulfilled]: receivedSingleItemState,
@@ -46,7 +51,8 @@ const itemSlice = createSlice({
   },
 });
 
-export const { processingRequest, processed, clearError } = itemSlice.actions;
+export const { processingRequest, processed, clearError, quickUpdateItems } =
+  itemSlice.actions;
 
 export const selectItems = (state) => state.item.items;
 export const selectSingleItem = (state) => state.item.item;

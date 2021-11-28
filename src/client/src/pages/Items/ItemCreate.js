@@ -68,7 +68,7 @@ const ItemCreate = () => {
     const { type, payload: resPayload } = await dispatch(addItem({ payload }));
 
     if (type.includes('fulfilled')) {
-      history.push(`/${storeUrl}/item/list`);
+      dispatch(processed());
       await dispatch(
         setNewNotification({
           message: 'Item successfully added.',
@@ -76,7 +76,9 @@ const ItemCreate = () => {
           severity: 'success',
         })
       );
+      history.push(`/${storeUrl}/item/list`);
     } else if (type.includes('rejected')) {
+      dispatch(processed());
       await dispatch(
         setNewNotification({
           message: resPayload.message,
@@ -85,7 +87,6 @@ const ItemCreate = () => {
         })
       );
     }
-    dispatch(processed());
   };
 
   if (isCategoryLoading) {

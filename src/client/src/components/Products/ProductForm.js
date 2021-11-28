@@ -29,6 +29,7 @@ import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
 import SpeedIcon from '@mui/icons-material/Speed';
 import InfoRoundedIcon from '@mui/icons-material/InfoRounded';
+import EditTwoToneIcon from '@mui/icons-material/EditTwoTone';
 
 import { makeStyles } from '@mui/styles';
 
@@ -746,6 +747,34 @@ const ProductForm = (props) => {
     setErrors(updatedError);
   };
 
+  const updateStandardGeneralInfo = (item) => {
+    if (item) {
+      nameRef.current.value = item.name;
+      barcodeNumberRef.current.value = item.barcode_number;
+
+      setProductName({
+        ...productName,
+        value: item.name,
+      });
+      setBarcodeNumber({
+        ...barcodeNumber,
+        value: item.barcode_number,
+      });
+    } else {
+      nameRef.current.value = '';
+      barcodeNumberRef.current.value = '';
+
+      setProductName({
+        ...productName,
+        value: '',
+      });
+      setBarcodeNumber({
+        ...barcodeNumber,
+        value: '',
+      });
+    }
+  };
+
   const handleSelectItem = (e, value) => {
     let totalQty = 0;
     let totalPrice = 0;
@@ -767,6 +796,7 @@ const ProductForm = (props) => {
       };
 
       updatedPrice = supPrice;
+      updateStandardGeneralInfo(value);
     } else {
       updatedProductItem = {
         ...selectedProductItem,
@@ -793,6 +823,8 @@ const ProductForm = (props) => {
     const updatedError = validateProductItem(updatedProductItem, errors);
     setErrors(updatedError);
   };
+
+  // console.log(barcodeNumber);
 
   const handleQuantityChange = (e, index) => {
     const oldItem = selectedProductItem.bundle;
@@ -857,282 +889,6 @@ const ProductForm = (props) => {
       style={{ flexGrow: 1 }}
     >
       <Grid container spacing={0}>
-        <Grid
-          item
-          xs={12}
-          md={12}
-          container
-          justifyContent="center"
-          alignItems="center"
-          direction="row"
-        >
-          <Paper className={classes.paper}>
-            <Grid container spacing={2}>
-              <Grid item sm={12} md={4}>
-                <h3 style={{ marginBottom: 5, marginTop: 0 }}>General</h3>
-                <span style={{ fontSize: '0.9rem' }}>
-                  Change general information regarding this product
-                </span>
-              </Grid>
-              <Grid item sm={12} md={8} container spacing={3}>
-                <Grid item xs={12}>
-                  <TextField
-                    id="name"
-                    label="Name"
-                    variant="outlined"
-                    onChange={handleInputChange}
-                    onBlur={handleInputChange}
-                    error={productName.error !== false}
-                    helperText={productName.error}
-                    className={classes.inputFields}
-                    inputRef={nameRef}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    id="barcode_number"
-                    label="Barcode Number"
-                    variant="outlined"
-                    autoComplete="on"
-                    onChange={handleInputChange}
-                    onBlur={handleInputChange}
-                    error={barcodeNumber.error !== false}
-                    helperText={barcodeNumber.error}
-                    className={classes.inputFields}
-                    inputRef={barcodeNumberRef}
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <QrCodeScannerIcon />
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <p
-                    className={classes.inputTiltle}
-                    style={{ color: errors.quillText ? '#d32f2f' : 'black' }}
-                  >
-                    Description
-                  </p>
-                  <ReactQuill
-                    value={quillText.editorHtml}
-                    onChange={handleChange}
-                    modules={quillModules}
-                    formats={quillFormats}
-                  />
-                  <FormHelperText error={errors.quillText !== false}>
-                    {errors.quillText ? errors.quillText : null}
-                  </FormHelperText>
-                </Grid>
-
-                <Grid item xs={12}>
-                  <CategorySelect
-                    categoryOptions={categoryOptions}
-                    setSelectedCategory={setSelectedCategory}
-                  />
-                  <FormHelperText error={errors.category !== false}>
-                    {errors.category ? errors.category : null}
-                  </FormHelperText>
-                </Grid>
-                <Grid item xs={12}>
-                  <Autocomplete
-                    disablePortal
-                    id="stock-select"
-                    options={['In Stock', 'Low Stock', 'Out of Stock']}
-                    sx={{ width: '100%' }}
-                    onChange={onSelectStockStatus}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        label="Stock Status"
-                        inputProps={{
-                          ...params.inputProps,
-                          style: { textAlign: 'right' },
-                        }}
-                        InputProps={{
-                          ...params.InputProps,
-                          startAdornment: (
-                            <>
-                              <InputAdornment position="start">
-                                {selectedStockStatus ? (
-                                  <Chip
-                                    label={selectedStockStatus}
-                                    style={{
-                                      fontWeight: 'bold',
-                                      paddingRight: 45,
-                                      paddingLeft: 30,
-                                      color: 'white',
-                                      backgroundColor:
-                                        selectedStockStatus === 'In Stock'
-                                          ? '#39A388'
-                                          : selectedStockStatus === 'Low Stock'
-                                          ? '#F0A500'
-                                          : '#FF5151',
-                                    }}
-                                  />
-                                ) : (
-                                  ''
-                                )}
-                              </InputAdornment>
-                              {params.InputProps.startAdornment}
-                            </>
-                          ),
-                        }}
-                      />
-                    )}
-                  />
-                  <FormHelperText error={errors.stock !== false}>
-                    {errors.stock ? errors.stock : null}
-                  </FormHelperText>
-                </Grid>
-                <Grid item sm={7} xs={12}>
-                  <TextField
-                    id="measurement_value"
-                    label="Measurement Value"
-                    variant="outlined"
-                    onChange={handleInputChange}
-                    onBlur={handleInputChange}
-                    error={measurementValue.error !== false}
-                    helperText={measurementValue.error}
-                    className={classes.inputFields}
-                    inputRef={measurementValueRef}
-                    // inputProps={{ style: { textAlign: 'right' } }}
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <SpeedIcon /> &nbsp;&nbsp;
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
-                </Grid>
-                <Grid item sm={5} xs={12}>
-                  <Autocomplete
-                    id="measurement_unit"
-                    disablePortal
-                    autoSelect
-                    freeSolo
-                    options={['gram', 'kilogram', 'packet']}
-                    sx={{ width: '100%' }}
-                    onChange={onSelectUnit}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        label="Measurement Unit"
-                        InputProps={{
-                          ...params.InputProps,
-                          startAdornment: (
-                            <>
-                              <InputAdornment position="start">
-                                <DeviceThermostatIcon />
-                              </InputAdornment>
-                              {params.InputProps.startAdornment}
-                            </>
-                          ),
-                        }}
-                      />
-                    )}
-                  />
-                  <FormHelperText error={errors.mUnit !== false}>
-                    {errors.mUnit ? errors.mUnit : null}
-                  </FormHelperText>
-                </Grid>
-                <Grid item sm={12}>
-                  <p className={classes.inputTiltle}>Product Images</p>
-                  <Box style={{ marginBottom: 30 }}>
-                    <input
-                      id="imgs"
-                      name="imgCollection"
-                      type="file"
-                      multiple
-                      accept="image/*"
-                      onChange={handleCapture}
-                      autoComplete="off"
-                      style={{ display: 'none' }}
-                    />
-                    <label
-                      htmlFor="imgs"
-                      className={classes.inputImageBox}
-                      onDrop={onDrop}
-                      onDragOver={(e) => e.preventDefault()}
-                    >
-                      <Box style={{ width: '310px', height: '500px' }}>
-                        <ReactLogo />
-                        <div
-                          style={{ fontSize: '0.8rem', position: 'relative', top: -30 }}
-                        >
-                          Drop images here or click &nbsp;
-                          <span style={{ color: '#004C99', textDecoration: 'underline' }}>
-                            browse
-                          </span>
-                          &nbsp; to upload
-                        </div>
-                      </Box>
-                    </label>
-
-                    <FormHelperText error={errors.image !== false}>
-                      {errors.image
-                        ? errors.image
-                        : 'Only jpg, jpeg or png are allowed. Max 12 uploads (each must < 1.5 MB)'}
-                    </FormHelperText>
-                  </Box>
-                  <p className={classes.inputTiltle}>Images Preview</p>
-                  <Divider sx={{ mb: image.imgPreviews.length > 0 ? 3 : 10 }} />
-                  <Grid container spacing={2}>
-                    {image.imgPreviews.map(({ path, name }) => (
-                      <Grid item sm={2} md={2} key={path}>
-                        <Card
-                          elevation={3}
-                          // onClick={(e) => onClickUrl(e, path)}
-                          onClick={handleOpenModal}
-                          style={{
-                            Width: '100px',
-                            height: '110px',
-                            borderRadius: 10,
-                          }}
-                        >
-                          <Box style={{ position: 'absolute' }}>
-                            <IconButton
-                              className={classes.customHoverFocus}
-                              onClick={(e) => removeImagesPreview(e, path, name)}
-                            >
-                              <RemoveCircleIcon
-                                fontSize="small"
-                                style={{
-                                  color: 'white',
-                                  backgroundColor: 'black',
-                                  borderRadius: 50,
-                                }}
-                              />
-                            </IconButton>
-                          </Box>
-                          <img
-                            src={path}
-                            alt="..."
-                            style={{
-                              width: '100px',
-                              height: '110px',
-                              objectFit: 'fill',
-                            }}
-                          />
-                        </Card>
-                      </Grid>
-                    ))}
-                    <ImageModal
-                      images={image.imgPreviews}
-                      Swiper={Swiper}
-                      SwiperSlide={SwiperSlide}
-                      openModal={openModal}
-                      handleCloseModal={handleCloseModal}
-                    />
-                  </Grid>
-                </Grid>
-              </Grid>
-            </Grid>
-          </Paper>
-        </Grid>
         <Grid
           item
           xs={12}
@@ -1403,6 +1159,290 @@ const ProductForm = (props) => {
             />
           </Paper>
         </Grid>
+        <Grid
+          item
+          xs={12}
+          md={12}
+          container
+          justifyContent="center"
+          alignItems="center"
+          direction="row"
+        >
+          <Paper className={classes.paper}>
+            <Grid container spacing={2}>
+              <Grid item sm={12} md={4}>
+                <h3 style={{ marginBottom: 5, marginTop: 0 }}>General</h3>
+                <span style={{ fontSize: '0.9rem' }}>
+                  Change general information regarding this product
+                </span>
+              </Grid>
+              <Grid item sm={12} md={8} container spacing={3}>
+                <Grid item xs={12}>
+                  <TextField
+                    id="name"
+                    label="Name"
+                    variant="outlined"
+                    onChange={handleInputChange}
+                    onBlur={handleInputChange}
+                    error={productName.error !== false}
+                    helperText={productName.error}
+                    className={classes.inputFields}
+                    inputRef={nameRef}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <EditTwoToneIcon />
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    id="barcode_number"
+                    label="Barcode Number"
+                    variant="outlined"
+                    autoComplete="on"
+                    onChange={handleInputChange}
+                    onBlur={handleInputChange}
+                    error={barcodeNumber.error !== false}
+                    helperText={barcodeNumber.error}
+                    className={classes.inputFields}
+                    inputRef={barcodeNumberRef}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <QrCodeScannerIcon />
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <p
+                    className={classes.inputTiltle}
+                    style={{ color: errors.quillText ? '#d32f2f' : 'black' }}
+                  >
+                    Description
+                  </p>
+                  <ReactQuill
+                    value={quillText.editorHtml}
+                    onChange={handleChange}
+                    modules={quillModules}
+                    formats={quillFormats}
+                  />
+                  <FormHelperText error={errors.quillText !== false}>
+                    {errors.quillText ? errors.quillText : null}
+                  </FormHelperText>
+                </Grid>
+
+                <Grid item xs={12}>
+                  <CategorySelect
+                    categoryOptions={categoryOptions}
+                    setSelectedCategory={setSelectedCategory}
+                  />
+                  <FormHelperText error={errors.category !== false}>
+                    {errors.category ? errors.category : null}
+                  </FormHelperText>
+                </Grid>
+                <Grid item xs={12}>
+                  <Autocomplete
+                    disablePortal
+                    id="stock-select"
+                    options={['In Stock', 'Low Stock', 'Out of Stock']}
+                    sx={{ width: '100%' }}
+                    onChange={onSelectStockStatus}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Stock Status"
+                        inputProps={{
+                          ...params.inputProps,
+                          style: { textAlign: 'right' },
+                        }}
+                        InputProps={{
+                          ...params.InputProps,
+                          startAdornment: (
+                            <>
+                              <InputAdornment position="start">
+                                {selectedStockStatus ? (
+                                  <Chip
+                                    label={selectedStockStatus}
+                                    style={{
+                                      fontWeight: 'bold',
+                                      paddingRight: 45,
+                                      paddingLeft: 30,
+                                      color: 'white',
+                                      backgroundColor:
+                                        selectedStockStatus === 'In Stock'
+                                          ? '#39A388'
+                                          : selectedStockStatus === 'Low Stock'
+                                          ? '#F0A500'
+                                          : '#FF5151',
+                                    }}
+                                  />
+                                ) : (
+                                  ''
+                                )}
+                              </InputAdornment>
+                              {params.InputProps.startAdornment}
+                            </>
+                          ),
+                        }}
+                      />
+                    )}
+                  />
+                  <FormHelperText error={errors.stock !== false}>
+                    {errors.stock ? errors.stock : null}
+                  </FormHelperText>
+                </Grid>
+                <Grid item sm={7} xs={12}>
+                  <TextField
+                    id="measurement_value"
+                    label="Measurement Value"
+                    variant="outlined"
+                    onChange={handleInputChange}
+                    onBlur={handleInputChange}
+                    error={measurementValue.error !== false}
+                    helperText={measurementValue.error}
+                    className={classes.inputFields}
+                    inputRef={measurementValueRef}
+                    // inputProps={{ style: { textAlign: 'right' } }}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <SpeedIcon /> &nbsp;&nbsp;
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                </Grid>
+                <Grid item sm={5} xs={12}>
+                  <Autocomplete
+                    id="measurement_unit"
+                    disablePortal
+                    autoSelect
+                    freeSolo
+                    options={['gram', 'kilogram', 'packet']}
+                    sx={{ width: '100%' }}
+                    onChange={onSelectUnit}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Measurement Unit"
+                        InputProps={{
+                          ...params.InputProps,
+                          startAdornment: (
+                            <>
+                              <InputAdornment position="start">
+                                <DeviceThermostatIcon />
+                              </InputAdornment>
+                              {params.InputProps.startAdornment}
+                            </>
+                          ),
+                        }}
+                      />
+                    )}
+                  />
+                  <FormHelperText error={errors.mUnit !== false}>
+                    {errors.mUnit ? errors.mUnit : null}
+                  </FormHelperText>
+                </Grid>
+                <Grid item sm={12}>
+                  <p className={classes.inputTiltle}>Product Images</p>
+                  <Box style={{ marginBottom: 30 }}>
+                    <input
+                      id="imgs"
+                      name="imgCollection"
+                      type="file"
+                      multiple
+                      accept="image/*"
+                      onChange={handleCapture}
+                      autoComplete="off"
+                      style={{ display: 'none' }}
+                    />
+                    <label
+                      htmlFor="imgs"
+                      className={classes.inputImageBox}
+                      onDrop={onDrop}
+                      onDragOver={(e) => e.preventDefault()}
+                    >
+                      <Box style={{ width: '310px', height: '500px' }}>
+                        <ReactLogo />
+                        <div
+                          style={{ fontSize: '0.8rem', position: 'relative', top: -30 }}
+                        >
+                          Drop images here or click &nbsp;
+                          <span style={{ color: '#004C99', textDecoration: 'underline' }}>
+                            browse
+                          </span>
+                          &nbsp; to upload
+                        </div>
+                      </Box>
+                    </label>
+
+                    <FormHelperText error={errors.image !== false}>
+                      {errors.image
+                        ? errors.image
+                        : 'Only jpg, jpeg or png are allowed. Max 12 uploads (each must < 1.5 MB)'}
+                    </FormHelperText>
+                  </Box>
+                  <p className={classes.inputTiltle}>Images Preview</p>
+                  <Divider sx={{ mb: image.imgPreviews.length > 0 ? 3 : 10 }} />
+                  <Grid container spacing={2}>
+                    {image.imgPreviews.map(({ path, name }) => (
+                      <Grid item sm={2} md={2} key={path}>
+                        <Card
+                          elevation={3}
+                          // onClick={(e) => onClickUrl(e, path)}
+                          onClick={handleOpenModal}
+                          style={{
+                            Width: '100px',
+                            height: '110px',
+                            borderRadius: 10,
+                          }}
+                        >
+                          <Box style={{ position: 'absolute' }}>
+                            <IconButton
+                              className={classes.customHoverFocus}
+                              onClick={(e) => removeImagesPreview(e, path, name)}
+                            >
+                              <RemoveCircleIcon
+                                fontSize="small"
+                                style={{
+                                  color: 'white',
+                                  backgroundColor: 'black',
+                                  borderRadius: 50,
+                                }}
+                              />
+                            </IconButton>
+                          </Box>
+                          <img
+                            src={path}
+                            alt="..."
+                            style={{
+                              width: '100px',
+                              height: '110px',
+                              objectFit: 'fill',
+                            }}
+                          />
+                        </Card>
+                      </Grid>
+                    ))}
+                    <ImageModal
+                      images={image.imgPreviews}
+                      Swiper={Swiper}
+                      SwiperSlide={SwiperSlide}
+                      openModal={openModal}
+                      handleCloseModal={handleCloseModal}
+                    />
+                  </Grid>
+                </Grid>
+              </Grid>
+            </Grid>
+          </Paper>
+        </Grid>
+
         <Grid
           item
           xs={12}

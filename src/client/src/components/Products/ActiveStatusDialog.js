@@ -51,18 +51,6 @@ const deActivate = (
   </Typography>
 );
 
-// const activate = (
-//   <Typography>
-//     <b>Activate</b>{' '}
-//   </Typography>
-// );
-
-// const deActivate = (
-//   <Typography>
-//     <b>Deactivate</b>{' '}
-//   </Typography>
-// );
-
 const ActiveStatusDialog = (props) => {
   const { open, handleClose, onUpdate, productLoading } = props;
   const [status, setStatus] = useState('activate');

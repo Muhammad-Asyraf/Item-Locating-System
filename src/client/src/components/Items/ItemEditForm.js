@@ -399,7 +399,6 @@ const ItemEditForm = (props) => {
       const file = await getFileObject(eachImage.path);
       selectedImages.push(file);
     }
-    console.log(selectedImages);
 
     handleImagePreview(selectedImages);
   }, []);

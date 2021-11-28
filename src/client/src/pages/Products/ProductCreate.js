@@ -150,8 +150,9 @@ const ProductCreate = () => {
               textTransform: 'none',
               fontSize: '0.95rem',
               borderRadius: 3,
+              width: 105,
               height: 50,
-              paddingRight: 3,
+              paddingRight: 2.5,
               boxShadow: 'rgba(53, 132, 167, 0.44) 0px 8px 16px 0px !important',
             }}
           >

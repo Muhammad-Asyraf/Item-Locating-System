@@ -145,8 +145,8 @@ export const updateProduct = createAsyncThunk(
   }
 );
 
-export const toggleProductStatus = createAsyncThunk(
-  'product/toggleProductStatus',
+export const patchSingleProduct = createAsyncThunk(
+  'product/patchSingleProduct',
   async ({ uuid, payload }, { rejectWithValue, getState }) => {
     try {
       const { authHeader } = await getState().auth;

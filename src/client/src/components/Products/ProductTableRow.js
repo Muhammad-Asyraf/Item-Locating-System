@@ -30,6 +30,7 @@ import { makeStyles } from '@mui/styles';
 
 import RowOptions from './RowOptions';
 import ImageModal from '../Images/ImageModal';
+import StockStatusDialog from './StockStatusDialog';
 
 SwiperCore.use([Pagination, Navigation]);
 
@@ -51,6 +52,8 @@ const ProductTableRow = (props) => {
   const classes = useStyles();
   const [open, setOpen] = useState(false);
   const [openModal, setOpenModal] = useState(false);
+  const [openStockStatusDialog, setOpenStockStatusDialog] = useState(false);
+
   const {
     product,
     isProductSelected,
@@ -59,10 +62,19 @@ const ProductTableRow = (props) => {
     handleDelete,
     handleEdit,
     handleToggleStatus,
+    handleStockStatus,
+    productLoading,
   } = props;
 
   const handleOpenModal = () => setOpenModal(true);
   const handleCloseModal = () => setOpenModal(false);
+
+  const handleClickOpenStockStatusDialog = () => setOpenStockStatusDialog(true);
+  const handleCloseStockStatusDialog = () => setOpenStockStatusDialog(false);
+
+  const handleUpdateStockStatus = (status, handleClose) => {
+    handleStockStatus(product.uuid, status, handleClose);
+  };
 
   return (
     <>
@@ -200,6 +212,7 @@ const ProductTableRow = (props) => {
             Link={Link}
             handleDelete={handleDelete}
             handleEdit={handleEdit}
+            handleClickOpenStockStatusDialog={handleClickOpenStockStatusDialog}
           />
         </TableCell>
       </TableRow>
@@ -238,7 +251,7 @@ const ProductTableRow = (props) => {
                             borderRadius: '20px 20px 0px 0px',
                           }}
                         >
-                          Item Overview
+                          Product Overview
                         </Box>
                       </Grid>
                       <Grid item xs={3}>
@@ -279,9 +292,6 @@ const ProductTableRow = (props) => {
                         <Box
                           style={{
                             padding: '20px 25px 20px 10px',
-                            // maxHeight: 300,
-                            // overflow: 'scroll',
-                            // overflowX: 'hidden',
                             borderRadius: '0px 0px 20px 0px',
                           }}
                         >
@@ -305,6 +315,12 @@ const ProductTableRow = (props) => {
           SwiperSlide={SwiperSlide}
           openModal={openModal}
           handleCloseModal={handleCloseModal}
+        />
+        <StockStatusDialog
+          open={openStockStatusDialog}
+          handleClose={handleCloseStockStatusDialog}
+          onUpdate={handleUpdateStockStatus}
+          productLoading={productLoading}
         />
       </TableRow>
     </>

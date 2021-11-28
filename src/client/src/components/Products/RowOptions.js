@@ -8,13 +8,18 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import MoreVertRoundedIcon from '@mui/icons-material/MoreVertRounded';
 import DeleteRoundedIcon from '@mui/icons-material/DeleteRounded';
 import EditRoundedIcon from '@mui/icons-material/EditRounded';
+import LocalGroceryStoreRoundedIcon from '@mui/icons-material/LocalGroceryStoreRounded';
 
 import '../../assets/css/categorySelectOverride.css';
+
+const listItemIconStyles = { mr: 5, fontSize: '0.875rem !important' };
+const IconStyles = { ml: 1, mr: 3, mt: 0.1 };
 
 const RowMenu = (props) => {
   const storeUrl = localStorage.getItem('storeUrl');
   const [anchorEl, setAnchorEl] = useState();
-  const { product, Link, handleDelete, handleEdit } = props;
+  const { product, Link, handleDelete, handleEdit, handleClickOpenStockStatusDialog } =
+    props;
 
   const handleClickOption = (event) => {
     setAnchorEl(event.currentTarget);
@@ -22,6 +27,11 @@ const RowMenu = (props) => {
 
   const handleCloseOption = () => {
     setAnchorEl(null);
+  };
+
+  const openStockStatusDialog = () => {
+    setAnchorEl(null);
+    handleClickOpenStockStatusDialog();
   };
 
   return (
@@ -39,8 +49,8 @@ const RowMenu = (props) => {
           elevation: 2,
           sx: {
             overflow: 'visible',
-            mt: -0.5,
-            ml: -9.5,
+            mt: 0.1,
+            ml: -7,
             '& .MuiAvatar-root': {
               width: 99,
               height: 32,
@@ -64,8 +74,8 @@ const RowMenu = (props) => {
         }}
       >
         <MenuItem onClick={() => handleDelete(product.uuid)}>
-          <ListItemIcon sx={{ mr: 5, fontSize: '0.875rem !important' }}>
-            <DeleteRoundedIcon fontSize="small" sx={{ ml: 1, mr: 3, mt: 0.1 }} />
+          <ListItemIcon sx={listItemIconStyles}>
+            <DeleteRoundedIcon fontSize="small" sx={IconStyles} />
             Delete
           </ListItemIcon>
         </MenuItem>
@@ -74,9 +84,15 @@ const RowMenu = (props) => {
           component={Link}
           to={`/${storeUrl}/product/edit/${product.uuid}`}
         >
-          <ListItemIcon sx={{ mr: 5, fontSize: '0.875rem !important' }}>
-            <EditRoundedIcon fontSize="small" sx={{ ml: 1, mr: 3, mt: 0.1 }} />
+          <ListItemIcon sx={listItemIconStyles}>
+            <EditRoundedIcon fontSize="small" sx={IconStyles} />
             Edit
+          </ListItemIcon>
+        </MenuItem>
+        <MenuItem onClick={openStockStatusDialog}>
+          <ListItemIcon sx={listItemIconStyles}>
+            <LocalGroceryStoreRoundedIcon fontSize="small" sx={IconStyles} />
+            Update Stock Status
           </ListItemIcon>
         </MenuItem>
       </Menu>

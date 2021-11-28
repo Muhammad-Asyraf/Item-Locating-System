@@ -70,6 +70,7 @@ const ItemEdit = (props) => {
     const { type, payload: resPayload } = await dispatch(updateItem({ uuid, payload }));
 
     if (type.includes('fulfilled')) {
+      dispatch(processed());
       await dispatch(
         setNewNotification({
           message: 'Item successfully updated',
@@ -77,8 +78,10 @@ const ItemEdit = (props) => {
           severity: 'success',
         })
       );
+
       history.push(`/${storeUrl}/item/list`);
     } else if (type.includes('rejected')) {
+      dispatch(processed());
       await dispatch(
         setNewNotification({
           message: resPayload.message,
@@ -87,7 +90,6 @@ const ItemEdit = (props) => {
         })
       );
     }
-    dispatch(processed());
   };
 
   if (isCategoryLoading) {

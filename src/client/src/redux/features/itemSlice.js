@@ -48,6 +48,7 @@ const itemSlice = createSlice({
     [deleteMultipleItems.rejected]: errorState,
     [updateItem.pending]: loadingState,
     [updateItem.rejected]: errorState,
+    // [updateItem.fulfilled]: updatedItemState,
   },
 });
 

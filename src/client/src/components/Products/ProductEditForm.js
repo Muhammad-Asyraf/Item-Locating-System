@@ -755,6 +755,34 @@ const ProductForm = (props) => {
     setErrors(updatedError);
   };
 
+  const updateStandardGeneralInfo = (item) => {
+    if (item) {
+      nameRef.current.value = item.name;
+      barcodeNumberRef.current.value = item.barcode_number;
+
+      setProductName({
+        ...productName,
+        value: item.name,
+      });
+      setBarcodeNumber({
+        ...barcodeNumber,
+        value: item.barcode_number,
+      });
+    } else {
+      nameRef.current.value = '';
+      barcodeNumberRef.current.value = '';
+
+      setProductName({
+        ...productName,
+        value: '',
+      });
+      setBarcodeNumber({
+        ...barcodeNumber,
+        value: '',
+      });
+    }
+  };
+
   const handleSelectItem = (e, value) => {
     let totalQty = 0;
     let totalPrice = 0;
@@ -776,6 +804,7 @@ const ProductForm = (props) => {
       };
 
       updatedPrice = supPrice;
+      updateStandardGeneralInfo(value);
     } else {
       updatedProductItem = {
         ...selectedProductItem,

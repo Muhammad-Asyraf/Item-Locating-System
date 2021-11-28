@@ -16,7 +16,8 @@ import LocalGroceryStoreRoundedIcon from '@mui/icons-material/LocalGroceryStoreR
 
 import { makeStyles } from '@mui/styles';
 
-import CategoryFilterDialog from '../Category/CategoryFilterDialog';
+import ProductFilter from '../Products/ProductFilters';
+import CategoryFilter from '../Category/CategoryFilterDialog';
 import ActiveStatusDialog from '../Products/ActiveStatusDialog';
 import StockStatusDialog from '../Products/StockStatusDialog';
 
@@ -61,11 +62,19 @@ const EnhancedTableToolbar = (props) => {
     handleMultipleActiveStatusUpdate,
     handleMultipleStockStatusUpdate,
     handleSearch,
-    setSelectedCategory,
-    defaultValue,
     categoriesOption,
     filteredQuantity,
     productLoading,
+    setCategoryFilterType,
+    setSelectedCategoryFilter,
+    setSelectedActiveStatusFilter,
+    setSelectedStockStatusFilter,
+    categoryFilterType,
+    selectedCategoryFilter,
+    selectedActiveStatusFilter,
+    selectedStockStatusFilter,
+    filterActivated,
+    clearFilters,
   } = props;
 
   const [openFilter, setOpenFilter] = useState(false);
@@ -90,14 +99,37 @@ const EnhancedTableToolbar = (props) => {
         [classes.highlight]: numSelected > 0,
       })}
     >
-      <CategoryFilterDialog
-        open={openFilter}
-        handleClose={handleClose}
-        categoryOptions={categoriesOption}
-        setSelectedCategory={setSelectedCategory}
-        defaultValue={defaultValue}
-        filteredQuantity={filteredQuantity}
-      />
+      {type === 'product' ? (
+        <ProductFilter
+          open={openFilter}
+          handleClose={handleClose}
+          categoryOptions={categoriesOption}
+          setCategoryFilterType={setCategoryFilterType}
+          setSelectedCategoryFilter={setSelectedCategoryFilter}
+          setSelectedActiveStatusFilter={setSelectedActiveStatusFilter}
+          setSelectedStockStatusFilter={setSelectedStockStatusFilter}
+          categoryFilterType={categoryFilterType}
+          selectedCategoryFilter={selectedCategoryFilter}
+          selectedActiveStatusFilter={selectedActiveStatusFilter}
+          selectedStockStatusFilter={selectedStockStatusFilter}
+          filteredQuantity={filteredQuantity}
+          filterActivated={filterActivated}
+          clearFilters={clearFilters}
+        />
+      ) : (
+        <CategoryFilter
+          open={openFilter}
+          handleClose={handleClose}
+          categoryOptions={categoriesOption}
+          setCategoryFilterType={setCategoryFilterType}
+          categoryFilterType={categoryFilterType}
+          setSelectedCategoryFilter={setSelectedCategoryFilter}
+          selectedCategoryFilter={selectedCategoryFilter}
+          filterActivated={filterActivated}
+          filteredQuantity={filteredQuantity}
+        />
+      )}
+
       <ActiveStatusDialog
         open={openActiveStatusDialog}
         handleClose={handleCloseActiveStatusDialog}
@@ -130,8 +162,7 @@ const EnhancedTableToolbar = (props) => {
             onInput={updateSearchInput}
             defaultValue={searchValue}
             InputProps={{
-              className:
-                numSelected > 0 ? classes.input : JSON.stringify({ color: 'black' }),
+              className: numSelected > 0 ? classes.input : JSON.stringify({ color: 'black' }),
               classes: {
                 notchedOutline: numSelected > 0 ? classes.notchedOutline : classes.input,
               },
@@ -166,16 +197,15 @@ const EnhancedTableToolbar = (props) => {
                       onClick={handleClickOpen}
                       style={{
                         paddingLeft: 20,
-                        paddingRight: defaultValue.length > 0 ? 15 : 10,
+                        paddingRight: filterActivated ? 15 : 10,
                         color: 'white',
                         borderRadius: 11,
-                        backgroundColor:
-                          defaultValue.length > 0
-                            ? 'rgba(255, 255, 255, 0.07)'
-                            : '#001933',
+                        backgroundColor: filterActivated
+                          ? 'rgba(255, 255, 255, 0.07)'
+                          : '#001933',
                       }}
                     >
-                      {defaultValue.length > 0 ? (
+                      {filterActivated ? (
                         <div style={{ fontSize: '0.875rem' }}>
                           <b>
                             {filteredQuantity} &nbsp;&nbsp;<span>{type}s found</span>
@@ -220,14 +250,13 @@ const EnhancedTableToolbar = (props) => {
                     onClick={handleClickOpen}
                     style={{
                       paddingLeft: 20,
-                      paddingRight: defaultValue.length > 0 ? 15 : 10,
+                      paddingRight: filterActivated ? 15 : 10,
                       color: 'black',
                       borderRadius: 11,
-                      backgroundColor:
-                        defaultValue.length > 0 ? 'rgba(0, 0, 0, 0.04)' : 'white',
+                      backgroundColor: filterActivated ? 'rgba(0, 0, 0, 0.04)' : 'white',
                     }}
                   >
-                    {defaultValue.length > 0 ? (
+                    {filterActivated ? (
                       <div style={{ fontSize: '0.875rem' }}>
                         <b>
                           {filteredQuantity} &nbsp;&nbsp;<span>{type}s found</span>
@@ -249,16 +278,15 @@ const EnhancedTableToolbar = (props) => {
                       onClick={handleClickOpen}
                       style={{
                         paddingLeft: 20,
-                        paddingRight: defaultValue.length > 0 ? 15 : 10,
+                        paddingRight: filterActivated ? 15 : 10,
                         color: 'white',
                         borderRadius: 11,
-                        backgroundColor:
-                          defaultValue.length > 0
-                            ? 'rgba(255, 255, 255, 0.07)'
-                            : '#001933',
+                        backgroundColor: filterActivated
+                          ? 'rgba(255, 255, 255, 0.07)'
+                          : '#001933',
                       }}
                     >
-                      {defaultValue.length > 0 ? (
+                      {filterActivated ? (
                         <div style={{ fontSize: '0.875rem' }}>
                           <b>
                             {filteredQuantity} &nbsp;&nbsp;<span>{type}s found</span>
@@ -285,14 +313,13 @@ const EnhancedTableToolbar = (props) => {
                     onClick={handleClickOpen}
                     style={{
                       paddingLeft: 20,
-                      paddingRight: defaultValue.length > 0 ? 15 : 10,
+                      paddingRight: filterActivated ? 15 : 10,
                       color: 'black',
                       borderRadius: 11,
-                      backgroundColor:
-                        defaultValue.length > 0 ? 'rgba(0, 0, 0, 0.04)' : 'white',
+                      backgroundColor: filterActivated ? 'rgba(0, 0, 0, 0.04)' : 'white',
                     }}
                   >
-                    {defaultValue.length > 0 ? (
+                    {filterActivated ? (
                       <div style={{ fontSize: '0.875rem' }}>
                         <b>
                           {filteredQuantity} &nbsp;&nbsp;<span>{type}s found</span>

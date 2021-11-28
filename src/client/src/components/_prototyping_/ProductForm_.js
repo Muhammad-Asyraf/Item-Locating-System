@@ -8,7 +8,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 
 import { makeStyles } from '@mui/styles';
 
-import MultiChipSelect from './MultiChipSelect';
+import MultiChipSelect from '../Products/MultiChipSelect';
 
 const useStyles = makeStyles((theme) => ({
   root: {

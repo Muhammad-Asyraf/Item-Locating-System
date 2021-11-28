@@ -7,6 +7,7 @@ import Modal from '@mui/material/Modal';
 import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
+import Chip from '@mui/material/Chip';
 import Divider from '@mui/material/Divider';
 
 export default function ItemDetailsModal(props) {
@@ -113,8 +114,17 @@ export default function ItemDetailsModal(props) {
                   >
                     <h3>
                       <b>{items[itemIndex].name}</b>
+                      <br />
+                      <b>{items[itemIndex].barcode_number}</b>
                     </h3>
-
+                    <Grid container spacing={0.5}>
+                      {items[itemIndex].sub_categories.map((cat) => (
+                        <Grid item key={cat.uuid}>
+                          <Chip color="primary" size="small" label={cat.name} />
+                        </Grid>
+                      ))}
+                    </Grid>
+                    <br />
                     <Divider />
                     <ReactQuill value={items[itemIndex].note} readOnly theme="bubble" />
                   </Box>

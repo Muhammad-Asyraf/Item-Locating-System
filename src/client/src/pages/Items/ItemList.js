@@ -56,23 +56,22 @@ const ItemList = () => {
   const storeName = localStorage.getItem('storeName');
 
   const [items, setItems] = useState([]);
-  const [triggeredOnce, setTriggeredOnce] = useState(false);
 
   useEffect(() => {
     (async () => {
       dispatch(processingRequest());
-      await dispatch(getItems());
-      await dispatch(getSubcategories());
-      dispatch(processed());
+      const { type: getItemsProcessed, payload } = await dispatch(getItems());
+      const { type: getSubCatProcessed } = await dispatch(getSubcategories());
+
+      if (
+        getItemsProcessed.includes('fulfilled') &&
+        getSubCatProcessed.includes('fulfilled')
+      ) {
+        setItems(payload.items);
+        dispatch(processed());
+      }
     })();
   }, []);
-
-  useEffect(() => {
-    if (initItem.length > 0 && !triggeredOnce) {
-      setItems(initItem);
-      setTriggeredOnce(true);
-    }
-  }, [initItem]);
 
   const handleDelete = async (uuid) => {
     const newInitItem = initItem.filter((item) => item.uuid !== uuid);

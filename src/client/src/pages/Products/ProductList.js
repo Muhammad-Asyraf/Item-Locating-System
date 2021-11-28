@@ -28,7 +28,7 @@ import {
   getProducts,
   deleteProduct,
   deleteMultipleProducts,
-  toggleProductStatus,
+  patchSingleProduct,
   patchMultipleProducts,
 } from '../../redux/thunks/productThunk';
 import { getSubcategories } from '../../redux/thunks/categoryThunk';
@@ -87,24 +87,23 @@ const ProductList = () => {
   const storeName = localStorage.getItem('storeName');
 
   const [products, setProducts] = useState([]);
-  const [triggeredOnce, setTriggeredOnce] = useState(false);
 
   useEffect(() => {
     (async () => {
       dispatch(processingCategory());
-      await dispatch(getProducts());
-      await dispatch(getSubcategories());
-      dispatch(processed());
-      dispatch(productProccessed());
+      const { type: getProductsProcessed, payload } = await dispatch(getProducts());
+      const { type: getSubCatProcessed } = await dispatch(getSubcategories());
+
+      if (
+        getProductsProcessed.includes('fulfilled') &&
+        getSubCatProcessed.includes('fulfilled')
+      ) {
+        setProducts(payload.products);
+        dispatch(processed());
+        dispatch(productProccessed());
+      }
     })();
   }, []);
-
-  useEffect(() => {
-    if (initProduct.length > 0 && !triggeredOnce) {
-      setProducts(initProduct);
-      setTriggeredOnce(true);
-    }
-  }, [initProduct]);
 
   const handleEdit = () => {
     dispatch(processingCategory());
@@ -174,7 +173,7 @@ const ProductList = () => {
       return product;
     });
 
-    const { type } = await dispatch(toggleProductStatus({ uuid, payload }));
+    const { type } = await dispatch(patchSingleProduct({ uuid, payload }));
 
     if (type.includes('fulfilled')) {
       dispatch(quickUpdateProducts({ products: newInitProduct }));
@@ -190,12 +189,7 @@ const ProductList = () => {
     }
   };
 
-  const handleMultipleToggleStatus = async (
-    selected,
-    status,
-    setSelected,
-    handleClose
-  ) => {
+  const handleMultipleToggleStatus = async (selected, status, setSelected, handleClose) => {
     const updatedStatus = status === 'activate' ? true : false;
     const payload = {
       listToUpdate: selected,
@@ -242,15 +236,49 @@ const ProductList = () => {
     }
   };
 
-  // console.log('product Data', initProduct);
-  // console.log('products', products);
+  const handleStockStatus = async (uuid, status, handleClose) => {
+    // console.log(uuid);
+    // console.log(status);
+    // console.log(handleClose);
+    const payload = { stock_status: status };
+    const newInitProduct = initProduct.map((product) => {
+      if (product.uuid === uuid) {
+        return {
+          ...product,
+          stock_status: status,
+        };
+      }
+      return product;
+    });
 
-  const handleMultipleStockStatus = async (
-    selected,
-    status,
-    setSelected,
-    handleClose
-  ) => {
+    const newProducts = products.map((product) => {
+      if (product.uuid === uuid) {
+        return {
+          ...product,
+          stock_status: status,
+        };
+      }
+      return product;
+    });
+
+    const { type } = await dispatch(patchSingleProduct({ uuid, payload }));
+
+    if (type.includes('fulfilled')) {
+      dispatch(quickUpdateProducts({ products: newInitProduct }));
+      setProducts(newProducts);
+      handleClose();
+
+      await dispatch(
+        setNewNotification({
+          message: 'Product stock status successfully updated',
+          backgroundColor: 'green',
+          severity: 'success',
+        })
+      );
+    }
+  };
+
+  const handleMultipleStockStatus = async (selected, status, setSelected, handleClose) => {
     const payload = {
       listToUpdate: selected,
       updatedPayload: {
@@ -278,9 +306,6 @@ const ProductList = () => {
       return product;
     });
 
-    // console.log('newInitProduct', newInitProduct);
-    // console.log('newProducts', newProducts);
-
     const { type } = await dispatch(patchMultipleProducts({ payload }));
 
     if (type.includes('fulfilled')) {
@@ -305,8 +330,7 @@ const ProductList = () => {
         <LinearProgress
           className={classes.linear}
           sx={{
-            backgroundImage:
-              'linear-gradient(-225deg, #473B7B 0%, #003366 51%, #30D2BE 100%)',
+            backgroundImage: 'linear-gradient(-225deg, #473B7B 0%, #003366 51%, #30D2BE 100%)',
           }}
         />
       </div>
@@ -363,6 +387,7 @@ const ProductList = () => {
           onMultipleActiveStatusUpdate={handleMultipleToggleStatus}
           onMultipleStockStatusUpdate={handleMultipleStockStatus}
           handleToggleStatus={handleToggleStatus}
+          handleStockStatus={handleStockStatus}
           handleEdit={handleEdit}
         />
       </Grid>

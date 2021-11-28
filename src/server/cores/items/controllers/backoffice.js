@@ -190,14 +190,3 @@ exports.editItem = async (req, res, next) => {
     next(err);
   }
 };
-
-// console.log('barcode', barcode_number);
-// console.log('name', name);
-// console.log('price', wholesale_price);
-// console.log('note', note);
-// console.log('category', item_sub_category);
-// console.log('imgFile', imgFiles);
-// console.log('imgs', new_images);
-// console.log('storeid', store_uuid);
-// console.log('itemid', uuid);
-// console.log('oldImgs', old_imgs);

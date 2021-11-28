@@ -118,7 +118,11 @@ const ProductListTable = (props) => {
   const [selected, setSelected] = useState([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [selectedCategory, setSelectedCategory] = useState([]);
+  const [categoryFilterType, setCategoryFilterType] = useState('any');
+  const [selectedCategoryFilter, setSelectedCategoryFilter] = useState([]);
+  const [selectedActiveStatusFilter, setSelectedActiveStatusFilter] = useState(null);
+  const [selectedStockStatusFilter, setSelectedStockStatusFilter] = useState(null);
+  const [filterActivated, setFilterActivated] = useState(false);
   const [filteredData, setFilteredData] = useState([]);
 
   const categoriesOption = useSelector(selectSubcategory);
@@ -133,10 +137,12 @@ const ProductListTable = (props) => {
     onMultipleActiveStatusUpdate,
     onMultipleStockStatusUpdate,
     handleToggleStatus,
+    handleStockStatus,
     handleEdit,
   } = props;
 
   /* eslint-disable arrow-body-style */
+  /* eslint-disable no-unneeded-ternary */
   const handleSearch = (event) => {
     const searchKeywords = event.target.value.toLowerCase();
 
@@ -155,14 +161,56 @@ const ProductListTable = (props) => {
   };
 
   const filterProduct = () => {
-    if (selectedCategory.length > 0) {
-      const selectedCatList = selectedCategory.map(({ uuid }) => uuid);
-      const filteredItem = initProduct.filter(({ sub_categories: subCat }) => {
-        return subCat.some(({ uuid }) => selectedCatList.includes(uuid));
-      });
+    const categoryFilterActivated = selectedCategoryFilter.length > 0;
+    const activeStatusFilterActivated = selectedActiveStatusFilter !== null;
+    const stockStatusFilterActivated = selectedStockStatusFilter !== null;
+
+    if (categoryFilterActivated || activeStatusFilterActivated || stockStatusFilterActivated) {
+      setFilterActivated(true);
+      const selectedCatList = selectedCategoryFilter.map(({ uuid }) => uuid);
+
+      const filteredItem = initProduct.filter(
+        ({ sub_categories: subCat, is_active: isActive, stock_status: stockStatus }) => {
+          let validCategory = true;
+          let validActiveStatus = true;
+          let validStockStatus = true;
+
+          if (categoryFilterActivated) {
+            switch (categoryFilterType) {
+              case 'any':
+                validCategory = subCat.some(({ uuid }) => selectedCatList.includes(uuid));
+                break;
+              case 'all':
+                validCategory = subCat.every(({ uuid }) => selectedCatList.includes(uuid));
+                break;
+              default:
+              // no default
+            }
+          }
+
+          if (activeStatusFilterActivated) {
+            const selectedActiveStatusFlag =
+              selectedActiveStatusFilter === 'Active' ? true : false;
+            validActiveStatus = isActive === selectedActiveStatusFlag;
+          }
+
+          if (stockStatusFilterActivated) {
+            validStockStatus = stockStatus === selectedStockStatusFilter;
+          }
+
+          // console.log('name:', name);
+          // console.log('category:', validCategory);
+          // console.log('active:', validActiveStatus);
+          // console.log('stock:', validStockStatus);
+          // console.log('\n');
+
+          return validCategory && validActiveStatus && validStockStatus;
+        }
+      );
       setFilteredData(filteredItem);
       setProducts(filteredItem);
     } else {
+      setFilterActivated(false);
       setFilteredData(initProduct);
       setProducts(initProduct);
     }
@@ -170,7 +218,20 @@ const ProductListTable = (props) => {
 
   useEffect(() => {
     filterProduct();
-  }, [selectedCategory]);
+  }, [
+    initProduct,
+    selectedCategoryFilter,
+    selectedActiveStatusFilter,
+    selectedStockStatusFilter,
+    categoryFilterType,
+  ]);
+
+  const clearFilters = () => {
+    setCategoryFilterType('any');
+    setSelectedCategoryFilter([]);
+    setSelectedActiveStatusFilter(null);
+    setSelectedStockStatusFilter(null);
+  };
 
   const handleMultipleDelete = () => {
     onMultipleDelete(selected, setSelected);
@@ -229,8 +290,7 @@ const ProductListTable = (props) => {
 
   const isSelected = (uuid) => selected.indexOf(uuid) !== -1;
 
-  const emptyRows =
-    rowsPerPage - Math.min(rowsPerPage, products.length - page * rowsPerPage);
+  const emptyRows = rowsPerPage - Math.min(rowsPerPage, products.length - page * rowsPerPage);
 
   return (
     <Paper className={classes.paper}>
@@ -241,11 +301,19 @@ const ProductListTable = (props) => {
         handleMultipleActiveStatusUpdate={handleMultipleActiveStatusUpdate}
         handleMultipleStockStatusUpdate={handleMultipleStockStatusUpdate}
         handleSearch={handleSearch}
-        setSelectedCategory={setSelectedCategory}
-        defaultValue={selectedCategory}
         categoriesOption={categoriesOption}
         filteredQuantity={products.length}
         productLoading={productLoading}
+        setCategoryFilterType={setCategoryFilterType}
+        setSelectedCategoryFilter={setSelectedCategoryFilter}
+        setSelectedActiveStatusFilter={setSelectedActiveStatusFilter}
+        setSelectedStockStatusFilter={setSelectedStockStatusFilter}
+        categoryFilterType={categoryFilterType}
+        selectedCategoryFilter={selectedCategoryFilter}
+        selectedActiveStatusFilter={selectedActiveStatusFilter}
+        selectedStockStatusFilter={selectedStockStatusFilter}
+        filterActivated={filterActivated}
+        clearFilters={clearFilters}
       />
       <TableContainer>
         <Table
@@ -280,6 +348,8 @@ const ProductListTable = (props) => {
                     handleDelete={handleDelete}
                     handleEdit={handleEdit}
                     handleToggleStatus={handleToggleStatus}
+                    handleStockStatus={handleStockStatus}
+                    productLoading={productLoading}
                   />
                 );
               })}

@@ -109,7 +109,9 @@ const ItemListTable = (props) => {
   const [selected, setSelected] = useState([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [selectedCategory, setSelectedCategory] = useState([]);
+  const [categoryFilterType, setCategoryFilterType] = useState('any');
+  const [selectedCategoryFilter, setSelectedCategoryFilter] = useState([]);
+  const [filterActivated, setFilterActivated] = useState(false);
   const [filteredData, setFilteredData] = useState([]);
 
   const categoriesOption = useSelector(selectSubcategory);
@@ -135,14 +137,31 @@ const ItemListTable = (props) => {
   };
 
   const filterItemCategory = () => {
-    if (selectedCategory.length > 0) {
-      const selectedCatList = selectedCategory.map(({ uuid }) => uuid);
+    const categoryFilterActivated = selectedCategoryFilter.length > 0;
+    if (categoryFilterActivated) {
+      setFilterActivated(true);
+
+      const selectedCatList = selectedCategoryFilter.map(({ uuid }) => uuid);
       const filteredItem = initItem.filter(({ sub_categories: subCat }) => {
-        return subCat.some(({ uuid }) => selectedCatList.includes(uuid));
+        let validCategory;
+
+        switch (categoryFilterType) {
+          case 'any':
+            validCategory = subCat.some(({ uuid }) => selectedCatList.includes(uuid));
+            break;
+          case 'all':
+            validCategory = subCat.every(({ uuid }) => selectedCatList.includes(uuid));
+            break;
+          default:
+          // no default
+        }
+        return validCategory;
       });
+
       setFilteredData(filteredItem);
       setItems(filteredItem);
     } else {
+      setFilterActivated(false);
       setFilteredData(initItem);
       setItems(initItem);
     }
@@ -150,7 +169,7 @@ const ItemListTable = (props) => {
 
   useEffect(() => {
     filterItemCategory();
-  }, [selectedCategory]);
+  }, [selectedCategoryFilter, categoryFilterType]);
 
   const handleMultipleDelete = () => {
     onMultipleDelete(selected, setSelected);
@@ -201,8 +220,7 @@ const ItemListTable = (props) => {
 
   const isSelected = (uuid) => selected.indexOf(uuid) !== -1;
 
-  const emptyRows =
-    rowsPerPage - Math.min(rowsPerPage, items.length - page * rowsPerPage);
+  const emptyRows = rowsPerPage - Math.min(rowsPerPage, items.length - page * rowsPerPage);
 
   return (
     <Paper className={classes.paper} elevation={4}>
@@ -211,9 +229,12 @@ const ItemListTable = (props) => {
         numSelected={selected.length}
         handleMultipleDelete={handleMultipleDelete}
         handleSearch={handleSearch}
-        setSelectedCategory={setSelectedCategory}
-        defaultValue={selectedCategory}
+        setCategoryFilterType={setCategoryFilterType}
+        categoryFilterType={categoryFilterType}
+        setSelectedCategoryFilter={setSelectedCategoryFilter}
+        selectedCategoryFilter={selectedCategoryFilter}
         categoriesOption={categoriesOption}
+        filterActivated={filterActivated}
         filteredQuantity={items.length}
       />
       <TableContainer>

@@ -12,6 +12,8 @@ import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import SearchIcon from '@mui/icons-material/Search';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import LocalGroceryStoreRoundedIcon from '@mui/icons-material/LocalGroceryStoreRounded';
 
 import { makeStyles } from '@mui/styles';
 
@@ -45,6 +47,7 @@ const useToolbarStyles = makeStyles((theme) => ({
 const EnhancedTableToolbar = (props) => {
   const classes = useToolbarStyles();
   const {
+    type,
     numSelected,
     handleMultipleDelete,
     handleSearch,
@@ -55,12 +58,13 @@ const EnhancedTableToolbar = (props) => {
   } = props;
 
   const [openFilter, setOpenFilter] = useState(false);
+  const [searchValue, setSearchValue] = useState('');
 
   const handleClickOpen = () => setOpenFilter(true);
-
   const handleClose = () => setOpenFilter(false);
 
-  console.log(filteredQuantity);
+  const updateSearchInput = (e) => setSearchValue(e.target.value);
+
   return (
     <Toolbar
       className={clsx(classes.root, {
@@ -75,6 +79,7 @@ const EnhancedTableToolbar = (props) => {
         defaultValue={defaultValue}
         filteredQuantity={filteredQuantity}
       />
+
       {numSelected > 0 ? (
         <Grid container sx={{ marginBottom: 3.5, marginTop: 3.5 }}>
           <Grid item xs={6} container justifyContent="flex-start" alignItems="center">
@@ -88,6 +93,24 @@ const EnhancedTableToolbar = (props) => {
             </Typography>
           </Grid>
           <Grid item xs={6} container justifyContent="flex-end" alignItems="center">
+            {type === 'product' ? (
+              <>
+                <Tooltip title="Active Status">
+                  <IconButton className={classes.selected} aria-label="update-active">
+                    <CheckCircleIcon />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Stock Status">
+                  <IconButton
+                    className={classes.selected}
+                    aria-label="update-stock-status"
+                    // onClick={handleMultipleDelete}
+                  >
+                    <LocalGroceryStoreRoundedIcon />
+                  </IconButton>
+                </Tooltip>
+              </>
+            ) : null}
             <Tooltip title="Delete">
               <IconButton
                 className={classes.selected}
@@ -104,12 +127,13 @@ const EnhancedTableToolbar = (props) => {
           <Grid item xs={9}>
             <TextField
               id="outlined-basic"
-              placeholder="Search for items ..."
-              // label="Search for Items"
+              placeholder={`Search for ${type}...`}
               autoComplete="off"
               variant="outlined"
               style={{ width: '50%' }}
               onChange={handleSearch}
+              onInput={updateSearchInput}
+              defaultValue={searchValue}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -130,13 +154,13 @@ const EnhancedTableToolbar = (props) => {
           >
             {defaultValue.length > 0 ? (
               <>
-                <b>{filteredQuantity}</b> &nbsp;&nbsp; <span>Items found</span>
+                <b>{filteredQuantity}</b> &nbsp;&nbsp; <span>{type}s found</span>
                 &nbsp;&nbsp;
               </>
             ) : null}
           </Grid>
           <Grid item xs={1} container justifyContent="flex-end" alignItems="center">
-            {filteredQuantity > 0 ? (
+            {filteredQuantity > 0 || defaultValue.length > 0 ? (
               <IconButton
                 onClick={handleClickOpen}
                 style={{

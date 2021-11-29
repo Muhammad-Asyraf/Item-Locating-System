@@ -27,7 +27,7 @@ import {
 } from '../../../redux/features/authSlice';
 import { auth } from '../../../services/firebase';
 
-const drawerWidth = 228;
+const drawerWidth = 240;
 const useStyles = makeStyles((theme) => ({
   appBar: {
     [theme.breakpoints.up('lg')]: {

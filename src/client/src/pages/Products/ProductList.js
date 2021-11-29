@@ -1,29 +1,39 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
 
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
-import CircularProgress from '@mui/material/CircularProgress';
+import LinearProgress from '@mui/material/LinearProgress';
+import Breadcrumbs from '@mui/material/Breadcrumbs';
 import { makeStyles } from '@mui/styles';
 
 import AddIcon from '@mui/icons-material/Add';
 
-import ProductListTable from '../../components/Products/ProductListTable';
-
 import {
   selectProducts,
-  selectIsLoading,
-  processed,
+  processed as productProccessed,
+  selectIsLoading as productLoading,
+  // processingRequest,
+  quickUpdateProducts,
 } from '../../redux/features/productSlice';
-import { selectAuthHeader } from '../../redux/features/authSlice';
+import {
+  processed,
+  processingRequest as processingCategory,
+  selectIsLoading as categoryLoading,
+} from '../../redux/features/categorySlice';
+import { setNewNotification } from '../../redux/features/notificationSlice';
 
 import {
   getProducts,
   deleteProduct,
   deleteMultipleProducts,
+  patchSingleProduct,
+  patchMultipleProducts,
 } from '../../redux/thunks/productThunk';
+import { getSubcategories } from '../../redux/thunks/categoryThunk';
+
+import ProductListTable from '../../components/Products/ProductListTable';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -43,12 +53,12 @@ const useStyles = makeStyles(() => ({
     top: 20,
     width: 1,
   },
-  circular: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: '80vh',
-    width: '80vw',
+  linear: {
+    position: 'relative',
+    top: '10px !important',
+    left: '-45px !important',
+    width: '100vw',
+    height: '7px !important',
   },
   addButton: {
     height: '50px',
@@ -64,100 +74,324 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
+/* eslint-disable no-unneeded-ternary */
 const ProductList = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
-  const productData = useSelector(selectProducts);
-  const isLoading = useSelector(selectIsLoading);
-  const authHeader = useSelector(selectAuthHeader);
+
+  const initProduct = useSelector(selectProducts);
+  const isProductLoading = useSelector(productLoading);
+  const isCategoryLoading = useSelector(categoryLoading);
+
   const storeUrl = localStorage.getItem('storeUrl');
-  const [products, setProducts] = React.useState([]);
+  const storeName = localStorage.getItem('storeName');
+
+  const [products, setProducts] = useState([]);
 
   useEffect(() => {
     (async () => {
-      await dispatch(getProducts(authHeader));
-      dispatch(processed());
+      dispatch(processingCategory());
+      const { type: getProductsProcessed, payload } = await dispatch(getProducts());
+      const { type: getSubCatProcessed } = await dispatch(getSubcategories());
+
+      if (
+        getProductsProcessed.includes('fulfilled') &&
+        getSubCatProcessed.includes('fulfilled')
+      ) {
+        setProducts(payload.products);
+        dispatch(processed());
+        dispatch(productProccessed());
+      }
     })();
   }, []);
 
-  useEffect(() => {
-    if (productData.length > 0) {
-      setProducts(productData);
-    }
-  }, [productData]);
+  const handleEdit = () => {
+    dispatch(processingCategory());
+  };
 
   const handleDelete = async (uuid) => {
-    const newProductList = products.filter((item) => item.uuid !== uuid);
-    await dispatch(deleteProduct({ uuid, authHeader }));
-    setProducts(newProductList);
+    const newInitProduct = initProduct.filter((item) => item.uuid !== uuid);
+    const newProducts = products.filter((item) => item.uuid !== uuid);
+
+    const { type } = await dispatch(deleteProduct({ uuid }));
+
+    if (type.includes('fulfilled')) {
+      dispatch(quickUpdateProducts({ products: newInitProduct }));
+      setProducts(newProducts);
+
+      await dispatch(
+        setNewNotification({
+          message: 'Product successfully deleted',
+          backgroundColor: 'green',
+          severity: 'success',
+        })
+      );
+    }
   };
 
   const handleMultipleDelete = async (selected, setSelected) => {
-    const newProductList = products.filter(({ uuid }) => !selected.includes(uuid));
+    const newInitProduct = initProduct.filter(({ uuid }) => !selected.includes(uuid));
+    const newProducts = products.filter(({ uuid }) => !selected.includes(uuid));
     const payload = { listToDelete: selected };
 
-    await dispatch(deleteMultipleProducts({ payload, authHeader }));
-    setProducts(newProductList);
-    setSelected([]);
-  };
+    const { type } = await dispatch(deleteMultipleProducts({ payload }));
 
-  const handleToggleStatus = async (uuid, status) => {
-    try {
-      const payload = {
-        is_active: !status,
-      };
-      const endpointURL = `/api/backoffice/product-service/product/${uuid}`;
-      await axios.patch(endpointURL, payload, authHeader);
+    if (type.includes('fulfilled')) {
+      dispatch(quickUpdateProducts({ products: newInitProduct }));
+      setProducts(newProducts);
+      setSelected([]);
 
-      const newProductList = products.map((product) => {
-        if (product.uuid === uuid) {
-          return {
-            ...product,
-            is_active: !status,
-          };
-        }
-        return product;
-      });
-      setProducts(newProductList);
-    } catch (err) {
-      console.log(err);
+      await dispatch(
+        setNewNotification({
+          message: 'All selected products successfully deleted',
+          backgroundColor: 'green',
+          severity: 'success',
+        })
+      );
     }
   };
 
-  if (isLoading) {
+  const handleToggleStatus = async (uuid, status) => {
+    const payload = { is_active: !status };
+    const newInitProduct = initProduct.map((product) => {
+      if (product.uuid === uuid) {
+        return {
+          ...product,
+          is_active: !status,
+        };
+      }
+      return product;
+    });
+
+    const newProducts = products.map((product) => {
+      if (product.uuid === uuid) {
+        return {
+          ...product,
+          is_active: !status,
+        };
+      }
+      return product;
+    });
+
+    const { type } = await dispatch(patchSingleProduct({ uuid, payload }));
+
+    if (type.includes('fulfilled')) {
+      dispatch(quickUpdateProducts({ products: newInitProduct }));
+      setProducts(newProducts);
+
+      await dispatch(
+        setNewNotification({
+          message: 'Product active status successfully updated',
+          backgroundColor: 'green',
+          severity: 'success',
+        })
+      );
+    }
+  };
+
+  const handleMultipleToggleStatus = async (selected, status, setSelected, handleClose) => {
+    const updatedStatus = status === 'activate' ? true : false;
+    const payload = {
+      listToUpdate: selected,
+      updatedPayload: {
+        is_active: updatedStatus,
+      },
+    };
+
+    const newInitProduct = initProduct.map((product) => {
+      if (selected.includes(product.uuid)) {
+        return {
+          ...product,
+          is_active: updatedStatus,
+        };
+      }
+      return product;
+    });
+
+    const newProducts = products.map((product) => {
+      if (selected.includes(product.uuid)) {
+        return {
+          ...product,
+          is_active: updatedStatus,
+        };
+      }
+      return product;
+    });
+
+    const { type } = await dispatch(patchMultipleProducts({ payload }));
+
+    if (type.includes('fulfilled')) {
+      dispatch(quickUpdateProducts({ products: newInitProduct }));
+      setProducts(newProducts);
+      setSelected([]);
+      handleClose();
+
+      await dispatch(
+        setNewNotification({
+          message: 'All selected products status successfully updated',
+          backgroundColor: 'green',
+          severity: 'success',
+        })
+      );
+    }
+  };
+
+  const handleStockStatus = async (uuid, status, handleClose) => {
+    // console.log(uuid);
+    // console.log(status);
+    // console.log(handleClose);
+    const payload = { stock_status: status };
+    const newInitProduct = initProduct.map((product) => {
+      if (product.uuid === uuid) {
+        return {
+          ...product,
+          stock_status: status,
+        };
+      }
+      return product;
+    });
+
+    const newProducts = products.map((product) => {
+      if (product.uuid === uuid) {
+        return {
+          ...product,
+          stock_status: status,
+        };
+      }
+      return product;
+    });
+
+    const { type } = await dispatch(patchSingleProduct({ uuid, payload }));
+
+    if (type.includes('fulfilled')) {
+      dispatch(quickUpdateProducts({ products: newInitProduct }));
+      setProducts(newProducts);
+      handleClose();
+
+      await dispatch(
+        setNewNotification({
+          message: 'Product stock status successfully updated',
+          backgroundColor: 'green',
+          severity: 'success',
+        })
+      );
+    }
+  };
+
+  const handleMultipleStockStatus = async (selected, status, setSelected, handleClose) => {
+    const payload = {
+      listToUpdate: selected,
+      updatedPayload: {
+        stock_status: status,
+      },
+    };
+
+    const newInitProduct = initProduct.map((product) => {
+      if (selected.includes(product.uuid)) {
+        return {
+          ...product,
+          stock_status: status,
+        };
+      }
+      return product;
+    });
+
+    const newProducts = products.map((product) => {
+      if (selected.includes(product.uuid)) {
+        return {
+          ...product,
+          stock_status: status,
+        };
+      }
+      return product;
+    });
+
+    const { type } = await dispatch(patchMultipleProducts({ payload }));
+
+    if (type.includes('fulfilled')) {
+      dispatch(quickUpdateProducts({ products: newInitProduct }));
+      setProducts(newProducts);
+      setSelected([]);
+      handleClose();
+
+      await dispatch(
+        setNewNotification({
+          message: 'All selected products status successfully updated',
+          backgroundColor: 'green',
+          severity: 'success',
+        })
+      );
+    }
+  };
+
+  if (isCategoryLoading) {
     return (
-      <div className={classes.circular}>
-        <CircularProgress size={70} color="secondary" />
+      <div>
+        <LinearProgress
+          className={classes.linear}
+          sx={{
+            backgroundImage: 'linear-gradient(-225deg, #473B7B 0%, #003366 51%, #30D2BE 100%)',
+          }}
+        />
       </div>
     );
   }
+
   return (
-    <div className={classes.root}>
-      <Grid container spacing={2} style={{ marginTop: '30px' }}>
-        <Grid item sm={12} md={8}>
-          <h1>Products</h1>
-          <p>Add, view and edit your products all in one place.</p>
+    <Grid container spacing={2} style={{ marginTop: '30px' }}>
+      <Grid item xs={12} container>
+        <Grid item xs={8}>
+          <h1 style={{ marginBottom: 3, marginTop: 3 }}>Product Catalogue</h1>
+          <Breadcrumbs separator="•" aria-label="breadcrumb">
+            <div style={{ fontSize: '0.875rem' }}>{storeName}&nbsp;&nbsp;</div>,
+            <div style={{ fontSize: '0.875rem' }}>&nbsp;&nbsp;Catalogue&nbsp;&nbsp;</div>,
+            <div style={{ fontSize: '0.875rem' }}>&nbsp;&nbsp;Product&nbsp;&nbsp;</div>,
+            <div style={{ fontSize: '0.875rem' }}>&nbsp;&nbsp;List</div>
+          </Breadcrumbs>
         </Grid>
-        <Grid item sm={12} md={4}>
+        <Grid
+          item
+          sm={4}
+          container
+          direction="row"
+          justifyContent="flex-end"
+          alignItems="center"
+        >
           <Button
             variant="contained"
             color="primary"
             type="button"
-            className={classes.addButton}
             component={Link}
             to={`/${storeUrl}/product/create`}
+            sx={{
+              textTransform: 'none',
+              fontSize: '0.95rem',
+              borderRadius: 3,
+              height: 50,
+              paddingRight: 3,
+              boxShadow: 'rgba(53, 132, 167, 0.44) 0px 8px 16px 0px !important',
+            }}
           >
-            <AddIcon style={{ marginRight: 10 }} /> Add Product
+            <AddIcon style={{ marginRight: 10 }} fontSize="small" /> New Product
           </Button>
         </Grid>
       </Grid>
-      <ProductListTable
-        products={products}
-        handleDelete={handleDelete}
-        onMultipleDelete={handleMultipleDelete}
-        handleToggleStatus={handleToggleStatus}
-      />
-    </div>
+      <Grid item xs={12}>
+        <ProductListTable
+          initProduct={initProduct}
+          products={products}
+          productLoading={isProductLoading}
+          setProducts={setProducts}
+          handleDelete={handleDelete}
+          onMultipleDelete={handleMultipleDelete}
+          onMultipleActiveStatusUpdate={handleMultipleToggleStatus}
+          onMultipleStockStatusUpdate={handleMultipleStockStatus}
+          handleToggleStatus={handleToggleStatus}
+          handleStockStatus={handleStockStatus}
+          handleEdit={handleEdit}
+        />
+      </Grid>
+    </Grid>
   );
 };
 

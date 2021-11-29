@@ -95,3 +95,27 @@
 .ql-toolbar.ql-snow .ql-picker-label {
   font-weight: bolder !important;
 }
+
+.ql-toolbar.ql-snow .ql-expanded.ql-align .ql-picker-options {
+  padding: 0px !important;
+  display: flex !important;
+}
+
+.ql-toolbar.ql-snow .ql-expanded .ql-picker-options {
+  padding: 0px !important;
+  margin-top: 6px !important;
+  border: none !important;
+  max-height: 200px !important;
+  overflow: auto !important;
+  box-shadow: rgba(145, 158, 171, 0.4) 0px 0px 2px 0px,
+    rgba(145, 158, 171, 0.4) 0px 20px 40px -4px !important;
+  border-radius: 8px !important;
+  background-color: rgb(255, 255, 255) !important;
+}
+
+.ql-toolbar.ql-snow .ql-expanded .ql-picker-label {
+  border-radius: 4px;
+  color: rgb(145, 158, 171);
+  background-color: rgba(145, 158, 171, 0.14);
+  border-color: transparent !important;
+}

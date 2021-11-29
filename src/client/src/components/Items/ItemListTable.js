@@ -10,14 +10,69 @@ import TableContainer from '@mui/material/TableContainer';
 import TablePagination from '@mui/material/TablePagination';
 import { makeStyles } from '@mui/styles';
 
-import EnhancedTableHead from './EnhancedTableHead';
-import EnhancedTableToolbar from './EnhancedTableToolbar';
+import AttachMoneyRoundedIcon from '@mui/icons-material/AttachMoneyRounded';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import CreditCardRoundedIcon from '@mui/icons-material/CreditCardRounded';
+import TodayIcon from '@mui/icons-material/Today';
+import CategoryIcon from '@mui/icons-material/Category';
+import QrCode2RoundedIcon from '@mui/icons-material/QrCode2Rounded';
+
+import EnhancedTableHead from '../Table/EnhancedTableHead';
+import EnhancedTableToolbar from '../Table/EnhancedTableToolbar';
 import ItemTableRow from './ItemTableRow';
 
 import { selectSubcategory } from '../../redux/features/categorySlice';
 import { getComparator, stableSort } from '../../utils/general';
 
-// import useFirstRender from '../../hooks/useFirstRender';
+const getItemHeadCells = () => [
+  {
+    id: 'name',
+    align: 'left',
+    disablePadding: true,
+    label: 'Name',
+    icon: <CreditCardRoundedIcon fontSize="medium" />,
+  },
+  {
+    id: 'barcode_number',
+    align: 'center',
+    disablePadding: true,
+    label: 'Barcode',
+    icon: <QrCode2RoundedIcon fontSize="medium" />,
+  },
+  {
+    id: 'category',
+    align: 'center',
+    disablePadding: true,
+    label: 'Categories',
+    icon: <CategoryIcon fontSize="medium" />,
+  },
+  {
+    id: 'wholesale_price',
+    align: 'center',
+    disablePadding: true,
+    label: 'Supplier Price',
+    icon: <AttachMoneyRoundedIcon fontSize="medium" />,
+  },
+  {
+    id: 'updated_at',
+    align: 'center',
+    disablePadding: false,
+    label: 'Updated',
+    icon: <CalendarTodayIcon fontSize="small" />,
+  },
+  {
+    id: 'created_at',
+    align: 'center',
+    disablePadding: false,
+    label: 'Created',
+    icon: <TodayIcon fontSize="medium" />,
+  },
+  {
+    id: 'action',
+    align: 'left',
+    disablePadding: false,
+  },
+];
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -34,9 +89,6 @@ const useStyles = makeStyles((theme) => ({
   table: {
     minWidth: 750,
   },
-  itemOption: {
-    color: 'red !important',
-  },
   addButton: {
     height: '40px',
     color: 'white',
@@ -51,23 +103,20 @@ const useStyles = makeStyles((theme) => ({
 
 const ItemListTable = (props) => {
   const classes = useStyles();
-  // const isFirstRender = useFirstRender();
+  const itemHeadCells = getItemHeadCells();
   const [order, setOrder] = useState('asc');
   const [orderBy, setOrderBy] = useState('calories');
   const [selected, setSelected] = useState([]);
   const [page, setPage] = useState(0);
-  const [selectedCategory, setSelectedCategory] = useState([]);
-  const [filteredData, setFilteredData] = useState([]);
-  // const [selectedCategoryValue, setSelectedCategoryValue] = useState([]);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [categoryFilterType, setCategoryFilterType] = useState('any');
+  const [selectedCategoryFilter, setSelectedCategoryFilter] = useState([]);
+  const [filterActivated, setFilterActivated] = useState(false);
+  const [filteredData, setFilteredData] = useState([]);
 
   const categoriesOption = useSelector(selectSubcategory);
 
-  const { itemData, items, setItems, handleDelete, onMultipleDelete, handleEdit } = props;
-
-  const handleMultipleDelete = () => {
-    onMultipleDelete(selected, setSelected);
-  };
+  const { initItem, items, setItems, handleDelete, onMultipleDelete, handleEdit } = props;
 
   /* eslint-disable arrow-body-style */
   const handleSearch = (event) => {
@@ -87,21 +136,44 @@ const ItemListTable = (props) => {
     setItems(filteredItems);
   };
 
-  useEffect(() => {
-    const selectedCatList = selectedCategory.map(({ uuid }) => uuid);
-    let filteredItem;
+  const filterItemCategory = () => {
+    const categoryFilterActivated = selectedCategoryFilter.length > 0;
+    if (categoryFilterActivated) {
+      setFilterActivated(true);
 
-    if (selectedCategory.length > 0) {
-      filteredItem = itemData.filter(({ sub_categories: subCat }) => {
-        return subCat.some(({ uuid }) => selectedCatList.includes(uuid));
+      const selectedCatList = selectedCategoryFilter.map(({ uuid }) => uuid);
+      const filteredItem = initItem.filter(({ sub_categories: subCat }) => {
+        let validCategory;
+
+        switch (categoryFilterType) {
+          case 'any':
+            validCategory = subCat.some(({ uuid }) => selectedCatList.includes(uuid));
+            break;
+          case 'all':
+            validCategory = subCat.every(({ uuid }) => selectedCatList.includes(uuid));
+            break;
+          default:
+          // no default
+        }
+        return validCategory;
       });
+
       setFilteredData(filteredItem);
       setItems(filteredItem);
     } else {
-      setFilteredData(itemData);
-      setItems(itemData);
+      setFilterActivated(false);
+      setFilteredData(initItem);
+      setItems(initItem);
     }
-  }, [selectedCategory]);
+  };
+
+  useEffect(() => {
+    filterItemCategory();
+  }, [selectedCategoryFilter, categoryFilterType]);
+
+  const handleMultipleDelete = () => {
+    onMultipleDelete(selected, setSelected);
+  };
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -148,18 +220,21 @@ const ItemListTable = (props) => {
 
   const isSelected = (uuid) => selected.indexOf(uuid) !== -1;
 
-  const emptyRows =
-    rowsPerPage - Math.min(rowsPerPage, items.length - page * rowsPerPage);
+  const emptyRows = rowsPerPage - Math.min(rowsPerPage, items.length - page * rowsPerPage);
 
   return (
     <Paper className={classes.paper} elevation={4}>
       <EnhancedTableToolbar
+        type="item"
         numSelected={selected.length}
         handleMultipleDelete={handleMultipleDelete}
         handleSearch={handleSearch}
-        setSelectedCategory={setSelectedCategory}
-        defaultValue={selectedCategory}
+        setCategoryFilterType={setCategoryFilterType}
+        categoryFilterType={categoryFilterType}
+        setSelectedCategoryFilter={setSelectedCategoryFilter}
+        selectedCategoryFilter={selectedCategoryFilter}
         categoriesOption={categoriesOption}
+        filterActivated={filterActivated}
         filteredQuantity={items.length}
       />
       <TableContainer>
@@ -169,6 +244,7 @@ const ItemListTable = (props) => {
           aria-label="enhanced table"
         >
           <EnhancedTableHead
+            headCells={itemHeadCells}
             numSelected={selected.length}
             order={order}
             orderBy={orderBy}
@@ -176,7 +252,6 @@ const ItemListTable = (props) => {
             onRequestSort={handleRequestSort}
             rowCount={items.length}
           />
-          {/* <div style={{ height: '10px', width: '100%', clear: 'both' }} /> */}
           <TableBody>
             <TableRow style={{ height: '10px' }} />
             {stableSort(items, getComparator(order, orderBy))

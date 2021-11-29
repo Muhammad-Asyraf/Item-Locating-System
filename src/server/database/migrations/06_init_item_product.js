@@ -5,6 +5,7 @@ exports.up = async (knex) => {
     table.increments('id').primary();
     table.uuid('product_uuid').references('product.uuid').onDelete('CASCADE');
     table.uuid('item_uuid').references('item.uuid').onDelete('CASCADE');
+    table.integer('item_quantity');
     table.timestamps(true, true);
   });
 };

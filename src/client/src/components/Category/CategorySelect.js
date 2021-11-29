@@ -13,7 +13,7 @@ const CategorySelect = (props) => {
   };
 
   return (
-    <Stack spacing={3} sx={{ width: '100%', mb: 2 }}>
+    <Stack spacing={3} sx={{ width: '100%' }}>
       <Autocomplete
         id="tags-outlined"
         multiple

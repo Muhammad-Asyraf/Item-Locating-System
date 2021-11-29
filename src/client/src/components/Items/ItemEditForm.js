@@ -13,12 +13,10 @@ import IconButton from '@mui/material/IconButton';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
 import FormHelperText from '@mui/material/FormHelperText';
 import InputAdornment from '@mui/material/InputAdornment';
 import AttachMoneyRoundedIcon from '@mui/icons-material/AttachMoneyRounded';
-import CircularProgress from '@mui/material/CircularProgress';
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
 
@@ -44,7 +42,7 @@ const getEditorModules = () => ({
     [{ size: [] }],
     ['bold', 'italic', 'underline', 'strike', 'blockquote'],
     [{ list: 'ordered' }, { list: 'bullet' }, { indent: '-1' }, { indent: '+1' }],
-
+    [{ align: ['', 'center', 'right', 'justify'] }],
     ['link', 'clean'],
   ],
   clipboard: {
@@ -63,6 +61,7 @@ const getEditorFormat = () => [
   'list',
   'bullet',
   'indent',
+  'align',
   'link',
 ];
 
@@ -154,12 +153,13 @@ const ItemEditForm = (props) => {
   const quillFormats = getEditorFormat();
   const storeUUID = localStorage.getItem('storeUUID');
 
-  const { match, onSubmit, currentItem, isItemLoading, categoryOptions } = props;
+  const { match, onSubmit, currentItem, categoryOptions } = props;
 
   const nameRef = useRef();
   const barcodeNumberRef = useRef();
   const wholesalePriceRef = useRef();
-
+  const [quillText, setQuillText] = useState({ editorHtml: currentItem.note });
+  const [openModal, setOpenModal] = useState(false);
   const [itemName, setItemName] = useState({
     value: currentItem.name,
     error: false,
@@ -175,13 +175,46 @@ const ItemEditForm = (props) => {
   const [selectedCategory, setSelectedCategory] = useState(
     currentItem.sub_categories.map(({ category, name, ...uuid }) => uuid)
   );
-  const [quillText, setQuillText] = useState({ editorHtml: currentItem.note });
-  const [openModal, setOpenModal] = useState(false);
+  const [validationComplete, setValidationComplete] = useState(false);
   const [image, setImage] = useState({
     imgFiles: [],
     imgPreviews: [],
     error: false,
   });
+
+  useEffect(() => {
+    const reset = false;
+
+    if (
+      validationComplete === true &&
+      barcodeNumber.error === false &&
+      itemName.error === false &&
+      wholesalePrice.error === false
+    ) {
+      const formData = new FormData();
+
+      formData.append('barcode_number', barcodeNumber.value);
+      formData.append('name', itemName.value);
+      formData.append('wholesale_price', wholesalePrice.value);
+      formData.append('note', quillText.editorHtml);
+      formData.append('sub_category', JSON.stringify(selectedCategory));
+      formData.append('store_uuid', storeUUID);
+      formData.append('old_imgs', JSON.stringify(currentItem.images));
+
+      for (const key of Object.keys(image.imgFiles)) {
+        formData.append('imgCollection', image.imgFiles[key], image.imgFiles[key].name);
+      }
+
+      const data = {
+        uuid: match.params.uuid,
+        formData,
+      };
+
+      onSubmit(data);
+    }
+
+    setValidationComplete(reset);
+  }, [validationComplete]);
 
   const handleOpenModal = (e) => {
     if (e.target.tagName === 'IMG') {
@@ -290,26 +323,7 @@ const ItemEditForm = (props) => {
     validateName(nameRef.current.value);
     validatePrice(wholesalePriceRef.current.value);
 
-    const formData = new FormData();
-
-    formData.append('barcode_number', barcodeNumber.value);
-    formData.append('name', itemName.value);
-    formData.append('wholesale_price', wholesalePrice.value);
-    formData.append('note', quillText.editorHtml);
-    formData.append('sub_category', JSON.stringify(selectedCategory));
-    formData.append('store_uuid', storeUUID);
-    formData.append('old_imgs', JSON.stringify(currentItem.images));
-
-    for (const key of Object.keys(image.imgFiles)) {
-      formData.append('imgCollection', image.imgFiles[key], image.imgFiles[key].name);
-    }
-
-    const data = {
-      uuid: match.params.uuid,
-      formData,
-    };
-
-    onSubmit(data);
+    setValidationComplete(true);
   };
 
   const handleChange = (value) => {
@@ -389,15 +403,9 @@ const ItemEditForm = (props) => {
     handleImagePreview(selectedImages);
   }, []);
 
-  // const onClickUrl = (e, path) => {
-  //   if (e.target.tagName === 'IMG') {
-  //     const newWindow = window.open(path, '_blank', 'noopener,noreferrer');
-  //     if (newWindow) newWindow.opener = null;
-  //   }
-  // };
-
   return (
     <form
+      id="item-edit-form"
       className={classes.form}
       onSubmit={handleSubmit}
       autoComplete="off"
@@ -483,7 +491,9 @@ const ItemEditForm = (props) => {
               setSelectedCategory={setSelectedCategory}
               defaultValue={currentItem.sub_categories}
             />
-            <p className={classes.inputTiltle}>Add Images</p>
+            <p className={classes.inputTiltle} style={{ marginTop: 20 }}>
+              Add Images
+            </p>
             <Box style={{ marginBottom: 30 }}>
               <input
                 id="imgs"
@@ -570,7 +580,7 @@ const ItemEditForm = (props) => {
               />
             </Grid>
           </Paper>
-          <Button
+          {/* <Button
             variant="contained"
             color="primary"
             type="submit"
@@ -586,7 +596,7 @@ const ItemEditForm = (props) => {
             ) : (
               <>Update</>
             )}
-          </Button>
+          </Button> */}
         </Grid>
       </Grid>
     </form>

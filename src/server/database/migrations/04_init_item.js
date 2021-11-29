@@ -11,8 +11,8 @@ exports.up = async (knex) => {
       .references('store.uuid')
       .onDelete('CASCADE')
       .notNullable();
-    table.timestamps(true, true);
     table.text('note');
+    table.timestamps(true, true);
   });
 };
 

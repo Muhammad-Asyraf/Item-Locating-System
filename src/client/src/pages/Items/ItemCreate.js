@@ -3,10 +3,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useHistory, Link } from 'react-router-dom';
 
 import IconButton from '@mui/material/IconButton';
+import Button from '@mui/material/Button';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Grid from '@mui/material/Grid';
 import LinearProgress from '@mui/material/LinearProgress';
 import KeyboardReturnRoundedIcon from '@mui/icons-material/KeyboardReturnRounded';
+import SaveRoundedIcon from '@mui/icons-material/SaveRounded';
+import CircularProgress from '@mui/material/CircularProgress';
 import { makeStyles } from '@mui/styles';
 
 import { getSubcategories } from '../../redux/thunks/categoryThunk';
@@ -53,6 +56,7 @@ const ItemCreate = () => {
   const categoryOptions = useSelector(selectSubcategory);
 
   useEffect(async () => {
+    dispatch(processed());
     dispatch(processingCatRequest());
     await dispatch(getSubcategories());
     dispatch(catProcessed());
@@ -64,15 +68,17 @@ const ItemCreate = () => {
     const { type, payload: resPayload } = await dispatch(addItem({ payload }));
 
     if (type.includes('fulfilled')) {
-      history.push(`/${storeUrl}/item/list`);
+      dispatch(processed());
       await dispatch(
         setNewNotification({
           message: 'Item successfully added.',
-          backgroundColor: '#202124',
+          backgroundColor: 'green',
           severity: 'success',
         })
       );
+      history.push(`/${storeUrl}/item/list`);
     } else if (type.includes('rejected')) {
+      dispatch(processed());
       await dispatch(
         setNewNotification({
           message: resPayload.message,
@@ -81,7 +87,6 @@ const ItemCreate = () => {
         })
       );
     }
-    dispatch(processed());
   };
 
   if (isCategoryLoading) {
@@ -101,7 +106,7 @@ const ItemCreate = () => {
   return (
     <div className={classes.root}>
       <Grid container spacing={2} style={{ marginTop: '30px' }}>
-        <Grid item xs={12} container>
+        <Grid item xs={8} container>
           <Grid item xs={8}>
             <h1 style={{ marginBottom: 1, marginTop: 3, fontSize: '2em' }}>
               <span> Add a new item </span>
@@ -122,12 +127,40 @@ const ItemCreate = () => {
             </Breadcrumbs>
           </Grid>
         </Grid>
+        <Grid
+          item
+          xs={4}
+          container
+          direction="row"
+          justifyContent="flex-end"
+          alignItems="center"
+        >
+          <Button
+            form="item-form"
+            variant="contained"
+            color="primary"
+            type="submit"
+            sx={{
+              textTransform: 'none',
+              fontSize: '0.95rem',
+              borderRadius: 3,
+              height: 50,
+              width: '30%',
+              paddingRight: 3,
+              boxShadow: 'rgba(53, 132, 167, 0.44) 0px 8px 16px 0px !important',
+            }}
+          >
+            {isItemLoading ? (
+              <CircularProgress size={25} style={{ color: 'white' }} />
+            ) : (
+              <>
+                <SaveRoundedIcon style={{ marginRight: 10 }} fontSize="small" /> Save
+              </>
+            )}
+          </Button>
+        </Grid>
         <Grid item xs={12}>
-          <ItemForm
-            onSubmit={handleSubmit}
-            isItemLoading={isItemLoading}
-            categoryOptions={categoryOptions}
-          />
+          <ItemForm onSubmit={handleSubmit} categoryOptions={categoryOptions} />
         </Grid>
       </Grid>
     </div>

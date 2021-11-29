@@ -78,9 +78,11 @@ export const addItem = createAsyncThunk(
 
 export const deleteItem = createAsyncThunk(
   'item/deleteItem',
-  async ({ uuid, authHeader }, { rejectWithValue }) => {
+  async ({ uuid }, { rejectWithValue, getState }) => {
     try {
+      const { authHeader } = await getState().auth;
       const endpointURL = `/api/backoffice/item-service/item/${uuid}`;
+
       await axios.delete(endpointURL, authHeader);
 
       return true;
@@ -99,9 +101,11 @@ export const deleteItem = createAsyncThunk(
 
 export const deleteMultipleItems = createAsyncThunk(
   'item/deleteMultipleItems',
-  async ({ listToDelete, authHeader }, { rejectWithValue }) => {
+  async ({ listToDelete }, { rejectWithValue, getState }) => {
     try {
+      const { authHeader } = await getState().auth;
       const endpointURL = '/api/backoffice/item-service/item/delete';
+
       await axios.post(endpointURL, { listToDelete }, authHeader);
 
       return true;

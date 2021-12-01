@@ -237,9 +237,6 @@ const ProductList = () => {
   };
 
   const handleStockStatus = async (uuid, status, handleClose) => {
-    // console.log(uuid);
-    // console.log(status);
-    // console.log(handleClose);
     const payload = { stock_status: status };
     const newInitProduct = initProduct.map((product) => {
       if (product.uuid === uuid) {

@@ -14,6 +14,7 @@ import 'swiper/swiper-bundle.min.css';
 import 'swiper/swiper.min.css';
 
 import Box from '@mui/material/Box';
+import Switch from '@mui/material/Switch';
 import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
 import Checkbox from '@mui/material/Checkbox';
@@ -29,8 +30,7 @@ import { makeStyles } from '@mui/styles';
 
 import RowOptions from './RowOptions';
 import ImageModal from '../Images/ImageModal';
-
-// import { isSameDay } from '../../utils/general';
+import StockStatusDialog from './StockStatusDialog';
 
 SwiperCore.use([Pagination, Navigation]);
 
@@ -38,7 +38,6 @@ const useStyles = makeStyles(() => ({
   tableRow: {
     '&:hover': {
       backgroundColor: 'rgb(244, 246, 248) !important',
-      // backgroundColor: 'rgb(244, 246, 248) !important',
     },
   },
   selected: {
@@ -47,24 +46,45 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const ItemTableRow = (props) => {
+/* eslint-disable no-nested-ternary */
+/* eslint-disable indent */
+const ProductTableRow = (props) => {
   const classes = useStyles();
   const [open, setOpen] = useState(false);
   const [openModal, setOpenModal] = useState(false);
-  const { item, isItemSelected, labelId, handleClick, handleDelete, handleEdit } = props;
+  const [openStockStatusDialog, setOpenStockStatusDialog] = useState(false);
+
+  const {
+    product,
+    isProductSelected,
+    labelId,
+    handleClick,
+    handleDelete,
+    handleEdit,
+    handleToggleStatus,
+    handleStockStatus,
+    productLoading,
+  } = props;
 
   const handleOpenModal = () => setOpenModal(true);
   const handleCloseModal = () => setOpenModal(false);
+
+  const handleClickOpenStockStatusDialog = () => setOpenStockStatusDialog(true);
+  const handleCloseStockStatusDialog = () => setOpenStockStatusDialog(false);
+
+  const handleUpdateStockStatus = (status, handleClose) => {
+    handleStockStatus(product.uuid, status, handleClose);
+  };
 
   return (
     <>
       <TableRow
         hover
         role="checkbox"
-        aria-checked={isItemSelected}
+        aria-checked={isProductSelected}
         tabIndex={-1}
-        key={item.name}
-        selected={isItemSelected}
+        key={product.name}
+        selected={isProductSelected}
         classes={{ selected: classes.selected }}
         className={classes.tableRow}
       >
@@ -92,8 +112,8 @@ const ItemTableRow = (props) => {
           align="left"
         >
           <Checkbox
-            checked={isItemSelected}
-            onClick={(event) => handleClick(event, item.uuid)}
+            checked={isProductSelected}
+            onClick={(event) => handleClick(event, product.uuid)}
             inputProps={{ 'aria-labelledby': labelId }}
           />
         </TableCell>
@@ -101,23 +121,20 @@ const ItemTableRow = (props) => {
           style={{ borderBottom: 'none' }}
           id={labelId}
           scope="row"
-          // padding="none"
           align="left"
           sx={{
             fontSize: '0.95rem !important',
-            // whiteSpace: 'nowrap',
-            // overflow: 'hidden',
             paddingLeft: 0,
           }}
         >
-          {item.name}
+          {product.name}
         </TableCell>
         <TableCell
           style={{ borderBottom: 'none' }}
-          align="left"
+          align="center"
           sx={{ fontSize: '0.95rem !important' }}
         >
-          {item.barcode_number}
+          {product.barcode_number}
         </TableCell>
         <TableCell
           style={{ borderBottom: 'none' }}
@@ -132,7 +149,7 @@ const ItemTableRow = (props) => {
           }}
         >
           <Grid container spacing={0.5}>
-            {item.sub_categories.map((cat) => (
+            {product.sub_categories.map((cat) => (
               <Grid item key={cat.uuid}>
                 <Chip color="primary" size="small" label={cat.name} />
               </Grid>
@@ -144,32 +161,58 @@ const ItemTableRow = (props) => {
           align="center"
           sx={{ fontSize: '0.95rem !important' }}
         >
-          {item.wholesale_price}
+          RM {product.retail_price}
+        </TableCell>
+        <TableCell
+          style={{ borderBottom: 'none' }}
+          align="center"
+          sx={{ fontSize: '0.95rem !important' }}
+        >
+          <Switch
+            checked={product.is_active}
+            onChange={() => {
+              handleToggleStatus(product.uuid, product.is_active);
+            }}
+          />
+        </TableCell>
+        <TableCell
+          style={{ borderBottom: 'none' }}
+          align="center"
+          sx={{ fontSize: '0.95rem !important' }}
+        >
+          <Chip
+            label={product.stock_status}
+            style={{
+              fontWeight: 'bold',
+              paddingRight: 10,
+              color: 'white',
+              backgroundColor:
+                product.stock_status === 'In Stock'
+                  ? '#39A388'
+                  : product.stock_status === 'Low Stock'
+                  ? '#F0A500'
+                  : '#FF5151',
+            }}
+          />
         </TableCell>
         <TableCell
           style={{ borderBottom: 'none' }}
           align="center"
           sx={{ fontSize: '0.95rem !important', letterSpacing: 0.8 }}
         >
-          {moment(new Date(item.updated_at)).format('DD/MM/YYYY')}
-        </TableCell>
-        <TableCell
-          style={{ borderBottom: 'none' }}
-          align="center"
-          sx={{ fontSize: '0.95rem !important', letterSpacing: 0.8 }}
-        >
-          {moment(new Date(item.created_at)).format('DD/MM/YYYY')}
+          {moment(new Date(product.updated_at)).format('DD/MM/YYYY')}
         </TableCell>
         <TableCell
           style={{ borderBottom: 'none' }}
           align="left"
-          sx={{ paddingLeft: '5px !important' }}
+          // sx={{ paddingLeft: '0px !important' }}
         >
           <RowOptions
-            item={item}
+            product={product}
             Link={Link}
             handleDelete={handleDelete}
             handleEdit={handleEdit}
+            handleClickOpenStockStatusDialog={handleClickOpenStockStatusDialog}
           />
         </TableCell>
       </TableRow>
@@ -208,7 +251,7 @@ const ItemTableRow = (props) => {
                             borderRadius: '20px 20px 0px 0px',
                           }}
                         >
-                          Item Overview
+                          Product Overview
                         </Box>
                       </Grid>
                       <Grid item xs={3}>
@@ -230,7 +273,7 @@ const ItemTableRow = (props) => {
                           centeredSlides
                           slidesPerView={1}
                         >
-                          {item.images.map(({ path }) => (
+                          {product.images.map(({ path }) => (
                             <SwiperSlide key={path} onClick={handleOpenModal} style={{}}>
                               <img
                                 src={path}
@@ -249,13 +292,14 @@ const ItemTableRow = (props) => {
                         <Box
                           style={{
                             padding: '20px 25px 20px 10px',
-                            // maxHeight: 300,
-                            // overflow: 'scroll',
-                            // overflowX: 'hidden',
                             borderRadius: '0px 0px 20px 0px',
                           }}
                         >
-                          <ReactQuill value={item.note} readOnly theme="bubble" />
+                          <ReactQuill
+                            value={product.description}
+                            readOnly
+                            theme="bubble"
+                          />
                         </Box>
                       </Grid>
                     </Grid>
@@ -266,15 +310,21 @@ const ItemTableRow = (props) => {
           </Collapse>
         </TableCell>
         <ImageModal
-          images={item.images}
+          images={product.images}
           Swiper={Swiper}
           SwiperSlide={SwiperSlide}
           openModal={openModal}
           handleCloseModal={handleCloseModal}
+        />
+        <StockStatusDialog
+          open={openStockStatusDialog}
+          handleClose={handleCloseStockStatusDialog}
+          onUpdate={handleUpdateStockStatus}
+          productLoading={productLoading}
         />
       </TableRow>
     </>
   );
 };
 
-export default ItemTableRow;
+export default ProductTableRow;

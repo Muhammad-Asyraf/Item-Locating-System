@@ -26,7 +26,7 @@ class Store extends Model {
       },
       items: {
         relation: Model.HasManyRelation,
-        modelClass: require('../items/model '),
+        modelClass: require('../items/model'),
         join: {
           from: 'store.uuid',
           to: 'item.store_uuid',

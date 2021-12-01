@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { makeStyles } from '@mui/styles';
 import Container from '@mui/material/Container';
-import Alert from '@mui/lab/Alert';
+import Alert from '@mui/material/Alert';
 import Snackbar from '@mui/material/Snackbar';
 import Slide from '@mui/material/Slide';
 
@@ -19,7 +19,7 @@ import {
 
 import '../../assets/css/overrideSnackbar.css';
 
-const drawerWidth = 228;
+const drawerWidth = 240;
 const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
@@ -79,7 +79,7 @@ const Layout = (props) => {
 
     setTimeout(() => {
       dispatch(clearNotification());
-    }, 1500);
+    }, 500);
   };
 
   return (

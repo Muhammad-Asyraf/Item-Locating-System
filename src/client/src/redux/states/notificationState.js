@@ -9,7 +9,7 @@ export const newNotiState = (state, { payload }) => ({
 export const noNotiState = (state) => ({
   ...state,
   message: '',
-  severity: '',
+  severity: 'success',
   backgroundColor: '',
   color: '',
 });

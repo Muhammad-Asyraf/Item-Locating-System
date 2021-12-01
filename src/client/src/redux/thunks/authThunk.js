@@ -7,7 +7,7 @@ import { setNewNotification } from '../features/notificationSlice';
 
 export const setHeader = createAsyncThunk('auth/setHeader', async (firebase) => {
   const user = firebase.currentUser;
-  const token = user && (await user.getIdToken());
+  const token = user && (await user.getIdToken(true));
   const payloadHeader = {
     headers: {
       'Content-Type': 'application/json',

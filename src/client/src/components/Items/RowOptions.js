@@ -69,7 +69,6 @@ const RowMenu = (props) => {
             Delete
           </ListItemIcon>
         </MenuItem>
-        {/* <MenuItem component={Link} to={`/${storeUrl}/item/edit/${item.uuid}`}> */}
         <MenuItem
           onClick={handleEdit}
           component={Link}

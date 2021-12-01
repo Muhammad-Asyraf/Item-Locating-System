@@ -41,8 +41,16 @@ class Image extends Model {
         relation: Model.BelongsToOneRelation,
         modelClass: require('../items/model'),
         join: {
-          from: 'item.store_uuid',
+          from: 'image.item_uuid',
           to: 'item.uuid',
+        },
+      },
+      product: {
+        relation: Model.BelongsToOneRelation,
+        modelClass: require('../products/model'),
+        join: {
+          from: 'image.product_uuid',
+          to: 'product.uuid',
         },
       },
     };

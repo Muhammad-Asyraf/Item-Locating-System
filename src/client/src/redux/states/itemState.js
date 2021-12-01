@@ -11,3 +11,8 @@ export const receivedSingleItemState = (state, { payload }) => ({
   message: payload.message,
   status: payload.status,
 });
+
+export const updatedItemState = (state, { payload }) => ({
+  ...state,
+  items: payload.items,
+});

@@ -17,28 +17,30 @@ import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
 
 // import Icon from '@mui/material/Icon';
-import SupervisorAccountTwoToneIcon from '@mui/icons-material/SupervisorAccountTwoTone';
+// import SupervisorAccountTwoToneIcon from '@mui/icons-material/SupervisorAccountTwoTone';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import ListItemIcon from '@mui/material/ListItemIcon';
-import DashboardTwoToneIcon from '@mui/icons-material/DashboardTwoTone';
+// import DashboardTwoToneIcon from '@mui/icons-material/DashboardTwoTone';
 import LocalOfferTwoToneIcon from '@mui/icons-material/LocalOfferTwoTone';
-import SupervisedUserCircleTwoToneIcon from '@mui/icons-material/SupervisedUserCircleTwoTone';
+// import SupervisedUserCircleTwoToneIcon from '@mui/icons-material/SupervisedUserCircleTwoTone';
 import LocalMallTwoToneIcon from '@mui/icons-material/LocalMallTwoTone';
-import BusinessCenterTwoToneIcon from '@mui/icons-material/BusinessCenterTwoTone';
+// import BusinessCenterTwoToneIcon from '@mui/icons-material/BusinessCenterTwoTone';
 import RoomTwoToneIcon from '@mui/icons-material/RoomTwoTone';
-import DomainTwoToneIcon from '@mui/icons-material/DomainTwoTone';
-import LocalAtmTwoToneIcon from '@mui/icons-material/LocalAtmTwoTone';
+// import DomainTwoToneIcon from '@mui/icons-material/DomainTwoTone';
+// import LocalAtmTwoToneIcon from '@mui/icons-material/LocalAtmTwoTone';
 import FormatListBulletedRoundedIcon from '@mui/icons-material/FormatListBulletedRounded';
 import AddCircleTwoToneIcon from '@mui/icons-material/AddCircleTwoTone';
-import AccountCircleTwoToneIcon from '@mui/icons-material/AccountCircleTwoTone';
+// import AccountCircleTwoToneIcon from '@mui/icons-material/AccountCircleTwoTone';
 import DeveloperBoardRoundedIcon from '@mui/icons-material/DeveloperBoardRounded';
+import EditLocationRoundedIcon from '@mui/icons-material/EditLocationRounded';
+import FitScreenRoundedIcon from '@mui/icons-material/FitScreenRounded';
 
 import { makeStyles, useTheme } from '@mui/styles';
 
 import { ReactComponent as Megaphone } from '../../../assets/svg/megaphone.svg';
 
-const drawerWidth = 228;
+const drawerWidth = 240;
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -81,53 +83,55 @@ const Drawer = (props) => {
   const classes = useStyles();
   const { window, type, status, handleDrawerToggle, location } = props;
   const theme = useTheme();
+  // const isDesktop = false;
   const isDesktop = useMediaQuery(theme.breakpoints.up('lg'));
   const storeUrl = localStorage.getItem('storeUrl');
   const container = window !== undefined ? () => window().document.body : undefined;
   const [open, setOpen] = useState({
     products: false,
     items: false,
+    productMapping: false,
     users: false,
     businessRules: false,
   });
 
   // linear-gradient(-225deg, #473B7B 0%, #003366 51%, #30D2BE 100%)
   const drawerList = [
-    {
-      header: 'GENERAL',
-      key: 'general',
-      items: [
-        {
-          text: 'Dashboard',
-          itemKey: 'dashboard',
-          path: '/dashboard',
-          icon: (
-            <DashboardTwoToneIcon
-              style={{ color: '#003366' }}
-              // sx={{ fill: 'url(#linearColors)' }}
-              fontSize="large"
-            />
-          ),
-        },
-        {
-          text: 'Sales',
-          itemKey: 'sales',
-          path: '/sales',
-          icon: <LocalAtmTwoToneIcon style={{ color: '#003366' }} fontSize="large" />,
-        },
-        {
-          text: 'Customers',
-          itemKey: 'customers',
-          path: '/customers',
-          icon: (
-            <SupervisedUserCircleTwoToneIcon
-              style={{ color: '#003366' }}
-              fontSize="large"
-            />
-          ),
-        },
-      ],
-    },
+    // {
+    //   header: 'GENERAL',
+    //   key: 'general',
+    //   items: [
+    //     {
+    //       text: 'Dashboard',
+    //       itemKey: 'dashboard',
+    //       path: '/dashboard',
+    //       icon: (
+    //         <DashboardTwoToneIcon
+    //           style={{ color: '#003366' }}
+    //           // sx={{ fill: 'url(#linearColors)' }}
+    //           fontSize="large"
+    //         />
+    //       ),
+    //     },
+    //     {
+    //       text: 'Sales',
+    //       itemKey: 'sales',
+    //       path: '/sales',
+    //       icon: <LocalAtmTwoToneIcon style={{ color: '#003366' }} fontSize="large" />,
+    //     },
+    //     {
+    //       text: 'Customers',
+    //       itemKey: 'customers',
+    //       path: '/customers',
+    //       icon: (
+    //         <SupervisedUserCircleTwoToneIcon
+    //           style={{ color: '#003366' }}
+    //           fontSize="large"
+    //         />
+    //       ),
+    //     },
+    //   ],
+    // },
     {
       header: 'CATALOGUE',
       key: 'catalogue',
@@ -165,6 +169,25 @@ const Drawer = (props) => {
           itemKey: 'productMapping',
           path: '/product-mapping',
           icon: <RoomTwoToneIcon style={{ color: '#003366' }} fontSize="large" />,
+          onClick: () => setOpen({ ...open, productMapping: !open.productMapping }),
+          itemSubList: [
+            {
+              _text: 'Positioning',
+              _key: 'product-mapping-positioning',
+              _icon: (
+                <EditLocationRoundedIcon style={{ color: '#003366' }} fontSize="medium" />
+              ),
+              _path: '/product-mapping/positioning',
+            },
+            {
+              _text: 'Layout Editor',
+              _key: 'product-mapping-layout-editor',
+              _icon: (
+                <FitScreenRoundedIcon style={{ color: '#003366' }} fontSize="medium" />
+              ),
+              _path: '/product-mapping/layout-editor',
+            },
+          ],
           // icon: (
           //   <Icon
           //     className="fas fa-map-pin"
@@ -236,88 +259,88 @@ const Drawer = (props) => {
         },
       ],
     },
-    {
-      header: 'CONFIG',
-      key: 'config',
-      items: [
-        {
-          text: 'Users',
-          itemKey: 'users',
-          path: '/user',
-          icon: (
-            <SupervisorAccountTwoToneIcon style={{ color: '#003366' }} fontSize="large" />
-          ),
-          onClick: () => setOpen({ ...open, users: !open.users }),
-          itemSubList: [
-            {
-              _text: 'List',
-              _key: 'user-list',
-              _icon: (
-                <FormatListBulletedRoundedIcon
-                  style={{ color: '#003366' }}
-                  fontSize="medium"
-                />
-              ),
-              _path: '/user/list',
-            },
-            {
-              _text: 'Roles',
-              _key: 'role-list',
-              _icon: (
-                <AccountCircleTwoToneIcon
-                  style={{ color: '#003366' }}
-                  fontSize="medium"
-                />
-              ),
-              _path: '/role/list',
-            },
-          ],
-        },
+    // {
+    //   header: 'CONFIG',
+    //   key: 'config',
+    //   items: [
+    //     {
+    //       text: 'Users',
+    //       itemKey: 'users',
+    //       path: '/user',
+    //       icon: (
+    //         <SupervisorAccountTwoToneIcon style={{ color: '#003366' }} fontSize="large" />
+    //       ),
+    //       onClick: () => setOpen({ ...open, users: !open.users }),
+    //       itemSubList: [
+    //         {
+    //           _text: 'List',
+    //           _key: 'user-list',
+    //           _icon: (
+    //             <FormatListBulletedRoundedIcon
+    //               style={{ color: '#003366' }}
+    //               fontSize="medium"
+    //             />
+    //           ),
+    //           _path: '/user/list',
+    //         },
+    //         {
+    //           _text: 'Roles',
+    //           _key: 'role-list',
+    //           _icon: (
+    //             <AccountCircleTwoToneIcon
+    //               style={{ color: '#003366' }}
+    //               fontSize="medium"
+    //             />
+    //           ),
+    //           _path: '/role/list',
+    //         },
+    //       ],
+    //     },
 
-        {
-          text: 'Business Rules',
-          itemKey: 'businessRules',
-          path: '/business-rules',
-          icon: (
-            <BusinessCenterTwoToneIcon style={{ color: '#003366' }} fontSize="large" />
-          ),
-          onClick: () => setOpen({ ...open, businessRules: !open.businessRules }),
-          itemSubList: [
-            {
-              _text: 'List',
-              _key: 'business-rules-list',
-              _icon: (
-                <FormatListBulletedRoundedIcon
-                  style={{ color: '#003366' }}
-                  fontSize="medium"
-                />
-              ),
-              _path: '/business-rules/List',
-            },
-            {
-              _text: 'Create',
-              _key: 'business-rules-create',
-              _icon: (
-                <AddCircleTwoToneIcon style={{ color: '#003366' }} fontSize="medium" />
-              ),
-              _path: '/business-rules/Create',
-            },
-          ],
-        },
-        {
-          text: 'Office',
-          itemKey: 'office',
-          path: '/office',
-          icon: <DomainTwoToneIcon style={{ color: '#003366' }} fontSize="large" />,
-          // icon: (
-          //   <Icon
-          //     className="fas fa-building"
-          //     style={{ fontSize: 33, marginLeft: 3, color: '#007AFF' }}
-          //   />
-          // ),
-        },
-      ],
-    },
+    //     {
+    //       text: 'Business Rules',
+    //       itemKey: 'businessRules',
+    //       path: '/business-rules',
+    //       icon: (
+    //         <BusinessCenterTwoToneIcon style={{ color: '#003366' }} fontSize="large" />
+    //       ),
+    //       onClick: () => setOpen({ ...open, businessRules: !open.businessRules }),
+    //       itemSubList: [
+    //         {
+    //           _text: 'List',
+    //           _key: 'business-rules-list',
+    //           _icon: (
+    //             <FormatListBulletedRoundedIcon
+    //               style={{ color: '#003366' }}
+    //               fontSize="medium"
+    //             />
+    //           ),
+    //           _path: '/business-rules/List',
+    //         },
+    //         {
+    //           _text: 'Create',
+    //           _key: 'business-rules-create',
+    //           _icon: (
+    //             <AddCircleTwoToneIcon style={{ color: '#003366' }} fontSize="medium" />
+    //           ),
+    //           _path: '/business-rules/Create',
+    //         },
+    //       ],
+    //     },
+    //     {
+    //       text: 'Office',
+    //       itemKey: 'office',
+    //       path: '/office',
+    //       icon: <DomainTwoToneIcon style={{ color: '#003366' }} fontSize="large" />,
+    //       // icon: (
+    //       //   <Icon
+    //       //     className="fas fa-building"
+    //       //     style={{ fontSize: 33, marginLeft: 3, color: '#007AFF' }}
+    //       //   />
+    //       // ),
+    //     },
+    //   ],
+    // },
   ];
 
   useEffect(() => {

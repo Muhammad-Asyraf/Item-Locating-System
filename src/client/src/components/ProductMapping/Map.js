@@ -128,19 +128,6 @@ const Map = () => {
     console.log(test2);
   };
 
-  // const handleKeyDownMarker = (event) => {
-  //   const { myParam: layer } = event.currentTarget;
-  //   let allowed;
-  //   if (event.repeat !== undefined) {
-  //     allowed = !event.repeat;
-  //   }
-  //   if (!allowed) return;
-  //   allowed = false;
-  //   console.log(event.key);
-  //   layer.enableRotate();
-  //   layer.disable();
-  // };
-
   const enableDrag = ({ key, repeat, currentTarget }) => {
     if (repeat) return;
     const { myParam: layer } = currentTarget;
@@ -162,12 +149,6 @@ const Map = () => {
   };
 
   const initShapeObj = (layer) => {
-    // console.log(layer._path);
-    // console.log(layer._path instanceof Element);
-    // layer._path.setAttribute('tabindex', 0);
-    // console.log(layer._path);
-    // layer._path.focus();
-
     layer.on('pm:enable', ({ layer: editedLayer }) => {
       console.log('enabled edit', editedLayer);
       if (!layer.pm.rotateEnabled()) {
@@ -211,7 +192,9 @@ const Map = () => {
 
   const handleKeyDown = (e) => {
     const { altKey, ctrlKey, key, repeat } = e;
+
     if (repeat) return;
+
     if (ctrlKey && key === 'd') {
       e.preventDefault();
       console.log('’Cmd+/’ was pressed');

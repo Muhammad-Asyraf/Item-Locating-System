@@ -1,27 +1,27 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
   View,
   Text,
   FlatList,
   TouchableOpacity,
-} from "react-native";
-import { Appbar, Dialog, Button, TextInput } from "react-native-paper";
-import LoketlistListItem from "../components/LoketlistListItem";
-import Loading from "../components/Loading";
+} from 'react-native';
+import { Appbar, Dialog, Button, TextInput } from 'react-native-paper';
+import LoketlistListItem from '../components/LoketlistListItem';
+import Loading from '../components/Loading';
 
 // Utilities
-import axios from "axios";
+import axios from 'axios';
 
 // Redux
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector, useDispatch } from 'react-redux';
 
 // Environment configs
-import { environment } from "../environment";
+import { environment } from '../environment';
 
 // Styling
-import { GlobalStyle } from "../styles/theme";
-import { appBarStyles } from "../styles/appBarStyles";
+import { GlobalStyle } from '../styles/Theme';
+import { appBarStyles } from '../styles/appBarStyles';
 
 export default function Lists() {
   const [isLoading, setLoading] = useState(true);
@@ -29,14 +29,14 @@ export default function Lists() {
   const [editVisible, setEditVisible] = useState(false);
   const [loketlists, setLoketlists] = useState();
 
-  const [controlCartUuid, setControlCartUuid] = useState("");
+  const [controlCartUuid, setControlCartUuid] = useState('');
 
   const user = useSelector((state) => state.user);
-  const auth = useSelector((state) => state.auth)
+  const auth = useSelector((state) => state.auth);
 
   // Dialog states
-  const [listName, setListName] = useState("");
-  let name = listName
+  const [listName, setListName] = useState('');
+  let name = listName;
 
   // Dialog functions
   const showAddDialog = () => setAddVisible(true);
@@ -52,9 +52,9 @@ export default function Lists() {
     const fetchLoketlists = async () => {
       const { data } = await axios.get(
         environment.host +
-          "/api/mobile/planning-cart-service/carts/" +
+          '/api/mobile/planning-cart-service/carts/' +
           user.uuid,
-          auth.authHeader
+        auth.authHeader
       );
       let loketlists = [];
       for (i = 0; i < data.length; i++) {
@@ -63,7 +63,7 @@ export default function Lists() {
             key: i,
             uuid: data[i].uuid,
             app_user_uuid: data[i].app_user_uuid,
-            name: "General Cart",
+            name: 'General Cart',
             updated_at: data[i].updated_at,
           });
         } else {
@@ -88,7 +88,7 @@ export default function Lists() {
   const submitEdit = async () => {
     // Add cart to back end
     const { data } = await axios.patch(
-      environment.host + "/api/mobile/planning-cart-service/cart/update",
+      environment.host + '/api/mobile/planning-cart-service/cart/update',
       {
         app_user_uuid: user.uuid,
         cart_uuid: controlCartUuid,
@@ -104,14 +104,14 @@ export default function Lists() {
   const submitDelete = async () => {
     // Add cart to back end
     const { data } = await axios.delete(
-      environment.host + "/api/mobile/planning-cart-service/cart/delete",
+      environment.host + '/api/mobile/planning-cart-service/cart/delete',
       {
         headers: auth.authHeader.headers,
         data: {
           app_user_uuid: user.uuid,
           cart_uuid: controlCartUuid,
-        }
-      },
+        },
+      }
     );
     closeEditDialog();
     // Refresh
@@ -128,7 +128,7 @@ export default function Lists() {
   const addList = async () => {
     // Add cart to back end
     const { data } = await axios.post(
-      environment.host + "/api/mobile/planning-cart-service/cart/create",
+      environment.host + '/api/mobile/planning-cart-service/cart/create',
       {
         app_user_uuid: user.uuid,
         name: listName,
@@ -148,7 +148,7 @@ export default function Lists() {
           <Appbar.Action
             icon="plus"
             onPress={() => {
-              console.log("Open add new list dialog");
+              console.log('Open add new list dialog');
               showAddDialog();
             }}
           />
@@ -209,7 +209,7 @@ export default function Lists() {
 
 const styles = StyleSheet.create({
   appBar: {
-    justifyContent: "space-between",
+    justifyContent: 'space-between',
   },
   flatListView: {
     paddingHorizontal: 18,

@@ -1,25 +1,25 @@
 // Components
-import React, { useState } from "react";
-import { StyleSheet, View, Text, FlatList } from "react-native";
-import { Appbar, Title, Dialog } from "react-native-paper";
-import { useFocusEffect } from "@react-navigation/native";
-import CartListItem from "../components/CartListItem";
-import CartHeader from "../components/CartHeader";
-import Loading from "../components/Loading";
+import React, { useState } from 'react';
+import { StyleSheet, View, Text, FlatList } from 'react-native';
+import { Appbar, Title, Dialog } from 'react-native-paper';
+import { useFocusEffect } from '@react-navigation/native';
+import CartListItem from '../components/CartListItem';
+import CartHeader from '../components/CartHeader';
+import Loading from '../components/Loading';
 
 // Utilities
-import axios from "axios";
+import axios from 'axios';
 
 // Redux
-import { useSelector, useDispatch } from "react-redux";
-import { update } from "../redux/cart/cartSlice";
+import { useSelector, useDispatch } from 'react-redux';
+import { update } from '../redux/cart/cartSlice';
 
 // Environment configs
-import { environment } from "../environment";
+import { environment } from '../environment';
 
 // Styling
-import { GlobalStyle } from "../styles/theme";
-import { appBarStyles } from "../styles/appBarStyles";
+import { GlobalStyle } from '../styles/Theme';
+import { appBarStyles } from '../styles/appBarStyles';
 
 export default function Cart({ navigation }) {
   const [isLoading, setLoading] = useState(true);
@@ -35,15 +35,15 @@ export default function Cart({ navigation }) {
 
   useFocusEffect(
     React.useCallback(() => {
-      setLoading(cart.update)
-      console.log("Reload? : " + isLoading);
+      setLoading(cart.update);
+      console.log('Reload? : ' + isLoading);
 
       const fetchProducts = async () => {
         const { data } = await axios.get(
           environment.host +
-            "/api/mobile/planning-cart-service/cart/" +
+            '/api/mobile/planning-cart-service/cart/' +
             default_cart_uuid,
-            authHeader
+          authHeader
         );
         let DATA = [];
         for (i = 0; i < cart.products.length; i++) {
@@ -54,10 +54,10 @@ export default function Cart({ navigation }) {
             name: data.products[i].name,
             quantity: data.products[i].quantity,
             selling_price: data.products[i].selling_price,
-            imageUrl: "https://tinyurl.com/cu8nm69m",
+            imageUrl: 'https://tinyurl.com/cu8nm69m',
           });
         }
-        console.log("Loaded all products into array");
+        console.log('Loaded all products into array');
 
         // Update redux states
         dispatch(update(false));
@@ -77,7 +77,7 @@ export default function Cart({ navigation }) {
       for (i = 0; i < DATA.length; i++) {
         totalPrice += DATA[i].selling_price * DATA[i].quantity;
       }
-      console.log(totalPrice)
+      console.log(totalPrice);
       setTotalPrice(totalPrice);
     }, [isLoading, cart.quantity])
   );
@@ -106,7 +106,7 @@ export default function Cart({ navigation }) {
         <View
           style={[
             GlobalStyle.contentContainer,
-            { justifyContent: "center", alignItems: "center" },
+            { justifyContent: 'center', alignItems: 'center' },
           ]}
         >
           <Text>Your cart is empty!</Text>
@@ -123,13 +123,13 @@ export default function Cart({ navigation }) {
           {
             elevation: 0,
             borderBottomWidth: 0.5,
-            borderBottomColor: "#CBCBCB",
+            borderBottomColor: '#CBCBCB',
           },
         ]}
       >
         <Text style={appBarStyles.appBarTitle}>CART</Text>
       </Appbar.Header>
-      <CartHeader price={"RM" + totalPrice} />
+      <CartHeader price={'RM' + totalPrice} />
       <FlatList
         style={styles.sectionListView}
         onRefresh={refreshCart}
@@ -152,8 +152,8 @@ const styles = StyleSheet.create({
     marginVertical: 8,
   },
   listSection: {
-    color: "#707070",
-    fontFamily: "interSemiBold",
+    color: '#707070',
+    fontFamily: 'interSemiBold',
     fontSize: 14,
     letterSpacing: 0.1,
     marginHorizontal: 16,

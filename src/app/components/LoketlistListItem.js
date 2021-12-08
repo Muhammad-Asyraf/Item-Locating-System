@@ -1,26 +1,26 @@
 // Components
-import React from "react";
-import { StyleSheet, View, ImageBackground, TouchableOpacity } from "react-native";
-import { Text } from "react-native-paper";
-import SmallTextChip from "./SmallTextChip";
+import React from 'react';
+import {
+  StyleSheet,
+  View,
+  ImageBackground,
+  TouchableOpacity,
+} from 'react-native';
+import { Text } from 'react-native-paper';
+import SmallTextChip from './core/SmallTextChip';
 
-export default function LoketlistListItem({
-  item,
-  store_count,
-}) {
+export default function LoketlistListItem({ item, store_count }) {
+  const image = { uri: 'https://tinyurl.com/cu8nm69m' };
 
-  const image = { uri: 'https://tinyurl.com/cu8nm69m'}
-  
-  
   return (
-      <ImageBackground source={image} style={styles.listItemContainer} >
+    <ImageBackground source={image} style={styles.listItemContainer}>
       <View style={styles.horizontalContainer}>
         <Text style={styles.title}>{item.name}</Text>
         <Text style={styles.storeCount}>{store_count} stores in route</Text>
       </View>
       <View style={styles.horizontalContainer}>
         <Text style={styles.updatedAt}>Recently added</Text>
-        <SmallTextChip text={"RM350.00"} fill={true} />
+        <SmallTextChip text={'RM350.00'} fill={true} />
       </View>
     </ImageBackground>
   );
@@ -33,9 +33,9 @@ const styles = StyleSheet.create({
     paddingBottom: 12,
     marginBottom: 18,
     borderRadius: 4,
-    overflow: "hidden",
+    overflow: 'hidden',
     zIndex: 1,
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 1,
@@ -46,24 +46,24 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   horizontalContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginVertical: 2,
   },
   title: {
     fontSize: 20,
-    fontFamily: "interBold",
-    color: "white",
+    fontFamily: 'interBold',
+    color: 'white',
   },
   storeCount: {
     fontSize: 14,
-    fontFamily: "interSemiBold",
-    color: "white",
+    fontFamily: 'interSemiBold',
+    color: 'white',
   },
   updatedAt: {
     fontSize: 14,
-    fontFamily: "interSemiBold",
-    color: "white",
+    fontFamily: 'interSemiBold',
+    color: 'white',
   },
 });

@@ -1,28 +1,45 @@
-import React, { useState, useEffect } from "react";
-import { StyleSheet, StatusBar, Text } from "react-native";
-import { Provider as PaperProvider } from "react-native-paper";
-import { Theme } from "./styles/theme";
+import React, { useState, useEffect } from 'react';
+import { Provider as PaperProvider } from 'react-native-paper';
+import { Theme } from './styles/Theme';
 import {
   useFonts,
-  Inter_500Medium as interMedium,
-  Inter_600SemiBold as interSemiBold,
-  Inter_700Bold as interBold,
-  Inter_800ExtraBold as interBoldExtra,
-} from "@expo-google-fonts/inter";
-import { NavigationContainer } from "@react-navigation/native";
+  Inter_100Thin,
+  Inter_200ExtraLight,
+  Inter_300Light,
+  Inter_400Regular,
+  Inter_500Medium,
+  Inter_600SemiBold,
+  Inter_700Bold,
+  Inter_800ExtraBold,
+  Inter_900Black,
+} from '@expo-google-fonts/inter';
+import {
+  Roboto_100Thin,
+  Roboto_100Thin_Italic,
+  Roboto_300Light,
+  Roboto_300Light_Italic,
+  Roboto_400Regular,
+  Roboto_400Regular_Italic,
+  Roboto_500Medium,
+  Roboto_500Medium_Italic,
+  Roboto_700Bold,
+  Roboto_700Bold_Italic,
+  Roboto_900Black,
+  Roboto_900Black_Italic,
+} from '@expo-google-fonts/roboto';
+import { NavigationContainer } from '@react-navigation/native';
 
 // Component imports
-import Loading from "./components/Loading"
+import Loading from './components/Loading';
 
 // Navigation
-import AuthTabsNavigator from "./navigation/AuthTabsNavigator";
-import MainStackNavigator from "./navigation/MainStackNavigator";
+import AuthTabsNavigator from './navigation/AuthTabsNavigator';
+import MainStackNavigator from './navigation/MainStackNavigator';
 
 // Auth modules
-import auth from "@react-native-firebase/auth";
+import auth from '@react-native-firebase/auth';
 
 export default function App() {
-  
   // Authentication states
   const [isInitializing, setInitializing] = useState(true);
   const [user, setUser] = useState();
@@ -40,14 +57,31 @@ export default function App() {
 
   // Fonts to be used
   let [fontsLoaded] = useFonts({
-    interMedium,
-    interSemiBold,
-    interBold,
-    interBoldExtra,
+    Roboto_100Thin,
+    Roboto_100Thin_Italic,
+    Roboto_300Light,
+    Roboto_300Light_Italic,
+    Roboto_400Regular,
+    Roboto_400Regular_Italic,
+    Roboto_500Medium,
+    Roboto_500Medium_Italic,
+    Roboto_700Bold,
+    Roboto_700Bold_Italic,
+    Roboto_900Black,
+    Roboto_900Black_Italic,
+    Inter_100Thin,
+    Inter_200ExtraLight,
+    Inter_300Light,
+    Inter_400Regular,
+    Inter_500Medium,
+    Inter_600SemiBold,
+    Inter_700Bold,
+    Inter_800ExtraBold,
+    Inter_900Black,
   });
 
   if (!fontsLoaded || isInitializing) {
-    return <Loading />
+    return <Loading />;
   } else {
     if (!user) {
       return (
@@ -63,12 +97,12 @@ export default function App() {
 
     return (
       // Use NavigationContainer to implement navigation throughout the app
-        <NavigationContainer>
-          {/* PaperProvider for global theming */}
-          <PaperProvider theme={Theme}>
-            <MainStackNavigator />
-          </PaperProvider>
-        </NavigationContainer>
+      <NavigationContainer>
+        {/* PaperProvider for global theming */}
+        <PaperProvider theme={Theme}>
+          <MainStackNavigator />
+        </PaperProvider>
+      </NavigationContainer>
     );
   }
 }

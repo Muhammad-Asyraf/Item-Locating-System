@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
   Dimensions,
@@ -6,16 +6,16 @@ import {
   FlatList,
   View,
   Image,
-} from "react-native";
-import { Appbar, Title, Searchbar } from "react-native-paper";
-import Carousel, { ParallaxImage } from "react-native-snap-carousel";
+} from 'react-native';
+import { Appbar, Title, Searchbar } from 'react-native-paper';
+import Carousel, { ParallaxImage } from 'react-native-snap-carousel';
 
 // Styling
-import { GlobalStyle } from "../styles/theme";
+import { GlobalStyle } from '../styles/Theme';
 
-const { width: screenWidth } = Dimensions.get("window");
+const { width: screenWidth } = Dimensions.get('window');
 export default function Home({ navigation }) {
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const [banners, setBanners] = useState([1, 2, 3]);
 
   // Handle query state changes
@@ -23,14 +23,14 @@ export default function Home({ navigation }) {
 
   // Push a search result screen
   const search = () => {
-    navigation.dangerouslyGetParent().push("Search Result", {
+    navigation.dangerouslyGetParent().navigate('Search Result', {
       query: searchQuery,
     });
   };
 
   return (
     <View style={GlobalStyle.screenContainer}>
-      <Appbar.Header style={{ backgroundColor: "transparent" }}>
+      <Appbar.Header style={{ backgroundColor: 'transparent' }}>
         <Searchbar
           style={GlobalStyle.searchBar}
           placeholder="Search for something"
@@ -48,7 +48,7 @@ export default function Home({ navigation }) {
           renderItem={({ item }, parallaxProps) => (
             <View style={styles.item}>
               <ParallaxImage
-                source={{ uri: "https://tinyurl.com/cu8nm69m" }}
+                source={{ uri: 'https://tinyurl.com/cu8nm69m' }}
                 containerStyle={styles.imageContainer}
                 style={styles.image}
                 parallaxFactor={0.4}
@@ -69,7 +69,7 @@ export default function Home({ navigation }) {
               <View style={styles.listItemContainer}>
                 <Image
                   style={styles.horizontalProductImage}
-                  source={{ uri: "https://tinyurl.com/urszpsxs" }}
+                  source={{ uri: 'https://tinyurl.com/urszpsxs' }}
                 />
               </View>
             )}
@@ -88,7 +88,7 @@ export default function Home({ navigation }) {
               <View style={styles.listItemContainer}>
                 <Image
                   style={styles.horizontalProductImage}
-                  source={{ uri: "https://tinyurl.com/268aa7js" }}
+                  source={{ uri: 'https://tinyurl.com/268aa7js' }}
                 />
               </View>
             )}
@@ -107,12 +107,12 @@ const styles = StyleSheet.create({
   imageContainer: {
     flex: 1,
     //marginBottom: Platform.select({ ios: 0, android: 1 }), // Prevent a random Android rendering issue
-    backgroundColor: "white",
+    backgroundColor: 'white',
     borderRadius: 4,
   },
   image: {
     ...StyleSheet.absoluteFillObject,
-    resizeMode: "cover",
+    resizeMode: 'cover',
   },
   // Parallax end
 
@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
   horizontalListContainer: {
     paddingVertical: 8,
     paddingHorizontal: 22,
-    backgroundColor: "#F5F5F5",
+    backgroundColor: '#F5F5F5',
   },
   horizontalProductImage: {
     width: 160,
@@ -140,7 +140,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   listItemContainer: {
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 1,

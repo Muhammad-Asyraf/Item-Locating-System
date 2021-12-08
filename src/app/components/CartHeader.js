@@ -1,11 +1,11 @@
 // Components
-import React from "react";
-import { StyleSheet, View } from "react-native";
-import { Text } from "react-native-paper";
-import SmallTextChip from "./SmallTextChip";
+import React from 'react';
+import { StyleSheet, View } from 'react-native';
+import { Text } from 'react-native-paper';
+import SmallTextChip from './core/SmallTextChip';
 
 // Styling
-import { Theme } from "../styles/theme";
+import { Theme } from '../styles/Theme';
 
 export default function CartHeader({ discount, price }) {
   return (
@@ -27,9 +27,9 @@ const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 18,
     paddingVertical: 12,
-    backgroundColor: "white",
+    backgroundColor: 'white',
     zIndex: 1,
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 2,
@@ -41,18 +41,18 @@ const styles = StyleSheet.create({
   },
   textContainer: {
     marginVertical: 4,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   titleText: {
     fontSize: 14,
-    fontFamily: "interMedium",
-    color: "#707070",
+    fontFamily: 'interMedium',
+    color: '#707070',
   },
   discountText: {
     fontSize: 12,
-    fontFamily: "interSemiBold",
+    fontFamily: 'interSemiBold',
     color: Theme.colors.primary,
   },
 });

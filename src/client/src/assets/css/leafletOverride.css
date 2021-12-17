@@ -8,26 +8,36 @@
   line-height: 35px;
 }
 
+.leaflet-touch .leaflet-bar a:first-child {
+  border-top-left-radius: 7px;
+  border-top-right-radius: 7px;
+}
+.leaflet-touch .leaflet-bar a:last-child {
+  border-bottom-left-radius: 7px;
+  border-bottom-right-radius: 7px;
+}
+
 .leaflet-bar {
   border-radius: 7px;
 }
 
-.leaflet-pm-toolbar .button-container:first-child a.leaflet-buttons-control-button {
-  border-radius: 7px 7px 0 0;
+.leaflet-pm-toolbar
+  .leaflet-pm-actions-container
+  a.leaflet-pm-action:first-child:not(.pos-right),
+.leaflet-pm-toolbar .leaflet-pm-actions-container a.leaflet-pm-action:last-child.pos-right {
+  border-radius: 0;
+}
+
+.leaflet-pm-toolbar .button-container a.leaflet-buttons-control-button {
+  border-radius: 0;
 }
 
 .leaflet-pm-toolbar .button-container:last-child a.leaflet-buttons-control-button {
   border-radius: 0 0 7px 7px;
 }
 
-.leaflet-touch .leaflet-bar a:first-child {
-  border-top-left-radius: 7px;
-  border-top-right-radius: 7px;
-}
-
-.leaflet-touch .leaflet-bar a:last-child {
-  border-bottom-left-radius: 7px;
-  border-bottom-right-radius: 7px;
+.leaflet-pm-toolbar .button-container:first-child a.leaflet-buttons-control-button {
+  border-radius: 7px 7px 0 0;
 }
 
 .marker-icon,
@@ -49,13 +59,16 @@
 }
 .leaflet-pm-toolbar .leaflet-rectangle-floor {
   background-image: url('../img/square.png');
+  background-size: 90% 90%;
 }
 .leaflet-pm-toolbar .leaflet-polygon-floor {
   background-image: url('../img/draw.png');
+  /* background-size: 90% 90%; */
 }
 
 .leaflet-pm-toolbar .leaflet-circle-shelf {
   background-image: url('../img/circle_.png');
+  background-size: 90% 90%;
 }
 .leaflet-pm-toolbar .leaflet-rectangle-shelf {
   background-image: url('../img/rectangle_shelf.png');
@@ -66,10 +79,13 @@
 
 .leaflet-pm-toolbar .leaflet-circle-shelf-partition {
   background-image: url('../img/circle_partition.png');
+  background-size: 90% 90%;
 }
 .leaflet-pm-toolbar .leaflet-rectangle-shelf-partition {
-  background-image: url('../img/square_partition.png');
+  background-image: url('../img/02395ffa2b1b6ee661481892e0e35c8f.png');
+  background-size: 90% 90%;
 }
 .leaflet-pm-toolbar .leaflet-polygon-shelf-partition {
   background-image: url('../img/free_draw_partition.png');
+  background-size: 90% 90%;
 }

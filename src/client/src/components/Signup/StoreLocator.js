@@ -20,8 +20,7 @@ const useStyles = makeStyles(() => ({
   map: {
     overflow: 'hidden',
     borderRadius: '15px',
-    boxShadow:
-      'rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px',
+    boxShadow: 'rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px',
     // boxShadow: 'rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px',
   },
   coordinate: {
@@ -152,7 +151,7 @@ const StoreLocator = (props) => {
         width="100%"
         height="500px"
         maxZoom={18}
-        mapStyle="mapbox://styles/mapbox/streets-v11"
+        mapStyle="mapbox://styles/loketla/ckwt0h82z3pvu14mkkjoypl6h"
         onViewportChange={handleViewportChange}
         mapboxApiAccessToken={mapboxToken}
       >

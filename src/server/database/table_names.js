@@ -12,4 +12,6 @@ module.exports = {
   item_sub_category: 'item_sub_category',
   product_sub_category: 'product_sub_category',
   image: 'image',
+  layer: 'layer',
+  layout: 'layout',
 };

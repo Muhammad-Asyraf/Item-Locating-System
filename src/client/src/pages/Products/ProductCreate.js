@@ -100,8 +100,7 @@ const ProductCreate = () => {
         <LinearProgress
           className={classes.linear}
           sx={{
-            backgroundImage:
-              'linear-gradient(-225deg, #473B7B 0%, #003366 51%, #30D2BE 100%)',
+            backgroundImage: 'linear-gradient(-225deg, #473B7B 0%, #003366 51%, #30D2BE 100%)',
           }}
         />
       </div>
@@ -126,10 +125,8 @@ const ProductCreate = () => {
             </h1>
             <Breadcrumbs separator="•" aria-label="breadcrumb">
               <div style={{ fontSize: '0.875rem' }}>{storeName}&nbsp;&nbsp;</div>,
-              <div style={{ fontSize: '0.875rem' }}>
-                &nbsp;&nbsp;Catalogue&nbsp;&nbsp;
-              </div>
-              ,<div style={{ fontSize: '0.875rem' }}>&nbsp;&nbsp;New Product</div>
+              <div style={{ fontSize: '0.875rem' }}>&nbsp;&nbsp;Catalogue&nbsp;&nbsp;</div>,
+              <div style={{ fontSize: '0.875rem' }}>&nbsp;&nbsp;New Product</div>
             </Breadcrumbs>
           </Grid>
         </Grid>

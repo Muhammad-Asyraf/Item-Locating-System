@@ -1,5 +1,6 @@
 # Start from base image of Node.js of version 14.16.1
-FROM node:14.16.1
+FROM node:16.13.1
+# FROM node:14.16.1
 
 # Set working directory of our container to be the '/app' within container
 WORKDIR /app/client

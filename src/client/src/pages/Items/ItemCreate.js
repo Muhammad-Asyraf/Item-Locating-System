@@ -95,8 +95,7 @@ const ItemCreate = () => {
         <LinearProgress
           className={classes.linear}
           sx={{
-            backgroundImage:
-              'linear-gradient(-225deg, #473B7B 0%, #003366 51%, #30D2BE 100%)',
+            backgroundImage: 'linear-gradient(-225deg, #473B7B 0%, #003366 51%, #30D2BE 100%)',
           }}
         />
       </div>
@@ -120,10 +119,8 @@ const ItemCreate = () => {
             </h1>
             <Breadcrumbs separator="•" aria-label="breadcrumb">
               <div style={{ fontSize: '0.875rem' }}>{storeName}&nbsp;&nbsp;</div>,
-              <div style={{ fontSize: '0.875rem' }}>
-                &nbsp;&nbsp;Inventory&nbsp;&nbsp;
-              </div>
-              ,<div style={{ fontSize: '0.875rem' }}>&nbsp;&nbsp;New Item</div>
+              <div style={{ fontSize: '0.875rem' }}>&nbsp;&nbsp;Inventory&nbsp;&nbsp;</div>,
+              <div style={{ fontSize: '0.875rem' }}>&nbsp;&nbsp;New Item</div>
             </Breadcrumbs>
           </Grid>
         </Grid>
@@ -154,7 +151,7 @@ const ItemCreate = () => {
               <CircularProgress size={25} style={{ color: 'white' }} />
             ) : (
               <>
-                <SaveRoundedIcon style={{ marginRight: 10 }} fontSize="small" /> Save
+                <SaveRoundedIcon style={{ marginRight: 10 }} fontSize="small" /> Savess
               </>
             )}
           </Button>

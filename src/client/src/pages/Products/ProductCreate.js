@@ -118,7 +118,7 @@ const ProductCreate = () => {
               <IconButton
                 component={Link}
                 to={`/${storeUrl}/product/list`}
-                sx={{ position: 'relative', top: -3 }}
+                sx={{ position: 'relative', top: -3, left: 5 }}
               >
                 <KeyboardReturnRoundedIcon fontSize="large" color="primary" />
               </IconButton>

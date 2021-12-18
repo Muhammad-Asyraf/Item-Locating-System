@@ -21,7 +21,7 @@ import Grid from '@mui/material/Grid';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import ListItemIcon from '@mui/material/ListItemIcon';
-import Grid4x4RoundedIcon from '@mui/icons-material/Grid4x4Rounded';
+import ViewCompactRoundedIcon from '@mui/icons-material/ViewCompactRounded';
 // import DashboardTwoToneIcon from '@mui/icons-material/DashboardTwoTone';
 import LocalOfferTwoToneIcon from '@mui/icons-material/LocalOfferTwoTone';
 // import SupervisedUserCircleTwoToneIcon from '@mui/icons-material/SupervisedUserCircleTwoTone';
@@ -34,8 +34,8 @@ import FormatListBulletedRoundedIcon from '@mui/icons-material/FormatListBullete
 import AddCircleTwoToneIcon from '@mui/icons-material/AddCircleTwoTone';
 // import AccountCircleTwoToneIcon from '@mui/icons-material/AccountCircleTwoTone';
 import DeveloperBoardRoundedIcon from '@mui/icons-material/DeveloperBoardRounded';
-import EditLocationRoundedIcon from '@mui/icons-material/EditLocationRounded';
-import FitScreenRoundedIcon from '@mui/icons-material/FitScreenRounded';
+import AddLocationAltRoundedIcon from '@mui/icons-material/AddLocationAltRounded';
+// import FitScreenRoundedIcon from '@mui/icons-material/FitScreenRounded';
 
 import { makeStyles, useTheme } from '@mui/styles';
 
@@ -164,10 +164,10 @@ const Drawer = (props) => {
           ],
         },
         {
-          text: 'Layout',
+          text: 'Layouts',
           itemKey: 'layout',
           path: '/layout',
-          icon: <Grid4x4RoundedIcon style={{ color: '#003366' }} fontSize="large" />,
+          icon: <ViewCompactRoundedIcon style={{ color: '#003366' }} fontSize="large" />,
           onClick: () => setOpen({ ...open, layout: !open.layout }),
           itemSubList: [
             {
@@ -182,19 +182,26 @@ const Drawer = (props) => {
               _path: '/layout/list',
             },
             {
+              _text: 'Create',
+              _key: 'layout-create',
+              _icon: <AddCircleTwoToneIcon style={{ color: '#003366' }} fontSize="medium" />,
+              _path: '/layout/create',
+            },
+            {
               _text: 'Product Mapping',
               _key: 'layout-product-mapping',
               _icon: (
-                <EditLocationRoundedIcon style={{ color: '#003366' }} fontSize="medium" />
+                <AddLocationAltRoundedIcon style={{ color: '#003366' }} fontSize="medium" />
               ),
               _path: '/layout/product-mapping',
             },
-            {
-              _text: 'Layout Editor',
-              _key: 'layout-editor',
-              _icon: <FitScreenRoundedIcon style={{ color: '#003366' }} fontSize="medium" />,
-              _path: '/layout/layout-editor',
-            },
+
+            // {
+            //   _text: 'Layout Editor',
+            //   _key: 'layout-editor',
+            //   _icon: <FitScreenRoundedIcon style={{ color: '#003366' }} fontSize="medium" />,
+            //   _path: '/layout/layout-editor',
+            // },
           ],
           // icon: (
           //   <Icon

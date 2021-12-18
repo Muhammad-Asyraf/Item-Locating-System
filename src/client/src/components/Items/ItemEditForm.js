@@ -201,6 +201,7 @@ const ItemEditForm = (props) => {
       formData.append('store_uuid', storeUUID);
       formData.append('old_imgs', JSON.stringify(currentItem.images));
 
+      formData.append('multer_type', 'image');
       for (const key of Object.keys(image.imgFiles)) {
         formData.append('imgCollection', image.imgFiles[key], image.imgFiles[key].name);
       }
@@ -379,12 +380,8 @@ const ItemEditForm = (props) => {
     let currentImagesPreview = image.imgPreviews;
     let currentImagesFiles = image.imgFiles;
 
-    currentImagesPreview = currentImagesPreview.filter(
-      ({ path }) => path !== selectedUrl
-    );
-    currentImagesFiles = currentImagesFiles.filter(
-      ({ name }) => name !== selectedImgName
-    );
+    currentImagesPreview = currentImagesPreview.filter(({ path }) => path !== selectedUrl);
+    currentImagesFiles = currentImagesFiles.filter(({ name }) => name !== selectedImgName);
     setImage({
       imgFiles: [...currentImagesFiles],
       imgPreviews: [...currentImagesPreview],

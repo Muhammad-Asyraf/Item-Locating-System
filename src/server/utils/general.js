@@ -19,9 +19,17 @@ const references = (table, tableName, notNullable = true, columnName = '') => {
 };
 
 const removeFiles = async (files) => {
-  for (const file of files) {
+  if (Array.isArray(files)) {
+    for (const file of files) {
+      try {
+        await fs.unlinkSync(file.path);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+  } else {
     try {
-      await fs.unlinkSync(file.path);
+      await fs.unlinkSync(files.path);
     } catch (err) {
       console.error(err);
     }

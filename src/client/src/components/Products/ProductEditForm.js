@@ -209,9 +209,7 @@ const ProductForm = (props) => {
   const [selectedMeasurementUnit, setSelectedMeasurementUnit] = useState(
     currentProduct.measurement_unit
   );
-  const [selectedStockStatus, setSelectedStockStatus] = useState(
-    currentProduct.stock_status
-  );
+  const [selectedStockStatus, setSelectedStockStatus] = useState(currentProduct.stock_status);
   const [selectedProductItem, setSelectedProductItem] = useState({
     standard: null,
     bundle: [],
@@ -494,13 +492,7 @@ const ProductForm = (props) => {
       };
     } else if (bundle_checked) {
       productItem = selectedProductItem.bundle.map(
-        ({
-          barcode_number,
-          name,
-          totalSupplyPrice,
-          wholesalePrice,
-          ...remainingAttrs
-        }) => ({
+        ({ barcode_number, name, totalSupplyPrice, wholesalePrice, ...remainingAttrs }) => ({
           ...remainingAttrs,
         })
       );
@@ -543,10 +535,7 @@ const ProductForm = (props) => {
       formData.append('store_uuid', storeUUID);
       formData.append('old_imgs', JSON.stringify(currentProduct.images));
 
-      formData.append(
-        'product_type',
-        productType.standard_checked ? 'Standard' : 'Bundle'
-      );
+      formData.append('product_type', productType.standard_checked ? 'Standard' : 'Bundle');
 
       formData.append(
         'supply_price',
@@ -554,7 +543,7 @@ const ProductForm = (props) => {
           ? product.standard.supplyPrice
           : product.bundle.totalSupplyPrice
       );
-
+      formData.append('multer_type', 'image');
       for (const key of Object.keys(image.imgFiles)) {
         formData.append('imgCollection', image.imgFiles[key], image.imgFiles[key].name);
       }
@@ -736,12 +725,8 @@ const ProductForm = (props) => {
     let currentImagesPreview = image.imgPreviews;
     let currentImagesFiles = image.imgFiles;
 
-    currentImagesPreview = currentImagesPreview.filter(
-      ({ path }) => path !== selectedUrl
-    );
-    currentImagesFiles = currentImagesFiles.filter(
-      ({ name }) => name !== selectedImgName
-    );
+    currentImagesPreview = currentImagesPreview.filter(({ path }) => path !== selectedUrl);
+    currentImagesFiles = currentImagesFiles.filter(({ name }) => name !== selectedImgName);
     setImage({
       imgFiles: [...currentImagesFiles],
       imgPreviews: [...currentImagesPreview],
@@ -1180,9 +1165,7 @@ const ProductForm = (props) => {
                     >
                       <Box style={{ width: '310px', height: '500px' }}>
                         <ReactLogo />
-                        <div
-                          style={{ fontSize: '0.8rem', position: 'relative', top: -30 }}
-                        >
+                        <div style={{ fontSize: '0.8rem', position: 'relative', top: -30 }}>
                           Drop images here or click &nbsp;
                           <span style={{ color: '#004C99', textDecoration: 'underline' }}>
                             browse
@@ -1267,7 +1250,7 @@ const ProductForm = (props) => {
               <Grid item xs={12} sm={12} md={4}>
                 <h3 style={{ marginBottom: 5, marginTop: 0 }}>Product Items</h3>
                 <span style={{ fontSize: '0.9rem' }}>
-                  Select item/s from the inventory to create a new product
+                  Select item/s from the inventory to create <br /> a new product
                 </span>
               </Grid>
               <Grid item xs={12} sm={12} md={8} container spacing={3}>
@@ -1389,8 +1372,7 @@ const ProductForm = (props) => {
                       />
                       <FormHelperText
                         error={
-                          productType.standard_checked &&
-                          errors.standardProductItem !== false
+                          productType.standard_checked && errors.standardProductItem !== false
                         }
                       >
                         {productType.standard_checked && errors.standardProductItem

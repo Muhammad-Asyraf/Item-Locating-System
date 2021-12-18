@@ -20,7 +20,7 @@ class Layer extends Model {
         relation: Model.BelongsToOneRelation,
         modelClass: require('../layouts/model'),
         join: {
-          from: 'layers.layout_uuid',
+          from: 'layer.layout_uuid',
           to: 'layout.uuid',
         },
       },

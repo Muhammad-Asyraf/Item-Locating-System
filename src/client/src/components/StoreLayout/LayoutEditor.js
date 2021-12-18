@@ -26,7 +26,7 @@ import {
   mapStyles,
   firstBtn,
   lastBtn,
-} from './mapConfig';
+} from './utils/mapConfig';
 
 const useStyles = makeStyles(() => ({
   refreshButton: {
@@ -59,21 +59,22 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-/* eslint-disable no-underscore-dangle */
 /* eslint-disable camelcase */
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable arrow-body-style */
 const Editor = (props) => {
   const classes = useStyles();
+  const storeUUID = localStorage.getItem('storeUUID');
+
   const mapRef = useRef(null);
-  // const mapBoxTileRef = useRef(null);
   const editedShapesRef = useRef([]);
   const isDrawingRef = useRef(false);
   const floorLockToggle = useRef(false);
   const floorLayers = useRef([]);
   const shelfLayers = useRef([]);
   const shelfPartitionLayers = useRef([]);
-  // const mapboxToken = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
+  const savedLayers = useRef([]);
   const storeViewport = [50, 50];
-  // const storeViewport = [3.1717115606179553, 101.69704167783205];
 
   const {
     floor: { shapes: floorComponent, config: floorConfig },
@@ -89,123 +90,7 @@ const Editor = (props) => {
   const shelfShapes = shelfConfig.shapes;
   const shelfPartitionShapes = shelfPartitionConfig.shapes;
 
-  const { setFloorIsLocked, setZoomLevel, saveLayout } = props;
-  // const mapboxTileURL =
-  //   'https://api.mapbox.com/styles/v1/loketla/ckwt0h82z3pvu14mkkjoypl6h/tiles/{z}/{x}/{y}@2x?access_token={accessToken}';
-
-  // styles/loketla/ckwt0h82z3pvu14mkkjoypl6h
-
-  useEffect(() => {
-    const map = L.map('map', mapDefaultConfig).setView(storeViewport, 2);
-    map.flyTo(storeViewport, 2.8);
-    L.marker([50, 50]).addTo(map);
-    map.fitBounds(mapBounds);
-    console.log(floorPlanBounds);
-
-    // override default hidden tile by creating a plugin and create a visible tile
-    L.GridLayer.GridDebug = L.GridLayer.extend({
-      createTile: () => {
-        const tile = document.createElement('div');
-        tile.style.outline = '1px solid rgba(0,0,0,0.1)';
-        return tile;
-      },
-    });
-
-    L.gridLayer.gridDebug = (opts) => new L.GridLayer.GridDebug(opts);
-
-    map.addLayer(L.gridLayer.gridDebug());
-
-    // map.flyTo(storeViewport, 15);
-
-    // const mapBoxTile = L.tileLayer(mapboxTileURL, {
-    //   maxZoom: 23.5,
-    //   minZoom: 15,
-    //   tileSize: 512,
-    //   zoomOffset: -1,
-    //   accessToken: mapboxToken,
-    // }).addTo(map);
-
-    map.createPane('floor').style.zIndex = 350;
-    map.createPane('shelf').style.zIndex = 370;
-    map.createPane('shelfPartition').style.zIndex = 390;
-
-    map._getPaneRenderer('floor').options.padding = 100;
-    map._getPaneRenderer('shelf').options.padding = 100;
-    map._getPaneRenderer('shelfPartition').options.padding = 100;
-
-    // Others
-    // const floorPlanSVG = '/app/public/uploaded_layout/floorPlan.svg';
-    // const floorPlanSVG = '/app/public/uploaded_layout/layout-1.svg';
-    // const floorPlanSVG = '/app/public/uploaded_layout/layout-2.svg';
-    // const floorPlanSVG = '/app/public/uploaded_layout/layout-3.svg';
-    const floorPlanSVG = '/app/public/uploaded_layout/layout-4.svg';
-
-    L.imageOverlay(floorPlanSVG, floorPlanBounds, { pane: 'floor' }).addTo(map);
-
-    map.pm.addControls(geomanConfig);
-    map.pm.Toolbar.copyDrawControl('Polyline', floorComponent.line);
-    map.pm.Toolbar.copyDrawControl('Rectangle', floorComponent.rectangle);
-    map.pm.Toolbar.copyDrawControl('Polygon', floorComponent.polygon);
-
-    map.pm.Toolbar.copyDrawControl('Circle', shelfComponent.circle);
-    map.pm.Toolbar.copyDrawControl('Rectangle', shelfComponent.rectangle);
-    map.pm.Toolbar.copyDrawControl('Polygon', shelfComponent.polygon);
-
-    map.pm.Toolbar.copyDrawControl('Circle', shelfPartitionComponent.circle);
-    map.pm.Toolbar.copyDrawControl('Rectangle', shelfPartitionComponent.rectangle);
-    map.pm.Toolbar.copyDrawControl('Polygon', shelfPartitionComponent.polygon);
-
-    map.pm.setPathOptions(floorStyles, {
-      ignoreShapes: floorConfig.ignoreShapes,
-    });
-    map.pm.setPathOptions(shelfStyles, {
-      ignoreShapes: shelfConfig.ignoreShapes,
-    });
-    map.pm.setPathOptions(shelfPartitionStyles, {
-      ignoreShapes: shelfPartitionConfig.ignoreShapes,
-    });
-
-    map.pm.setGlobalOptions(geomanGlobalOpt);
-
-    map.on('zoomend', () => {
-      const zoomlevel = map.getZoom();
-      // const floorStyles = mapComponent.floor.config.styles.pathOptions;
-      // const { ignoreShapes: floorIgnoreShapes } = mapComponent.floor.config;
-      console.log('The layers', zoomlevel);
-      setZoomLevel(Math.round(zoomlevel) - 2);
-
-      if (zoomlevel >= 23) {
-        // map.removeLayer(mapBoxTile);
-      } else if (zoomlevel < 23 && zoomlevel > 21) {
-        // if (!map.hasLayer(mapBoxTile)) {
-        //   map.addLayer(mapBoxTile);
-        // }
-      }
-
-      // console.log('ada tak', map.hasLayer(mapBoxTile));
-
-      // if (zoomlevel < 21) {
-      //   mapRef.current.pm.disableGlobalEditMode();
-      //   layers.forEach((layer) => {
-      //     if (!floorIgnoreShapes.includes(layer.pm._shape)) {
-      //       layer.setStyle({ ...floorStyles, stroke: false });
-      //     }
-      //   });
-      // } else {
-      //   layers.forEach((layer) => {
-      //     if (!floorIgnoreShapes.includes(layer.pm._shape)) {
-      //       layer.setStyle({ ...floorStyles, stroke: true });
-      //     }
-      //   });
-      // }
-    });
-
-    mapRef.current = map;
-    // mapBoxTileRef.current = mapBoxTile;
-    return () => {
-      map.remove();
-    };
-  }, []);
+  const { floorPlan, setFloorIsLocked, setZoomLevel, saveLayout, leafletLayers, mode } = props;
 
   const reCenter = () => {
     mapRef.current.flyTo(storeViewport, 2.8);
@@ -248,18 +133,7 @@ const Editor = (props) => {
   const enableEdit = ({ currentTarget }) => {
     const { myParam: layer } = currentTarget;
 
-    console.log(
-      'Im up click?',
-      layer.pm.rotateEnabled(),
-      'shiftKey? ',
-      layer._path.shiftKeyHold
-    );
-
-    // console.log('check dis mododdoodod edit', isDrawingRef.current);
-
     if (!layer.pm.rotateEnabled() && !isDrawingRef.current) {
-      // console.log('Eh eh babi ni ter triggered');
-
       layer._path.isFromRotate = false;
 
       if (!layer._path.shiftKeyHold) {
@@ -275,19 +149,13 @@ const Editor = (props) => {
     }
   };
 
-  // layer._path.myParam = layer;
-  // L.DomEvent.on(layer._path, 'keydown', handleEditKeyDown);
-
   const initShapeObj = (layer, shape) => {
-    layer._path.isFromRotate = false;
-
     const floorPaneShapes = floorShapes.includes(shape);
     const shelfPaneShapes = shelfShapes.includes(shape);
     const shelfPartitionPaneShapes = shelfPartitionShapes.includes(shape);
+    layer._path.isFromRotate = false;
 
     layer.on('pm:enable', ({ layer: editedLayer }) => {
-      // console.log('will add to list', editedLayer, !editedLayer._path.isFromRotate);
-
       if (floorPaneShapes) {
         editedLayer.setStyle({ ...floorStyles, dashArray: '10' });
       } else if (shelfPaneShapes) {
@@ -307,13 +175,6 @@ const Editor = (props) => {
     });
 
     layer.on('pm:disable', ({ layer: disabledLayer }) => {
-      console.log(
-        'will remove from list',
-        disabledLayer,
-        layer._leaflet_id,
-        !disabledLayer._path.isFromRotate
-      );
-
       if (floorPaneShapes) {
         disabledLayer.setStyle({ ...floorStyles });
       } else if (shelfPaneShapes) {
@@ -341,8 +202,6 @@ const Editor = (props) => {
     });
 
     layer._path.onmousedown = ({ srcElement }) => {
-      console.log('shape mouse down?', layer.pm.rotateEnabled());
-      // console.log('check dis mododdoodod', isDrawingRef.current);
       if (!layer.pm.rotateEnabled() && !isDrawingRef.current) {
         layer.pm.enableLayerDrag();
         if (!layer._path.shiftKeyHold) {
@@ -350,7 +209,6 @@ const Editor = (props) => {
             currentLayer.pm.disable();
           });
         }
-
         // mapRef.current.pm.disableGlobalEditMode();
         // after enableLayerDrag, find the mousedown event of the el & triggers it
         const firstKey = Object.keys(srcElement._leaflet_events)[0];
@@ -360,7 +218,7 @@ const Editor = (props) => {
 
     layer._path.onmouseover = () => {
       document.myParam = layer;
-      // console.log(layer);
+
       document.addEventListener('mouseup', enableEdit);
     };
 
@@ -368,6 +226,37 @@ const Editor = (props) => {
       document.myParam = layer;
       document.removeEventListener('mouseup', enableEdit);
     };
+  };
+
+  const initLayoutLayers = (shape, pane, latLngs, meta_data, styles) => {
+    const isRectangle = shape.includes('Rectangle');
+    const isPolygon = shape.includes('Polygon');
+    const isCircle = shape.includes('Circle');
+    const isPolyline = shape.includes('Line');
+
+    const { angle, radius } = meta_data;
+
+    let newLayer;
+
+    if (isRectangle) {
+      newLayer = L.rectangle(Object.values(latLngs), { ...styles, pane });
+    } else if (isPolygon) {
+      newLayer = L.polygon(latLngs, { ...styles, pane });
+    } else if (isCircle) {
+      newLayer = L.circle(latLngs, { ...styles, pane, radius });
+    } else if (isPolyline) {
+      newLayer = L.polyline(latLngs, { ...styles, pane });
+    }
+
+    newLayer.pm._shape = shape;
+    newLayer.addTo(mapRef.current);
+
+    // if its a rotated shape, adjust angle
+    if (angle) {
+      newLayer.pm.rotateLayerToAngle(angle);
+    }
+
+    return newLayer;
   };
 
   const drawLayer = (shape, pane, styles, layer) => {
@@ -398,12 +287,6 @@ const Editor = (props) => {
       layer.pm.rotateLayerToAngle(initialAngle);
     }
 
-    // adjust duplicate shape's latlngs to be few meters away
-    // const adjustedLatLngs = oriLatLngs.map((latlng) => ({
-    //   lat: latlng.lat,
-    //   lng: latlng.lng,
-    // }));
-
     if (isRectangle) {
       duplicateLayer = L.rectangle(latLngs, { ...styles, pane });
     } else if (isPolygon) {
@@ -425,30 +308,27 @@ const Editor = (props) => {
     return duplicateLayer;
   };
 
-  const duplicateShapes = () => {
-    editedShapesRef.current.forEach((currentLayer) => {
+  const duplicateShapes = (listToDuplicates) => {
+    listToDuplicates.forEach((currentLayer) => {
       const { _shape: shape } = currentLayer.pm;
       const floorPaneShapes = floorShapes.includes(shape);
       const shelfPaneShapes = shelfShapes.includes(shape);
       const shelfPartitionPaneShapes = shelfPartitionShapes.includes(shape);
 
       let newLayer;
-      console.log('duplicate layer', currentLayer);
 
       if (floorPaneShapes) {
         newLayer = drawLayer(shape, 'floor', floorStyles, currentLayer);
-        newLayer.id = `FL-${uuidv4()}`;
         floorLayers.current = [...floorLayers.current, newLayer];
       } else if (shelfPaneShapes) {
         newLayer = drawLayer(shape, 'shelf', shelfStyles, currentLayer);
-        newLayer.id = `SH-${uuidv4()}`;
         shelfLayers.current = [...shelfLayers.current, newLayer];
       } else if (shelfPartitionPaneShapes) {
         newLayer = drawLayer(shape, 'shelfPartition', shelfPartitionStyles, currentLayer);
-        newLayer.id = `SP-${uuidv4()}`;
         shelfPartitionLayers.current = [...shelfPartitionLayers.current, newLayer];
       }
 
+      newLayer.id = uuidv4();
       initShapeObj(newLayer);
     });
   };
@@ -457,7 +337,7 @@ const Editor = (props) => {
     const { altKey, ctrlKey, shiftKey, key, repeat } = evt;
 
     if (repeat) return;
-    // console.log('pressed key checked', key, editedShapesRef.current);
+
     if (altKey && editedShapesRef.current.length > 0) {
       editedShapesRef.current.forEach(({ pm, _path }) => {
         _path.isFromRotate = true;
@@ -469,19 +349,17 @@ const Editor = (props) => {
 
     if (shiftKey) {
       // get all layers except 1st index since its the floor plan layer
-      const allLayers = mapRef.current.pm.getGeomanLayers();
-      allLayers.shift();
+      const allLayers = mapRef.current.pm.getGeomanLayers().slice(1);
 
       allLayers.forEach(({ _path }) => {
         _path.shiftKeyHold = true;
       });
-      // console.log(allLayers);
     }
 
     if (ctrlKey && key === 'd') {
       evt.preventDefault();
 
-      duplicateShapes();
+      duplicateShapes(editedShapesRef.current);
       mapRef.current.pm.disableGlobalEditMode();
       mapRef.current.pm.disableGlobalRotateMode();
     }
@@ -509,8 +387,6 @@ const Editor = (props) => {
   };
 
   const handleKeyUp = ({ key }) => {
-    // console.log('pressed up:', key);
-
     if (key === 'Alt' && editedShapesRef.current.length > 0) {
       editedShapesRef.current.forEach(({ pm }) => {
         pm.disableRotate();
@@ -521,21 +397,15 @@ const Editor = (props) => {
     }
 
     if (key === 'Shift') {
-      const allLayers = mapRef.current.pm.getGeomanLayers();
-      allLayers.shift();
+      const allLayers = mapRef.current.pm.getGeomanLayers().slice(1);
 
       allLayers.forEach(({ _path }) => {
         _path.shiftKeyHold = false;
       });
-
-      // mapRef.current.pm.disableGlobalEditMode();
-      // editedShapesRef.current = [];
     }
   };
 
   const handleDblClick = ({ target }) => {
-    // mapRef.current.pm.disableGlobalEditMode();
-
     if (!target.className.baseVal && editedShapesRef.current.length > 0) {
       editedShapesRef.current.forEach(({ _path, pm }) => {
         _path.isFromRotate = false;
@@ -545,83 +415,37 @@ const Editor = (props) => {
     }
   };
 
-  useEffect(() => {
-    mapRef.current.on('pm:drawstart', () => {
-      isDrawingRef.current = true;
-      // { workingLayer, shape }
-      // workingLayer.options.pane = 'shelfPartition';
-
-      // console.log('lllllllllllll', workingLayer, shape);
-    });
-
-    mapRef.current.on('pm:drawend', () => {
-      isDrawingRef.current = false;
-    });
-
-    mapRef.current.on('pm:create', (e) => {
-      document.addEventListener('keydown', handleKeyDown);
-      document.addEventListener('dblclick', handleDblClick);
-      document.addEventListener('keyup', handleKeyUp);
-
-      console.log(e);
-      const currentLayer = e.layer;
-      const { shape } = e;
-
-      // mapRef.current.removeLayer(currentLayer);
-      currentLayer.remove();
-
+  const loadLayers = (layers) => {
+    layers.forEach(({ layer_coordinate: latLngs, meta_data, shape, uuid }) => {
       const floorPaneShapes = floorShapes.includes(shape);
       const shelfPaneShapes = shelfShapes.includes(shape);
       const shelfPartitionPaneShapes = shelfPartitionShapes.includes(shape);
 
-      // console.log('shape', shape);
-      // console.log('floorPaneShapes', floorShapes, floorPaneShapes);
-      // console.log('shelfPaneShapes', shelfShapes, shelfPaneShapes);
-      // console.log('shelfPartitionPaneShapes', shelfPartitionShapes, shelfPartitionPaneShapes);
+      let newLayer;
 
       if (floorPaneShapes) {
-        currentLayer.options.pane = 'floor';
-        currentLayer.id = `FL-${uuidv4()}`;
-        floorLayers.current = [...floorLayers.current, currentLayer];
+        newLayer = initLayoutLayers(shape, 'floor', latLngs, meta_data, floorStyles);
+        floorLayers.current = [...floorLayers.current, newLayer];
       } else if (shelfPaneShapes) {
-        currentLayer.options.pane = 'shelf';
-        currentLayer.id = `SH-${uuidv4()}`;
-        shelfLayers.current = [...shelfLayers.current, currentLayer];
+        newLayer = initLayoutLayers(shape, 'shelf', latLngs, meta_data, shelfStyles);
+        shelfLayers.current = [...shelfLayers.current, newLayer];
       } else if (shelfPartitionPaneShapes) {
-        currentLayer.options.pane = 'shelfPartition';
-        currentLayer.id = `SP-${uuidv4()}`;
-        shelfPartitionLayers.current = [...shelfPartitionLayers.current, currentLayer];
-      }
-
-      // console.log('mari menengok', currentLayer.id);
-      // console.log('mari menengok floorLayers', floorLayers.current);
-      // console.log('mari menengok shelfLayers', shelfLayers.current);
-      // console.log('mari menengok shelfPartitionLayers', shelfPartitionLayers.current);
-      currentLayer.addTo(mapRef.current);
-
-      if (shelfPartitionPaneShapes && shelfLayers.current.length > 0) {
-        const center = shape.includes('Circle')
-          ? currentLayer.getLatLng()
-          : currentLayer.getCenter();
-
-        const parentShelf = L.GeometryUtil.closestLayer(
-          mapRef.current,
-          shelfLayers.current,
-          center
+        newLayer = initLayoutLayers(
+          shape,
+          'shelfPartition',
+          latLngs,
+          meta_data,
+          shelfPartitionStyles
         );
-        console.log('parentShelf', parentShelf.layer._path);
+
+        shelfPartitionLayers.current = [...shelfPartitionLayers.current, newLayer];
       }
-      initShapeObj(currentLayer, shape);
+      newLayer.id = uuid;
+      initShapeObj(newLayer);
     });
+  };
 
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-      document.removeEventListener('dblclick', handleDblClick);
-      document.removeEventListener('keyup', handleKeyUp);
-    };
-  }, []);
-
-  const preparePayload = (layer) => {
+  const reconstructLayers = (layer) => {
     const {
       pm: { _shape: shape },
       id,
@@ -630,7 +454,6 @@ const Editor = (props) => {
 
     const isCircle = shape.includes('Circle');
     const isPolyline = shape.includes('Line');
-    // const shelfPartitionPaneShapes = shelfPartitionShapes.includes(shape);
 
     let latLngs = null;
     let radius = null;
@@ -656,25 +479,219 @@ const Editor = (props) => {
     }
 
     return {
-      id,
+      uuid: id,
       shape,
-      latLngs,
-      radius,
-      angle: initialAngle,
+      layer_coordinate: Array.isArray(latLngs) ? { ...latLngs } : latLngs,
+      meta_data: { radius, angle: initialAngle },
     };
   };
 
-  /* eslint-disable arrow-body-style */
+  const prepareSavedLayers = () => {
+    const _floorLayers = floorLayers.current.map((layer) => reconstructLayers(layer));
+    const _shelfLayers = shelfLayers.current.map((layer) => reconstructLayers(layer));
+    const _shelfPartitionLayers = shelfPartitionLayers.current.map((layer) => {
+      return reconstructLayers(layer);
+    });
+
+    return [..._floorLayers, ..._shelfLayers, ..._shelfPartitionLayers];
+  };
+
+  const initMap = () => {
+    const map = L.map('map', mapDefaultConfig).setView(storeViewport, 2);
+    map.fitBounds(mapBounds);
+
+    // override default hidden tile by creating a plugin and create a visible tile
+    L.GridLayer.GridDebug = L.GridLayer.extend({
+      createTile: () => {
+        const tile = document.createElement('div');
+        tile.style.outline = '1px solid rgba(0,0,0,0.1)';
+        return tile;
+      },
+    });
+
+    L.gridLayer.gridDebug = (opts) => new L.GridLayer.GridDebug(opts);
+    map.addLayer(L.gridLayer.gridDebug());
+
+    mapRef.current = map;
+  };
+
+  const initCustomPane = () => {
+    const map = mapRef.current;
+
+    map.createPane('floor').style.zIndex = 350;
+    map.createPane('shelf').style.zIndex = 370;
+    map.createPane('shelfPartition').style.zIndex = 390;
+
+    map._getPaneRenderer('floor').options.padding = 100;
+    map._getPaneRenderer('shelf').options.padding = 100;
+    map._getPaneRenderer('shelfPartition').options.padding = 100;
+  };
+
+  const initGeoman = () => {
+    const map = mapRef.current;
+
+    map.pm.addControls(geomanConfig);
+
+    map.pm.Toolbar.copyDrawControl('Polyline', floorComponent.line);
+    map.pm.Toolbar.copyDrawControl('Rectangle', floorComponent.rectangle);
+    map.pm.Toolbar.copyDrawControl('Polygon', floorComponent.polygon);
+
+    map.pm.Toolbar.copyDrawControl('Circle', shelfComponent.circle);
+    map.pm.Toolbar.copyDrawControl('Rectangle', shelfComponent.rectangle);
+    map.pm.Toolbar.copyDrawControl('Polygon', shelfComponent.polygon);
+
+    map.pm.Toolbar.copyDrawControl('Circle', shelfPartitionComponent.circle);
+    map.pm.Toolbar.copyDrawControl('Rectangle', shelfPartitionComponent.rectangle);
+    map.pm.Toolbar.copyDrawControl('Polygon', shelfPartitionComponent.polygon);
+
+    map.pm.setGlobalOptions(geomanGlobalOpt);
+  };
+
+  const initFloorPlan = () => {
+    const map = mapRef.current;
+
+    if (floorPlan) {
+      L.imageOverlay(floorPlan.path, floorPlanBounds, { pane: 'floor' }).addTo(map);
+    }
+
+    // map.flyTo(storeViewport, 2.8);
+  };
+
+  const initDrawLayerStyles = () => {
+    const map = mapRef.current;
+
+    map.pm.setPathOptions(floorStyles, {
+      ignoreShapes: floorConfig.ignoreShapes,
+    });
+    map.pm.setPathOptions(shelfStyles, {
+      ignoreShapes: shelfConfig.ignoreShapes,
+    });
+    map.pm.setPathOptions(shelfPartitionStyles, {
+      ignoreShapes: shelfPartitionConfig.ignoreShapes,
+    });
+  };
+
+  const setZoomBehavior = () => {
+    const map = mapRef.current;
+
+    map.on('zoomend', () => {
+      const zoomlevel = map.getZoom();
+      setZoomLevel(Math.round(zoomlevel) - 2);
+
+      if (zoomlevel >= 23) {
+        // map.removeLayer(mapBoxTile);
+      } else if (zoomlevel < 23 && zoomlevel > 21) {
+        // if (!map.hasLayer(mapBoxTile)) {
+        //   map.addLayer(mapBoxTile);
+        // }
+      }
+    });
+  };
+
+  const initLayersEvent = () => {
+    mapRef.current.on('pm:drawstart', () => {
+      isDrawingRef.current = true;
+    });
+
+    mapRef.current.on('pm:drawend', () => {
+      isDrawingRef.current = false;
+    });
+
+    mapRef.current.on('pm:create', ({ layer: currentLayer, shape }) => {
+      const floorPaneShapes = floorShapes.includes(shape);
+      const shelfPaneShapes = shelfShapes.includes(shape);
+      const shelfPartitionPaneShapes = shelfPartitionShapes.includes(shape);
+
+      currentLayer.remove();
+
+      if (floorPaneShapes) {
+        currentLayer.options.pane = 'floor';
+        floorLayers.current = [...floorLayers.current, currentLayer];
+      } else if (shelfPaneShapes) {
+        currentLayer.options.pane = 'shelf';
+        shelfLayers.current = [...shelfLayers.current, currentLayer];
+      } else if (shelfPartitionPaneShapes) {
+        currentLayer.options.pane = 'shelfPartition';
+        shelfPartitionLayers.current = [...shelfPartitionLayers.current, currentLayer];
+      }
+
+      currentLayer.id = uuidv4();
+      currentLayer.addTo(mapRef.current);
+
+      if (shelfPartitionPaneShapes && shelfLayers.current.length > 0) {
+        const center = shape.includes('Circle')
+          ? currentLayer.getLatLng()
+          : currentLayer.getCenter();
+
+        const parentShelf = L.GeometryUtil.closestLayer(
+          mapRef.current,
+          shelfLayers.current,
+          center
+        );
+        console.log('parentShelf', parentShelf.layer._path);
+      }
+
+      initShapeObj(currentLayer, shape);
+    });
+  };
+
+  useEffect(() => {
+    initMap();
+    initCustomPane();
+    initFloorPlan();
+    initGeoman();
+    initDrawLayerStyles();
+
+    if (mode === 'edit') {
+      loadLayers(leafletLayers);
+    }
+
+    if (savedLayers.current) {
+      console.log('savedLayers', savedLayers.current);
+      loadLayers(savedLayers.current);
+      // loadLayers();
+      // duplicateShapes(floorLayers.current);
+      // duplicateShapes(shelfLayers.current);
+      // duplicateShapes(shelfPartitionLayers.current);
+    }
+
+    setZoomBehavior();
+    initLayersEvent();
+
+    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('dblclick', handleDblClick);
+    document.addEventListener('keyup', handleKeyUp);
+
+    return () => {
+      savedLayers.current = prepareSavedLayers();
+
+      floorLayers.current = [];
+      shelfLayers.current = [];
+      shelfPartitionLayers.current = [];
+
+      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('dblclick', handleDblClick);
+      document.removeEventListener('keyup', handleKeyUp);
+
+      mapRef.current.remove();
+    };
+  }, [floorPlan]);
+
+  /// save logic //////////////////
+
   const handleSavelayout = (e) => {
     e.preventDefault();
 
-    const _floorLayers = floorLayers.current.map((layer) => preparePayload(layer));
-    const _shelfLayers = shelfLayers.current.map((layer) => preparePayload(layer));
-    const _shelfPartitionLayers = shelfPartitionLayers.current.map((layer) => {
-      return preparePayload(layer);
-    });
+    const formData = new FormData();
+    const layers = prepareSavedLayers();
 
-    saveLayout({ _floorLayers, _shelfLayers, _shelfPartitionLayers });
+    formData.append('multer_type', 'layout');
+    formData.append('name', 'Floor 1');
+    formData.append('store_uuid', storeUUID);
+    formData.append('layers_', JSON.stringify(layers));
+    formData.append('floorPlanSVG', floorPlan.file);
+
+    saveLayout(formData);
   };
 
   return (

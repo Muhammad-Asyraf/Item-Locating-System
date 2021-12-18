@@ -21,7 +21,7 @@ class Layout extends Model {
         modelClass: require('../layers/model'),
         join: {
           from: 'layout.uuid',
-          to: 'layers.layout_uuid',
+          to: 'layer.layout_uuid',
         },
       },
       store: {

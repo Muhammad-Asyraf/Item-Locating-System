@@ -206,7 +206,7 @@ const ItemCreate = (props) => {
       formData.append('note', quillText.editorHtml);
       formData.append('sub_category', JSON.stringify(selectedCategory));
       formData.append('store_uuid', storeUUID);
-
+      formData.append('multer_type', 'image');
       for (const key of Object.keys(image.imgFiles)) {
         formData.append('imgCollection', image.imgFiles[key]);
       }
@@ -381,12 +381,8 @@ const ItemCreate = (props) => {
     let currentImagesPreview = image.imgPreviews;
     let currentImagesFiles = image.imgFiles;
 
-    currentImagesPreview = currentImagesPreview.filter(
-      ({ path }) => path !== selectedUrl
-    );
-    currentImagesFiles = currentImagesFiles.filter(
-      ({ name }) => name !== selectedImgName
-    );
+    currentImagesPreview = currentImagesPreview.filter(({ path }) => path !== selectedUrl);
+    currentImagesFiles = currentImagesFiles.filter(({ name }) => name !== selectedImgName);
     setImage({
       imgFiles: [...currentImagesFiles],
       imgPreviews: [...currentImagesPreview],

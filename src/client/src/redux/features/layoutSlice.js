@@ -2,13 +2,23 @@ import { createSlice } from '@reduxjs/toolkit';
 
 import { loadingState, loadedState } from '../states/loadState';
 import { errorState } from '../states/errorState';
-import { setLayoutLayers } from '../states/layoutState';
+import { setLayout, setLayouts, updatedLayoutState } from '../states/layoutState';
 
-import { updateLayout, getLayout } from '../thunks/layoutThunk';
+import {
+  getLayout,
+  getLayouts,
+  addLayout,
+  deleteLayout,
+  deleteMultipleLayouts,
+  updateLayout,
+  patchSingleLayout,
+  patchMultipleLayouts,
+} from '../thunks/layoutThunk';
 
 const initialState = {
   isLoading: false,
-  layoutLayers: [],
+  layouts: [],
+  layout: {},
   status: null,
   message: [],
   errors: [],
@@ -20,18 +30,32 @@ const layoutSlice = createSlice({
   reducers: {
     processingRequest: loadingState,
     processed: loadedState,
+    quickUpdateLayouts: updatedLayoutState,
   },
   extraReducers: {
+    [getLayout.fulfilled]: setLayout,
     [getLayout.pending]: loadingState,
-    [getLayout.fulfilled]: setLayoutLayers,
+    [getLayout.rejected]: errorState,
+    [getLayouts.fulfilled]: setLayouts,
+    [getLayouts.pending]: loadingState,
+    [getLayouts.rejected]: errorState,
+    [addLayout.pending]: loadingState,
+    [addLayout.rejected]: errorState,
+    [deleteLayout.rejected]: errorState,
+    [deleteMultipleLayouts.rejected]: errorState,
+    [patchSingleLayout.rejected]: errorState,
     [updateLayout.pending]: loadingState,
     [updateLayout.rejected]: errorState,
+    [patchMultipleLayouts.pending]: loadingState,
+    [patchMultipleLayouts.rejected]: errorState,
+    [patchMultipleLayouts.fulfilled]: loadedState,
   },
 });
 
-export const { processingRequest, processed } = layoutSlice.actions;
+export const { processingRequest, processed, quickUpdateLayouts } = layoutSlice.actions;
 
-export const selectLayoutLayers = (state) => state.layout.layoutLayers;
+export const selectLayout = (state) => state.layout.layout;
+export const selectLayouts = (state) => state.layout.layouts;
 export const selectIsLoading = (state) => state.layout.isLoading;
 
 export default layoutSlice.reducer;

@@ -256,8 +256,3 @@ exports.patchMultipleProduct = async (req, res, next) => {
     next(err);
   }
 };
-
-// console.log(req.files);
-// console.log(req.body);
-// await removeFiles(req.files);
-// res.json('Yay');

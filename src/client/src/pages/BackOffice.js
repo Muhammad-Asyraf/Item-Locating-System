@@ -1,7 +1,6 @@
 import React from 'react';
 import { Switch, Route } from 'react-router-dom';
 
-import DashboardPage from './Dashboard';
 import ItemPages from './Items';
 import SalesPage from './Sales';
 import ProductPages from './Products';
@@ -15,7 +14,6 @@ const BackOffice = () => {
   return (
     <Layout>
       <Switch>
-        <Route path={`/${storeUrl}/dashboard`} component={DashboardPage} />
         <Route path={`/${storeUrl}/item`} component={ItemPages} />
         <Route path={`/${storeUrl}/sales`} component={SalesPage} />
         <Route path={`/${storeUrl}/product`} component={ProductPages} />

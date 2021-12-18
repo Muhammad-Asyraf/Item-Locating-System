@@ -7,15 +7,8 @@ import Checkbox from '@mui/material/Checkbox';
 import TableSortLabel from '@mui/material/TableSortLabel';
 
 const EnhancedTableHead = (props) => {
-  const {
-    headCells,
-    onSelectAllClick,
-    order,
-    orderBy,
-    numSelected,
-    rowCount,
-    onRequestSort,
-  } = props;
+  const { headCells, onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort } =
+    props;
 
   const createSortHandler = (property) => (event) => {
     onRequestSort(event, property);
@@ -74,7 +67,7 @@ const EnhancedTableHead = (props) => {
             padding={headCell.disablePadding ? 'none' : 'normal'}
             sortDirection={orderBy === headCell.id ? order : false}
           >
-            {!['action'].includes(headCell.id) ? (
+            {!['action'].includes(headCell.id) && (
               <TableSortLabel
                 active={orderBy === headCell.id}
                 direction={orderBy === headCell.id ? order : 'asc'}
@@ -83,7 +76,7 @@ const EnhancedTableHead = (props) => {
               >
                 {headCell.icon}&nbsp; {headCell.label}
               </TableSortLabel>
-            ) : null}
+            )}
           </TableCell>
         ))}
       </TableRow>
@@ -91,5 +84,4 @@ const EnhancedTableHead = (props) => {
   );
 };
 
-// 'is_active', 'stock_status'
 export default EnhancedTableHead;

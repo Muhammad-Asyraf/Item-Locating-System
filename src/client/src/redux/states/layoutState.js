@@ -1,11 +1,18 @@
-export const setLayoutLayers = (state, { payload }) => ({
+export const setLayouts = (state, { payload }) => ({
   ...state,
-  layoutLayers: payload.layoutLayers,
+  layouts: payload.layouts,
   message: payload.message,
   status: payload.status,
 });
 
-export const updatedItemState = (state, { payload }) => ({
+export const setLayout = (state, { payload }) => ({
   ...state,
-  items: payload.items,
+  layout: payload.layout,
+  message: payload.message,
+  status: payload.status,
+});
+
+export const updatedLayoutState = (state, { payload }) => ({
+  ...state,
+  layouts: payload.layouts,
 });

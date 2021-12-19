@@ -36,6 +36,9 @@ import Loading from './components/Loading';
 import AuthTabsNavigator from './navigation/AuthTabsNavigator';
 import MainStackNavigator from './navigation/MainStackNavigator';
 
+// Geolocation
+import BackgroundGeolocation from '@mauron85/react-native-background-geolocation';
+
 // Auth modules
 import auth from '@react-native-firebase/auth';
 

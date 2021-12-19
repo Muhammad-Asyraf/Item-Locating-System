@@ -1,8 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Text, Button } from 'react-native-paper';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import RouteStoreItem from './RouteStoreItem';
 import Icon1 from 'react-native-vector-icons/MaterialIcons';
 import Icon2 from 'react-native-vector-icons/MaterialCommunityIcons';
 
@@ -11,25 +9,20 @@ import { useNavigation } from '@react-navigation/native';
 
 import { Theme, TextStyle } from '../../styles/Theme';
 
-export default function EnRouteDetails({ style, currentRoute }) {
+export default function EnRouteDetails({ style, store }) {
   /**
-   * currentRoute object: {currentStop, totalStops, storeID, storeName, price, distance, itemCount, lat, lng}
+   * store object: {key(currentStop), totalStops, uuid, name, price, distance, itemCount, coordinates}
    */
   //const [isExpanded, setExpanded] = useState(false);
-  const [currentStop, setCurrentStop] = useState(0);
-  const [totalStops, setTotalStops] = useState(0);
-  const [price, setPrice] = useState(0);
-  const [storeID, setStoreID] = useState('STORE_ID');
-  const [storeName, setStoreName] = useState('STORE_NAME');
-  const [distance, setDistance] = useState('DISTANCE');
-  const [itemCount, setItemCount] = useState('ITEM_COUNT');
+  const [isLoading, setLoading] = useState(true);
+  const [storeDetail, setStoreDetail] = useState(store);
   const navigation = useNavigation();
 
   const openMaps = () => {
     openMap({
       provider: 'google',
-      latitude: 3.3269192256373805,
-      longitude: 101.54644046731136,
+      latitude: storeDetail.coordinate[1],
+      longitude: storeDetail.coordinate[0],
     });
   };
 
@@ -39,14 +32,26 @@ export default function EnRouteDetails({ style, currentRoute }) {
       .navigate('Floor Plan', { storeID: 'test' });
   };
 
+  const load = () => {
+    //console.log(`storeDetail: ${JSON.stringify(store)}`);
+
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    if (isLoading) {
+      load();
+    }
+  });
+
   return (
     <View style={styles.container} {...style}>
       <View style={styles.routeContentContainer}>
         <Text style={[TextStyle.overline1, styles.overlineText]}>
-          {`En Route \u00B7 ${currentStop} / ${totalStops} stops`}
+          {`En Route \u00B7 ${storeDetail.key} / ${storeDetail.totalStops} stops`}
         </Text>
         <Text style={[TextStyle.headline6, styles.containerTitle]}>
-          {storeName}
+          {storeDetail.name}
         </Text>
         <View style={styles.storeDetailContainer}>
           <View style={styles.storeDetailItem}>
@@ -56,7 +61,7 @@ export default function EnRouteDetails({ style, currentRoute }) {
               color={Theme.colors.placeholder}
             />
             <Text style={[TextStyle.caption, styles.text, styles.detailText]}>
-              {distance}
+              {storeDetail.distance}
             </Text>
           </View>
           <View style={styles.storeDetailItem}>
@@ -66,7 +71,7 @@ export default function EnRouteDetails({ style, currentRoute }) {
               color={Theme.colors.placeholder}
             />
             <Text style={[TextStyle.caption, styles.text, styles.detailText]}>
-              {itemCount}
+              {storeDetail.itemCount}
             </Text>
           </View>
         </View>

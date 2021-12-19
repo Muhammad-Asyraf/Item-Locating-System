@@ -142,7 +142,6 @@ const styles = StyleSheet.create({
   },
   listSection: {
     color: '#707070',
-    fontFamily: 'interSemiBold',
     fontSize: 14,
     letterSpacing: 0.1,
     marginHorizontal: 16,

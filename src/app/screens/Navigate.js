@@ -1,55 +1,286 @@
 // Components
-import React, { useState, useEffect } from 'react';
-import { SafeAreaView, View, StyleSheet } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { Dimensions, View, StyleSheet } from 'react-native';
 import CartDropdown from '../components/navigation/CartDropdown';
 import LoadingSheet from '../components/core/LoadingSheet';
+import Carousel from 'react-native-snap-carousel';
 import RouteDetails from '../components/navigation/RouteDetails';
 import EnRouteDetails from '../components/navigation/EnRouteDetails';
+import marker from '../assets/icons/location-pin.png';
+
+// Redux
+import { useSelector } from 'react-redux';
 
 // Utilities
 import MapboxGL from '@react-native-mapbox-gl/maps';
-import { getLocation } from '../utils/Geolocation';
-import { getStatusBarHeight } from 'react-native-status-bar-height';
+import DirectionsProvider from '@mapbox/mapbox-sdk/services/directions';
+import { createBounds, calculateCenterCoordinate } from '../utils/Optimization';
+import { getAllCartsForUser } from '../services/LoketlistService';
+import { getOptimizedPathForCart } from '../services/OptimizationService';
 
 // Configurations
 import { mapboxAPIKey } from '../environment';
+import { Theme } from '../styles/Theme';
 
 export default function Navigate({ navigation }) {
   // Initialize Mapbox access token
   MapboxGL.setAccessToken(mapboxAPIKey);
+  const directionsProvider = DirectionsProvider({ accessToken: mapboxAPIKey });
 
-  const [cartList, setCartList] = useState([
-    {
-      label: 'Cart 1',
-      value: 'cart1',
-    },
-    {
-      label: 'Cart 2',
-      value: 'cart2',
-    },
-  ]);
-  const [coordinate, setCoordinate] = useState(null);
-  const [cartID, setCartID] = useState(cartList[0].label);
-  const [route, setRoute] = useState();
+  const { width: screenWidth } = Dimensions.get('window');
+  const { authHeader } = useSelector((state) => state.auth);
+  const { uuid, position } = useSelector((state) => state.user);
+  const [isCartLoading, setCartLoading] = useState(true);
+  const [iconLoading, setIconLoading] = useState(true);
+
+  // Populate cart dropdown items
+  const [cartList, setCartList] = useState();
+
+  // Track cart dropdown choice
+  const [cartID, setCartID] = useState();
+
+  // Store current optimized route
+  const [route, setRoute] = useState([]);
+
+  // Store current route geometry
+  const [geometry, setGeometry] = useState();
+
+  // Camera bounds
+  const [bounds, setBounds] = useState();
+
+  // Message field for loading sheet
+  const [message, setMessage] = useState();
 
   /** FLOW STATE
-   * 0-Choose cart
+   * -1 -Idle
+   * 0-Load cart
    * 1-Load path
    * 2-Path Overview
    * 3-En route
    */
   const [flowState, setFlowState] = useState(0);
 
-  useEffect(() => {
-    if (true) {
-      setCoordinate(getLocation());
-      console.log('Position : ' + coordinate);
+  const camera = useRef();
+
+  const [mapboxImages, setMapboxImages] = useState({});
+
+  // Get all user's carts
+  const fetchAllCarts = async () => {
+    setMessage('Getting your carts');
+    setCartLoading(true);
+
+    let res = await getAllCartsForUser(authHeader, uuid);
+    let carts;
+    if (res.length != 0) {
+      carts = res.map((item) => {
+        let label = item.name;
+        if (item.is_default) {
+          label = 'Your Current Cart';
+        }
+        return {
+          label,
+          value: item.uuid,
+        };
+      });
     }
-  }, []);
+    setCartList(carts);
+    setCartLoading(false);
+  };
+
+  const fetchPath = async () => {
+    setMessage('Calculating route');
+
+    let path;
+    let directionsRequest = {
+      profile: 'driving-traffic',
+      geometries: 'geojson',
+    };
+    let mapboxWaypoints = [];
+    let directions;
+    let geoJSON = {};
+
+    try {
+      path = await getOptimizedPathForCart(position, cartID);
+
+      // Set waypoint for Directions API
+      mapboxWaypoints = path.map((point) => {
+        return {
+          coordinates: [point.coordinate[0], point.coordinate[1]],
+        };
+      });
+      directionsRequest.waypoints = mapboxWaypoints;
+
+      setRoute(path);
+    } catch (error) {
+      console.log(`getOptimizedPathForCart Error! :: ${error}`);
+    }
+
+    try {
+      directions = await directionsProvider
+        .getDirections(directionsRequest)
+        .send();
+
+      geoJSON = directions.body.routes[0].geometry;
+      setBounds(createBounds(geoJSON));
+      console.log(`Bounds: ${JSON.stringify(bounds)}`);
+      //console.log(directions.body.waypoints);
+    } catch (error) {
+      console.log(`getDirections Error! :: ` + error);
+    }
+
+    setGeometry(geoJSON);
+  };
+
+  useEffect(() => {
+    console.log(`Position: ${position}`);
+
+    if (flowState == 0) {
+      if (camera.current != null) {
+        camera.current.setCamera({
+          centerCoordinate: position,
+          animationDuration: 1000,
+          zoomLevel: 16,
+        });
+      }
+    }
+
+    if (flowState == 2) {
+      console.log(`Bounds: ${JSON.stringify(bounds)}`);
+      focusRoute();
+    }
+    const run = async () => {
+      // Get all user's carts
+      if (flowState == 0) {
+        await fetchAllCarts();
+      }
+
+      if (flowState == 1) {
+        await fetchPath();
+      }
+    };
+
+    run().then(() => {
+      if (route.length != 0) {
+        setFlowState(2);
+        // DEBUG: Ensure route is stored properly
+        //console.log(`(Navigate.js)Route: ${JSON.stringify(route)}`);
+      } else {
+        setFlowState(0);
+      }
+    });
+
+    if (iconLoading) {
+      setMapboxImages({ ...mapboxImages, pin: marker });
+      setIconLoading(false);
+    }
+  }, [flowState]);
 
   const setCart = (value) => {
+    console.log(`${value} selected`);
     setCartID(value);
     setFlowState(1);
+  };
+
+  const renderDirections = () => {
+    //console.log(JSON.stringify(geometry));
+    const style = {
+      lineCap: 'round',
+      lineJoin: 'round',
+      lineColor: Theme.colors.primary,
+      lineWidth: 4,
+    };
+
+    if (geometry != null) {
+      return (
+        <MapboxGL.ShapeSource id="routeSource" shape={geometry}>
+          <MapboxGL.LineLayer id="routeLines" style={style} />
+        </MapboxGL.ShapeSource>
+      );
+    }
+  };
+
+  const renderPoints = () => {
+    let storesPoint = route.slice();
+    storesPoint.shift();
+    storesPoint.pop();
+
+    // Create geoJSON
+    let geoJSON = {
+      type: 'MultiPoint',
+      coordinates: storesPoint.map((value) => {
+        return [value.coordinate[0], value.coordinate[1]];
+      }),
+    };
+
+    //console.log(JSON.stringify(geoJSON));
+
+    const style = {
+      icon: {
+        iconImage: 'pin',
+        iconSize: 0.3,
+        iconAnchor: 'bottom',
+      },
+    };
+    return (
+      <MapboxGL.ShapeSource id="pointSource" shape={geoJSON}>
+        <MapboxGL.SymbolLayer
+          id="storePoint"
+          aboveLayerID="routeLines"
+          style={style.icon}
+        />
+      </MapboxGL.ShapeSource>
+    );
+  };
+
+  const renderCarousel = ({ item, index }) => {
+    if (index == 0) {
+      return <RouteDetails routeDetails={item} />;
+    } else {
+      return (
+        <EnRouteDetails
+          store={{ ...item, totalStops: route.length - 2, key: index }}
+        />
+      );
+    }
+  };
+
+  const getData = () => {
+    let storesDetails = route.slice();
+    storesDetails.shift();
+    storesDetails.pop();
+    return [route, ...storesDetails];
+  };
+
+  const focusStoreMarker = (slideIndex) => {
+    if (slideIndex == 0) {
+      focusRoute();
+    } else {
+      camera.current.setCamera({
+        centerCoordinate: route[slideIndex].coordinate,
+        zoomLevel: 17,
+        animationDuration: 1000,
+      });
+    }
+  };
+
+  const focusRoute = () => {
+    //console.log(`Bounds: ${JSON.stringify(bounds)}`);
+
+    calculateCenterCoordinate([bounds.ne, bounds.sw])
+      .then((center) => {
+        //console.log(`Center point: ${JSON.stringify(center)}`);
+        if (camera.current != null) {
+          camera.current.setCamera({
+            centerCoordinate: center,
+            animationDuration: 1000,
+            zoomLevel: 14,
+            padding: 48,
+          });
+        }
+      })
+      .catch((error) => {
+        console.log(`calculateCenterCoordinate() call error`);
+      });
   };
 
   return (
@@ -61,24 +292,46 @@ export default function Navigate({ navigation }) {
       }}
     >
       {/* Cart Dropdown */}
-      <CartDropdown
-        containerStyle={styles.dropdownContainer}
-        list={cartList}
-        value={cartID}
-        setValue={setCart}
-      />
+      {!isCartLoading ? (
+        <CartDropdown
+          containerStyle={styles.dropdownContainer}
+          list={cartList}
+          value={cartID}
+          setValue={setCart}
+        />
+      ) : (
+        <LoadingSheet text={message} style={styles.bottomSheets} />
+      )}
 
       {flowState == 1 && (
-        <LoadingSheet text={'Calculating route'} style={styles.bottomSheets} />
+        <LoadingSheet text={message} style={styles.bottomSheets} />
       )}
-      {flowState == 2 && <RouteDetails style={styles.bottomSheets} />}
-      {flowState == 3 && <EnRouteDetails style={styles.bottomSheets} />}
+      {flowState == 2 && route != null && (
+        <Carousel
+          containerCustomStyle={styles.carousel}
+          contentContainerCustomStyle={styles.carouselContent}
+          data={getData()}
+          renderItem={renderCarousel}
+          sliderWidth={screenWidth}
+          itemWidth={screenWidth - 44}
+          onSnapToItem={focusStoreMarker}
+        />
+      )}
 
       <MapboxGL.MapView style={{ flexGrow: 1 }}>
         <MapboxGL.UserLocation />
-        {coordinate !== null ? (
-          <MapboxGL.Camera zoomLevel={17} followUserLocation={true} />
-        ) : null}
+        <MapboxGL.Camera
+          ref={camera}
+          zoomLevel={16}
+          animationMode="flyTo"
+          animationDuration={1000}
+          centerCoordinate={position}
+        />
+
+        <MapboxGL.Images images={mapboxImages} />
+
+        {renderDirections()}
+        {renderPoints()}
       </MapboxGL.MapView>
     </View>
   );
@@ -111,5 +364,16 @@ const styles = StyleSheet.create({
     zIndex: 2,
     marginHorizontal: 16,
     marginBottom: 16,
+  },
+  carousel: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    zIndex: 2,
+    marginBottom: 16,
+  },
+  carouselContent: {
+    alignItems: 'flex-end',
   },
 });

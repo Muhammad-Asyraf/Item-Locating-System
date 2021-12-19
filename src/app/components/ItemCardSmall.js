@@ -154,12 +154,10 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 12,
-    fontFamily: 'interSemiBold',
     height: 32,
   },
   text: {
     fontSize: 12,
-    fontFamily: 'interMedium',
     color: '#707070',
   },
   normalPriceText: {
@@ -170,7 +168,6 @@ const styles = StyleSheet.create({
   },
   sellingPriceText: {
     fontSize: 14,
-    fontFamily: 'interSemiBold',
     color: Theme.colors.primary,
   },
   addToCartButton: {

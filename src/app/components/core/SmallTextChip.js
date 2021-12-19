@@ -13,6 +13,7 @@ export default function SmallTextChip(
     size = 10,
     color = Theme.colors.primary,
     marginEnd = true,
+    style,
   },
   props
 ) {
@@ -26,6 +27,7 @@ export default function SmallTextChip(
           ? { backgroundColor: color, color: 'white', borderWidth: 0 }
           : { borderColor: color, color: color },
         { fontSize: size },
+        style,
       ]}
       {...props}
     >

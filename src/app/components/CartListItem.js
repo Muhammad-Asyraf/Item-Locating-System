@@ -11,7 +11,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { changeItemQuantity } from '../redux/cart/cartSlice';
 
 // Styling
-import { Theme } from '../styles/Theme';
+import { Theme, TextStyle } from '../styles/Theme';
 
 export default function CartListItem({ style, item, update }) {
   const dispatch = useDispatch();
@@ -31,6 +31,7 @@ export default function CartListItem({ style, item, update }) {
     });
   };
 
+  // TODO : Update fields
   return (
     <Surface style={[style, { borderRadius: 5, elevation: 2 }]}>
       <View style={styles.listItemContainer}>
@@ -46,8 +47,10 @@ export default function CartListItem({ style, item, update }) {
             style={[styles.itemLocation, { flexDirection: 'row-reverse' }]}
           />
           <View style={styles.horizontalContainer}>
-            <Text style={styles.itemName}>{item.name}</Text>
-            <Text style={styles.itemPrice}>
+            <Text style={[TextStyle.caption, styles.itemName]}>
+              {item.name}
+            </Text>
+            <Text style={[TextStyle.caption, styles.itemPrice]}>
               {'RM' + itemDetails.selling_price + '/pc'}
             </Text>
           </View>
@@ -97,13 +100,8 @@ const styles = StyleSheet.create({
   itemLocation: {
     marginBottom: 12,
   },
-  itemName: {
-    fontSize: 12,
-    fontFamily: 'interSemiBold',
-  },
+  itemName: {},
   itemPrice: {
-    fontSize: 12,
-    fontFamily: 'interSemiBold',
     color: Theme.colors.primary,
   },
   itemQuantityContainer: {

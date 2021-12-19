@@ -7,24 +7,29 @@ import SmallTextChip from '../core/SmallTextChip';
 
 import { Theme, TextStyle } from '../../styles/Theme';
 
-export default function RouteStoreItem({ expand = false, storeInfo }) {
+export default function RouteStoreItem({ expand = false, storeDetail }) {
   /**
-   * storeInfo object: {name, price, distance, itemCount}
+   * storeDetail object: {name, price, distance, itemCount}
    */
   const [isExpanded, setExpanded] = useState(expand);
-  const [storeName, setStoreName] = useState('Test');
-  const [storeTotalPrice, setStoreTotalPrice] = useState('100.00');
-  const [distance, setDistance] = useState(0);
-  const [itemCount, setItemCount] = useState(0);
+  const [store, setStore] = useState(storeDetail);
 
   return (
     <View style={styles.container}>
       <View style={styles.storeContainer}>
         <View style={styles.storeNameContainer}>
           <Icon1 name={'location-pin'} size={20} color={Theme.colors.primary} />
-          <Text style={[TextStyle.subhead2, styles.text]}>{storeName}</Text>
+          <Text
+            numberOfLines={1}
+            ellipsizeMode="tail"
+            style={[TextStyle.subhead2, styles.text]}
+          >
+            {store.name}
+          </Text>
         </View>
-        <SmallTextChip fill={true} text={'RM' + storeTotalPrice} />
+        {store.price != undefined && (
+          <SmallTextChip fill={true} text={'RM' + store.price} />
+        )}
       </View>
       {expand && (
         <View style={styles.storeDetailContainer}>
@@ -65,6 +70,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   storeNameContainer: {
+    width: '60%',
     flexDirection: 'row',
     alignItems: 'center',
   },

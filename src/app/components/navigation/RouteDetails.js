@@ -1,51 +1,83 @@
-import React, { useState } from 'react';
-import { View, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, FlatList, StyleSheet } from 'react-native';
 import { Text } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import RouteStoreItem from './RouteStoreItem';
 
 import { Theme, TextStyle } from '../../styles/Theme';
 
-export default function RouteDetails({ style }) {
+/**
+ *
+ * @param {Array} storesInfo : Contains all of the route's info
+ * @returns
+ */
+export default function RouteDetails({ routeDetails, style }) {
+  /**
+   * routeDetails array : [{storeUUID,storeName,totalPrice}]
+   */
+  const [isLoading, setLoading] = useState(true);
   const [isExpanded, setExpanded] = useState(false);
-  const [noOfStops, setNoOfStops] = useState(0);
+  const [noOfStops, setNoOfStops] = useState();
   const [totalPrice, setTotalPrice] = useState(0);
   const [storeList, setStoreList] = useState();
 
-  if (isExpanded) {
-    return (
-      <View style={styles.container} {...style}>
-        <View style={styles.routeContentContainer}>
-          <Text style={[TextStyle.overline1, styles.overlineText]}>
-            {'3 STOPS \u00B7 RM300.00 in total'}
-          </Text>
-          <Text style={[TextStyle.headline5, styles.containerTitle]}>
-            Your Route Details
-          </Text>
-          <RouteStoreItem />
-          <RouteStoreItem />
-        </View>
-        <View style={styles.routeStartContainer}>
-          <Icon name="gesture-swipe-left" size={20} color="white" />
-          <Text style={[TextStyle.subhead2, styles.routeStartText]}>
-            Swipe left to start your journey
-          </Text>
-        </View>
-      </View>
-    );
-  }
+  const load = () => {
+    setNoOfStops(routeDetails.length - 2);
+
+    let stores = routeDetails.slice();
+    stores.pop();
+    stores.shift();
+
+    setStoreList(stores);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    //console.log(`Route Details: ${JSON.stringify(routeDetails)}`);
+    if (isLoading) {
+      load();
+    }
+  });
+
+  // IMPLEMENT
+  // if (isExpanded) {
+  //   return (
+  //     <View style={styles.container} {...style}>
+  //       <View style={styles.routeContentContainer}>
+  //         <Text style={[TextStyle.overline1, styles.overlineText]}>
+  //           {`${noOfStops} STORE(S) \u00B7 ${totalPrice} in total`}
+  //         </Text>
+  //         <Text style={[TextStyle.headline5, styles.containerTitle]}>
+  //           Your Route Details
+  //         </Text>
+  //         {/* ScrollList here */}
+  //       </View>
+  //       <View style={styles.routeStartContainer}>
+  //         <Icon name="gesture-swipe-left" size={20} color="white" />
+  //         <Text style={[TextStyle.subhead2, styles.routeStartText]}>
+  //           Swipe left to start your journey
+  //         </Text>
+  //       </View>
+  //     </View>
+  //   );
+  // }
 
   return (
     <View style={styles.container} {...style}>
       <View style={styles.routeContentContainer}>
         <Text style={[TextStyle.overline1, styles.overlineText]}>
-          {'3 STOPS \u00B7 RM300.00 in total'}
+          {`${noOfStops} STORE(S) \u00B7 ${totalPrice} in total`}
         </Text>
         <Text style={[TextStyle.headline5, styles.containerTitle]}>
           Your Route Details
         </Text>
-        <RouteStoreItem />
-        <RouteStoreItem />
+        {/* ScrollList here */}
+        <FlatList
+          data={storeList}
+          renderItem={({ item }) => {
+            return <RouteStoreItem storeDetail={{ name: item.name }} />;
+          }}
+        />
       </View>
       <View style={styles.routeStartContainer}>
         <Icon name="gesture-swipe-left" size={20} color="white" />

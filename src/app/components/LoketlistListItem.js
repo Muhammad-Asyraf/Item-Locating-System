@@ -9,17 +9,24 @@ import {
 import { Text } from 'react-native-paper';
 import SmallTextChip from './core/SmallTextChip';
 
+// Styling
+import { TextStyle } from '../styles/Theme';
+
 export default function LoketlistListItem({ item, store_count }) {
   const image = { uri: 'https://tinyurl.com/cu8nm69m' };
 
   return (
     <ImageBackground source={image} style={styles.listItemContainer}>
       <View style={styles.horizontalContainer}>
-        <Text style={styles.title}>{item.name}</Text>
-        <Text style={styles.storeCount}>{store_count} stores in route</Text>
+        <Text style={[TextStyle.headline5, styles.title]}>{item.name}</Text>
+        <Text style={[TextStyle.subhead2, styles.storeCount]}>
+          {store_count} stores in route
+        </Text>
       </View>
       <View style={styles.horizontalContainer}>
-        <Text style={styles.updatedAt}>Recently added</Text>
+        <Text style={[TextStyle.subhead2, styles.updatedAt]}>
+          Recently added
+        </Text>
         <SmallTextChip text={'RM350.00'} fill={true} />
       </View>
     </ImageBackground>
@@ -52,18 +59,12 @@ const styles = StyleSheet.create({
     marginVertical: 2,
   },
   title: {
-    fontSize: 20,
-    fontFamily: 'interBold',
     color: 'white',
   },
   storeCount: {
-    fontSize: 14,
-    fontFamily: 'interSemiBold',
     color: 'white',
   },
   updatedAt: {
-    fontSize: 14,
-    fontFamily: 'interSemiBold',
     color: 'white',
   },
 });

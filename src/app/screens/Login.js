@@ -1,26 +1,22 @@
 // Components
-import React, { useState } from "react";
-import { StyleSheet, ScrollView, View, } from "react-native";
-import { TextInput, Title, Paragraph, Button } from "react-native-paper";
-
-// Utilities
-import auth from "@react-native-firebase/auth";
+import React, { useState } from 'react';
+import { StyleSheet, ScrollView, View } from 'react-native';
+import { TextInput, Title, Paragraph, Button } from 'react-native-paper';
 
 // Redux
-import { useSelector, useDispatch } from "react-redux";
-import { login } from "../redux/auth/authThunk";
+import { useSelector, useDispatch } from 'react-redux';
+import { login } from '../redux/auth/authThunk';
 
+// Styling
+import { TextStyle } from '../styles/Theme';
 
-// Environment configs
-import { environment } from "../environment";
 export default function Login() {
-
   const dispatch = useDispatch();
   const authState = useSelector((state) => state.auth);
 
   const [credentials, setCredentials] = useState({
-    email: "danishrashidin@gmail.com",
-    password: "danish123",
+    email: 'danishrashidin@gmail.com',
+    password: 'danish123',
   });
 
   const handleEmailChange = (email) => {
@@ -35,8 +31,7 @@ export default function Login() {
   };
 
   const handleLogIn = () => {
-
-    dispatch(login(credentials))
+    dispatch(login(credentials));
 
     // // Authenticate
     // auth()
@@ -63,14 +58,14 @@ export default function Login() {
     let reg =
       /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     if (reg.test(text) === false) {
-      console.log("Email is Not Correct");
+      console.log('Email is Not Correct');
       return false;
     } else {
       setCredentials({
         ...credentials,
         email: text,
       });
-      console.log("Email is Correct");
+      console.log('Email is Correct');
       return true;
     }
   };
@@ -78,9 +73,9 @@ export default function Login() {
   return (
     <ScrollView
       style={{ ...styles.container }}
-      contentContainerStyle={{ flexGrow: 1, justifyContent: "center" }}
+      contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}
     >
-      <Title style={styles.title}>Hello There.</Title>
+      <Title style={[TextStyle.headline2, styles.title]}>Hello There.</Title>
       <Paragraph style={styles.description}>
         Please login or sign up to continue
       </Paragraph>
@@ -118,7 +113,7 @@ export default function Login() {
       </Button>
 
       <Paragraph
-        style={{ ...styles.description, alignSelf: "center", marginTop: 24 }}
+        style={{ ...styles.description, alignSelf: 'center', marginTop: 24 }}
       >
         OR
       </Paragraph>
@@ -137,38 +132,35 @@ export default function Login() {
 
 const styles = StyleSheet.create({
   title: {
-    lineHeight: 36,
-    fontSize: 36,
     marginTop: 54,
     marginBottom: 16,
-    fontFamily: "interBold",
   },
   description: {
     fontSize: 14,
-    color: "#545454",
+    color: '#545454',
   },
   forgotPassword: {
     marginVertical: 12,
-    alignSelf: "center",
+    alignSelf: 'center',
     fontSize: 12,
-    color: "#545454",
+    color: '#545454',
   },
   container: {
-    height: "100%",
+    height: '100%',
     paddingHorizontal: 48,
-    backgroundColor: "white",
+    backgroundColor: 'white',
   },
   textInputContainer: {
     paddingVertical: 24,
   },
   textInput: {
-    backgroundColor: "transparent",
+    backgroundColor: 'transparent',
     marginVertical: 5,
     fontSize: 14,
   },
   buttonContainerRow: {
-    flexDirection: "row",
-    justifyContent: "space-evenly",
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
   },
   button: {
     marginTop: 24,
@@ -179,6 +171,6 @@ const styles = StyleSheet.create({
   googleSignInButton: {},
   buttonLabel: {},
   googleButtonLabel: {
-    color: "#545454",
+    color: '#545454',
   },
 });

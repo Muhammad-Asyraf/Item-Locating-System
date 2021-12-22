@@ -18,16 +18,15 @@ const axiosInstance = axios.create({
  */
 export const getOptimizedPathForCart = async (userPosition, cartID) => {
   let optimizedPath;
-  console.log(userPosition);
-  axiosInstance
-    .post(`/api/mobile/optimization-service/path/optimize-cart/${cartID}`, {
-      position: userPosition,
-    })
-    .then((res) => {
-      optimizedPath = res.data;
-      return optimizedPath;
-    })
-    .catch((error) => {
-      console.log(error);
-    });
+  try {
+    let { data } = await axiosInstance.post(
+      `/api/mobile/optimization-service/path/optimize-cart/${cartID}`,
+      {
+        position: userPosition,
+      }
+    );
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
 };

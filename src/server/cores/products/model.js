@@ -64,6 +64,14 @@ class Product extends Model {
           to: 'image.product_uuid',
         },
       },
+      stores: {
+        relation: Model.BelongsToOneRelation,
+        modelClass: require('../stores/model'),
+        join: {
+          from: 'product.store_uuid',
+          to: 'store.uuid',
+        },
+      },
     };
   }
 

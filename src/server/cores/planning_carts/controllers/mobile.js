@@ -66,6 +66,25 @@ exports.getCart = async (req, res, next) => {
   }
 };
 
+// Get all planning carts by app_user_uuid
+exports.getAllCarts = async (req, res, next) => {
+  try {
+    const { app_user_uuid } = req.params;
+    const planningCarts = await PlanningCart.query()
+      .where({ app_user_uuid })
+      .withGraphFetched('products');
+
+    planningCartLogger.info(
+      `Successfully retrieved planningCarts for user ${app_user_uuid}: ${planningCarts.length} carts`
+    );
+
+    res.json(planningCarts);
+  } catch (err) {
+    planningCartLogger.warn(`Error retrieving all planningCarts`);
+    next(err);
+  }
+};
+
 // Create new planning cart
 exports.createNewCart = async (req, res, next) => {
   try {
@@ -146,24 +165,6 @@ exports.saveDefaultCartAs = async (req, res, next) => {
       .where({ uuid: cart_uuid });
     planningCartLogger.info(
       `Successfully saved default planning cart into ${name} for user ${app_user_uuid}`
-    );
-
-    res.json(planningCarts);
-  } catch (err) {
-    planningCartLogger.warn(`Error retrieving all planningCarts`);
-    next(err);
-  }
-};
-
-// Get all planning carts by app_user_uuid
-exports.getAllCarts = async (req, res, next) => {
-  try {
-    const { app_user_uuid } = req.params;
-    const planningCarts = await AppUser.relatedQuery('planning_carts').for(
-      app_user_uuid
-    );
-    planningCartLogger.info(
-      `Successfully retrieved planningCarts for user ${app_user_uuid}: ${planningCarts.length} carts`
     );
 
     res.json(planningCarts);

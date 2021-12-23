@@ -1,50 +1,57 @@
 // Components
-import React, { useState } from "react";
-import { StyleSheet, View, Image } from "react-native";
-import { Text, Button, TextInput, Surface } from "react-native-paper";
-import NumericInput from "react-native-numeric-input";
-import SmallTextChip from "./SmallTextChip";
-import LocationText from "./LocationText";
+import React, { useState } from 'react';
+import { StyleSheet, View, Image } from 'react-native';
+import { Text, Button, TextInput, Surface } from 'react-native-paper';
+import NumericInput from 'react-native-numeric-input';
+import SmallTextChip from './core/SmallTextChip';
+import LocationText from './LocationText';
 
 // Redux
-import { useSelector, useDispatch } from "react-redux";
-import { changeItemQuantity } from "../redux/cart/cartSlice";
+import { useSelector, useDispatch } from 'react-redux';
+import { changeItemQuantity } from '../redux/cart/cartSlice';
 
 // Styling
-import { Theme } from "../styles/theme";
+import { Theme, TextStyle } from '../styles/Theme';
 
 export default function CartListItem({ style, item, update }) {
-
   const dispatch = useDispatch();
-  const [itemDetails, setItemDetails] = useState(item)
+  const [itemDetails, setItemDetails] = useState(item);
 
   const handleQuantityChange = (value) => {
-    dispatch(changeItemQuantity({
-      cart_uuid: item.cart_uuid,
-      product_uuid: item.product_uuid,
-      quantity: value,
-    }))
+    dispatch(
+      changeItemQuantity({
+        cart_uuid: item.cart_uuid,
+        product_uuid: item.product_uuid,
+        quantity: value,
+      })
+    );
     setItemDetails({
       ...itemDetails,
-      quantity: value
-    })
+      quantity: value,
+    });
   };
 
+  // TODO : Update fields
   return (
     <Surface style={[style, { borderRadius: 5, elevation: 2 }]}>
       <View style={styles.listItemContainer}>
-        <Image style={styles.itemImage} source={{ uri: itemDetails.imageUrl }}></Image>
+        <Image
+          style={styles.itemImage}
+          source={{ uri: itemDetails.imageUrl }}
+        ></Image>
         <View style={styles.itemDetailsContainer}>
           <LocationText
-            text={"General Store"}
+            text={'General Store'}
             size={10}
             color="#707070"
-            style={[styles.itemLocation, { flexDirection: "row-reverse" }]}
+            style={[styles.itemLocation, { flexDirection: 'row-reverse' }]}
           />
           <View style={styles.horizontalContainer}>
-            <Text style={styles.itemName}>{item.name}</Text>
-            <Text style={styles.itemPrice}>
-              {"RM" + itemDetails.selling_price + "/pc"}
+            <Text style={[TextStyle.caption, styles.itemName]}>
+              {item.name}
+            </Text>
+            <Text style={[TextStyle.caption, styles.itemPrice]}>
+              {'RM' + itemDetails.selling_price + '/pc'}
             </Text>
           </View>
           <View style={styles.horizontalContainer}>
@@ -54,7 +61,9 @@ export default function CartListItem({ style, item, update }) {
               totalHeight={30}
               onChange={handleQuantityChange}
             />
-            <SmallTextChip text={"RM" + itemDetails.quantity * itemDetails.selling_price} />
+            <SmallTextChip
+              text={'RM' + itemDetails.quantity * itemDetails.selling_price}
+            />
           </View>
         </View>
       </View>
@@ -65,19 +74,19 @@ export default function CartListItem({ style, item, update }) {
 // Dedicated styling
 const styles = StyleSheet.create({
   horizontalContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-end",
-    flexWrap: "wrap",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+    flexWrap: 'wrap',
     flexGrow: 1,
     marginTop: 12,
   },
   listItemContainer: {
-    flexDirection: "row",
-    justifyContent: "flex-start",
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
     borderRadius: 4,
-    overflow: "hidden",
-    backgroundColor: "white",
+    overflow: 'hidden',
+    backgroundColor: 'white',
   },
   itemImage: {
     height: undefined,
@@ -91,24 +100,19 @@ const styles = StyleSheet.create({
   itemLocation: {
     marginBottom: 12,
   },
-  itemName: {
-    fontSize: 12,
-    fontFamily: "interSemiBold",
-  },
+  itemName: {},
   itemPrice: {
-    fontSize: 12,
-    fontFamily: "interSemiBold",
     color: Theme.colors.primary,
   },
   itemQuantityContainer: {
-    flexDirection: "row",
-    alignItems: "flex-end",
+    flexDirection: 'row',
+    alignItems: 'flex-end',
   },
   itemQuantityButton: {},
   itemQuantityInput: {
     height: 24,
     width: 40,
-    textAlign: "center",
+    textAlign: 'center',
     fontSize: 12,
     padding: 0,
   },

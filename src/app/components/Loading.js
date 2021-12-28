@@ -4,7 +4,7 @@ import { View } from 'react-native';
 import { ActivityIndicator, Text } from 'react-native-paper';
 
 // Styling
-import { Theme, TextStyle } from '../styles/Theme';
+import { Theme } from '../styles/Theme';
 
 export default function Loading({ message }) {
   return (
@@ -21,7 +21,17 @@ export default function Loading({ message }) {
         size="large"
         style={{ alignSelf: 'center' }}
       />
-      <Text style={[TextStyle.subhead1, { marginTop: 24 }]}>
+      <Text
+        style={[
+          {
+            fontStyle: 'normal',
+            fontSize: 16,
+            lineHeight: 24,
+            letterSpacing: 0.5,
+            marginTop: 24,
+          },
+        ]}
+      >
         {message != null ? message : 'Getting your items'}
       </Text>
     </View>

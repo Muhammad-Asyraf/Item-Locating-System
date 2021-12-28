@@ -18,7 +18,7 @@ const IconStyles = { ml: 1, mr: 3, mt: 0.1 };
 const RowMenu = (props) => {
   const storeUrl = localStorage.getItem('storeUrl');
   const [anchorEl, setAnchorEl] = useState();
-  const { layout, Link, handleDelete, handleClickOpenStockStatusDialog } = props;
+  const { layout, Link, handleDelete, handleEdit } = props;
 
   const handleClickOption = (event) => {
     setAnchorEl(event.currentTarget);
@@ -26,11 +26,6 @@ const RowMenu = (props) => {
 
   const handleCloseOption = () => {
     setAnchorEl(null);
-  };
-
-  const openStockStatusDialog = () => {
-    setAnchorEl(null);
-    handleClickOpenStockStatusDialog();
   };
 
   return (
@@ -72,14 +67,8 @@ const RowMenu = (props) => {
           },
         }}
       >
-        <MenuItem onClick={() => handleDelete(layout.uuid)}>
-          <ListItemIcon sx={listItemIconStyles}>
-            <DeleteRoundedIcon fontSize="small" sx={IconStyles} />
-            Delete
-          </ListItemIcon>
-        </MenuItem>
         <MenuItem
-          // onClick={handleEdit}
+          onClick={handleEdit}
           component={Link}
           to={`/${storeUrl}/layout/edit/${layout.uuid}`}
         >
@@ -88,10 +77,20 @@ const RowMenu = (props) => {
             Layout Editor
           </ListItemIcon>
         </MenuItem>
-        <MenuItem onClick={openStockStatusDialog}>
+        <MenuItem
+          onClick={handleEdit}
+          component={Link}
+          to={`/${storeUrl}/layout/product-mapping/${layout.uuid}`}
+        >
           <ListItemIcon sx={listItemIconStyles}>
             <MyLocationIcon fontSize="small" sx={IconStyles} />
             Map Product
+          </ListItemIcon>
+        </MenuItem>
+        <MenuItem onClick={() => handleDelete(layout.uuid)}>
+          <ListItemIcon sx={listItemIconStyles}>
+            <DeleteRoundedIcon fontSize="small" sx={IconStyles} />
+            Delete
           </ListItemIcon>
         </MenuItem>
       </Menu>

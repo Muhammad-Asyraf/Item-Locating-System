@@ -18,14 +18,9 @@ import Tooltip from '@mui/material/Tooltip';
 
 import { makeStyles } from '@mui/styles';
 
-import {
-  selectIsLoading,
-  processingRequest,
-  processed,
-} from '../../redux/features/layoutSlice';
-
-import { addLayout } from '../../redux/thunks/layoutThunk';
+import { selectIsLoading, processed } from '../../redux/features/layoutSlice';
 import { setNewNotification } from '../../redux/features/notificationSlice';
+import { addLayout } from '../../redux/thunks/layoutThunk';
 
 import LayoutEditor from '../../components/StoreLayout/LayoutEditor';
 
@@ -73,6 +68,7 @@ const LayoutCreate = () => {
   const [floorIsLocked, setFloorIsLocked] = useState(false);
   const [zoomLevel, setZoomLevel] = useState(0);
   const [floorPlan, setFloorPlan] = useState(null);
+  const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
 
   const isLayoutLoading = useSelector(selectIsLoading);
   console.log(isLayoutLoading);
@@ -80,13 +76,16 @@ const LayoutCreate = () => {
   const storeUrl = localStorage.getItem('storeUrl');
   const storeName = localStorage.getItem('storeName');
 
-  const saveLayout = async (payload) => {
-    dispatch(processingRequest());
+  const handleOpenDetailsDialog = () => setOpenDetailsDialog(true);
+  const handleCloseDetailsDialog = () => setOpenDetailsDialog(false);
 
+  const saveLayout = async (payload) => {
     const { type, payload: resPayload } = await dispatch(addLayout({ payload }));
 
     if (type.includes('fulfilled')) {
-      history.push(`/${storeUrl}/layout/list`);
+      dispatch(processed());
+      history.push(`/${storeUrl}/layout/edit/${resPayload}`);
+
       await dispatch(
         setNewNotification({
           message: 'Layout successfully created',
@@ -95,6 +94,7 @@ const LayoutCreate = () => {
         })
       );
     } else if (type.includes('rejected')) {
+      dispatch(processed());
       await dispatch(
         setNewNotification({
           message: resPayload.message,
@@ -103,7 +103,6 @@ const LayoutCreate = () => {
         })
       );
     }
-    dispatch(processed());
   };
 
   const uploadFloorPlan = ({ target }) => {
@@ -151,8 +150,6 @@ const LayoutCreate = () => {
       >
         <Box
           style={{
-            // border: '2px solid rgba(0, 0, 0, 0.2)',
-
             padding: '3px 12px',
             borderRadius: 10,
             boxShadow: 'rgba(0, 0, 0, 0.24) 0px 3px 8px',
@@ -201,7 +198,7 @@ const LayoutCreate = () => {
             </IconButton>
           </Tooltip>
           <Tooltip title="Layout Details" placement="top">
-            <IconButton color="primary" size="small">
+            <IconButton color="primary" size="small" onClick={handleOpenDetailsDialog}>
               <InfoRoundedIcon color="primary" fontSize="large" />
             </IconButton>
           </Tooltip>
@@ -240,6 +237,8 @@ const LayoutCreate = () => {
           setFloorIsLocked={setFloorIsLocked}
           setZoomLevel={setZoomLevel}
           saveLayout={saveLayout}
+          open={openDetailsDialog}
+          handleClose={handleCloseDetailsDialog}
         />
       </Grid>
     </Grid>

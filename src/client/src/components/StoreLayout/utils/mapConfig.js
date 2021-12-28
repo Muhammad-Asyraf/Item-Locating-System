@@ -70,10 +70,12 @@ export const mapComponent = {
     config: {
       styles: {
         strokeOpacity: '1',
-        stroke: false,
-        fillColor: '#43291F',
+        stroke: true,
+        color: 'black',
+        weight: 2,
+        fillColor: '#e84393',
         // fillColor: '#161853',
-        weight: 1,
+
         fillOpacity: 1,
         lineJoin: 'round',
         lineCap: 'round',
@@ -114,9 +116,10 @@ export const mapComponent = {
     config: {
       styles: {
         strokeOpacity: '1',
-        stroke: false,
-        fillColor: '#F4F0BB',
-        weight: 1,
+        stroke: true,
+        color: 'black',
+        fillColor: '#6c5ce7',
+        weight: 2,
         fillOpacity: 1,
         lineJoin: 'round',
         lineCap: 'round',
@@ -146,6 +149,14 @@ export const floorPlanBounds = [
   [100, 130],
   [0, -30],
 ];
+
+export const checkeredTileLayer = {
+  path: '/app/public/uploaded_layout/tileLayer.svg',
+  bounds: [
+    [600, 600],
+    [-600, -600],
+  ],
+};
 
 export const mapDefaultConfig = {
   crs: L.CRS.Simple,

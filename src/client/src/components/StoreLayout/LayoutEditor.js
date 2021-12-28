@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import L from 'leaflet';
 import 'leaflet-geometryutil';
 
@@ -15,6 +15,8 @@ import '@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css';
 
 import { makeStyles } from '@mui/styles';
 
+import LayoutDetailsDialogue from './LayoutDetailsDialogue';
+
 import '../../assets/css/leafletOverride.css';
 import {
   mapBounds,
@@ -26,6 +28,7 @@ import {
   mapStyles,
   firstBtn,
   lastBtn,
+  checkeredTileLayer,
 } from './utils/mapConfig';
 
 const useStyles = makeStyles(() => ({
@@ -90,7 +93,22 @@ const Editor = (props) => {
   const shelfShapes = shelfConfig.shapes;
   const shelfPartitionShapes = shelfPartitionConfig.shapes;
 
-  const { floorPlan, setFloorIsLocked, setZoomLevel, saveLayout, leafletLayers, mode } = props;
+  const {
+    floorPlan,
+    previousFloorPlan,
+    setFloorIsLocked,
+    setZoomLevel,
+    saveLayout,
+    patchLayout,
+    leafletLayers,
+    mode,
+    open,
+    handleClose,
+    theLayout,
+  } = props;
+
+  const [name, setName] = useState(theLayout ? theLayout.name : '');
+  const [label, setLabel] = useState(theLayout ? theLayout.label : '');
 
   const reCenter = () => {
     mapRef.current.flyTo(storeViewport, 2.8);
@@ -149,19 +167,59 @@ const Editor = (props) => {
     }
   };
 
+  const getnClosestPartitionShelf = (currentLayer) => {
+    const {
+      pm: { _shape: shape },
+    } = currentLayer;
+
+    const center = shape.includes('Circle')
+      ? currentLayer.getLatLng()
+      : currentLayer.getCenter();
+
+    const nClosestPartitionShelf = L.GeometryUtil.nClosestLayers(
+      mapRef.current,
+      shelfPartitionLayers.current,
+      center,
+      10
+    );
+    console.log('nClosestPartitionShelf', nClosestPartitionShelf);
+    return nClosestPartitionShelf;
+  };
+
+  const setParentShelf = (currentLayer) => {
+    const {
+      pm: { _shape: shape },
+    } = currentLayer;
+
+    const center = shape.includes('Circle')
+      ? currentLayer.getLatLng()
+      : currentLayer.getCenter();
+
+    const parentShelf = L.GeometryUtil.closestLayer(
+      mapRef.current,
+      shelfLayers.current,
+      center
+    );
+
+    currentLayer.parentShelf = parentShelf.layer.id;
+    currentLayer.parentShelfPath = parentShelf.layer._path;
+
+    console.log('currentLayer', currentLayer);
+  };
+
   const initShapeObj = (layer, shape) => {
-    const floorPaneShapes = floorShapes.includes(shape);
-    const shelfPaneShapes = shelfShapes.includes(shape);
-    const shelfPartitionPaneShapes = shelfPartitionShapes.includes(shape);
+    const isFloorLayer = floorShapes.includes(shape);
+    const isShelfLayer = shelfShapes.includes(shape);
+    const isPartitionLayer = shelfPartitionShapes.includes(shape);
     layer._path.isFromRotate = false;
 
     layer.on('pm:enable', ({ layer: editedLayer }) => {
-      if (floorPaneShapes) {
+      if (isFloorLayer) {
         editedLayer.setStyle({ ...floorStyles, dashArray: '10' });
-      } else if (shelfPaneShapes) {
-        editedLayer.setStyle({ ...shelfStyles });
-      } else if (shelfPartitionPaneShapes) {
-        editedLayer.setStyle({ ...shelfPartitionStyles });
+      } else if (isShelfLayer) {
+        editedLayer.setStyle({ ...shelfStyles, fillColor: '#d7e75c' });
+      } else if (isPartitionLayer) {
+        editedLayer.setStyle({ ...shelfPartitionStyles, fillColor: '#d7e75c' });
       }
 
       if (!editedLayer._path.isFromRotate) {
@@ -175,11 +233,11 @@ const Editor = (props) => {
     });
 
     layer.on('pm:disable', ({ layer: disabledLayer }) => {
-      if (floorPaneShapes) {
+      if (isFloorLayer) {
         disabledLayer.setStyle({ ...floorStyles });
-      } else if (shelfPaneShapes) {
+      } else if (isShelfLayer) {
         disabledLayer.setStyle({ ...shelfStyles });
-      } else if (shelfPartitionPaneShapes) {
+      } else if (isPartitionLayer) {
         disabledLayer.setStyle({ ...shelfPartitionStyles });
       }
 
@@ -192,6 +250,18 @@ const Editor = (props) => {
           ...geomanGlobalOpt,
           syncLayersOnDrag: editedList,
         });
+      }
+    });
+
+    layer.on('pm:dragend', ({ layer: currentLayer, shape: currentShape }) => {
+      if (shelfPartitionShapes.includes(currentShape) && shelfLayers.current.length > 0) {
+        setParentShelf(currentLayer);
+      } else if (
+        shelfShapes.includes(currentShape) &&
+        shelfPartitionLayers.current.length > 0
+      ) {
+        const nClosestPartitionShelf = getnClosestPartitionShelf(currentLayer);
+        nClosestPartitionShelf.forEach(({ layer: layer_ }) => setParentShelf(layer_));
       }
     });
 
@@ -218,12 +288,34 @@ const Editor = (props) => {
 
     layer._path.onmouseover = () => {
       document.myParam = layer;
+      const zoomlevel = mapRef.current.getZoom();
+      const adjustedZoomLevel = (zoomlevel - 2).toFixed(1);
+      console.log('enter hover', layer);
+      console.log('isPartitionLayer', isPartitionLayer);
+
+      if (adjustedZoomLevel >= 0.8 && isPartitionLayer) {
+        layer.setStyle({ ...shelfPartitionStyles, fillColor: '#d7e75c' });
+      } else if (adjustedZoomLevel < 0.8 && isShelfLayer) {
+        layer.setStyle({ ...shelfStyles, fillColor: '#d7e75c' });
+      }
 
       document.addEventListener('mouseup', enableEdit);
     };
 
     layer._path.onmouseleave = () => {
       document.myParam = layer;
+      const zoomlevel = mapRef.current.getZoom();
+      const adjustedZoomLevel = (zoomlevel - 2).toFixed(1);
+      const currentlyEdit = layer.pm.enabled();
+
+      console.log('edit?', layer.pm.enabled());
+
+      if (adjustedZoomLevel >= 0.8 && isPartitionLayer && !currentlyEdit) {
+        layer.setStyle({ ...shelfPartitionStyles });
+      } else if (adjustedZoomLevel < 0.8 && isShelfLayer && !currentlyEdit) {
+        layer.setStyle({ ...shelfStyles });
+      }
+
       document.removeEventListener('mouseup', enableEdit);
     };
   };
@@ -241,7 +333,7 @@ const Editor = (props) => {
     if (isRectangle) {
       newLayer = L.rectangle(Object.values(latLngs), { ...styles, pane });
     } else if (isPolygon) {
-      newLayer = L.polygon(latLngs, { ...styles, pane });
+      newLayer = L.polygon(Object.values(latLngs), { ...styles, pane });
     } else if (isCircle) {
       newLayer = L.circle(latLngs, { ...styles, pane, radius });
     } else if (isPolyline) {
@@ -329,7 +421,7 @@ const Editor = (props) => {
       }
 
       newLayer.id = uuidv4();
-      initShapeObj(newLayer);
+      initShapeObj(newLayer, shape);
     });
   };
 
@@ -349,7 +441,13 @@ const Editor = (props) => {
 
     if (shiftKey) {
       // get all layers except 1st index since its the floor plan layer
-      const allLayers = mapRef.current.pm.getGeomanLayers().slice(1);
+      let allLayers;
+
+      if (floorPlan) {
+        allLayers = mapRef.current.pm.getGeomanLayers().slice(2);
+      } else {
+        allLayers = mapRef.current.pm.getGeomanLayers().slice(1);
+      }
 
       allLayers.forEach(({ _path }) => {
         _path.shiftKeyHold = true;
@@ -397,7 +495,13 @@ const Editor = (props) => {
     }
 
     if (key === 'Shift') {
-      const allLayers = mapRef.current.pm.getGeomanLayers().slice(1);
+      let allLayers;
+
+      if (floorPlan) {
+        allLayers = mapRef.current.pm.getGeomanLayers().slice(2);
+      } else {
+        allLayers = mapRef.current.pm.getGeomanLayers().slice(1);
+      }
 
       allLayers.forEach(({ _path }) => {
         _path.shiftKeyHold = false;
@@ -441,7 +545,7 @@ const Editor = (props) => {
         shelfPartitionLayers.current = [...shelfPartitionLayers.current, newLayer];
       }
       newLayer.id = uuid;
-      initShapeObj(newLayer);
+      initShapeObj(newLayer, shape);
     });
   };
 
@@ -482,7 +586,7 @@ const Editor = (props) => {
       uuid: id,
       shape,
       layer_coordinate: Array.isArray(latLngs) ? { ...latLngs } : latLngs,
-      meta_data: { radius, angle: initialAngle },
+      meta_data: { radius, angle: initialAngle, parentShelf: layer.parentShelf },
     };
   };
 
@@ -500,17 +604,9 @@ const Editor = (props) => {
     const map = L.map('map', mapDefaultConfig).setView(storeViewport, 2);
     map.fitBounds(mapBounds);
 
-    // override default hidden tile by creating a plugin and create a visible tile
-    L.GridLayer.GridDebug = L.GridLayer.extend({
-      createTile: () => {
-        const tile = document.createElement('div');
-        tile.style.outline = '1px solid rgba(0,0,0,0.1)';
-        return tile;
-      },
-    });
-
-    L.gridLayer.gridDebug = (opts) => new L.GridLayer.GridDebug(opts);
-    map.addLayer(L.gridLayer.gridDebug());
+    L.imageOverlay(checkeredTileLayer.path, checkeredTileLayer.bounds, {
+      pane: 'tilePane',
+    }).addTo(map);
 
     mapRef.current = map;
   };
@@ -553,7 +649,6 @@ const Editor = (props) => {
     if (floorPlan) {
       L.imageOverlay(floorPlan.path, floorPlanBounds, { pane: 'floor' }).addTo(map);
     }
-
     // map.flyTo(storeViewport, 2.8);
   };
 
@@ -576,14 +671,32 @@ const Editor = (props) => {
 
     map.on('zoomend', () => {
       const zoomlevel = map.getZoom();
-      setZoomLevel(Math.round(zoomlevel) - 2);
+      const adjustedZoomLevel = (zoomlevel - 2).toFixed(1);
+      setZoomLevel(adjustedZoomLevel);
+      console.log('zoomlevel', adjustedZoomLevel);
 
-      if (zoomlevel >= 23) {
-        // map.removeLayer(mapBoxTile);
-      } else if (zoomlevel < 23 && zoomlevel > 21) {
-        // if (!map.hasLayer(mapBoxTile)) {
-        //   map.addLayer(mapBoxTile);
-        // }
+      if (adjustedZoomLevel >= 0.8) {
+        shelfLayers.current.forEach((currentLayer) => {
+          currentLayer.setStyle({ ...shelfStyles, weight: 0 });
+        });
+
+        shelfPartitionLayers.current.forEach((currentLayer) => {
+          L.DomUtil.addClass(currentLayer._path, 'leaflet-interactive');
+          currentLayer.setStyle({ ...shelfPartitionStyles });
+        });
+      } else if (adjustedZoomLevel < 0.8) {
+        shelfLayers.current.forEach((currentLayer) => {
+          currentLayer.setStyle({ ...shelfStyles });
+        });
+
+        shelfPartitionLayers.current.forEach((currentLayer) => {
+          L.DomUtil.removeClass(currentLayer._path, 'leaflet-interactive');
+          currentLayer.setStyle({
+            ...shelfPartitionStyles,
+            weight: 0,
+            fillColor: 'transparent',
+          });
+        });
       }
     });
   };
@@ -619,16 +732,7 @@ const Editor = (props) => {
       currentLayer.addTo(mapRef.current);
 
       if (shelfPartitionPaneShapes && shelfLayers.current.length > 0) {
-        const center = shape.includes('Circle')
-          ? currentLayer.getLatLng()
-          : currentLayer.getCenter();
-
-        const parentShelf = L.GeometryUtil.closestLayer(
-          mapRef.current,
-          shelfLayers.current,
-          center
-        );
-        console.log('parentShelf', parentShelf.layer._path);
+        setParentShelf(currentLayer);
       }
 
       initShapeObj(currentLayer, shape);
@@ -647,12 +751,7 @@ const Editor = (props) => {
     }
 
     if (savedLayers.current) {
-      console.log('savedLayers', savedLayers.current);
       loadLayers(savedLayers.current);
-      // loadLayers();
-      // duplicateShapes(floorLayers.current);
-      // duplicateShapes(shelfLayers.current);
-      // duplicateShapes(shelfPartitionLayers.current);
     }
 
     setZoomBehavior();
@@ -685,13 +784,31 @@ const Editor = (props) => {
     const formData = new FormData();
     const layers = prepareSavedLayers();
 
+    console.log('layers', layers);
+
     formData.append('multer_type', 'layout');
-    formData.append('name', 'Floor 1');
+    formData.append('name', name);
+    formData.append('label', label);
     formData.append('store_uuid', storeUUID);
     formData.append('layers_', JSON.stringify(layers));
-    formData.append('floorPlanSVG', floorPlan.file);
 
-    saveLayout(formData);
+    if (floorPlan) {
+      formData.append('floorPlanSVG', floorPlan.file, floorPlan.file.name);
+    }
+
+    switch (mode) {
+      case 'create':
+        saveLayout(formData);
+        break;
+      case 'edit':
+        if (previousFloorPlan) {
+          formData.append('oldFloorPlanPath', JSON.stringify(previousFloorPlan));
+        }
+        patchLayout(formData);
+        break;
+      default:
+      // code block
+    }
   };
 
   return (
@@ -710,6 +827,14 @@ const Editor = (props) => {
         <FlipToBackRoundedIcon sx={{ color: 'black' }} />
       </Button>
       <form id="layout-form" onSubmit={handleSavelayout} style={{ display: 'hidden' }} />
+      <LayoutDetailsDialogue
+        open={open}
+        handleClose={handleClose}
+        name={name}
+        label={label}
+        setName={setName}
+        setLabel={setLabel}
+      />
     </>
   );
 };

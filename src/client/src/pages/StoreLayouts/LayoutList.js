@@ -16,6 +16,7 @@ import {
   processingRequest,
   processed,
   quickUpdateLayouts,
+  clearLayout,
 } from '../../redux/features/layoutSlice';
 import { setNewNotification } from '../../redux/features/notificationSlice';
 
@@ -83,6 +84,7 @@ const LayoutList = () => {
 
   useEffect(() => {
     (async () => {
+      dispatch(clearLayout());
       dispatch(processingRequest());
       const { type: getLayoutsProcessed, payload } = await dispatch(getLayouts());
 
@@ -93,11 +95,9 @@ const LayoutList = () => {
     })();
   }, []);
 
-  console.log('layouts', layouts);
-
-  // const handleEdit = () => {
-  //   dispatch(processingCategory());
-  // };
+  const handleEdit = () => {
+    dispatch(processingRequest());
+  };
 
   const handleDelete = async (uuid) => {
     const newinitLayout = initLayout.filter((item) => item.uuid !== uuid);
@@ -288,7 +288,7 @@ const LayoutList = () => {
           onMultipleDelete={handleMultipleDelete}
           onMultipleActiveStatusUpdate={handleMultipleToggleStatus}
           handleToggleStatus={handleToggleStatus}
-          // handleEdit={handleEdit}
+          handleEdit={handleEdit}
         />
       </Grid>
     </Grid>

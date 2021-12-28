@@ -1,20 +1,20 @@
 import React, { useState, useEffect } from 'react';
-// import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-// import { useHistory, Link } from 'react-router-dom';
 
 import IconButton from '@mui/material/IconButton';
-// import Paper from '@mui/material/Paper';
-import Button from '@mui/material/Button';
+import Box from '@mui/material/Box';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Grid from '@mui/material/Grid';
-import LinearProgress from '@mui/material/LinearProgress';
-import CircularProgress from '@mui/material/CircularProgress';
+// import CircularProgress from '@mui/material/CircularProgress';
 import KeyboardReturnRoundedIcon from '@mui/icons-material/KeyboardReturnRounded';
 import SaveRoundedIcon from '@mui/icons-material/SaveRounded';
-// import FileUploadRoundedIcon from '@mui/icons-material/FileUploadRounded';
-import MoreVertRoundedIcon from '@mui/icons-material/MoreVertRounded';
+import LinearProgress from '@mui/material/LinearProgress';
+import FileUploadRoundedIcon from '@mui/icons-material/FileUploadRounded';
+import InfoRoundedIcon from '@mui/icons-material/InfoRounded';
+import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
+import MyLocationRoundedIcon from '@mui/icons-material/MyLocationRounded';
+import Tooltip from '@mui/material/Tooltip';
 
 import { makeStyles } from '@mui/styles';
 
@@ -25,11 +25,10 @@ import {
   processed,
 } from '../../redux/features/layoutSlice';
 
-import { addLayout, getLayout } from '../../redux/thunks/layoutThunk';
+import { updateLayout, getLayout } from '../../redux/thunks/layoutThunk';
 import { setNewNotification } from '../../redux/features/notificationSlice';
 
 import LayoutEditor from '../../components/StoreLayout/LayoutEditor';
-
 import { getFileObject } from '../../utils/general';
 
 const useStyles = makeStyles(() => ({
@@ -68,16 +67,17 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const LayoutEdit = () => {
+const LayoutEdit = (props) => {
   const classes = useStyles();
   const dispatch = useDispatch();
-  // const history = useHistory();
 
   const [floorIsLocked, setFloorIsLocked] = useState(false);
+  const [firstRefresh, setFirstRefresh] = useState(true);
   const [zoomLevel, setZoomLevel] = useState(0);
-  const [floorPlan, setFloorPlan] = useState();
+  const [floorPlan, setFloorPlan] = useState(null);
+  const [previousFloorPlan, setPreviuosFloorPlan] = useState(null);
+  const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
   const [leafletLayers, setLeafletLayers] = useState([]);
-  // const [layers, setAllLayers] = useState([]);
 
   const theLayout = useSelector(selectLayout);
   const isLayoutLoading = useSelector(selectIsLoading);
@@ -85,38 +85,43 @@ const LayoutEdit = () => {
   const storeUrl = localStorage.getItem('storeUrl');
   const storeName = localStorage.getItem('storeName');
 
+  const { match } = props;
+
   useEffect(async () => {
-    dispatch(processingRequest());
-    // await dispatch(getLayout({ uuid: match.params.uuid }));
-    await dispatch(getLayout({ uuid: '2bb25f34-cd11-409c-acaf-3781299f7305' }));
+    const { type: layoutStatus, payload: layoutPayload } = await dispatch(
+      getLayout({ uuid: match.params.uuid })
+    );
+
+    const requestStatusOk = layoutStatus.includes('fulfilled');
+    const { layout } = layoutPayload;
+
+    if (requestStatusOk) {
+      const path = layout.floor_plan_path;
+
+      if (path) {
+        const file = await getFileObject(path);
+        setFloorPlan({ file, path });
+        setPreviuosFloorPlan({ path });
+      }
+
+      setLeafletLayers(layout.layers);
+      dispatch(processed());
+      setFirstRefresh(false);
+    }
   }, []);
 
-  useEffect(async () => {
-    if (theLayout) {
-      const path = theLayout.floor_plan_path;
-      const file = await getFileObject(path);
-      setFloorPlan({ file, path });
-      setLeafletLayers(theLayout.layers);
-      dispatch(processed());
-    }
-  }, [theLayout]);
+  const handleOpenDetailsDialog = () => setOpenDetailsDialog(true);
+  const handleCloseDetailsDialog = () => setOpenDetailsDialog(false);
 
-  // console.log('The layout', theLayout);
-
-  // console.log('test lock', floorIsLocked);
-  // console.log('History', history);
-  // console.log('layers', layers);
-
-  const saveLayout = async (payload) => {
-    dispatch(processingRequest());
-
-    const { type, payload: resPayload } = await dispatch(addLayout({ payload }));
+  const patchLayout = async (payload) => {
+    const { type, payload: resPayload } = await dispatch(
+      updateLayout({ uuid: match.params.uuid, payload })
+    );
 
     if (type.includes('fulfilled')) {
-      // history.push(`/${storeUrl}/layout/list`);
       await dispatch(
         setNewNotification({
-          message: 'Layout successfully created',
+          message: 'Layout successfully updated',
           backgroundColor: 'green',
           severity: 'success',
         })
@@ -133,28 +138,20 @@ const LayoutEdit = () => {
     dispatch(processed());
   };
 
-  const handleCapture = async ({ target }) => {
-    // console.log('files', target.files);
+  const uploadFloorPlan = ({ target }) => {
     const uploadedFloorPlanPath = URL.createObjectURL(target.files[0]);
-
-    // const path = URL.createObjectURL(img);
-    // console.log('path', target.files[0]);
-    // console.log('path');
     setFloorPlan({ file: target.files[0], path: uploadedFloorPlanPath });
-
-    // const files = Object.values(target.files);
-    // const updatedError = validateImages({ errors, files });
-
-    // setErrors(updatedError);
-
-    // if (!updatedError.image) {
-    //   handleImagePreview(files);
-    // }
   };
 
-  console.log('isloadinglayout', isLayoutLoading);
+  const removeFloorPlan = () => {
+    setFloorPlan(null);
+  };
 
-  if (isLayoutLoading) {
+  const toProductMapping = () => {
+    dispatch(processingRequest());
+  };
+
+  if (isLayoutLoading && firstRefresh) {
     return (
       <div>
         <LinearProgress
@@ -176,23 +173,18 @@ const LayoutEdit = () => {
             <IconButton
               component={Link}
               to={`/${storeUrl}/layout/list`}
-              sx={{ position: 'relative', top: -3 }}
+              sx={{ position: 'relative', top: -3, left: 5 }}
             >
               <KeyboardReturnRoundedIcon fontSize="large" color="primary" />
             </IconButton>
-            <IconButton sx={{ position: 'relative', top: -3 }} component="label">
-              {/* <FileUploadRoundedIcon style={{ color: 'green' }} /> */}
-              <MoreVertRoundedIcon fontSize="large" color="primary" />
-              <input
-                id="imgs"
-                name="imgCollection"
-                type="file"
-                multiple
-                accept="image/*"
-                onChange={handleCapture}
-                autoComplete="off"
-                style={{ display: 'none' }}
-              />
+            <IconButton
+              size="large"
+              component={Link}
+              onClick={toProductMapping}
+              to={`/${storeUrl}/layout/product-mapping/${match.params.uuid}`}
+              sx={{ position: 'relative', top: -5, left: 5 }}
+            >
+              <MyLocationRoundedIcon color="primary" sx={{ fontSize: '1.7rem' }} />
             </IconButton>
           </h1>
           <Grid item xs={12} container>
@@ -202,6 +194,11 @@ const LayoutEdit = () => {
                 <div style={{ fontSize: '0.875rem' }}>
                   &nbsp;&nbsp;Layout Editor&nbsp;&nbsp;
                 </div>
+                {theLayout && (
+                  <div style={{ fontSize: '0.875rem' }}>
+                    &nbsp;&nbsp;{theLayout.name} ({theLayout.label})&nbsp;&nbsp;
+                  </div>
+                )}
               </Breadcrumbs>
             </Grid>
           </Grid>
@@ -213,42 +210,76 @@ const LayoutEdit = () => {
         container
         direction="row"
         justifyContent="flex-end"
-        alignItems="center"
+        alignItems="flex-end"
       >
-        <Button
-          form="layout-form"
-          variant="contained"
-          color="primary"
-          type="submit"
-          sx={{
-            textTransform: 'none',
-            fontSize: '0.95rem',
-            borderRadius: 3,
-            height: 50,
-            width: '30%',
-            paddingRight: 3,
-            boxShadow: 'rgba(53, 132, 167, 0.44) 0px 8px 16px 0px !important',
+        <Box
+          style={{
+            padding: '3px 12px',
+            borderRadius: 10,
+            boxShadow: 'rgba(0, 0, 0, 0.24) 0px 3px 8px',
           }}
         >
-          {isLayoutLoading ? (
-            <CircularProgress size={25} style={{ color: 'white' }} />
+          {floorPlan ? (
+            <Tooltip title="Remove Layout" placement="top">
+              <IconButton color="primary" onClick={removeFloorPlan} size="small">
+                <RemoveCircleIcon style={{ color: '#d32f2f' }} fontSize="large" />
+              </IconButton>
+            </Tooltip>
           ) : (
-            <>
-              <SaveRoundedIcon style={{ marginRight: 10 }} fontSize="small" /> Save
-            </>
+            <Tooltip title="Upload Floor Plan" placement="top">
+              <IconButton
+                component="label"
+                sx={{ position: 'relative', top: 1.5 }}
+                color="primary"
+                size="small"
+              >
+                <FileUploadRoundedIcon color="primary" fontSize="large" />
+                <input
+                  id="imgs"
+                  name="imgCollection"
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  onChange={uploadFloorPlan}
+                  autoComplete="off"
+                  style={{ display: 'none' }}
+                />
+              </IconButton>
+            </Tooltip>
           )}
-        </Button>
+          <Tooltip title="Save Layout" placement="top">
+            <IconButton
+              form="layout-form"
+              variant="contained"
+              color="primary"
+              type="submit"
+              size="small"
+            >
+              <SaveRoundedIcon color="primary" fontSize="large" />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Layout Details" placement="top">
+            <IconButton color="primary" size="small" onClick={handleOpenDetailsDialog}>
+              <InfoRoundedIcon color="primary" fontSize="large" />
+            </IconButton>
+          </Tooltip>
+        </Box>
       </Grid>
 
       <Grid item xs={10}>
         {floorIsLocked ? <div className={classes.floorLocked}>Floor Locked</div> : null}
         <div className={classes.zoomLevel}>Zoom Level: {zoomLevel}</div>
         <LayoutEditor
+          mode="edit"
+          theLayout={theLayout}
+          leafletLayers={leafletLayers}
           floorPlan={floorPlan}
+          previousFloorPlan={previousFloorPlan}
           setFloorIsLocked={setFloorIsLocked}
           setZoomLevel={setZoomLevel}
-          saveLayout={saveLayout}
-          leafletLayers={leafletLayers}
+          patchLayout={patchLayout}
+          open={openDetailsDialog}
+          handleClose={handleCloseDetailsDialog}
         />
       </Grid>
     </Grid>

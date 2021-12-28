@@ -15,7 +15,7 @@ import CreditCardRoundedIcon from '@mui/icons-material/CreditCardRounded';
 import TodayIcon from '@mui/icons-material/Today';
 import CategoryIcon from '@mui/icons-material/Category';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import QrCode2RoundedIcon from '@mui/icons-material/QrCode2Rounded';
+// import QrCode2RoundedIcon from '@mui/icons-material/QrCode2Rounded';
 import LocalGroceryStoreRoundedIcon from '@mui/icons-material/LocalGroceryStoreRounded';
 
 import EnhancedTableHead from '../Table/EnhancedTableHead';
@@ -33,13 +33,13 @@ const getProductHeadCells = () => [
     label: 'Product',
     icon: <CreditCardRoundedIcon fontSize="medium" />,
   },
-  {
-    id: 'barcode_number',
-    align: 'center',
-    disablePadding: true,
-    label: 'Barcode',
-    icon: <QrCode2RoundedIcon fontSize="medium" />,
-  },
+  // {
+  //   id: 'barcode_number',
+  //   align: 'center',
+  //   disablePadding: true,
+  //   label: 'Barcode',
+  //   icon: <QrCode2RoundedIcon fontSize="medium" />,
+  // },
   {
     id: 'category',
     align: 'center',

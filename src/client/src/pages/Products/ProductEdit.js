@@ -119,7 +119,7 @@ const ProductEdit = (props) => {
         <Grid item xs={7} container>
           <Grid item xs={12}>
             <h1 style={{ marginBottom: 1, marginTop: 3, fontSize: '2em' }}>
-              <span> Add a new product</span>
+              <span> Edit product</span>
               <IconButton
                 component={Link}
                 to={`/${storeUrl}/product/list`}

@@ -35,7 +35,19 @@ export const getProducts = createAsyncThunk(
       const { authHeader } = await getState().auth;
       const endpointURL = `/api/backoffice/product-service/products/${storeUuid}`;
 
-      const res = await axios.get(endpointURL, authHeader);
+      let res;
+
+      if (args) {
+        const { params } = args;
+        const { headers } = authHeader;
+        const reqConfig = { headers, params };
+
+        console.log('reqConfig', reqConfig);
+
+        res = await axios.get(endpointURL, reqConfig);
+      } else {
+        res = await axios.get(endpointURL, authHeader);
+      }
 
       return {
         products: res.data,

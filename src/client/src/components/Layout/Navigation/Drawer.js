@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { withRouter, Link } from 'react-router-dom';
 
+import { useDispatch } from 'react-redux';
+
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import 'react-perfect-scrollbar/dist/css/styles.css';
 // import { loadCSS } from 'fg-loadcss';
@@ -40,6 +42,8 @@ import AddLocationAltRoundedIcon from '@mui/icons-material/AddLocationAltRounded
 import { makeStyles, useTheme } from '@mui/styles';
 
 import { ReactComponent as Megaphone } from '../../../assets/svg/megaphone.svg';
+
+import { processingRequest } from '../../../redux/features/layoutSlice';
 
 const drawerWidth = 240;
 
@@ -82,6 +86,7 @@ const useStyles = makeStyles((theme) => ({
 /* eslint-disable react/prop-types */
 const Drawer = (props) => {
   const classes = useStyles();
+  const dispatch = useDispatch();
   const { window, type, status, handleDrawerToggle, location } = props;
   const theme = useTheme();
   // const isDesktop = false;
@@ -374,6 +379,10 @@ const Drawer = (props) => {
   //   };
   // }, []);
 
+  const handleProductMapping = () => {
+    dispatch(processingRequest());
+  };
+
   return (
     <Hidden
       mdDown={type === 'Desktop' && true}
@@ -490,6 +499,11 @@ const Drawer = (props) => {
                                   className={classes.nested}
                                   component={Link}
                                   to={`/${storeUrl}${_path}`}
+                                  onClick={
+                                    _key === 'layout-product-mapping'
+                                      ? handleProductMapping
+                                      : null
+                                  }
                                   classes={{ selected: classes.selected }}
                                   selected={location.pathname === _path}
                                   sx={{

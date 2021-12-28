@@ -16,3 +16,8 @@ export const updatedLayoutState = (state, { payload }) => ({
   ...state,
   layouts: payload.layouts,
 });
+
+export const clearLayoutState = (state) => ({
+  ...state,
+  layout: null,
+});

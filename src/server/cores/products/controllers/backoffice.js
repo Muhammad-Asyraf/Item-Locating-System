@@ -1,5 +1,7 @@
 const { v4: uuidv4 } = require('uuid');
 const Product = require('../model');
+const Item = require('../../items/model');
+const SubCategory = require('../../categories/sub_categories/model');
 const getLogger = require('../../../utils/logger');
 const { removeFiles } = require('../../../utils/general');
 
@@ -116,7 +118,6 @@ exports.createProduct = async (req, res, next) => {
 
     const product = await Product.query().insertGraph(
       {
-        uuid: uuidv4(),
         name,
         description,
         store_uuid,
@@ -144,6 +145,83 @@ exports.createProduct = async (req, res, next) => {
   } catch (err) {
     productLogger.warn(`Error creating product`);
     await removeFiles(req.files);
+    next(err);
+  }
+};
+
+exports.createMultipleProducts = async (req, res, next) => {
+  try {
+    const { body: payloadList } = req;
+    let subCatList = [];
+    let itemList = [];
+
+    payloadList.forEach(({ sub_categories, items }) => {
+      subCatList = [...new Set([...subCatList, ...sub_categories])];
+
+      barcodeNumberList = items.map(({ barcode_number }) => barcode_number);
+      itemList = [...new Set([...itemList, ...barcodeNumberList])];
+    });
+
+    const subCatIds = await SubCategory.query()
+      .select('uuid', 'name')
+      .whereIn('name', subCatList);
+
+    const itemsIds = await Item.query()
+      .select('uuid', 'barcode_number')
+      .whereIn('barcode_number', itemList);
+
+    const multipleProductsPayload = payloadList.map((payload) => {
+      const {
+        items,
+        sub_categories,
+        barcode_number,
+        measurement_value,
+        markup_percentage,
+        retail_price,
+        supply_price,
+      } = payload;
+
+      const subCatByUUID = sub_categories.map((subCat) => {
+        // get the UUID of the subcat by name
+        const subCatUUID = subCatIds.find((obj) => obj.name === subCat).uuid;
+        return { uuid: subCatUUID };
+      });
+
+      const itemsByUUID = items.map(({ barcode_number, quantity }) => {
+        // get the UUID of the items by barcode number
+        const itemUUID = itemsIds.find(
+          (obj) => obj.barcode_number === barcode_number
+        ).uuid;
+
+        return { uuid: itemUUID, quantity };
+      });
+
+      return {
+        ...payload,
+        barcode_number: parseInt(barcode_number, 10),
+        measurement_value: parseFloat(measurement_value),
+        markup_percentage: parseFloat(markup_percentage),
+        retail_price: parseFloat(retail_price),
+        supply_price: parseFloat(supply_price),
+        sub_categories: subCatByUUID,
+        items: itemsByUUID,
+      };
+    });
+
+    const products = await Product.query().insertGraph(
+      multipleProductsPayload,
+      {
+        relate: ['items', 'sub_categories'],
+      }
+    );
+
+    productLogger.info(
+      `Multiple products [${products.length}] successfully inserted with!`
+    );
+
+    res.json(products);
+  } catch (err) {
+    productLogger.warn(`Error creating product`);
     next(err);
   }
 };

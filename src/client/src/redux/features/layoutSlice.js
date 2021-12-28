@@ -2,7 +2,12 @@ import { createSlice } from '@reduxjs/toolkit';
 
 import { loadingState, loadedState } from '../states/loadState';
 import { errorState } from '../states/errorState';
-import { setLayout, setLayouts, updatedLayoutState } from '../states/layoutState';
+import {
+  setLayout,
+  setLayouts,
+  updatedLayoutState,
+  clearLayoutState,
+} from '../states/layoutState';
 
 import {
   getLayout,
@@ -16,9 +21,9 @@ import {
 } from '../thunks/layoutThunk';
 
 const initialState = {
-  isLoading: false,
+  isLoading: true,
   layouts: [],
-  layout: {},
+  layout: null,
   status: null,
   message: [],
   errors: [],
@@ -31,6 +36,7 @@ const layoutSlice = createSlice({
     processingRequest: loadingState,
     processed: loadedState,
     quickUpdateLayouts: updatedLayoutState,
+    clearLayout: clearLayoutState,
   },
   extraReducers: {
     [getLayout.fulfilled]: setLayout,
@@ -52,7 +58,8 @@ const layoutSlice = createSlice({
   },
 });
 
-export const { processingRequest, processed, quickUpdateLayouts } = layoutSlice.actions;
+export const { clearLayout, processingRequest, processed, quickUpdateLayouts } =
+  layoutSlice.actions;
 
 export const selectLayout = (state) => state.layout.layout;
 export const selectLayouts = (state) => state.layout.layouts;

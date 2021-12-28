@@ -1,5 +1,6 @@
 const { Model } = require('objection');
 const tableNames = require('../../database/table_names');
+const { v4: uuidv4 } = require('uuid');
 
 class Product extends Model {
   static get tableName() {
@@ -8,6 +9,10 @@ class Product extends Model {
 
   static get idColumn() {
     return 'uuid';
+  }
+
+  $beforeInsert() {
+    this.uuid = uuidv4();
   }
 
   $beforeUpdate() {

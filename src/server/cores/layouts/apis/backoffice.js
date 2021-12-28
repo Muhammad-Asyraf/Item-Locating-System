@@ -19,6 +19,12 @@ router.post(
   upload.single('floorPlanSVG'),
   layoutController.AddLayout
 );
+router.put(
+  '/layout/:uuid',
+  checkAuth,
+  upload.single('floorPlanSVG'),
+  layoutController.UpdateLayout
+);
 // router.put(
 //   '/layout/:uuid',
 //   checkAuth,

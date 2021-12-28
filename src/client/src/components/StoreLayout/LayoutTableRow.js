@@ -37,7 +37,7 @@ const LayoutTableRow = (props) => {
     labelId,
     handleClick,
     handleDelete,
-    // handleEdit,
+    handleEdit,
     handleToggleStatus,
   } = props;
 
@@ -94,7 +94,12 @@ const LayoutTableRow = (props) => {
             padding: '10px 20px 10px 20px',
           }}
         >
-          <Chip color="primary" size="small" label="FL-1" style={{ padding: '8px 15px' }} />
+          <Chip
+            color="primary"
+            size="small"
+            label={layout.label}
+            style={{ padding: '8px 15px' }}
+          />
           {/* <Chip color="primary" size="small" label={layout.label} /> */}
         </TableCell>
         <TableCell
@@ -132,7 +137,7 @@ const LayoutTableRow = (props) => {
             layout={layout}
             Link={Link}
             handleDelete={handleDelete}
-            // handleEdit={handleEdit}
+            handleEdit={handleEdit}
           />
         </TableCell>
       </TableRow>

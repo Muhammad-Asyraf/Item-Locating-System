@@ -13,6 +13,7 @@ import '../../assets/css/swiper_override.css';
 import 'swiper/swiper-bundle.min.css';
 import 'swiper/swiper.min.css';
 
+import Divider from '@mui/material/Divider';
 import Box from '@mui/material/Box';
 import Switch from '@mui/material/Switch';
 import Paper from '@mui/material/Paper';
@@ -129,13 +130,13 @@ const ProductTableRow = (props) => {
         >
           {product.name}
         </TableCell>
-        <TableCell
+        {/* <TableCell
           style={{ borderBottom: 'none' }}
           align="center"
           sx={{ fontSize: '0.95rem !important' }}
         >
           {product.barcode_number}
-        </TableCell>
+        </TableCell> */}
         <TableCell
           style={{ borderBottom: 'none' }}
           component="th"
@@ -295,11 +296,26 @@ const ProductTableRow = (props) => {
                             borderRadius: '0px 0px 20px 0px',
                           }}
                         >
-                          <ReactQuill
-                            value={product.description}
-                            readOnly
-                            theme="bubble"
-                          />
+                          <div style={{ fontSize: 16 }}>
+                            <b>UPC Code:</b> {product.barcode_number}
+                          </div>
+                          <div style={{ fontSize: 16 }}>
+                            <b>Supply Price:</b> {product.supply_price}
+                          </div>
+                          <div style={{ fontSize: 16 }}>
+                            <b>Markup:</b> {Math.round(product.markup_percentage)} %
+                          </div>
+                          <div style={{ fontSize: 16 }}>
+                            <b>Product Type:</b> {product.product_type}
+                          </div>
+                          <div style={{ fontSize: 16 }}>
+                            <b>Measurement:</b> {Math.round(product.measurement_value)}{' '}
+                            {product.measurement_unit}
+                          </div>
+                          <br />
+                          <Divider />
+                          <br />
+                          <ReactQuill value={product.description} readOnly theme="bubble" />
                         </Box>
                       </Grid>
                     </Grid>

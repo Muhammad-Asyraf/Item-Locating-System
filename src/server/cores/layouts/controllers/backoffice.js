@@ -8,24 +8,24 @@ const layoutLogger = getLogger(__filename, 'layout');
 exports.AddLayout = async (req, res, next) => {
   try {
     const layoutId = uuidv4();
-    const { name, layers_, store_uuid } = req.body;
+    const { name, label, layers_, store_uuid } = req.body;
     const { file: floorPlanFile } = req;
-
     const layers = JSON.parse(layers_);
-    const { path } = floorPlanFile;
 
     const layout = await Layout.query().insertGraph({
       uuid: layoutId,
       name,
+      label,
       is_active: false,
-      floor_plan_path: path,
       store_uuid,
+      ...(floorPlanFile && { floor_plan_path: floorPlanFile.path }),
       layers,
     });
 
     layoutLogger.info(
       `layout successfully created with [UUID -${layout.uuid}]`
     );
+
     res.json(layout);
   } catch (err) {
     layoutLogger.warn(`Error adding new layout`);
@@ -95,6 +95,48 @@ exports.removeMultipleLayout = async (req, res, next) => {
     res.json({ message: logMessage });
   } catch (err) {
     layoutLogger.warn(`Error deleting layouts`);
+    next(err);
+  }
+};
+
+exports.UpdateLayout = async (req, res, next) => {
+  try {
+    const { uuid } = req.params;
+    const { name, label, layers_, store_uuid, oldFloorPlanPath } = req.body;
+    const { file: floorPlanFile } = req;
+    const layers = JSON.parse(layers_);
+    const _oldFloorPlanPath = oldFloorPlanPath
+      ? JSON.parse(oldFloorPlanPath)
+      : null;
+
+    console.log(floorPlanFile);
+    console.log(layers);
+
+    const layout = await Layout.query().upsertGraph(
+      {
+        uuid,
+        name,
+        label,
+        is_active: false,
+        store_uuid,
+        floor_plan_path: floorPlanFile ? floorPlanFile.path : null,
+        layers,
+      },
+      { insertMissing: true }
+    );
+
+    if (_oldFloorPlanPath && layout) {
+      await removeFiles(_oldFloorPlanPath);
+    }
+
+    layoutLogger.info(
+      `layout with [UUID -${layout.uuid}] successfully updated`
+    );
+
+    res.json(layout);
+  } catch (err) {
+    layoutLogger.warn(`Error updating layout`);
+    await removeFiles(req.file);
     next(err);
   }
 };

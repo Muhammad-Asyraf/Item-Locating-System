@@ -16,6 +16,11 @@ router.post(
   productController.createProduct
 );
 router.post(
+  '/product/multiple',
+  checkAuth,
+  productController.createMultipleProducts
+);
+router.post(
   '/product/delete',
   checkAuth,
   productController.removeMultipleProduct

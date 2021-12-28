@@ -58,6 +58,7 @@ const ItemEdit = (props) => {
   const categoryOptions = useSelector(selectSubcategory);
 
   const { match } = props;
+  console.log(isCategoryLoading);
 
   useEffect(async () => {
     await dispatch(getSubcategories());

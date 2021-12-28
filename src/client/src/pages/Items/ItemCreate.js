@@ -151,7 +151,7 @@ const ItemCreate = () => {
               <CircularProgress size={25} style={{ color: 'white' }} />
             ) : (
               <>
-                <SaveRoundedIcon style={{ marginRight: 10 }} fontSize="small" /> Savess
+                <SaveRoundedIcon style={{ marginRight: 10 }} fontSize="small" /> Save
               </>
             )}
           </Button>

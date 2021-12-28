@@ -113,6 +113,7 @@ const LayoutListTable = (props) => {
     onMultipleDelete,
     onMultipleActiveStatusUpdate,
     handleToggleStatus,
+    handleEdit,
   } = props;
 
   /* eslint-disable arrow-body-style */
@@ -267,7 +268,7 @@ const LayoutListTable = (props) => {
                     labelId={labelId}
                     handleClick={handleClick}
                     handleDelete={handleDelete}
-                    // handleEdit={handleEdit}
+                    handleEdit={handleEdit}
                     handleToggleStatus={handleToggleStatus}
                   />
                 );

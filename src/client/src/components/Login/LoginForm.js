@@ -182,7 +182,7 @@ const LoginForm = (props) => {
             {authLoading ? (
               <CircularProgress size={20} sx={{ color: '#003366 !important' }} />
             ) : (
-              <>Sign Ins</>
+              <>Sign In</>
             )}
           </Button>
         </Grid>

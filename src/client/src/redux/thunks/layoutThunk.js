@@ -7,7 +7,6 @@ export const getLayout = createAsyncThunk(
     try {
       const endpointURL = `/api/backoffice/layout-service/layout/${uuid}`;
       const { authHeader } = await getState().auth;
-
       const { data } = await axios.get(endpointURL, authHeader);
 
       return {
@@ -61,9 +60,11 @@ export const addLayout = createAsyncThunk(
       const endpointURL = '/api/backoffice/layout-service/layout';
       const { authHeader } = await getState().auth;
 
-      await axios.post(endpointURL, payload, authHeader);
+      const {
+        data: { uuid },
+      } = await axios.post(endpointURL, payload, authHeader);
 
-      return true;
+      return uuid;
     } catch (err) {
       const { data } = err.response;
 
@@ -87,7 +88,6 @@ export const deleteLayout = createAsyncThunk(
 
       return true;
     } catch (err) {
-      console.log('error', err);
       const { data } = err.response;
 
       return rejectWithValue({
@@ -110,7 +110,6 @@ export const deleteMultipleLayouts = createAsyncThunk(
 
       return true;
     } catch (err) {
-      console.log('error', err);
       const { data } = err.response;
 
       return rejectWithValue({

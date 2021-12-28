@@ -4,9 +4,9 @@ import { View } from 'react-native';
 import { ActivityIndicator, Text } from 'react-native-paper';
 
 // Styling
-import { Theme } from '../styles/Theme';
+import { Theme, TextStyle } from '../styles/Theme';
 
-export default function Loading() {
+export default function Loading({ message }) {
   return (
     <View
       style={{
@@ -21,8 +21,8 @@ export default function Loading() {
         size="large"
         style={{ alignSelf: 'center' }}
       />
-      <Text style={{ fontSize: 16, letterSpacing: 1, marginTop: 24 }}>
-        Getting your items
+      <Text style={[TextStyle.subhead1, { marginTop: 24 }]}>
+        {message != null ? message : 'Getting your items'}
       </Text>
     </View>
   );

@@ -1,16 +1,10 @@
 // Components
-import React from 'react';
+import React, { useState } from 'react';
 import { ScrollView, View, StyleSheet } from 'react-native';
-import {
-  Appbar,
-  Button,
-  Title,
-  Text,
-  Card,
-  Headline,
-  Subheading,
-} from 'react-native-paper';
+import { Appbar, Button, Title, Text, Card, Dialog } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import Icon2 from 'react-native-vector-icons/MaterialCommunityIcons';
+import QRCode from 'react-native-qrcode-svg';
 import ProfileImage from '../components/core/ProfileImage';
 
 // Utilities
@@ -25,7 +19,8 @@ import { Theme, GlobalStyle, TextStyle, AppbarStyle } from '../styles/Theme';
 
 export default function Profile({ navigation }) {
   const dispatch = useDispatch();
-  const { userObject } = useSelector((state) => state.user);
+  const { uuid, userObject } = useSelector((state) => state.user);
+  const [isDialogVisible, setDialogVisible] = useState(false);
 
   const logout = () => {
     auth()
@@ -41,6 +36,13 @@ export default function Profile({ navigation }) {
 
     // Open ProfileEdit screen
     navigation.dangerouslyGetParent().navigate('Edit Profile', {});
+  };
+
+  const showQRDialog = () => {
+    setDialogVisible(true);
+  };
+  const hideQRDialog = () => {
+    setDialogVisible(false);
   };
 
   return (
@@ -63,13 +65,22 @@ export default function Profile({ navigation }) {
                 {userObject.email}
               </Text>
             </View>
-            <Icon.Button
-              name="edit"
-              size={24}
-              iconStyle={styles.profileEditIcon}
-              backgroundColor="transparent"
-              onPress={editProfile}
-            ></Icon.Button>
+            <View style={styles.profileButtonContainer}>
+              <Icon2.Button
+                name="qrcode"
+                size={24}
+                iconStyle={styles.profileIcon}
+                backgroundColor="transparent"
+                onPress={showQRDialog}
+              ></Icon2.Button>
+              <Icon.Button
+                name="edit"
+                size={24}
+                iconStyle={styles.profileIcon}
+                backgroundColor="transparent"
+                onPress={editProfile}
+              ></Icon.Button>
+            </View>
           </View>
         </Card>
 
@@ -78,6 +89,18 @@ export default function Profile({ navigation }) {
           <Button onPress={logout}>Log Out</Button>
         </ScrollView>
       </View>
+
+      <Dialog visible={isDialogVisible}>
+        <Dialog.Title>Your QR Code</Dialog.Title>
+        <Dialog.Content
+          style={{ justifyContent: 'center', alignItems: 'center' }}
+        >
+          <QRCode value={uuid} />
+        </Dialog.Content>
+        <Dialog.Actions>
+          <Button onPress={hideQRDialog}>Close</Button>
+        </Dialog.Actions>
+      </Dialog>
     </View>
   );
 }
@@ -110,8 +133,11 @@ const styles = StyleSheet.create({
     color: 'white',
     textAlign: 'center',
   },
-  profileEditIcon: {
+  profileIcon: {
     marginRight: 0,
     alignSelf: 'center',
+  },
+  profileButtonContainer: {
+    flexDirection: 'row',
   },
 });

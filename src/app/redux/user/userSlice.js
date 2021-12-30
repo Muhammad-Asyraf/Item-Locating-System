@@ -4,12 +4,16 @@ export const userSlice = createSlice({
   name: 'user',
   initialState: {
     uuid: '',
+    userObject: {},
     token: 'test',
     default_cart_uuid: '',
     cart_uuid: '',
     position: [],
   },
   reducers: {
+    setUserObject: (state, action) => {
+      state.userObject = action.payload;
+    },
     setToken: (state, action) => {
       state.token = action.payload;
     },
@@ -25,6 +29,7 @@ export const userSlice = createSlice({
     removeUser: (state) => {
       state.token = '';
       state.uuid = '';
+      state.userObject = '';
       state.default_cart_uuid = '';
       state.cart_uuid = '';
     },
@@ -34,6 +39,7 @@ export const userSlice = createSlice({
   },
 });
 export const {
+  setUserObject,
   setToken,
   setUuid,
   setDefaultCart,

@@ -6,5 +6,6 @@ router.get('/app-users', appUserController.getAllAppUsers);
 router.get('/app-user/:uuid', appUserController.findAppUserByUuid);
 router.get('/app-user/email/:email', appUserController.findAppUserByEmail);
 router.delete('/app-user/:uuid', appUserController.removeAppUser);
+router.patch('/app-user/:uuid', appUserController.updateUser);
 
 module.exports = router;

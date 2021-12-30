@@ -74,9 +74,11 @@ exports.findAppUserByEmail = async (req, res, next) => {
     const { email } = req.params;
 
     const appUser = await AppUser.query().where({
-      email
-    })
-    appUserLogger.info(`Successfully retrieved the appUser: ${appUser[0].email}`);
+      email,
+    });
+    appUserLogger.info(
+      `Successfully retrieved the appUser: ${appUser[0].email}`
+    );
 
     res.json(appUser[0]);
   } catch (err) {
@@ -98,6 +100,21 @@ exports.removeAppUser = async (req, res, next) => {
     res.json({ message: `Successfully deleted appUser <${uuid}>` });
   } catch (err) {
     appUserLogger.warn(`Error deleting appUser`);
+    next(err);
+  }
+};
+
+exports.updateUser = async (req, res, next) => {
+  try {
+    const { uuid } = req.params;
+    console.log(req.body);
+    const appUser = await AppUser.query().patchAndFetchById(uuid, req.body);
+    appUserLogger.info(`Successfully updated appUser <${uuid}> at Postgres `);
+
+    // return userObject
+    res.json(appUser);
+  } catch (err) {
+    appUserLogger.warn(`Error updating appUser`);
     next(err);
   }
 };

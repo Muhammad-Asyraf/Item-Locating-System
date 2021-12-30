@@ -49,12 +49,19 @@ class AppUser extends Model {
           description: 'The app user uuid.',
           examples: ['1dafa876-7f8c-45f8-a39a-a43d3d7774c3'],
         },
-        full_name: {
-          $id: '#/properties/full_name',
+        first_name: {
+          $id: '#/properties/first_name',
           type: 'string',
-          title: 'The full_name schema',
+          title: 'The first_name schema',
           description: 'The app user first name.',
           examples: ['Muhammad Asyraf'],
+        },
+        last_name: {
+          $id: '#/properties/last_name',
+          type: 'string',
+          title: 'The last_name schema',
+          description: 'The app user last name.',
+          examples: ['Zafrul Hisham'],
         },
         email: {
           $id: '#/properties/email',
@@ -74,6 +81,16 @@ class AppUser extends Model {
           $id: '#/properties/password',
           type: 'string',
           title: 'The users hashed password.',
+        },
+        birth_date: {
+          $id: '#/properties/birth_date',
+          type: 'date',
+          title: 'The users birth date.',
+        },
+        phone: {
+          $id: '#/properties/phone',
+          type: 'string',
+          title: 'The users phone number.',
         },
         created_at: {
           $id: '#/properties/created_at',

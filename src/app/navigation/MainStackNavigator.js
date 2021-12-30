@@ -6,6 +6,7 @@ import MainTabsNavigator from './MainTabsNavigator';
 import SearchResult from '../screens/SearchResult';
 import Loketlist from '../screens/Loketlist';
 import FloorPlan from '../screens/FloorPlan';
+import ProfileEdit from '../screens/ProfileEdit';
 
 // Utilities
 import auth from '@react-native-firebase/auth';
@@ -171,24 +172,31 @@ export default function MainStackNavigator() {
   }, [isLoaded]);
 
   const fetch = async () => {
-    const token = await auth().currentUser.getIdToken(true);
-    const uuid = await auth().currentUser.uid;
-    const { data } = await axios.get(
-      environment.host +
-        '/api/mobile/planning-cart-service/cart/default/' +
-        uuid,
-      authState.authHeader
-    );
+    try {
+      const token = await auth().currentUser.getIdToken(false);
+      console.log(`token: ${token}`);
+      console.log(`authHeader: ${JSON.stringify(authState.authHeader)}`);
+      const uuid = auth().currentUser.uid;
+      const { data } = await axios.get(
+        environment.host +
+          '/api/mobile/planning-cart-service/cart/default/' +
+          uuid,
+        authState.authHeader
+      );
 
-    dispatch(setToken(token));
-    dispatch(setUuid(uuid));
-    dispatch(setDefaultCart(data.uuid));
-    dispatch(loadAllItems(data.uuid));
-    dispatch(setCurrentCart(data.uuid));
+      dispatch(setToken(token));
+      dispatch(setUuid(uuid));
+      dispatch(setDefaultCart(data.uuid));
+      dispatch(loadAllItems(data.uuid));
+      dispatch(setCurrentCart(data.uuid));
 
-    console.log('Loaded! User uuid: ' + uuid);
-    console.log('Default cart uuid: ' + data.uuid);
-    setLoaded(true);
+      //console.log(`User data: ${JSON.stringify(user)}`);
+      // console.log('Loaded! User uuid: ' + uuid);
+      // console.log('Default cart uuid: ' + data.uuid);
+      setLoaded(true);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -204,6 +212,9 @@ export default function MainStackNavigator() {
       <Stack.Screen name="Search Result" component={SearchResult} />
       <Stack.Screen name="Loketlist" component={Loketlist} />
       <Stack.Screen name="Floor Plan" component={FloorPlan} />
+
+      {/* Profiles */}
+      <Stack.Screen name="Edit Profile" component={ProfileEdit} />
     </Stack.Navigator>
   );
 }

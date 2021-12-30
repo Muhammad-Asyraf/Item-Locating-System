@@ -42,8 +42,13 @@ const useStyles = makeStyles(() => ({
 const Content = (props) => {
   const classes = useStyles();
   const {
+    layerId,
+    currentLayoutId,
     reset,
     products,
+    productsRef,
+    initProducts,
+    setInitProducts,
     contentRef,
     selected,
     setSelected,
@@ -92,10 +97,6 @@ const Content = (props) => {
     const selectedActive = selected.length > 0 && selected.includes(uuid);
     let payload;
 
-    console.log('check', selected.includes(uuid));
-
-    // setSelected([]);
-
     if (selectedActive) {
       const draggables = document.querySelectorAll('[draggable]');
 
@@ -111,12 +112,10 @@ const Content = (props) => {
       evt.currentTarget.style.opacity = '0.4';
     }
 
-    // evt.currentTarget.style.opacity = '0.4';
-
     if (selectedActive) {
-      payload = JSON.stringify({ target: 'layer', payload: selected });
+      payload = JSON.stringify({ sourceId: layerId, payload: selected });
     } else {
-      payload = JSON.stringify({ target: 'layer', payload: [uuid] });
+      payload = JSON.stringify({ sourceId: layerId, payload: [uuid] });
       setSelected([]);
     }
 
@@ -146,9 +145,60 @@ const Content = (props) => {
     }
   };
 
+  const handleOnDrop = (event) => {
+    console.log('initProducts', initProducts);
+    const updatedProducts = [...initProducts];
+
+    const { sourceId, payload } = JSON.parse(event.dataTransfer.getData('dragPayload'));
+    event.dataTransfer.clearData();
+
+    if (sourceId === layerId) {
+      return;
+    }
+
+    payload.forEach((selectedProductUUID) => {
+      const selectedProductIndex = updatedProducts.findIndex(
+        ({ uuid }) => uuid === selectedProductUUID
+      );
+
+      const updatedSelectedProduct = { ...updatedProducts[selectedProductIndex] };
+      updatedSelectedProduct.layout_uuid = currentLayoutId;
+      updatedSelectedProduct.partition_uuid = layerId;
+
+      // patch and replace update product
+      updatedProducts[selectedProductIndex] = updatedSelectedProduct;
+    });
+
+    console.log('updatedProducts', updatedProducts);
+
+    productsRef.current = updatedProducts;
+    setInitProducts(updatedProducts);
+    // console.log(setInitProducts);
+  };
+
+  const handleRemove = (productUUID) => {
+    const updatedProducts = [...initProducts];
+
+    const selectedProductIndex = updatedProducts.findIndex(({ uuid }) => uuid === productUUID);
+
+    const updatedSelectedProduct = { ...updatedProducts[selectedProductIndex] };
+    updatedSelectedProduct.layout_uuid = null;
+    updatedSelectedProduct.partition_uuid = null;
+
+    updatedProducts[selectedProductIndex] = updatedSelectedProduct;
+
+    productsRef.current = updatedProducts;
+    setInitProducts(updatedProducts);
+  };
+
   const handleOnDragOver = (evt) => {
-    console.log('evt', evt);
-    highlightPartition(evt);
+    evt.preventDefault();
+    highlightPartition();
+  };
+
+  const handleDragLeave = (evt) => {
+    evt.preventDefault();
+    removeHighlight();
   };
 
   const updateSearchInput = (e) => setSearchValue(e.target.value);
@@ -220,16 +270,16 @@ const Content = (props) => {
       <Grid
         container
         ref={contentRef}
+        onDrop={handleOnDrop}
+        onDragOver={handleOnDragOver}
+        onDragLeave={handleDragLeave}
         style={{
-          // overflowX: 'hidden',
           height: '425px',
           marginTop: 8,
           marginBottom: 10,
           width: '100% !important',
           direction: 'rtl',
         }}
-        onDragOver={handleOnDragOver}
-        onDragLeave={removeHighlight}
       >
         <PerfectScrollbar
           id="product-bucket"
@@ -248,6 +298,7 @@ const Content = (props) => {
                   handleClick={handleClick}
                   handleDragStart={handleDragStart}
                   handleOnDragEnd={handleOnDragEnd}
+                  handleRemove={handleRemove}
                   isProductSelected={isProductSelected}
                   reset={reset}
                 />

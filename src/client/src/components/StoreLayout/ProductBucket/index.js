@@ -12,7 +12,7 @@ const PaperPortal = (props) => {
   const { initProducts, ...remainingProps } = props;
   unassignedProducts = initProducts.filter(({ partition_uuid: layerId }) => layerId === null);
 
-  const adjustedProps = { ...remainingProps, initProducts: unassignedProducts };
+  const adjustedProps = { ...remainingProps, unassignedProducts, initProducts };
 
   return (
     <Portal>

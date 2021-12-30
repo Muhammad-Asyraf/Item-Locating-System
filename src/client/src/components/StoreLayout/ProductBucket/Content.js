@@ -43,7 +43,10 @@ const Content = (props) => {
   const classes = useStyles();
   const {
     reset,
+    initProducts,
+    setInitProducts,
     products,
+    productsRef,
     contentRef,
     selected,
     setSelected,
@@ -90,10 +93,6 @@ const Content = (props) => {
     const selectedActive = selected.length > 0 && selected.includes(uuid);
     let payload;
 
-    console.log('check', selected.includes(uuid));
-
-    // setSelected([]);
-
     if (selectedActive) {
       const draggables = document.querySelectorAll('[draggable]');
 
@@ -109,17 +108,47 @@ const Content = (props) => {
       evt.currentTarget.style.opacity = '0.4';
     }
 
-    // evt.currentTarget.style.opacity = '0.4';
-
     if (selectedActive) {
-      payload = JSON.stringify({ target: 'layer', payload: selected });
+      payload = JSON.stringify({ sourceId: 'product-bucket', payload: selected });
     } else {
-      payload = JSON.stringify({ target: 'layer', payload: [uuid] });
+      payload = JSON.stringify({ sourceId: 'product-bucket', payload: [uuid] });
       setSelected([]);
     }
 
     evt.dataTransfer.dropEffect = 'copy';
     evt.dataTransfer.setData('dragPayload', payload);
+  };
+
+  const handleOnDrop = (event) => {
+    console.log('initProducts 0', initProducts);
+    const updatedProducts = [...initProducts];
+
+    const { sourceId, payload } = JSON.parse(event.dataTransfer.getData('dragPayload'));
+    event.dataTransfer.clearData();
+
+    if (sourceId === 'product-bucket') {
+      return;
+    }
+
+    console.log('payload', payload);
+
+    payload.forEach((selectedProductUUID) => {
+      const selectedProductIndex = updatedProducts.findIndex(
+        ({ uuid }) => uuid === selectedProductUUID
+      );
+
+      const updatedSelectedProduct = { ...updatedProducts[selectedProductIndex] };
+      updatedSelectedProduct.layout_uuid = null;
+      updatedSelectedProduct.partition_uuid = null;
+
+      // patch and replace update product
+      updatedProducts[selectedProductIndex] = updatedSelectedProduct;
+    });
+
+    console.log('updatedProducts', updatedProducts);
+
+    productsRef.current = updatedProducts;
+    setInitProducts(updatedProducts);
   };
 
   const handleOnDragEnd = (evt) => {
@@ -142,6 +171,10 @@ const Content = (props) => {
       // evt.currentTarget.style.background = '#385D63';
       evt.currentTarget.style.opacity = '1';
     }
+  };
+
+  const handleOnDragOver = (evt) => {
+    evt.preventDefault();
   };
 
   const updateSearchInput = (e) => setSearchValue(e.target.value);
@@ -213,17 +246,14 @@ const Content = (props) => {
       <Grid
         container
         ref={contentRef}
+        onDrop={handleOnDrop}
+        onDragOver={handleOnDragOver}
         style={{
-          // overflowX: 'hidden',
           height: '425px',
           marginTop: 8,
           marginBottom: 10,
           width: '100% !important',
           direction: 'rtl',
-        }}
-        onDragOver={(evt) => {
-          evt.preventDefault();
-          // console.log('wowowow');
         }}
       >
         <PerfectScrollbar

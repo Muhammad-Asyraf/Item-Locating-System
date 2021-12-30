@@ -1,12 +1,24 @@
-import React from 'react';
+import React, { useState } from 'react';
+
+import SwiperCore, { Pagination, Navigation } from 'swiper';
+import { Swiper, SwiperSlide } from 'swiper/react/swiper-react';
+
+import '../../../assets/css/swiper_override.css';
+import 'swiper/swiper-bundle.min.css';
+import 'swiper/swiper.min.css';
 
 import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
 // import ListItemButton from '@mui/material/ListItemButton';
 import Chip from '@mui/material/Chip';
 import Divider from '@mui/material/Divider';
+import PhotoSizeSelectActualRoundedIcon from '@mui/icons-material/PhotoSizeSelectActualRounded';
 
 import { makeStyles } from '@mui/styles';
+
+import ImageModal from '../../Images/ImageModal';
+
+SwiperCore.use([Pagination, Navigation]);
 
 const useStyles = makeStyles(() => ({
   input: {
@@ -49,7 +61,11 @@ const useStyles = makeStyles(() => ({
 const ProductCard = (props) => {
   const classes = useStyles();
 
+  const [openModal, setOpenModal] = useState(false);
   const { product, handleClick, handleDragStart, handleOnDragEnd, isProductSelected } = props;
+
+  const handleOpenModal = () => setOpenModal(true);
+  const handleCloseModal = () => setOpenModal(false);
 
   const onDragStart = (evt) => {
     // const { background } = evt.currentTarget.style;
@@ -65,6 +81,12 @@ const ProductCard = (props) => {
     // );
 
     handleDragStart(evt, product.uuid);
+  };
+
+  const handleCardClick = ({ target: { tagName, id } }) => {
+    if (tagName !== 'path' && id === '') {
+      handleClick(product.uuid);
+    }
   };
 
   const stockStatusChip = (stockStatus) => {
@@ -91,15 +113,8 @@ const ProductCard = (props) => {
       className={classes.paper}
       draggable
       onDragStart={onDragStart}
-      onDragEnd={(evt) => {
-        console.log('WTF so you do triggered?', evt.dataTransfer.dropEffect);
-        handleOnDragEnd(evt);
-      }}
-      onClick={() => handleClick(product.uuid)}
-      // style={{
-      //   backgroundColor: isProductSelected ? 'white' : '#385D63',
-      //   color: isProductSelected ? 'black' : 'white',
-      // }}
+      onDragEnd={handleOnDragEnd}
+      onClick={handleCardClick}
     >
       <Grid container>
         <Grid
@@ -147,6 +162,22 @@ const ProductCard = (props) => {
               {stockStatusChip(product.stock_status)}
               &nbsp;&nbsp;{product.stock_status}
             </span>
+            <span style={{ position: 'absolute', marginLeft: 8 }}>
+              {product.images.length > 0 && (
+                <PhotoSizeSelectActualRoundedIcon
+                  id="card-image"
+                  style={{ color: 'white' }}
+                  onClick={handleOpenModal}
+                />
+              )}
+            </span>
+            <ImageModal
+              images={product.images}
+              Swiper={Swiper}
+              SwiperSlide={SwiperSlide}
+              openModal={openModal}
+              handleCloseModal={handleCloseModal}
+            />
           </Grid>
 
           <Grid item xs={12} container>

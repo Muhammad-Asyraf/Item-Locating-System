@@ -24,6 +24,7 @@
     "fg-loadcss": "^3.1.0",
     "firebase": "^8.6.3",
     "leaflet": "^1.7.1",
+    "leaflet-color-number-markers": "^1.0.7",
     "leaflet-geometryutil": "^0.10.0",
     "mapbox-gl": "^2.5.1",
     "moment": "^2.29.1",

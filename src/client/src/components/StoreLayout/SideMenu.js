@@ -62,7 +62,7 @@ const SideMenu = (props) => {
   const [openBucket, setOpenBucket] = useState(false);
   const [openSearchDrawer, setOpenSearchDrawer] = useState(false);
 
-  const { initProducts, setInitProducts, categoryOptions } = props;
+  const { productsRef, initProducts, setInitProducts, categoryOptions } = props;
   // const { products, setProducts, initProducts, categoryOptions } = props;
 
   // console.log('layouts', layouts);
@@ -97,6 +97,7 @@ const SideMenu = (props) => {
       {openBucket && (
         <ProductBucket
           toggleProductBucket={toggleProductBucket}
+          productsRef={productsRef}
           initProducts={initProducts}
           setInitProducts={setInitProducts}
           categoryOptions={categoryOptions}

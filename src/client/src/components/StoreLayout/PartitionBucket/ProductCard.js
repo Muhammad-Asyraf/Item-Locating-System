@@ -1,15 +1,27 @@
-import React from 'react';
+import React, { useState } from 'react';
+
+import SwiperCore, { Pagination, Navigation } from 'swiper';
+import { Swiper, SwiperSlide } from 'swiper/react/swiper-react';
+
+import '../../../assets/css/swiper_override.css';
+import 'swiper/swiper-bundle.min.css';
+import 'swiper/swiper.min.css';
 
 import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
 // import ListItemButton from '@mui/material/ListItemButton';
 import Chip from '@mui/material/Chip';
 import Divider from '@mui/material/Divider';
+import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 // import IconButton from '@mui/material/IconButton';
 
 import PhotoSizeSelectActualRoundedIcon from '@mui/icons-material/PhotoSizeSelectActualRounded';
 
 import { makeStyles } from '@mui/styles';
+
+import ImageModal from '../../Images/ImageModal';
+
+SwiperCore.use([Pagination, Navigation]);
 
 const useStyles = makeStyles(() => ({
   input: {
@@ -52,7 +64,19 @@ const useStyles = makeStyles(() => ({
 const ProductCard = (props) => {
   const classes = useStyles();
 
-  const { product, handleClick, handleDragStart, handleOnDragEnd, isProductSelected } = props;
+  const {
+    product,
+    handleClick,
+    handleDragStart,
+    handleOnDragEnd,
+    handleRemove,
+    isProductSelected,
+  } = props;
+
+  const [openModal, setOpenModal] = useState(false);
+
+  const handleOpenModal = () => setOpenModal(true);
+  const handleCloseModal = () => setOpenModal(false);
 
   const onDragStart = (evt) => {
     // const { background } = evt.currentTarget.style;
@@ -87,18 +111,15 @@ const ProductCard = (props) => {
     }
   };
 
-  const handleCardClick = ({ target }) => {
-    console.log('check id', target.id);
-    if (target.id === 'card-image') {
-      console.log('wtf???', target.id);
-      return;
+  const handleCardClick = ({ target: { tagName, id } }) => {
+    if (tagName !== 'path' && id === '') {
+      handleClick(product.uuid);
     }
-
-    handleClick(product.uuid);
   };
 
-  const handleImageClick = () => {
-    console.log('YEZZZAA');
+  const handleRemoveCard = () => {
+    handleRemove(product.uuid);
+    console.log('remove click');
   };
 
   return (
@@ -108,10 +129,7 @@ const ProductCard = (props) => {
       className={classes.paper}
       draggable
       onDragStart={onDragStart}
-      onDragEnd={(evt) => {
-        console.log('WTF so you do triggered?', evt.dataTransfer.dropEffect);
-        handleOnDragEnd(evt);
-      }}
+      onDragEnd={handleOnDragEnd}
       onClick={handleCardClick}
       // style={{
       //   backgroundColor: isProductSelected ? 'white' : '#385D63',
@@ -128,9 +146,24 @@ const ProductCard = (props) => {
         >
           &nbsp;
         </Grid>
-        <Grid item xs={11.5} sx={{ padding: 1, paddingLeft: 1.5 }} container spacing={0.2}>
-          <Grid item xs={12}>
-            {product.name}&nbsp;&nbsp;
+        <Grid
+          item
+          xs={11.5}
+          sx={{ padding: 1, paddingLeft: 1.5, paddingRight: 0 }}
+          container
+          spacing={0.2}
+        >
+          <Grid item xs={12} container>
+            <Grid item xs={11}>
+              {product.name}&nbsp;&nbsp;
+            </Grid>
+            <Grid item xs={1} container alignItems="flex-start" justifyContent="flex-end">
+              <RemoveCircleIcon
+                id="remove-button"
+                sx={{ fontSize: '1.2rem' }}
+                onClick={handleRemoveCard}
+              />
+            </Grid>
           </Grid>
           <Grid item xs={12}>
             <Divider
@@ -165,12 +198,21 @@ const ProductCard = (props) => {
               &nbsp;&nbsp;{product.stock_status}
             </span>
             <span style={{ position: 'absolute', marginLeft: 8 }}>
-              <PhotoSizeSelectActualRoundedIcon
-                id="card-image"
-                style={{ color: 'white' }}
-                onClick={handleImageClick}
-              />
+              {product.images.length > 0 && (
+                <PhotoSizeSelectActualRoundedIcon
+                  id="card-image"
+                  style={{ color: 'white' }}
+                  onClick={handleOpenModal}
+                />
+              )}
             </span>
+            <ImageModal
+              images={product.images}
+              Swiper={Swiper}
+              SwiperSlide={SwiperSlide}
+              openModal={openModal}
+              handleCloseModal={handleCloseModal}
+            />
           </Grid>
 
           <Grid item xs={12} container>

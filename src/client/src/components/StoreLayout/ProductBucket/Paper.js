@@ -53,7 +53,14 @@ const ProductSearchPaper = (props) => {
   const paperRef = useRef(null);
   const contentRef = useRef(null);
 
-  const { toggleProductBucket, initProducts, categoryOptions } = props;
+  const {
+    toggleProductBucket,
+    productsRef,
+    unassignedProducts,
+    initProducts,
+    setInitProducts,
+    categoryOptions,
+  } = props;
 
   const [selected, setSelected] = useState([]);
   const [categoryFilterType, setCategoryFilterType] = useState('any');
@@ -62,7 +69,7 @@ const ProductSearchPaper = (props) => {
   const [selectedStockStatusFilter, setSelectedStockStatusFilter] = useState(null);
   const [filterActivated, setFilterActivated] = useState(false);
   const [filteredData, setFilteredData] = useState([]);
-  const [products, setProducts] = useState(initProducts);
+  const [products, setProducts] = useState(unassignedProducts);
 
   // console.log('initProducts', initProducts);
   // console.log('products', products);
@@ -174,7 +181,7 @@ const ProductSearchPaper = (props) => {
       setFilterActivated(true);
       const selectedCatList = selectedCategoryFilter.map(({ uuid }) => uuid);
 
-      const filteredItem = initProducts.filter(
+      const filteredItem = unassignedProducts.filter(
         ({ sub_categories: subCat, is_active: isActive, stock_status: stockStatus }) => {
           let validCategory = true;
           let validActiveStatus = true;
@@ -216,15 +223,15 @@ const ProductSearchPaper = (props) => {
       setProducts(filteredItem);
     } else {
       setFilterActivated(false);
-      setFilteredData(initProducts);
-      setProducts(initProducts);
+      setFilteredData(unassignedProducts);
+      setProducts(unassignedProducts);
     }
   };
 
   useEffect(() => {
     filterProduct();
   }, [
-    initProducts,
+    unassignedProducts,
     selectedCategoryFilter,
     selectedActiveStatusFilter,
     selectedStockStatusFilter,
@@ -264,7 +271,10 @@ const ProductSearchPaper = (props) => {
         <Divider variant="middle" style={{ backgroundColor: 'white' }} />
         <ProductSearchContent
           reset={resetAll}
+          initProducts={initProducts}
+          setInitProducts={setInitProducts}
           products={products}
+          productsRef={productsRef}
           contentRef={contentRef}
           selected={selected}
           setSelected={setSelected}

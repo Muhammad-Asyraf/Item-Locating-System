@@ -2,6 +2,8 @@ import React, { useEffect, useRef } from 'react';
 import L from 'leaflet';
 import 'leaflet-geometryutil';
 
+import icons from 'leaflet-color-number-markers';
+
 import Button from '@mui/material/Button';
 import CenterFocusStrongIcon from '@mui/icons-material/CenterFocusStrong';
 
@@ -17,7 +19,7 @@ import {
   mapComponent,
   mapDefaultConfig,
   mapStyles,
-  firstBtn,
+  recenterBtn,
 } from './utils/mapConfig';
 
 const useStyles = makeStyles(() => ({
@@ -42,18 +44,19 @@ const ProductMapper = (props) => {
     leafletLayers,
     floorPlan,
     setZoomLevel,
-    initProducts,
+    productsRef,
+    // initProducts,
     setInitProducts,
     addPartitionBucket,
     // updateProducts,
   } = props;
 
-  const productsRef = useRef(initProducts);
+  // const productsRef = useRef(initProducts);
   const mapRef = useRef(null);
   const floorLayers = useRef([]);
   const shelfLayers = useRef([]);
   const shelfPartitionLayers = useRef([]);
-  const savedLayers = useRef([]);
+  // const savedLayers = useRef([]);
   const storeViewport = [50, 50];
 
   const {
@@ -74,23 +77,23 @@ const ProductMapper = (props) => {
     mapRef.current.flyTo(storeViewport, 2.8);
   };
 
-  // const mouseRelease = ({ currentTarget }) => {
-  //   const { myParam: layer } = currentTarget;
-  //   console.log('Mouse is over the  layer', layer);
-  // };
+  const addLookupProductMarker = (number) => {
+    L.marker(storeViewport, { icon: icons.red.numbers[number] }).addTo(mapRef.current);
+  };
+
+  console.log(addLookupProductMarker);
 
   const initShapeObj = (layer, shape) => {
     const isPartitionLayer = shelfPartitionShapes.includes(shape);
     const isShelfLayer = shelfShapes.includes(shape);
 
     layer._path.ondrop = (event) => {
-      console.log('productsRef.current', productsRef.current);
       const updatedProducts = [...productsRef.current];
 
-      const { target, payload } = JSON.parse(event.dataTransfer.getData('dragPayload'));
+      const { sourceId, payload } = JSON.parse(event.dataTransfer.getData('dragPayload'));
       event.dataTransfer.clearData();
 
-      if (target !== 'layer') {
+      if (sourceId === layer.id) {
         return;
       }
 
@@ -134,7 +137,6 @@ const ProductMapper = (props) => {
 
     layer._path.onclick = () => {
       if (isPartitionLayer) {
-        console.log('Im click', layer, shape);
         addPartitionBucket(layer);
       }
     };
@@ -201,45 +203,45 @@ const ProductMapper = (props) => {
     return newLayer;
   };
 
-  const handleKeyDown = (evt) => {
-    const { shiftKey, key, repeat } = evt;
+  // const handleKeyDown = (evt) => {
+  //   const { shiftKey, key, repeat } = evt;
 
-    if (repeat) return;
+  //   if (repeat) return;
 
-    console.log('key is pressed', key);
+  //   console.log('key is pressed', key);
 
-    if (shiftKey) {
-      // get all layers except 1st index since its the floor plan layer
-      let allLayers;
+  //   if (shiftKey) {
+  //     // get all layers except 1st index since its the floor plan layer
+  //     let allLayers;
 
-      if (floorPlan) {
-        allLayers = mapRef.current.pm.getGeomanLayers().slice(2);
-      } else {
-        allLayers = mapRef.current.pm.getGeomanLayers().slice(1);
-      }
+  //     if (floorPlan) {
+  //       allLayers = mapRef.current.pm.getGeomanLayers().slice(2);
+  //     } else {
+  //       allLayers = mapRef.current.pm.getGeomanLayers().slice(1);
+  //     }
 
-      allLayers.forEach(({ _path }) => {
-        _path.shiftKeyHold = true;
-      });
-    }
-  };
+  //     allLayers.forEach(({ _path }) => {
+  //       _path.shiftKeyHold = true;
+  //     });
+  //   }
+  // };
 
-  const handleKeyUp = ({ key }) => {
-    if (key === 'Alt') {
-      console.log('key is released', key);
-    }
+  // const handleKeyUp = ({ key }) => {
+  //   if (key === 'Alt') {
+  //     console.log('key is released', key);
+  //   }
 
-    if (key === 'Shift') {
-      console.log('key is released', key);
-    }
-  };
+  //   if (key === 'Shift') {
+  //     console.log('key is released', key);
+  //   }
+  // };
 
-  const handleDblClick = ({ target }) => {
-    console.log('double Click', target, target.className);
-    if (!target.className.baseVal) {
-      console.log('double Click outside');
-    }
-  };
+  // const handleDblClick = ({ target }) => {
+  //   console.log('double Click', target, target.className);
+  //   if (!target.className.baseVal) {
+  //     console.log('double Click outside');
+  //   }
+  // };
 
   const loadLayers = (layers) => {
     layers.forEach(({ layer_coordinate: latLngs, meta_data, shape, uuid }) => {
@@ -392,30 +394,30 @@ const ProductMapper = (props) => {
 
     loadLayers(leafletLayers);
 
-    if (savedLayers.current) {
-      loadLayers(savedLayers.current);
-    }
+    // if (savedLayers.current) {
+    //   loadLayers(savedLayers.current);
+    // }
 
     setZoomBehavior();
 
-    document.addEventListener('keydown', handleKeyDown);
-    document.addEventListener('dblclick', handleDblClick);
-    document.addEventListener('keyup', handleKeyUp);
+    // document.addEventListener('keydown', handleKeyDown);
+    // document.addEventListener('dblclick', handleDblClick);
+    // document.addEventListener('keyup', handleKeyUp);
 
     return () => {
-      savedLayers.current = prepareSavedLayers();
+      // savedLayers.current = prepareSavedLayers();
 
       floorLayers.current = [];
       shelfLayers.current = [];
       shelfPartitionLayers.current = [];
 
-      document.removeEventListener('keydown', handleKeyDown);
-      document.removeEventListener('dblclick', handleDblClick);
-      document.removeEventListener('keyup', handleKeyUp);
+      // document.removeEventListener('keydown', handleKeyDown);
+      // document.removeEventListener('dblclick', handleDblClick);
+      // document.removeEventListener('keyup', handleKeyUp);
 
       mapRef.current.remove();
     };
-  }, [floorPlan]);
+  }, [currentLayout]);
 
   /// save logic //////////////////
 
@@ -431,7 +433,7 @@ const ProductMapper = (props) => {
   return (
     <>
       <div id="map" style={mapStyles} />
-      <Button onClick={reCenter} sx={firstBtn} className={classes.refreshButton}>
+      <Button onClick={reCenter} sx={recenterBtn} className={classes.refreshButton}>
         <CenterFocusStrongIcon sx={{ color: 'black' }} />
       </Button>
       <form id="layout-form" onSubmit={handleSavelayout} style={{ display: 'hidden' }} />

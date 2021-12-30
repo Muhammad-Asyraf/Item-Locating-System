@@ -56,7 +56,16 @@ const ProductSearchPaper = (props) => {
   const paperRef = useRef(null);
   const contentRef = useRef(null);
 
-  const { initProducts, categoryOptions, layer, removePartitionBucket } = props;
+  const {
+    productsRef,
+    initProducts,
+    setInitProducts,
+    partitionProducts,
+    categoryOptions,
+    layer,
+    removePartitionBucket,
+    currentLayoutId,
+  } = props;
 
   const [selected, setSelected] = useState([]);
   const [categoryFilterType, setCategoryFilterType] = useState('any');
@@ -65,7 +74,7 @@ const ProductSearchPaper = (props) => {
   const [selectedStockStatusFilter, setSelectedStockStatusFilter] = useState(null);
   const [filterActivated, setFilterActivated] = useState(false);
   const [filteredData, setFilteredData] = useState([]);
-  const [products, setProducts] = useState(initProducts);
+  const [products, setProducts] = useState(partitionProducts);
 
   const {
     shelfPartition: {
@@ -183,7 +192,7 @@ const ProductSearchPaper = (props) => {
       setFilterActivated(true);
       const selectedCatList = selectedCategoryFilter.map(({ uuid }) => uuid);
 
-      const filteredItem = initProducts.filter(
+      const filteredItem = partitionProducts.filter(
         ({ sub_categories: subCat, is_active: isActive, stock_status: stockStatus }) => {
           let validCategory = true;
           let validActiveStatus = true;
@@ -225,15 +234,15 @@ const ProductSearchPaper = (props) => {
       setProducts(filteredItem);
     } else {
       setFilterActivated(false);
-      setFilteredData(initProducts);
-      setProducts(initProducts);
+      setFilteredData(partitionProducts);
+      setProducts(partitionProducts);
     }
   };
 
   useEffect(() => {
     filterProduct();
   }, [
-    initProducts,
+    partitionProducts,
     selectedCategoryFilter,
     selectedActiveStatusFilter,
     selectedStockStatusFilter,
@@ -258,15 +267,13 @@ const ProductSearchPaper = (props) => {
 
   useEffect(() => {
     resetSelectionOnly();
-  }, [initProducts]);
+  }, [partitionProducts]);
 
-  const highlightPartition = (evt) => {
-    evt.preventDefault();
+  const highlightPartition = () => {
     layer.setStyle({ ...shelfPartitionStyles, fillColor: '#d7e75c' });
   };
 
-  const removeHighlight = (evt) => {
-    evt.preventDefault();
+  const removeHighlight = () => {
     layer.setStyle({ ...shelfPartitionStyles });
   };
 
@@ -292,11 +299,16 @@ const ProductSearchPaper = (props) => {
         />
         <Divider variant="middle" style={{ backgroundColor: 'white' }} />
         <ProductSearchContent
+          layerId={layer.id}
+          currentLayoutId={currentLayoutId}
           reset={resetAll}
+          productsRef={productsRef}
           products={products}
           contentRef={contentRef}
           selected={selected}
           setSelected={setSelected}
+          initProducts={initProducts}
+          setInitProducts={setInitProducts}
           categoryOptions={categoryOptions}
           setCategoryFilterType={setCategoryFilterType}
           setSelectedCategoryFilter={setSelectedCategoryFilter}

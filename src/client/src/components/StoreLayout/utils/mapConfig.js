@@ -236,6 +236,14 @@ export const firstBtn = {
   borderRadius: '7px 7px 0px 0px !important',
 };
 
+export const recenterBtn = {
+  padding: '2px',
+  height: 40,
+  minWidth: 40,
+  border: '2px solid rgba(0,0,0,0.2)',
+  borderRadius: '7px 7px 7px 7px !important',
+};
+
 export const lastBtn = {
   padding: '2px',
   height: 40,

@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 
+import TextField from '@mui/material/TextField';
+import Autocomplete from '@mui/material/Autocomplete';
 import IconButton from '@mui/material/IconButton';
 import Button from '@mui/material/Button';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
@@ -11,8 +13,6 @@ import KeyboardReturnRoundedIcon from '@mui/icons-material/KeyboardReturnRounded
 import ModeEditOutlineRoundedIcon from '@mui/icons-material/ModeEditOutlineRounded';
 import SaveRoundedIcon from '@mui/icons-material/SaveRounded';
 import LinearProgress from '@mui/material/LinearProgress';
-
-import Tooltip from '@mui/material/Tooltip';
 
 import { makeStyles } from '@mui/styles';
 
@@ -133,11 +133,13 @@ const ProductMapping = (props) => {
   const partitionBucketRef = useRef([]);
   const [partitionBuckets, setPartitionBuckets] = useState([]);
 
+  const productsRef = useRef([]);
+  const [products, setProducts] = useState([]);
+
   const [firstRefresh, setFirstRefresh] = useState(true);
   const [zoomLevel, setZoomLevel] = useState(0);
   const [floorPlan, setFloorPlan] = useState(null);
   const [leafletLayers, setLeafletLayers] = useState([]);
-  const [products, setProducts] = useState([]);
   const [currentLayout, setCurrentLayout] = useState(null);
 
   const layouts = useSelector(selectLayouts);
@@ -155,9 +157,10 @@ const ProductMapping = (props) => {
     },
   } = props;
 
-  console.log('partitionBuckets', partitionBuckets);
-  // console.log('products', products);
+  // console.log('layouts', layouts);
+  // console.log('currentLayout', currentLayout);
 
+  // console.log('products', products);
   // console.log('layouts', layouts);
   // console.log('initProducts', initProducts);
   // console.log('leafletLayers', leafletLayers);
@@ -205,6 +208,7 @@ const ProductMapping = (props) => {
       subCatStatus.includes('fulfilled');
 
     if (requestStatusOk) {
+      productsRef.current = productPayload.products;
       setProducts(productPayload.products);
       initLayoutLayers(layoutPayload.layouts);
     }
@@ -269,6 +273,19 @@ const ProductMapping = (props) => {
     setPartitionBuckets([...updatedPartitionBucketList]);
   };
 
+  const handleChangeLayout = async (e, selectedLayout) => {
+    console.log('selectedLayout', selectedLayout);
+
+    const { layers, floor_plan_path: path } = selectedLayout;
+
+    if (path) {
+      const file = await getFileObject(path);
+      setFloorPlan({ file, path });
+    }
+    setLeafletLayers(layers);
+    setCurrentLayout(selectedLayout);
+  };
+
   if (isLayoutLoading) {
     return (
       <div>
@@ -331,7 +348,25 @@ const ProductMapping = (props) => {
         justifyContent="flex-end"
         alignItems="center"
       >
-        <Tooltip title="Save Layout" placement="top">
+        <Grid item xs={6}>
+          <Autocomplete
+            disablePortal
+            disableClearable
+            options={layouts}
+            getOptionLabel={(option) => option.name}
+            renderInput={(params) => <TextField {...params} label="Layout" />}
+            onChange={handleChangeLayout}
+            value={currentLayout}
+          />
+        </Grid>
+        <Grid
+          item
+          xs={4}
+          container
+          direction="row"
+          justifyContent="flex-end"
+          alignItems="center"
+        >
           <Button
             form="layout-form"
             variant="contained"
@@ -351,12 +386,13 @@ const ProductMapping = (props) => {
             <SaveRoundedIcon style={{ marginRight: 10 }} fontSize="small" />
             Save
           </Button>
-        </Tooltip>
+        </Grid>
       </Grid>
       <Grid item xs={10}>
         <div className={classes.zoomLevel}>Zoom Level: {zoomLevel}</div>
         <SideMenu
           layouts={layouts}
+          productsRef={productsRef}
           initProducts={products}
           setInitProducts={setProducts}
           categoryOptions={categoryOptions}
@@ -368,6 +404,7 @@ const ProductMapping = (props) => {
           floorPlan={floorPlan}
           setZoomLevel={setZoomLevel}
           updateProducts={updateProducts}
+          productsRef={productsRef}
           initProducts={products}
           setInitProducts={setProducts}
           addPartitionBucket={addPartitionBucket}
@@ -376,6 +413,8 @@ const ProductMapping = (props) => {
           <div key={layer.id}>
             <PartitionBucket
               layer={layer}
+              currentLayoutId={currentLayout.uuid}
+              productsRef={productsRef}
               initProducts={products}
               setInitProducts={setProducts}
               categoryOptions={categoryOptions}

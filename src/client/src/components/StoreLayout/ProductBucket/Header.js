@@ -6,7 +6,7 @@ import IconButton from '@mui/material/IconButton';
 
 import ClearRoundedIcon from '@mui/icons-material/ClearRounded';
 import RefreshRoundedIcon from '@mui/icons-material/RefreshRounded';
-import Inventory2RoundedIcon from '@mui/icons-material/Inventory2Rounded';
+// import Inventory2RoundedIcon from '@mui/icons-material/Inventory2Rounded';
 
 import { makeStyles } from '@mui/styles';
 
@@ -69,11 +69,11 @@ const Header = (props) => {
       }}
     >
       <Grid container>
-        <Grid item xs={6} container justifyContent="flex-start" alignItems="center">
-          &nbsp;&nbsp;&nbsp;&nbsp; <Inventory2RoundedIcon sx={{ fontSize: '1.1rem' }} />
-          &nbsp;&nbsp;Products Bucket
+        <Grid item xs={7} container justifyContent="flex-start" alignItems="center">
+          {/* &nbsp;&nbsp;&nbsp;&nbsp; <Inventory2RoundedIcon sx={{ fontSize: '1.1rem' }} /> */}
+          &nbsp;&nbsp;Unassigned Products Bucket
         </Grid>
-        <Grid item xs={6} container justifyContent="flex-end" alignItems="center">
+        <Grid item xs={5} container justifyContent="flex-end" alignItems="center">
           {selectedQty > 0 && (
             <span
               style={{

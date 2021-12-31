@@ -130,6 +130,8 @@ const ProductMapping = (props) => {
   const classes = useStyles();
   const dispatch = useDispatch();
 
+  const leafletRef = useRef(null);
+
   const partitionBucketRef = useRef([]);
   const [partitionBuckets, setPartitionBuckets] = useState([]);
 
@@ -281,6 +283,8 @@ const ProductMapping = (props) => {
     if (path) {
       const file = await getFileObject(path);
       setFloorPlan({ file, path });
+    } else {
+      setFloorPlan(null);
     }
     setLeafletLayers(layers);
     setCurrentLayout(selectedLayout);
@@ -390,15 +394,8 @@ const ProductMapping = (props) => {
       </Grid>
       <Grid item xs={10}>
         <div className={classes.zoomLevel}>Zoom Level: {zoomLevel}</div>
-        <SideMenu
-          layouts={layouts}
-          productsRef={productsRef}
-          initProducts={products}
-          setInitProducts={setProducts}
-          categoryOptions={categoryOptions}
-          currentLayout={currentLayout}
-        />
         <ProductMapper
+          leafletRef={leafletRef}
           currentLayout={currentLayout}
           leafletLayers={leafletLayers}
           floorPlan={floorPlan}
@@ -408,6 +405,15 @@ const ProductMapping = (props) => {
           initProducts={products}
           setInitProducts={setProducts}
           addPartitionBucket={addPartitionBucket}
+        />
+        <SideMenu
+          layouts={layouts}
+          currentLayout={currentLayout}
+          leafletRef={leafletRef}
+          productsRef={productsRef}
+          initProducts={products}
+          setInitProducts={setProducts}
+          categoryOptions={categoryOptions}
         />
         {partitionBuckets.map(({ layer }) => (
           <div key={layer.id}>

@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 
+// import icons from 'leaflet-color-number-markers';
+
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 
@@ -9,7 +11,7 @@ import ShoppingBasketRoundedIcon from '@mui/icons-material/ShoppingBasketRounded
 import { makeStyles } from '@mui/styles';
 
 import ProductBucket from './ProductBucket';
-import ProductDrawer from './ProductSearch/Drawer';
+import ProductSearch from './ProductSearch';
 
 const useStyles = makeStyles(() => ({
   sideMenu: {
@@ -62,14 +64,23 @@ const SideMenu = (props) => {
   const [openBucket, setOpenBucket] = useState(false);
   const [openSearchDrawer, setOpenSearchDrawer] = useState(false);
 
-  const { productsRef, initProducts, setInitProducts, categoryOptions } = props;
-  // const { products, setProducts, initProducts, categoryOptions } = props;
+  const {
+    productsRef,
+    leafletRef,
+    initProducts,
+    setInitProducts,
+    categoryOptions,
+    currentLayout,
+    layouts,
+  } = props;
 
   // console.log('layouts', layouts);
-  // console.log('currentLayout', currentLayout);
+  console.log('currentLayout', currentLayout);
 
   const toggleProductBucket = () => setOpenBucket(!openBucket);
-  const toggleProductSearch = () => setOpenSearchDrawer(!openSearchDrawer);
+  const toggleProductSearch = () => {
+    setOpenSearchDrawer(!openSearchDrawer);
+  };
 
   return (
     <>
@@ -93,7 +104,15 @@ const SideMenu = (props) => {
           </Button>
         </Box>
       </Box>
-      <ProductDrawer open={openSearchDrawer} toggleDrawer={toggleProductSearch} />
+      <ProductSearch
+        layouts={layouts}
+        currentLayout={currentLayout}
+        open={openSearchDrawer}
+        toggleDrawer={toggleProductSearch}
+        initProducts={initProducts}
+        categoryOptions={categoryOptions}
+        leafletRef={leafletRef}
+      />
       {openBucket && (
         <ProductBucket
           toggleProductBucket={toggleProductBucket}

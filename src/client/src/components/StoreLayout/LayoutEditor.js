@@ -420,6 +420,8 @@ const Editor = (props) => {
         shelfPartitionLayers.current = [...shelfPartitionLayers.current, newLayer];
       }
 
+      newLayer.pm.setOptions(geomanGlobalOpt);
+
       newLayer.id = uuidv4();
       initShapeObj(newLayer, shape);
     });
@@ -562,9 +564,11 @@ const Editor = (props) => {
     let latLngs = null;
     let radius = null;
     let initialAngle = null;
+    let center = null;
 
     if (isCircle) {
       latLngs = layer.getLatLng();
+      center = latLngs;
       radius = layer.getRadius();
     } else {
       initialAngle = pm.getAngle();
@@ -580,13 +584,15 @@ const Editor = (props) => {
 
       // rotate back to previous rotation angle
       pm.rotateLayerToAngle(initialAngle);
+
+      center = layer.getCenter();
     }
 
     return {
       uuid: id,
       shape,
       layer_coordinate: Array.isArray(latLngs) ? { ...latLngs } : latLngs,
-      meta_data: { radius, angle: initialAngle, parentShelf: layer.parentShelf },
+      meta_data: { radius, angle: initialAngle, parentShelf: layer.parentShelf, center },
     };
   };
 

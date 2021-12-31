@@ -2,8 +2,6 @@ import React, { useEffect, useRef } from 'react';
 import L from 'leaflet';
 import 'leaflet-geometryutil';
 
-import icons from 'leaflet-color-number-markers';
-
 import Button from '@mui/material/Button';
 import CenterFocusStrongIcon from '@mui/icons-material/CenterFocusStrong';
 
@@ -40,6 +38,7 @@ const ProductMapper = (props) => {
   const storeUUID = localStorage.getItem('storeUUID');
 
   const {
+    leafletRef,
     currentLayout,
     leafletLayers,
     floorPlan,
@@ -76,12 +75,6 @@ const ProductMapper = (props) => {
   const reCenter = () => {
     mapRef.current.flyTo(storeViewport, 2.8);
   };
-
-  const addLookupProductMarker = (number) => {
-    L.marker(storeViewport, { icon: icons.red.numbers[number] }).addTo(mapRef.current);
-  };
-
-  console.log(addLookupProductMarker);
 
   const initShapeObj = (layer, shape) => {
     const isPartitionLayer = shelfPartitionShapes.includes(shape);
@@ -328,6 +321,7 @@ const ProductMapper = (props) => {
     const map = L.map('map', mapDefaultConfig).setView(storeViewport, 2);
     map.fitBounds(mapBounds);
 
+    leafletRef.current = { map, leaflet: L };
     mapRef.current = map;
   };
 

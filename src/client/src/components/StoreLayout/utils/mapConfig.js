@@ -190,7 +190,7 @@ export const geomanConfig = {
 export const geomanGlobalOpt = {
   snappable: true,
   finishOn: 'dblclick',
-  snapDistance: 10,
+  snapDistance: 15,
   templineStyle: {
     color: 'black',
     // color: 'rgba(0,0,0,0.2)',

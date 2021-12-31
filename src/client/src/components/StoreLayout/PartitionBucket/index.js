@@ -17,7 +17,6 @@ const PaperPortal = (props) => {
 
   const adjustedProps = { ...remainingProps, layer, partitionProducts, initProducts };
 
-  console.log('im rerendered', layer, partitionProducts);
   return (
     <Portal>
       <Paper {...adjustedProps} />

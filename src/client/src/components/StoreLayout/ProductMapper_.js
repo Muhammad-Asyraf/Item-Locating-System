@@ -80,53 +80,55 @@ const ProductMapper = (props) => {
     const isPartitionLayer = shelfPartitionShapes.includes(shape);
     const isShelfLayer = shelfShapes.includes(shape);
 
-    layer._path.ondrop = (event) => {
-      const updatedProducts = [...productsRef.current];
+    if (isPartitionLayer) {
+      layer._path.ondrop = (event) => {
+        const updatedProducts = [...productsRef.current];
 
-      const { sourceId, payload } = JSON.parse(event.dataTransfer.getData('dragPayload'));
-      event.dataTransfer.clearData();
+        const { sourceId, payload } = JSON.parse(event.dataTransfer.getData('dragPayload'));
+        event.dataTransfer.clearData();
 
-      if (sourceId === layer.id) {
-        return;
-      }
+        if (sourceId === layer.id) {
+          return;
+        }
 
-      payload.forEach((selectedProductUUID) => {
-        const selectedProductIndex = updatedProducts.findIndex(
-          ({ uuid }) => uuid === selectedProductUUID
-        );
+        payload.forEach((selectedProductUUID) => {
+          const selectedProductIndex = updatedProducts.findIndex(
+            ({ uuid }) => uuid === selectedProductUUID
+          );
 
-        const updatedSelectedProduct = { ...updatedProducts[selectedProductIndex] };
-        updatedSelectedProduct.layout_uuid = currentLayout.uuid;
-        updatedSelectedProduct.partition_uuid = layer.id;
-        updatedProducts[selectedProductIndex] = updatedSelectedProduct;
-      });
+          const updatedSelectedProduct = { ...updatedProducts[selectedProductIndex] };
+          updatedSelectedProduct.layout_uuid = currentLayout.uuid;
+          updatedSelectedProduct.partition_uuid = layer.id;
+          updatedProducts[selectedProductIndex] = updatedSelectedProduct;
+        });
 
-      productsRef.current = updatedProducts;
-      setInitProducts(updatedProducts);
-    };
+        productsRef.current = updatedProducts;
+        setInitProducts(updatedProducts);
+      };
 
-    layer._path.ondragover = (event) => {
-      event.preventDefault();
-      const zoomlevel = mapRef.current.getZoom();
-      const adjustedZoomLevel = (zoomlevel - 2).toFixed(1);
+      layer._path.ondragover = (event) => {
+        event.preventDefault();
+        const zoomlevel = mapRef.current.getZoom();
+        const adjustedZoomLevel = (zoomlevel - 2).toFixed(1);
 
-      if (adjustedZoomLevel >= 0.8 && isPartitionLayer) {
-        layer.setStyle({ ...shelfPartitionStyles, fillColor: '#d7e75c' });
-      } else if (adjustedZoomLevel < 0.8 && isShelfLayer) {
-        layer.setStyle({ ...shelfStyles, fillColor: '#d7e75c' });
-      }
-    };
+        if (adjustedZoomLevel >= 0.9 && isPartitionLayer) {
+          layer.setStyle({ ...shelfPartitionStyles, fillColor: '#d7e75c' });
+        } else if (adjustedZoomLevel < 0.9 && isShelfLayer) {
+          layer.setStyle({ ...shelfStyles, fillColor: '#d7e75c' });
+        }
+      };
 
-    layer._path.ondragleave = () => {
-      const zoomlevel = mapRef.current.getZoom();
-      const adjustedZoomLevel = (zoomlevel - 2).toFixed(1);
+      layer._path.ondragleave = () => {
+        const zoomlevel = mapRef.current.getZoom();
+        const adjustedZoomLevel = (zoomlevel - 2).toFixed(1);
 
-      if (adjustedZoomLevel >= 0.8 && isPartitionLayer) {
-        layer.setStyle({ ...shelfPartitionStyles });
-      } else if (adjustedZoomLevel < 0.8 && isShelfLayer) {
-        layer.setStyle({ ...shelfStyles });
-      }
-    };
+        if (adjustedZoomLevel >= 0.9 && isPartitionLayer) {
+          layer.setStyle({ ...shelfPartitionStyles });
+        } else if (adjustedZoomLevel < 0.9 && isShelfLayer) {
+          layer.setStyle({ ...shelfStyles });
+        }
+      };
+    }
 
     layer._path.onclick = () => {
       if (isPartitionLayer) {
@@ -139,9 +141,9 @@ const ProductMapper = (props) => {
       const zoomlevel = mapRef.current.getZoom();
       const adjustedZoomLevel = (zoomlevel - 2).toFixed(1);
 
-      if (adjustedZoomLevel >= 0.8 && isPartitionLayer) {
+      if (adjustedZoomLevel >= 0.9 && isPartitionLayer) {
         layer.setStyle({ ...shelfPartitionStyles, fillColor: '#d7e75c' });
-      } else if (adjustedZoomLevel < 0.8 && isShelfLayer) {
+      } else if (adjustedZoomLevel < 0.9 && isShelfLayer) {
         layer.setStyle({ ...shelfStyles, fillColor: '#d7e75c' });
       }
 
@@ -154,9 +156,9 @@ const ProductMapper = (props) => {
       const zoomlevel = mapRef.current.getZoom();
       const adjustedZoomLevel = (zoomlevel - 2).toFixed(1);
 
-      if (adjustedZoomLevel >= 0.8 && isPartitionLayer) {
+      if (adjustedZoomLevel >= 0.9 && isPartitionLayer) {
         layer.setStyle({ ...shelfPartitionStyles });
-      } else if (adjustedZoomLevel < 0.8 && isShelfLayer) {
+      } else if (adjustedZoomLevel < 0.9 && isShelfLayer) {
         layer.setStyle({ ...shelfStyles });
       }
 
@@ -355,7 +357,7 @@ const ProductMapper = (props) => {
       setZoomLevel(adjustedZoomLevel);
       console.log('zoomlevel', adjustedZoomLevel);
 
-      if (adjustedZoomLevel >= 0.8) {
+      if (adjustedZoomLevel >= 0.9) {
         shelfLayers.current.forEach((currentLayer) => {
           currentLayer.setStyle({ ...shelfStyles, weight: 0 });
         });
@@ -364,7 +366,7 @@ const ProductMapper = (props) => {
           L.DomUtil.addClass(currentLayer._path, 'leaflet-interactive');
           currentLayer.setStyle({ ...shelfPartitionStyles });
         });
-      } else if (adjustedZoomLevel < 0.8) {
+      } else if (adjustedZoomLevel < 0.9) {
         shelfLayers.current.forEach((currentLayer) => {
           currentLayer.setStyle({ ...shelfStyles });
         });

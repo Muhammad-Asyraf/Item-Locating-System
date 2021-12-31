@@ -8,7 +8,7 @@ const ProductSearchIndex = (props) => {
   const { initProducts, ...remainingProps } = props;
   assignedProducts = initProducts.filter(({ layout_uuid: layoutUUID }) => layoutUUID !== null);
 
-  const adjustedProps = { ...remainingProps, assignedProducts };
+  const adjustedProps = { ...remainingProps, assignedProducts, initProducts };
 
   return <ProductSearch {...adjustedProps} />;
 };

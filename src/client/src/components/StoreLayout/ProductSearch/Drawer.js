@@ -58,6 +58,11 @@ const useStyles = makeStyles(() => ({
     backgroundColor: 'white !important',
     borderRadius: '20px !important',
   },
+  btn: {
+    '&:hover': {
+      backgroundColor: 'rgba(255, 255, 255, 0.08) !important',
+    },
+  },
 }));
 
 const ProductDrawer = (props) => {

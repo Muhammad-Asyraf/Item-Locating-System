@@ -23,7 +23,7 @@ import {
   processingRequest,
 } from '../../redux/features/layoutSlice';
 import {
-  // selectProducts,
+  selectProducts,
   // selectIsLoading as productLoading,
   processed as productProccessed,
 } from '../../redux/features/productSlice';
@@ -34,10 +34,7 @@ import {
 } from '../../redux/features/categorySlice';
 import { setNewNotification } from '../../redux/features/notificationSlice';
 
-import {
-  getProducts,
-  // patchMultipleProducts,
-} from '../../redux/thunks/productThunk';
+import { getProducts, saveProductMapping } from '../../redux/thunks/productThunk';
 import { getLayouts } from '../../redux/thunks/layoutThunk';
 import { getSubcategories } from '../../redux/thunks/categoryThunk';
 
@@ -145,7 +142,7 @@ const ProductMapping = (props) => {
   const [currentLayout, setCurrentLayout] = useState(null);
 
   const layouts = useSelector(selectLayouts);
-  // const initProducts = useSelector(selectProducts);
+  const originalProducts = useSelector(selectProducts);
   const categoryOptions = useSelector(selectSubcategory);
   // const isProductLoading = useSelector(productLoading);
   const isLayoutLoading = useSelector(selectIsLoading);
@@ -290,6 +287,72 @@ const ProductMapping = (props) => {
     setCurrentLayout(selectedLayout);
   };
 
+  const preparedPayload = () => {
+    console.log('products', products);
+    console.log('originalProducts', originalProducts);
+    let updatedProducts = [];
+
+    products.forEach((product, index) => {
+      const {
+        uuid: productId,
+        partition_uuid: currentPartitionId,
+        layout_uuid: currentLayoutId,
+      } = product;
+      const oldPartitionId = originalProducts[index].partition_uuid;
+      const oldLayoutId = originalProducts[index].layout_uuid;
+
+      // console.log('compare partition', oldPartitionId, currentPartitionId);
+      // console.log('compare layout', oldLayoutId, currentLayoutId);
+
+      const partitionChanged = oldPartitionId !== currentPartitionId;
+      const layoutChanged = oldLayoutId !== currentLayoutId;
+
+      if (partitionChanged || layoutChanged) {
+        // console.log('Changed', partitionChanged, layoutChanged);
+        updatedProducts = [
+          ...updatedProducts,
+          {
+            uuid: productId,
+            partition_uuid: currentPartitionId,
+            layout_uuid: currentLayoutId,
+          },
+        ];
+      }
+    });
+
+    console.log('updatedProducts', updatedProducts);
+
+    return { updatedProducts };
+  };
+
+  const handleSave = async () => {
+    const payload = preparedPayload();
+
+    console.log('payload', payload);
+    const { type: saveStatus, payload: resPayload } = await dispatch(
+      saveProductMapping({ payload })
+    );
+
+    if (saveStatus.includes('fulfilled')) {
+      await dispatch(
+        setNewNotification({
+          message: 'Product successfully mapped',
+          backgroundColor: 'green',
+          severity: 'success',
+        })
+      );
+    } else if (saveStatus.includes('rejected')) {
+      dispatch(productProccessed());
+      await dispatch(
+        setNewNotification({
+          message: resPayload.message,
+          backgroundColor: '#be0000',
+          severity: 'error',
+        })
+      );
+    }
+  };
+
   if (isLayoutLoading) {
     return (
       <div>
@@ -372,12 +435,13 @@ const ProductMapping = (props) => {
           alignItems="center"
         >
           <Button
-            form="layout-form"
+            // form="layout-form"
+            onClick={handleSave}
             variant="contained"
             color="primary"
             type="button"
-            component={Link}
-            to={`/${storeUrl}/layout/create`}
+            // component={Link}
+            // to={`/${storeUrl}/layout/create`}
             sx={{
               textTransform: 'none',
               fontSize: '0.95rem',

@@ -200,3 +200,25 @@ export const patchMultipleProducts = createAsyncThunk(
     }
   }
 );
+
+export const saveProductMapping = createAsyncThunk(
+  'product/saveProductMapping',
+  async ({ payload }, { rejectWithValue, getState }) => {
+    try {
+      const { authHeader } = await getState().auth;
+      const endpointURL = '/api/backoffice/product-service/product/mapping';
+
+      await axios.post(endpointURL, payload, authHeader);
+
+      return true;
+    } catch (err) {
+      const { data } = err.response;
+
+      return rejectWithValue({
+        message: data.message,
+        status: 'Error!',
+        error: data.code,
+      });
+    }
+  }
+);

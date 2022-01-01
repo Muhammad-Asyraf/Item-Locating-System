@@ -334,3 +334,28 @@ exports.patchMultipleProduct = async (req, res, next) => {
     next(err);
   }
 };
+
+exports.saveProductMapping = async (req, res, next) => {
+  try {
+    const { updatedProducts } = req.body;
+
+    const trx = await Product.startTransaction();
+
+    Promise.all(
+      updatedProducts.map(async (updatedProduct) => {
+        const { uuid, ...remainingPayload } = updatedProduct;
+        return await Product.query(trx)
+          .patch(remainingPayload)
+          .where('uuid', uuid);
+      })
+    )
+      .then(trx.commit)
+      .catch(trx.rollback);
+
+    productLogger.info(`Successfully save product mapping`);
+    res.json('test');
+  } catch (err) {
+    productLogger.warn(`Error saving product's mapping`);
+    next(err);
+  }
+};

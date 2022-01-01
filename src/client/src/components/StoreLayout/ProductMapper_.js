@@ -82,6 +82,7 @@ const ProductMapper = (props) => {
 
     if (isPartitionLayer) {
       layer._path.ondrop = (event) => {
+        layer.setStyle({ ...shelfPartitionStyles });
         const updatedProducts = [...productsRef.current];
 
         const { sourceId, payload } = JSON.parse(event.dataTransfer.getData('dragPayload'));

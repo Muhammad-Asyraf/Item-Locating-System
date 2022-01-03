@@ -14,34 +14,29 @@ import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import Collapse from '@mui/material/Collapse';
 import ListSubheader from '@mui/material/ListSubheader';
-import SvgIcon from '@mui/material/SvgIcon';
 import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
 
+// import SvgIcon from '@mui/material/SvgIcon';
 // import Icon from '@mui/material/Icon';
 // import SupervisorAccountTwoToneIcon from '@mui/icons-material/SupervisorAccountTwoTone';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import ListItemIcon from '@mui/material/ListItemIcon';
-import ViewCompactRoundedIcon from '@mui/icons-material/ViewCompactRounded';
+import ViewCompactTwoToneIcon from '@mui/icons-material/ViewCompactTwoTone';
 // import DashboardTwoToneIcon from '@mui/icons-material/DashboardTwoTone';
 import LocalOfferTwoToneIcon from '@mui/icons-material/LocalOfferTwoTone';
 // import SupervisedUserCircleTwoToneIcon from '@mui/icons-material/SupervisedUserCircleTwoTone';
 import LocalMallTwoToneIcon from '@mui/icons-material/LocalMallTwoTone';
-// import BusinessCenterTwoToneIcon from '@mui/icons-material/BusinessCenterTwoTone';
-// import RoomTwoToneIcon from '@mui/icons-material/RoomTwoTone';
-// import DomainTwoToneIcon from '@mui/icons-material/DomainTwoTone';
-// import LocalAtmTwoToneIcon from '@mui/icons-material/LocalAtmTwoTone';
 import FormatListBulletedRoundedIcon from '@mui/icons-material/FormatListBulletedRounded';
 import AddCircleTwoToneIcon from '@mui/icons-material/AddCircleTwoTone';
-// import AccountCircleTwoToneIcon from '@mui/icons-material/AccountCircleTwoTone';
-import DeveloperBoardRoundedIcon from '@mui/icons-material/DeveloperBoardRounded';
 import AddLocationAltRoundedIcon from '@mui/icons-material/AddLocationAltRounded';
-// import FitScreenRoundedIcon from '@mui/icons-material/FitScreenRounded';
+import Inventory2TwoToneIcon from '@mui/icons-material/Inventory2TwoTone';
+import CampaignTwoToneIcon from '@mui/icons-material/CampaignTwoTone';
 
 import { makeStyles, useTheme } from '@mui/styles';
 
-import { ReactComponent as Megaphone } from '../../../assets/svg/megaphone.svg';
+// import { ReactComponent as Megaphone } from '../../../assets/svg/megaphone.svg';
 
 import { processingRequest } from '../../../redux/features/layoutSlice';
 
@@ -99,6 +94,8 @@ const Drawer = (props) => {
     layout: false,
     users: false,
     businessRules: false,
+    promotions: false,
+    campaigns: false,
   });
 
   // linear-gradient(-225deg, #473B7B 0%, #003366 51%, #30D2BE 100%)
@@ -172,7 +169,7 @@ const Drawer = (props) => {
           text: 'Layouts',
           itemKey: 'layout',
           path: '/layout',
-          icon: <ViewCompactRoundedIcon style={{ color: '#003366' }} fontSize="large" />,
+          icon: <ViewCompactTwoToneIcon style={{ color: '#003366' }} fontSize="large" />,
           onClick: () => setOpen({ ...open, layout: !open.layout }),
           itemSubList: [
             {
@@ -219,17 +216,47 @@ const Drawer = (props) => {
           text: 'Promotions',
           itemKey: 'promotions',
           path: '/promotions',
-          icon: (
-            <SvgIcon style={{ fontSize: 33, marginLeft: 3, color: '#003366' }}>
-              <Megaphone />
-            </SvgIcon>
-          ),
+          icon: <LocalOfferTwoToneIcon style={{ color: '#003366' }} fontSize="large" />,
+          // (
+          //   <SvgIcon style={{ fontSize: 33, marginLeft: 3, color: '#003366' }}>
+          //     <Megaphone />
+          //   </SvgIcon>
+          // ),
+          onClick: () => setOpen({ ...open, promotions: !open.promotions }),
+          itemSubList: [
+            {
+              _text: 'List',
+              _key: 'promotion-list',
+              _icon: (
+                <FormatListBulletedRoundedIcon
+                  style={{ color: '#003366' }}
+                  fontSize="medium"
+                />
+              ),
+              _path: '/promotion/list',
+            },
+            {
+              _text: 'Create',
+              _key: 'promotion-create',
+              _icon: <AddCircleTwoToneIcon style={{ color: '#003366' }} fontSize="medium" />,
+              _path: '/promotion/create',
+            },
+          ],
         },
+      ],
+    },
+    {
+      header: 'MARKETING',
+      key: 'marketing',
+      items: [
         {
-          text: 'Advertisements',
-          itemKey: 'advertisements',
-          path: '/advertisements',
-          icon: <DeveloperBoardRoundedIcon style={{ color: '#003366' }} fontSize="large" />,
+          text: 'Campaign',
+          itemKey: 'campaigns',
+          path: '/marketing-campaign/list',
+          icon: (
+            <CampaignTwoToneIcon style={{ color: '#003366' }} sx={{ fontSize: '2.5rem' }} />
+          ),
+
           // icon: (
           //   <Icon
           //     className="fab fa-adversal"
@@ -251,7 +278,7 @@ const Drawer = (props) => {
           text: 'Items',
           itemKey: 'items',
           path: '/item',
-          icon: <LocalOfferTwoToneIcon style={{ color: '#003366' }} fontSize="large" />,
+          icon: <Inventory2TwoToneIcon style={{ color: '#003366' }} fontSize="large" />,
           onClick: () => setOpen({ ...open, items: !open.items }),
           itemSubList: [
             {

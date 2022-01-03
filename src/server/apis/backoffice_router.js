@@ -6,6 +6,8 @@ const storeService = require('../cores/stores/apis/backoffice');
 const categoryService = require('../cores/categories/apis/backoffice');
 const subCategoryService = require('../cores/categories/sub_categories/apis/backoffice');
 const layoutService = require('../cores/layouts/apis/backoffice');
+const promotionService = require('../cores/promotions/apis/backoffice');
+const marketingCampaignService = require('../cores/marketing_campaigns/apis/backoffice');
 
 router.use('/backoffice-user-service', backofficeUserService);
 router.use('/item-service', itemService);
@@ -14,5 +16,7 @@ router.use('/store-service', storeService);
 router.use('/category-service', categoryService);
 router.use('/sub-category-service', subCategoryService);
 router.use('/layout-service', layoutService);
+router.use('/promotion-service', promotionService);
+router.use('/marketing-campaign-service', marketingCampaignService);
 
 module.exports = router;

@@ -114,7 +114,6 @@ const ProductSearch = (props) => {
       return false;
     });
 
-    console.log('filteredItems', filteredItems);
     setProducts(filteredItems);
   };
 
@@ -155,12 +154,6 @@ const ProductSearch = (props) => {
           if (stockStatusFilterActivated) {
             validStockStatus = stockStatus === selectedStockStatusFilter;
           }
-
-          // console.log('name:', name);
-          // console.log('category:', validCategory);
-          // console.log('active:', validActiveStatus);
-          // console.log('stock:', validStockStatus);
-          // console.log('\n');
 
           return validCategory && validActiveStatus && validStockStatus;
         }

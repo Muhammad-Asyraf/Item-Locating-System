@@ -14,4 +14,7 @@ module.exports = {
   image: 'image',
   layer: 'layer',
   layout: 'layout',
+  promotion: 'promotion',
+  promotion_product: 'promotion_product',
+  marketing_campaign: 'marketing_campaign',
 };

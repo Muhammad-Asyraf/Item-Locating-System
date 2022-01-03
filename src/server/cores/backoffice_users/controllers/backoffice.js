@@ -9,7 +9,7 @@ const backofficeUserLogger = getLogger(__filename, 'backofficeUser');
 exports.signup = async (req, res, next) => {
   let backofficeUser;
   const backofficeUserUUID = uuidv4();
-  const { email, password } = req.body;
+  const { email, password, last_name } = req.body;
   const encryptedPassword = await bcrypt.hash(password, 10);
 
   try {
@@ -30,6 +30,7 @@ exports.signup = async (req, res, next) => {
 
     const backofficeUserFirebase = await admin.auth().createUser({
       uid: backofficeUserUUID,
+      displayName: last_name,
       email,
       password,
     });

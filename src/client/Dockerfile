@@ -8,13 +8,14 @@ WORKDIR /app/client
 # copy dependency into our image to './' = working directory
 COPY package.json ./
 
+# update latest version of npm
+RUN npm install -g npm@latest npm-check-updates --silent
+
 # install our dependency into the container when buidling the image
 RUN npm install --silent
 
 RUN mkdir -p node_modules/.cache && chmod -R 777 node_modules/.cache
 
-# update latest version of npm
-RUN npm install -g npm@latest npm-check-updates --silent
 
 # copy all src/client files to './' = working directory
 COPY . ./

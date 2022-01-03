@@ -7,8 +7,11 @@ import { environment } from "../../environment";
 export const loadAllItems = createAsyncThunk(
   "loketlist/loadAllItems",
   async (params, thunkAPI) => {
+    const auth = thunkAPI.getState().auth
+    console.log(auth)
     const { data } = await axios.get(
-      environment.host + "/api/mobile/planning-cart-service/cart/" + params
+      environment.host + "/api/mobile/planning-cart-service/cart/" + params,
+      auth.authHeader
     );
     return data.products;
   }
@@ -17,14 +20,16 @@ export const loadAllItems = createAsyncThunk(
 export const addItem = createAsyncThunk(
   "loketlist/addItem",
   async (params, thunkAPI) => {
-    
+    const auth = thunkAPI.getState().auth
+    console.log(auth)
     const { data } = await axios.post(
       environment.host + "/api/mobile/planning-cart-service/cart/items/add",
       {
         cart_uuid: params.cart_uuid,
         product_uuid: params.product_uuid,
         quantity: params.quantity,
-      }
+      },
+      auth.authHeader
     );
     if (data === 1) console.log("Database updated");
 
@@ -35,13 +40,16 @@ export const addItem = createAsyncThunk(
 export const changeItemQuantity = createAsyncThunk(
   "loketlist/changeItemQuantity",
   async (params, thunkAPI) => {
+    const auth = thunkAPI.getState().auth
+    console.log(auth)
     const { data } = await axios.post(
       environment.host + "/api/mobile/planning-cart-service/cart/items/update",
       {
         cart_uuid: params.cart_uuid,
         product_uuid: params.product_uuid,
         quantity: params.quantity,
-      }
+      },
+      auth.authHeader
     );
     if (data === 1) console.log("Database updated");
 

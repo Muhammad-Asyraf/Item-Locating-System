@@ -32,6 +32,14 @@ class Store extends Model {
           to: 'item.store_uuid',
         },
       },
+      products: {
+        relation: Model.HasManyRelation,
+        modelClass: require('../products/model'),
+        join: {
+          from: 'store.uuid',
+          to: 'product.store_uuid',
+        },
+      },
     };
   }
 

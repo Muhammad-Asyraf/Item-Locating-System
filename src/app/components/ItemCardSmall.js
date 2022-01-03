@@ -1,17 +1,17 @@
 // Components
-import React, { useState, useEffect } from "react";
-import { View, StyleSheet } from "react-native";
-import { Card, Text, Button } from "react-native-paper";
-import NumericInput from "react-native-numeric-input";
-import SmallTextChip from "./SmallTextChip";
-import LocationText from "./LocationText";
+import React, { useState, useEffect } from 'react';
+import { View, StyleSheet } from 'react-native';
+import { Card, Text, Button } from 'react-native-paper';
+import NumericInput from 'react-native-numeric-input';
+import SmallTextChip from './core/SmallTextChip';
+import LocationText from './LocationText';
 
 // Redux
-import { useSelector, useDispatch } from "react-redux";
-import { addItem, changeItemQuantity, update } from "../redux/cart/cartSlice";
+import { useSelector, useDispatch } from 'react-redux';
+import { addItem, changeItemQuantity, update } from '../redux/cart/cartSlice';
 
 // Styling
-import { Theme } from "../styles/theme";
+import { Theme } from '../styles/Theme';
 
 export default function ItemCardSmall({
   style,
@@ -24,14 +24,14 @@ export default function ItemCardSmall({
   imageUrl,
 }) {
   const cart = useSelector((state) => state.cart);
-  const user = useSelector((state) => state.user)
-  const auth = useSelector((state) => state.auth)
+  const user = useSelector((state) => state.user);
+  const auth = useSelector((state) => state.auth);
   const dispatch = useDispatch();
 
   const [productInCart, setProductInCart] = useState(false);
 
   const addToCart = () => {
-    console.log("Add product #" + itemId + " to cart");
+    console.log('Add product #' + itemId + ' to cart');
     dispatch(
       addItem({
         cart_uuid: user.default_cart_uuid,
@@ -62,7 +62,7 @@ export default function ItemCardSmall({
     if (cart.products.includes(itemId)) {
       setProductInCart(true);
     } else {
-      setProductInCart(false)
+      setProductInCart(false);
     }
   });
 
@@ -82,25 +82,25 @@ export default function ItemCardSmall({
             ) : null}
             {sellingPrice < normalPrice ? (
               <SmallTextChip
-                text={((normalPrice - sellingPrice) / normalPrice) * 100 + "%"}
+                text={((normalPrice - sellingPrice) / normalPrice) * 100 + '%'}
               />
             ) : null}
           </View>
           {quantityLeft != 0 ? (
-            <Text style={[styles.text, {}]}>{quantityLeft + " left"}</Text>
+            <Text style={[styles.text, {}]}>{quantityLeft + ' left'}</Text>
           ) : null}
           <View style={[styles.horizontalContainer, { marginTop: 12 }]}>
             {sellingPrice > normalPrice ? (
               <Text style={[styles.text, styles.normalPriceText]}>
-                {"RM" + normalPrice}
+                {'RM' + normalPrice}
               </Text>
             ) : null}
             <Text style={[styles.text, styles.sellingPriceText]}>
-              {"RM" + sellingPrice}
+              {'RM' + sellingPrice}
             </Text>
           </View>
           <LocationText
-            style={{ alignSelf: "flex-end", marginTop: 16 }}
+            style={{ alignSelf: 'flex-end', marginTop: 16 }}
             text={merchant}
             size={10}
             color="#707070"
@@ -135,16 +135,16 @@ export default function ItemCardSmall({
 // Dedicated styling
 const styles = StyleSheet.create({
   content: {
-    alignItems: "flex-start",
+    alignItems: 'flex-start',
     paddingTop: 14,
   },
   itemContainer: {
-    flexDirection: "column",
+    flexDirection: 'column',
   },
   horizontalContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    alignItems: "center",
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
     marginVertical: 4,
   },
   image: {
@@ -154,23 +154,20 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 12,
-    fontFamily: "interSemiBold",
     height: 32,
   },
   text: {
     fontSize: 12,
-    fontFamily: "interMedium",
-    color: "#707070",
+    color: '#707070',
   },
   normalPriceText: {
     marginVertical: 0,
     marginRight: 4,
-    textDecorationLine: "line-through",
-    textDecorationStyle: "solid",
+    textDecorationLine: 'line-through',
+    textDecorationStyle: 'solid',
   },
   sellingPriceText: {
     fontSize: 14,
-    fontFamily: "interSemiBold",
     color: Theme.colors.primary,
   },
   addToCartButton: {
@@ -179,7 +176,7 @@ const styles = StyleSheet.create({
   },
   quantityInput: {
     marginTop: 8,
-    alignSelf: "center",
+    alignSelf: 'center',
     borderRadius: 4,
   },
 });

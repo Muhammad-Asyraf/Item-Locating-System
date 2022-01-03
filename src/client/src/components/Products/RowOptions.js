@@ -18,8 +18,7 @@ const IconStyles = { ml: 1, mr: 3, mt: 0.1 };
 const RowMenu = (props) => {
   const storeUrl = localStorage.getItem('storeUrl');
   const [anchorEl, setAnchorEl] = useState();
-  const { product, Link, handleDelete, handleEdit, handleClickOpenStockStatusDialog } =
-    props;
+  const { product, Link, handleDelete, handleEdit, handleClickOpenStockStatusDialog } = props;
 
   const handleClickOption = (event) => {
     setAnchorEl(event.currentTarget);
@@ -50,7 +49,7 @@ const RowMenu = (props) => {
           sx: {
             overflow: 'visible',
             mt: 0.1,
-            ml: -7,
+            ml: -9.5,
             '& .MuiAvatar-root': {
               width: 99,
               height: 32,
@@ -73,12 +72,6 @@ const RowMenu = (props) => {
           },
         }}
       >
-        <MenuItem onClick={() => handleDelete(product.uuid)}>
-          <ListItemIcon sx={listItemIconStyles}>
-            <DeleteRoundedIcon fontSize="small" sx={IconStyles} />
-            Delete
-          </ListItemIcon>
-        </MenuItem>
         <MenuItem
           onClick={handleEdit}
           component={Link}
@@ -93,6 +86,12 @@ const RowMenu = (props) => {
           <ListItemIcon sx={listItemIconStyles}>
             <LocalGroceryStoreRoundedIcon fontSize="small" sx={IconStyles} />
             Update Stock Status
+          </ListItemIcon>
+        </MenuItem>
+        <MenuItem onClick={() => handleDelete(product.uuid)}>
+          <ListItemIcon sx={listItemIconStyles}>
+            <DeleteRoundedIcon fontSize="small" sx={IconStyles} />
+            Delete
           </ListItemIcon>
         </MenuItem>
       </Menu>

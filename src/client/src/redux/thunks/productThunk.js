@@ -35,7 +35,19 @@ export const getProducts = createAsyncThunk(
       const { authHeader } = await getState().auth;
       const endpointURL = `/api/backoffice/product-service/products/${storeUuid}`;
 
-      const res = await axios.get(endpointURL, authHeader);
+      let res;
+
+      if (args) {
+        const { params } = args;
+        const { headers } = authHeader;
+        const reqConfig = { headers, params };
+
+        console.log('reqConfig', reqConfig);
+
+        res = await axios.get(endpointURL, reqConfig);
+      } else {
+        res = await axios.get(endpointURL, authHeader);
+      }
 
       return {
         products: res.data,
@@ -175,6 +187,28 @@ export const patchMultipleProducts = createAsyncThunk(
       const endpointURL = '/api/backoffice/product-service/product/multiple';
 
       await axios.patch(endpointURL, payload, authHeader);
+
+      return true;
+    } catch (err) {
+      const { data } = err.response;
+
+      return rejectWithValue({
+        message: data.message,
+        status: 'Error!',
+        error: data.code,
+      });
+    }
+  }
+);
+
+export const saveProductMapping = createAsyncThunk(
+  'product/saveProductMapping',
+  async ({ payload }, { rejectWithValue, getState }) => {
+    try {
+      const { authHeader } = await getState().auth;
+      const endpointURL = '/api/backoffice/product-service/product/mapping';
+
+      await axios.post(endpointURL, payload, authHeader);
 
       return true;
     } catch (err) {

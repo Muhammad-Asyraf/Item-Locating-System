@@ -6,6 +6,9 @@ import mapBoxReducer from './features/mapBoxSlice';
 import storeReducer from './features/storeSlice';
 import notificationReducer from './features/notificationSlice';
 import categoryReducer from './features/categorySlice';
+import layoutReducer from './features/layoutSlice';
+import promotionReducer from './features/promotionSlice';
+import campaignReducer from './features/campaignSlice';
 
 const combinedReducer = combineReducers({
   auth: authReducer,
@@ -15,6 +18,9 @@ const combinedReducer = combineReducers({
   store: storeReducer,
   notification: notificationReducer,
   category: categoryReducer,
+  layout: layoutReducer,
+  promotion: promotionReducer,
+  campaign: campaignReducer,
 });
 
 const rootReducer = (state, action) => {

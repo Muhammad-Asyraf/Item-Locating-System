@@ -105,15 +105,12 @@ const ProductEdit = (props) => {
         <LinearProgress
           className={classes.linear}
           sx={{
-            backgroundImage:
-              'linear-gradient(-225deg, #473B7B 0%, #003366 51%, #30D2BE 100%)',
+            backgroundImage: 'linear-gradient(-225deg, #473B7B 0%, #003366 51%, #30D2BE 100%)',
           }}
         />
       </div>
     );
   }
-
-  // console.log('dfsdfsdf', currentProduct);
 
   return (
     <div className={classes.root}>
@@ -122,24 +119,19 @@ const ProductEdit = (props) => {
         <Grid item xs={7} container>
           <Grid item xs={12}>
             <h1 style={{ marginBottom: 1, marginTop: 3, fontSize: '2em' }}>
-              <span> Add a new product</span>
+              <span> Edit product</span>
               <IconButton
                 component={Link}
                 to={`/${storeUrl}/product/list`}
-                sx={{ position: 'relative', top: -3 }}
+                sx={{ position: 'relative', top: -3, left: 5 }}
               >
                 <KeyboardReturnRoundedIcon fontSize="large" color="primary" />
               </IconButton>
             </h1>
             <Breadcrumbs separator="•" aria-label="breadcrumb">
               <div style={{ fontSize: '0.875rem' }}>{storeName}&nbsp;&nbsp;</div>,
-              <div style={{ fontSize: '0.875rem' }}>
-                &nbsp;&nbsp;Catalogue&nbsp;&nbsp;
-              </div>
-              ,
-              <div style={{ fontSize: '0.875rem' }}>
-                &nbsp;&nbsp;{currentProduct.uuid}
-              </div>
+              <div style={{ fontSize: '0.875rem' }}>&nbsp;&nbsp;Catalogue&nbsp;&nbsp;</div>,
+              <div style={{ fontSize: '0.875rem' }}>&nbsp;&nbsp;{currentProduct.uuid}</div>
             </Breadcrumbs>
           </Grid>
         </Grid>

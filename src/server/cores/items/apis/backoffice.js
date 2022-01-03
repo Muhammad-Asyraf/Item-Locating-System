@@ -11,6 +11,7 @@ router.post(
   upload.array('imgCollection', 6),
   itemController.createItem
 );
+router.post('/item/multiple', checkAuth, itemController.createMultipleItems);
 router.post('/item/delete', checkAuth, itemController.removeMultipleItem);
 router.put(
   '/item/:uuid',

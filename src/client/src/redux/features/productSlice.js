@@ -15,6 +15,7 @@ import {
   updateProduct,
   patchSingleProduct,
   patchMultipleProducts,
+  saveProductMapping,
   deleteProduct,
   deleteMultipleProducts,
 } from '../thunks/productThunk';
@@ -54,6 +55,9 @@ const productSlice = createSlice({
     [patchMultipleProducts.pending]: loadingState,
     [patchMultipleProducts.rejected]: errorState,
     [patchMultipleProducts.fulfilled]: loadedState,
+    [saveProductMapping.pending]: loadingState,
+    [saveProductMapping.rejected]: errorState,
+    [saveProductMapping.fulfilled]: loadedState,
   },
 });
 

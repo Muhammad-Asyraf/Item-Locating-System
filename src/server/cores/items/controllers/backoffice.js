@@ -1,5 +1,6 @@
 const { v4: uuidv4 } = require('uuid');
 const Item = require('../model');
+const SubCategory = require('../../categories/sub_categories/model');
 const getLogger = require('../../../utils/logger');
 const { removeFiles } = require('../../../utils/general');
 
@@ -90,7 +91,6 @@ exports.createItem = async (req, res, next) => {
     } = req.body;
     const { files: imgFiles } = req;
     const item_sub_category = JSON.parse(sub_category);
-    const itemId = uuidv4();
 
     const new_images = imgFiles.map(
       ({
@@ -107,7 +107,6 @@ exports.createItem = async (req, res, next) => {
 
     const item = await Item.query().insertGraph(
       {
-        uuid: itemId,
         name,
         note,
         store_uuid,
@@ -124,6 +123,50 @@ exports.createItem = async (req, res, next) => {
   } catch (err) {
     itemLogger.warn(`Error creating item`);
     await removeFiles(req.files);
+    next(err);
+  }
+};
+
+exports.createMultipleItems = async (req, res, next) => {
+  try {
+    const { body: payloadList } = req;
+    let subCatList = [];
+
+    payloadList.forEach(({ sub_categories }) => {
+      subCatList = [...new Set([...subCatList, ...sub_categories])];
+    });
+
+    const subCatIds = await SubCategory.query()
+      .select('uuid', 'name')
+      .whereIn('name', subCatList);
+
+    const multipleItemsPayload = payloadList.map((payload) => {
+      const { sub_categories, barcode_number, wholesale_price } = payload;
+
+      const subCatByUUID = sub_categories.map((subCat) => {
+        // get the UUID of the subcat by name
+        const subCatUUID = subCatIds.find((obj) => obj.name === subCat).uuid;
+        return { uuid: subCatUUID };
+      });
+
+      return {
+        ...payload,
+        barcode_number: parseInt(barcode_number, 10),
+        wholesale_price: parseFloat(wholesale_price),
+        sub_categories: subCatByUUID,
+      };
+    });
+
+    const items = await Item.query().insertGraph(multipleItemsPayload, {
+      relate: ['sub_categories'],
+    });
+
+    itemLogger.info(
+      `Multiple items [${items.length}] successfully inserted with!`
+    );
+    res.json(items);
+  } catch (err) {
+    itemLogger.warn(`Error inserting multiple items`);
     next(err);
   }
 };

@@ -1,0 +1,5 @@
+#product-bucket > div.ps__rail-x:hover,
+#product-bucket > div.ps__rail-y:hover {
+  display: block;
+  background-color: rgb(17, 25, 42) !important;
+}

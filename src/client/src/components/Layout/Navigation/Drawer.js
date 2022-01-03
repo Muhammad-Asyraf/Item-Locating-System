@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { withRouter, Link } from 'react-router-dom';
 
+import { useDispatch } from 'react-redux';
+
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import 'react-perfect-scrollbar/dist/css/styles.css';
 // import { loadCSS } from 'fg-loadcss';
@@ -12,33 +14,31 @@ import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import Collapse from '@mui/material/Collapse';
 import ListSubheader from '@mui/material/ListSubheader';
-import SvgIcon from '@mui/material/SvgIcon';
 import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
 
+// import SvgIcon from '@mui/material/SvgIcon';
 // import Icon from '@mui/material/Icon';
 // import SupervisorAccountTwoToneIcon from '@mui/icons-material/SupervisorAccountTwoTone';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import ListItemIcon from '@mui/material/ListItemIcon';
+import ViewCompactTwoToneIcon from '@mui/icons-material/ViewCompactTwoTone';
 // import DashboardTwoToneIcon from '@mui/icons-material/DashboardTwoTone';
 import LocalOfferTwoToneIcon from '@mui/icons-material/LocalOfferTwoTone';
 // import SupervisedUserCircleTwoToneIcon from '@mui/icons-material/SupervisedUserCircleTwoTone';
 import LocalMallTwoToneIcon from '@mui/icons-material/LocalMallTwoTone';
-// import BusinessCenterTwoToneIcon from '@mui/icons-material/BusinessCenterTwoTone';
-import RoomTwoToneIcon from '@mui/icons-material/RoomTwoTone';
-// import DomainTwoToneIcon from '@mui/icons-material/DomainTwoTone';
-// import LocalAtmTwoToneIcon from '@mui/icons-material/LocalAtmTwoTone';
 import FormatListBulletedRoundedIcon from '@mui/icons-material/FormatListBulletedRounded';
 import AddCircleTwoToneIcon from '@mui/icons-material/AddCircleTwoTone';
-// import AccountCircleTwoToneIcon from '@mui/icons-material/AccountCircleTwoTone';
-import DeveloperBoardRoundedIcon from '@mui/icons-material/DeveloperBoardRounded';
-import EditLocationRoundedIcon from '@mui/icons-material/EditLocationRounded';
-import FitScreenRoundedIcon from '@mui/icons-material/FitScreenRounded';
+import AddLocationAltRoundedIcon from '@mui/icons-material/AddLocationAltRounded';
+import Inventory2TwoToneIcon from '@mui/icons-material/Inventory2TwoTone';
+import CampaignTwoToneIcon from '@mui/icons-material/CampaignTwoTone';
 
 import { makeStyles, useTheme } from '@mui/styles';
 
-import { ReactComponent as Megaphone } from '../../../assets/svg/megaphone.svg';
+// import { ReactComponent as Megaphone } from '../../../assets/svg/megaphone.svg';
+
+import { processingRequest } from '../../../redux/features/layoutSlice';
 
 const drawerWidth = 240;
 
@@ -81,6 +81,7 @@ const useStyles = makeStyles((theme) => ({
 /* eslint-disable react/prop-types */
 const Drawer = (props) => {
   const classes = useStyles();
+  const dispatch = useDispatch();
   const { window, type, status, handleDrawerToggle, location } = props;
   const theme = useTheme();
   // const isDesktop = false;
@@ -90,9 +91,11 @@ const Drawer = (props) => {
   const [open, setOpen] = useState({
     products: false,
     items: false,
-    productMapping: false,
+    layout: false,
     users: false,
     businessRules: false,
+    promotions: false,
+    campaigns: false,
   });
 
   // linear-gradient(-225deg, #473B7B 0%, #003366 51%, #30D2BE 100%)
@@ -157,36 +160,50 @@ const Drawer = (props) => {
             {
               _text: 'Create',
               _key: 'product-create',
-              _icon: (
-                <AddCircleTwoToneIcon style={{ color: '#003366' }} fontSize="medium" />
-              ),
+              _icon: <AddCircleTwoToneIcon style={{ color: '#003366' }} fontSize="medium" />,
               _path: '/product/create',
             },
           ],
         },
         {
-          text: 'Product Mapping',
-          itemKey: 'productMapping',
-          path: '/product-mapping',
-          icon: <RoomTwoToneIcon style={{ color: '#003366' }} fontSize="large" />,
-          onClick: () => setOpen({ ...open, productMapping: !open.productMapping }),
+          text: 'Layouts',
+          itemKey: 'layout',
+          path: '/layout',
+          icon: <ViewCompactTwoToneIcon style={{ color: '#003366' }} fontSize="large" />,
+          onClick: () => setOpen({ ...open, layout: !open.layout }),
           itemSubList: [
             {
-              _text: 'Positioning',
-              _key: 'product-mapping-positioning',
+              _text: 'List',
+              _key: 'layout-list',
               _icon: (
-                <EditLocationRoundedIcon style={{ color: '#003366' }} fontSize="medium" />
+                <FormatListBulletedRoundedIcon
+                  style={{ color: '#003366' }}
+                  fontSize="medium"
+                />
               ),
-              _path: '/product-mapping/positioning',
+              _path: '/layout/list',
             },
             {
-              _text: 'Layout Editor',
-              _key: 'product-mapping-layout-editor',
-              _icon: (
-                <FitScreenRoundedIcon style={{ color: '#003366' }} fontSize="medium" />
-              ),
-              _path: '/product-mapping/layout-editor',
+              _text: 'Create',
+              _key: 'layout-create',
+              _icon: <AddCircleTwoToneIcon style={{ color: '#003366' }} fontSize="medium" />,
+              _path: '/layout/create',
             },
+            {
+              _text: 'Product Mapping',
+              _key: 'layout-product-mapping',
+              _icon: (
+                <AddLocationAltRoundedIcon style={{ color: '#003366' }} fontSize="medium" />
+              ),
+              _path: '/layout/product-mapping',
+            },
+
+            // {
+            //   _text: 'Layout Editor',
+            //   _key: 'layout-editor',
+            //   _icon: <FitScreenRoundedIcon style={{ color: '#003366' }} fontSize="medium" />,
+            //   _path: '/layout/layout-editor',
+            // },
           ],
           // icon: (
           //   <Icon
@@ -199,19 +216,47 @@ const Drawer = (props) => {
           text: 'Promotions',
           itemKey: 'promotions',
           path: '/promotions',
-          icon: (
-            <SvgIcon style={{ fontSize: 33, marginLeft: 3, color: '#003366' }}>
-              <Megaphone />
-            </SvgIcon>
-          ),
+          icon: <LocalOfferTwoToneIcon style={{ color: '#003366' }} fontSize="large" />,
+          // (
+          //   <SvgIcon style={{ fontSize: 33, marginLeft: 3, color: '#003366' }}>
+          //     <Megaphone />
+          //   </SvgIcon>
+          // ),
+          onClick: () => setOpen({ ...open, promotions: !open.promotions }),
+          itemSubList: [
+            {
+              _text: 'List',
+              _key: 'promotion-list',
+              _icon: (
+                <FormatListBulletedRoundedIcon
+                  style={{ color: '#003366' }}
+                  fontSize="medium"
+                />
+              ),
+              _path: '/promotion/list',
+            },
+            {
+              _text: 'Create',
+              _key: 'promotion-create',
+              _icon: <AddCircleTwoToneIcon style={{ color: '#003366' }} fontSize="medium" />,
+              _path: '/promotion/create',
+            },
+          ],
         },
+      ],
+    },
+    {
+      header: 'MARKETING',
+      key: 'marketing',
+      items: [
         {
-          text: 'Advertisements',
-          itemKey: 'advertisements',
-          path: '/advertisements',
+          text: 'Campaign',
+          itemKey: 'campaigns',
+          path: '/marketing-campaign/list',
           icon: (
-            <DeveloperBoardRoundedIcon style={{ color: '#003366' }} fontSize="large" />
+            <CampaignTwoToneIcon style={{ color: '#003366' }} sx={{ fontSize: '2.5rem' }} />
           ),
+
           // icon: (
           //   <Icon
           //     className="fab fa-adversal"
@@ -233,7 +278,7 @@ const Drawer = (props) => {
           text: 'Items',
           itemKey: 'items',
           path: '/item',
-          icon: <LocalOfferTwoToneIcon style={{ color: '#003366' }} fontSize="large" />,
+          icon: <Inventory2TwoToneIcon style={{ color: '#003366' }} fontSize="large" />,
           onClick: () => setOpen({ ...open, items: !open.items }),
           itemSubList: [
             {
@@ -250,9 +295,7 @@ const Drawer = (props) => {
             {
               _text: 'Create',
               _key: 'item-create',
-              _icon: (
-                <AddCircleTwoToneIcon style={{ color: '#003366' }} fontSize="medium" />
-              ),
+              _icon: <AddCircleTwoToneIcon style={{ color: '#003366' }} fontSize="medium" />,
               _path: '/item/create',
             },
           ],
@@ -363,6 +406,10 @@ const Drawer = (props) => {
   //   };
   // }, []);
 
+  const handleProductMapping = () => {
+    dispatch(processingRequest());
+  };
+
   return (
     <Hidden
       mdDown={type === 'Desktop' && true}
@@ -389,12 +436,7 @@ const Drawer = (props) => {
           >
             {/* <Divider /> */}
             <List>
-              <Grid
-                container
-                direction="column"
-                alignItems="center"
-                justifyContent="center"
-              >
+              <Grid container direction="column" alignItems="center" justifyContent="center">
                 <Grid item xs={12}>
                   <h1
                     style={{
@@ -430,100 +472,92 @@ const Drawer = (props) => {
                   >
                     {header}
                   </ListSubheader>
-                  {items.map(
-                    ({ text, itemKey, path, icon, onClick, itemSubList = [] }) => {
-                      const isExpandable = itemSubList && itemSubList.length > 0;
-                      return (
-                        <div key={itemKey}>
-                          <ListItem
-                            button
-                            classes={{ selected: classes.selected }}
-                            selected={location.pathname === path}
-                            onClick={isExpandable ? onClick : null}
-                            component={!isExpandable ? Link : null}
-                            to={`/${storeUrl}${path}`}
-                            sx={{
-                              '&:before': {
-                                top: '0px',
-                                right: '0px',
-                                width: '3px',
-                                bottom: '0px',
-                                content: '""',
-                                display: 'none',
-                                position: 'absolute',
-                                borderTopLeftRadius: '4px',
-                                borderBottomLeftRadius: '4px',
-                                backgroundColor: '#003366',
-                              },
-                            }}
-                          >
-                            <ListItemIcon
-                              className={classes.listItemIcons}
-                              sx={{ mr: -1.5 }}
-                            >
-                              <svg width={0} height={0}>
-                                <linearGradient
-                                  id="linearColors"
-                                  x1={0}
-                                  y1={0}
-                                  x2={1.5}
-                                  y2={1}
-                                >
-                                  <stop offset="0%" stopColor="#473B7B" />
-                                  <stop offset="51%" stopColor="#003366" />
-                                  <stop offset="100%" stopColor="#30D2BE" />
-                                </linearGradient>
-                              </svg>
-                              {icon}
-                            </ListItemIcon>
-                            <ListItemText className={classes.listItemTexts}>
-                              {text}
-                            </ListItemText>
-                            {isExpandable && !open[itemKey] && (
-                              <ExpandMore style={{ transform: 'rotate(-90deg)' }} />
-                            )}
-                            {isExpandable && open[itemKey] && (
-                              <ExpandLess style={{ transform: 'rotate(180deg)' }} />
-                            )}
-                          </ListItem>
-                          {isExpandable && (
-                            <Collapse in={open[itemKey]} timeout="auto" unmountOnExit>
-                              <List component="div" disablePadding>
-                                {itemSubList.map(({ _text, _key, _path, _icon }) => (
-                                  <ListItem
-                                    button
-                                    key={_key}
-                                    className={classes.nested}
-                                    component={Link}
-                                    to={`/${storeUrl}${_path}`}
-                                    classes={{ selected: classes.selected }}
-                                    selected={location.pathname === _path}
-                                    sx={{
-                                      '&:before': {
-                                        top: '0px',
-                                        right: '0px',
-                                        width: '3px',
-                                        bottom: '0px',
-                                        content: '""',
-                                        display: 'none',
-                                        position: 'absolute',
-                                        borderTopLeftRadius: '4px',
-                                        borderBottomLeftRadius: '4px',
-                                        backgroundColor: '#003366',
-                                      },
-                                    }}
-                                  >
-                                    <ListItemIcon sx={{ ml: 2 }}>{_icon}</ListItemIcon>
-                                    <ListItemText sx={{ ml: -1.5 }}>{_text}</ListItemText>
-                                  </ListItem>
-                                ))}
-                              </List>
-                            </Collapse>
+                  {items.map(({ text, itemKey, path, icon, onClick, itemSubList = [] }) => {
+                    const isExpandable = itemSubList && itemSubList.length > 0;
+                    return (
+                      <div key={itemKey}>
+                        <ListItem
+                          button
+                          classes={{ selected: classes.selected }}
+                          selected={location.pathname === path}
+                          onClick={isExpandable ? onClick : null}
+                          component={!isExpandable ? Link : null}
+                          to={`/${storeUrl}${path}`}
+                          sx={{
+                            '&:before': {
+                              top: '0px',
+                              right: '0px',
+                              width: '3px',
+                              bottom: '0px',
+                              content: '""',
+                              display: 'none',
+                              position: 'absolute',
+                              borderTopLeftRadius: '4px',
+                              borderBottomLeftRadius: '4px',
+                              backgroundColor: '#003366',
+                            },
+                          }}
+                        >
+                          <ListItemIcon className={classes.listItemIcons} sx={{ mr: -1.5 }}>
+                            <svg width={0} height={0}>
+                              <linearGradient id="linearColors" x1={0} y1={0} x2={1.5} y2={1}>
+                                <stop offset="0%" stopColor="#473B7B" />
+                                <stop offset="51%" stopColor="#003366" />
+                                <stop offset="100%" stopColor="#30D2BE" />
+                              </linearGradient>
+                            </svg>
+                            {icon}
+                          </ListItemIcon>
+                          <ListItemText className={classes.listItemTexts}>{text}</ListItemText>
+                          {isExpandable && !open[itemKey] && (
+                            <ExpandMore style={{ transform: 'rotate(-90deg)' }} />
                           )}
-                        </div>
-                      );
-                    }
-                  )}
+                          {isExpandable && open[itemKey] && (
+                            <ExpandLess style={{ transform: 'rotate(180deg)' }} />
+                          )}
+                        </ListItem>
+                        {isExpandable && (
+                          <Collapse in={open[itemKey]} timeout="auto" unmountOnExit>
+                            <List component="div" disablePadding>
+                              {itemSubList.map(({ _text, _key, _path, _icon }) => (
+                                <ListItem
+                                  button
+                                  key={_key}
+                                  className={classes.nested}
+                                  component={Link}
+                                  to={`/${storeUrl}${_path}`}
+                                  onClick={
+                                    _key === 'layout-product-mapping'
+                                      ? handleProductMapping
+                                      : null
+                                  }
+                                  classes={{ selected: classes.selected }}
+                                  selected={location.pathname === _path}
+                                  sx={{
+                                    '&:before': {
+                                      top: '0px',
+                                      right: '0px',
+                                      width: '3px',
+                                      bottom: '0px',
+                                      content: '""',
+                                      display: 'none',
+                                      position: 'absolute',
+                                      borderTopLeftRadius: '4px',
+                                      borderBottomLeftRadius: '4px',
+                                      backgroundColor: '#003366',
+                                    },
+                                  }}
+                                >
+                                  <ListItemIcon sx={{ ml: 2 }}>{_icon}</ListItemIcon>
+                                  <ListItemText sx={{ ml: -1.5 }}>{_text}</ListItemText>
+                                </ListItem>
+                              ))}
+                            </List>
+                          </Collapse>
+                        )}
+                      </div>
+                    );
+                  })}
                   <br />
                   <Divider />
                 </div>

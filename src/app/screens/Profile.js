@@ -6,6 +6,7 @@ import {
   Button,
   Title,
   Text,
+  TextInput,
   Card,
   Dialog,
   Snackbar,
@@ -18,7 +19,7 @@ import ProfileImage from '../components/core/ProfileImage';
 
 // Utilities
 import auth from '@react-native-firebase/auth';
-import { updateUser } from '../services/BackendService';
+import { updateUser, updatePassword } from '../services/BackendService';
 
 // Redux
 import { useSelector, useDispatch } from 'react-redux';
@@ -42,6 +43,23 @@ export default function Profile({ navigation }) {
   const [isPhoneValid, setPhoneValid] = useState(true);
   const [phoneNum, setPhoneNum] = useState();
   const [fullPhoneNum, setFullPhoneNum] = useState();
+
+  const [passwordErrorMessage, setPasswordErrorMessage] = useState('');
+  const [password, setPassword] = useState({
+    old: '',
+    new: '',
+    confirmation: '',
+  });
+  const [passwordSecure, setPasswordSecure] = useState({
+    old: false,
+    new: false,
+    confirmation: false,
+  });
+  const [passwordError, setPasswordError] = useState({
+    old: false,
+    new: false,
+    confirmation: false,
+  });
 
   const logout = () => {
     auth()
@@ -80,6 +98,60 @@ export default function Profile({ navigation }) {
     } else {
       setSnackbarMessage('Number is not valid');
       setSnackbarVisible(true);
+    }
+  };
+
+  const handlePasswordChange = () => {
+    if (password.new.length >= 8) {
+      setPasswordError({ ...passwordError, new: false });
+      if (password.new === password.confirmation) {
+        updatePassword(uuid, {
+          oldPassword: password.old,
+          newPassword: password.new,
+        })
+          .then((data) => {
+            if (typeof data == 'string') {
+              if (data.includes('[password-incorrect]')) {
+                setPasswordErrorMessage('Old password incorrect');
+                setPasswordError({ ...passwordError, old: true });
+              }
+            } else {
+              hidePasswordDialog();
+              setSnackbarMessage('Password updated');
+              setSnackbarVisible(true);
+            }
+          })
+          .catch((error) => {
+            console.log(error);
+            setSnackbarMessage(error);
+            setSnackbarVisible(true);
+          })
+          .finally(() => {
+            setPassword({
+              old: '',
+              new: '',
+              confirmation: '',
+            });
+            setPasswordSecure({
+              old: false,
+              new: false,
+              confirmation: false,
+            });
+            setPasswordError({
+              old: false,
+              new: false,
+              confirmation: false,
+            });
+          });
+      } else {
+        setPasswordError({ ...passwordError, confirmation: true });
+        setPasswordErrorMessage('Confirmation password does not match');
+      }
+    } else {
+      setPasswordErrorMessage(
+        'Password must be at least 8 alphanumerical letters'
+      );
+      setPasswordError({ ...passwordError, new: true });
     }
   };
 
@@ -207,9 +279,89 @@ export default function Profile({ navigation }) {
       {/* Change Password */}
       <Dialog visible={isPwDialogVisible} onDismiss={hidePasswordDialog}>
         <Dialog.Title>Change Password</Dialog.Title>
-        <Dialog.Content></Dialog.Content>
+        <Dialog.Content>
+          <TextInput
+            autoCapitalize="none"
+            label="Old Password"
+            style={styles.passwordTextInput}
+            value={password.old}
+            error={passwordError.old}
+            secureTextEntry={passwordSecure.old}
+            onChangeText={(text) => {
+              setPassword({
+                ...password,
+                old: text,
+              });
+            }}
+            right={
+              <TextInput.Icon
+                name="eye"
+                onPress={() => {
+                  setPasswordSecure({
+                    ...passwordSecure,
+                    old: !passwordSecure.old,
+                  });
+                }}
+              />
+            }
+          />
+          <TextInput
+            autoCapitalize="none"
+            label="New Password"
+            style={styles.passwordTextInput}
+            value={password.new}
+            error={passwordError.new}
+            secureTextEntry={passwordSecure.new}
+            onChangeText={(text) => {
+              setPassword({
+                ...password,
+                new: text,
+              });
+            }}
+            right={
+              <TextInput.Icon
+                name="eye"
+                onPress={() => {
+                  setPasswordSecure({
+                    ...passwordSecure,
+                    new: !passwordSecure.new,
+                  });
+                }}
+              />
+            }
+          />
+          <TextInput
+            autoCapitalize="none"
+            label="Confirm New Password"
+            style={styles.passwordTextInput}
+            value={password.confirmation}
+            error={passwordError.confirmation}
+            secureTextEntry={passwordSecure.confirmation}
+            onChangeText={(text) => {
+              setPassword({
+                ...password,
+                confirmation: text,
+              });
+            }}
+            right={
+              <TextInput.Icon
+                name="eye"
+                onPress={() => {
+                  setPasswordSecure({
+                    ...passwordSecure,
+                    confirmation: !passwordSecure.confirmation,
+                  });
+                }}
+              />
+            }
+          />
+          {Object.values(passwordError).includes(true) && (
+            <Text style={styles.dialogText}>{passwordErrorMessage}</Text>
+          )}
+        </Dialog.Content>
         <Dialog.Actions>
-          <Button onPress={hidePasswordDialog}>Close</Button>
+          <Button onPress={hidePasswordDialog}>Cancel</Button>
+          <Button onPress={handlePasswordChange}>Change</Button>
         </Dialog.Actions>
       </Dialog>
 
@@ -265,4 +417,8 @@ const styles = StyleSheet.create({
     width: 'auto',
   },
   dialogText: { marginVertical: 8 },
+  passwordTextInput: {
+    fontSize: 14,
+    marginVertical: 8,
+  },
 });

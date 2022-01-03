@@ -39,3 +39,18 @@ export const updateUser = async (userID, userObject) => {
     console.log(error);
   }
 };
+
+// passwordObject = {oldPassword,newPassword}
+export const updatePassword = async (userID, passwordObject) => {
+  try {
+    console.log(passwordObject);
+    let { data } = await axiosInstance.patch(
+      `/api/mobile/app-user-service/app-user/${userID}/password`,
+      passwordObject
+    );
+
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+};

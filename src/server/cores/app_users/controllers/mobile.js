@@ -107,7 +107,9 @@ exports.removeAppUser = async (req, res, next) => {
 exports.updateUser = async (req, res, next) => {
   try {
     const { uuid } = req.params;
-    console.log(req.body);
+    if (req.body.password != null) {
+      delete req.body.password;
+    }
     const appUser = await AppUser.query().patchAndFetchById(uuid, req.body);
     appUserLogger.info(`Successfully updated appUser <${uuid}> at Postgres `);
 
@@ -115,6 +117,44 @@ exports.updateUser = async (req, res, next) => {
     res.json(appUser);
   } catch (err) {
     appUserLogger.warn(`Error updating appUser`);
+    next(err);
+  }
+};
+
+exports.updateUserPassword = async (req, res, next) => {
+  try {
+    const { uuid } = req.params;
+    console.log(req.body);
+    const { oldPassword, newPassword } = req.body;
+
+    let appUser = await AppUser.query().findById(uuid).select('password');
+
+    const passwordCheck = await bcrypt.compare(oldPassword, appUser.password);
+    console.log(`Password same: ${passwordCheck}`);
+    if (!passwordCheck) {
+      res.json(
+        "[password-incorrect] Old password does not match user's current password"
+      );
+    } else {
+      const encryptedPassword = await bcrypt.hash(newPassword, 10);
+      appUser = await AppUser.query().patchAndFetchById(uuid, {
+        password: encryptedPassword,
+      });
+      appUserLogger.info(
+        `Successfully updated appUser password <${uuid}> at Postgres `
+      );
+
+      const appUserFirebase = await admin
+        .auth()
+        .updateUser(uuid, { password: newPassword });
+      appUserLogger.info(
+        `Successfully updated appUser password <${uuid}> at Firebase `
+      );
+      // return userObject
+      res.json(appUser);
+    }
+  } catch (err) {
+    appUserLogger.warn(`Error updating appUser password`);
     next(err);
   }
 };

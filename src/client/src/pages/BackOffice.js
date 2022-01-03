@@ -1,10 +1,11 @@
 import React from 'react';
 import { Switch, Route } from 'react-router-dom';
 
-import DashboardPage from './Dashboard';
 import ItemPages from './Items';
-import SalesPage from './Sales';
 import ProductPages from './Products';
+import StoreLayoutPages from './StoreLayouts';
+import PromotionPages from './Promotions';
+import CampaignPages from './Campaigns';
 import NotFoundPage from './NotFound';
 
 import Layout from '../components/Layout/Layout';
@@ -15,10 +16,11 @@ const BackOffice = () => {
   return (
     <Layout>
       <Switch>
-        <Route path={`/${storeUrl}/dashboard`} component={DashboardPage} />
         <Route path={`/${storeUrl}/item`} component={ItemPages} />
-        <Route path={`/${storeUrl}/sales`} component={SalesPage} />
         <Route path={`/${storeUrl}/product`} component={ProductPages} />
+        <Route path={`/${storeUrl}/layout`} component={StoreLayoutPages} />
+        <Route path={`/${storeUrl}/promotion`} component={PromotionPages} />
+        <Route path={`/${storeUrl}/marketing-campaign`} component={CampaignPages} />
         <Route path="*" component={NotFoundPage} />
       </Switch>
     </Layout>

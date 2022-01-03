@@ -99,7 +99,7 @@ const EnhancedTableToolbar = (props) => {
         [classes.highlight]: numSelected > 0,
       })}
     >
-      {type === 'product' ? (
+      {type === 'product' && (
         <ProductFilter
           open={openFilter}
           handleClose={handleClose}
@@ -116,7 +116,9 @@ const EnhancedTableToolbar = (props) => {
           filterActivated={filterActivated}
           clearFilters={clearFilters}
         />
-      ) : (
+      )}
+
+      {type === 'item' && (
         <CategoryFilter
           open={openFilter}
           handleClose={handleClose}
@@ -188,7 +190,7 @@ const EnhancedTableToolbar = (props) => {
           alignItems="center"
           // style={{ border: '1px solid red' }}
         >
-          {type === 'product' ? (
+          {type === 'product' && (
             <>
               {numSelected > 0 ? (
                 <>
@@ -205,14 +207,14 @@ const EnhancedTableToolbar = (props) => {
                           : '#001933',
                       }}
                     >
-                      {filterActivated ? (
+                      {filterActivated && (
                         <div style={{ fontSize: '0.875rem' }}>
                           <b>
                             {filteredQuantity} &nbsp;&nbsp;<span>{type}s found</span>
                           </b>
                           &nbsp;&nbsp;
                         </div>
-                      ) : null}
+                      )}
                       <FilterListIcon />
                     </IconButton>
                   </Tooltip>
@@ -256,20 +258,22 @@ const EnhancedTableToolbar = (props) => {
                       backgroundColor: filterActivated ? 'rgba(0, 0, 0, 0.04)' : 'white',
                     }}
                   >
-                    {filterActivated ? (
+                    {filterActivated && (
                       <div style={{ fontSize: '0.875rem' }}>
                         <b>
                           {filteredQuantity} &nbsp;&nbsp;<span>{type}s found</span>
                         </b>
                         &nbsp;&nbsp;
                       </div>
-                    ) : null}
+                    )}
                     <FilterListIcon />
                   </IconButton>
                 </Tooltip>
               )}
             </>
-          ) : (
+          )}
+
+          {type === 'item' && (
             <>
               {numSelected > 0 ? (
                 <>
@@ -319,14 +323,14 @@ const EnhancedTableToolbar = (props) => {
                       backgroundColor: filterActivated ? 'rgba(0, 0, 0, 0.04)' : 'white',
                     }}
                   >
-                    {filterActivated ? (
+                    {filterActivated && (
                       <div style={{ fontSize: '0.875rem' }}>
                         <b>
                           {filteredQuantity} &nbsp;&nbsp;<span>{type}s found</span>
                         </b>
                         &nbsp;&nbsp;
                       </div>
-                    ) : null}
+                    )}
                     <FilterListIcon />
                   </IconButton>
                 </Tooltip>

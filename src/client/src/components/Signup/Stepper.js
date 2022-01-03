@@ -118,12 +118,7 @@ function getDefaultValues() {
 }
 
 function getSteps() {
-  return [
-    'Personal Info',
-    'Contact Information',
-    'Business Information',
-    'Account Setup',
-  ];
+  return ['Personal Info', 'Contact Information', 'Business Information', 'Account Setup'];
 }
 
 function getStepsTitle() {

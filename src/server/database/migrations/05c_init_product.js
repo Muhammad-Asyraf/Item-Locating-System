@@ -19,6 +19,8 @@ exports.up = async (knex) => {
       .references('store.uuid')
       .onDelete('CASCADE')
       .notNullable();
+    table.uuid('layout_uuid').references('layout.uuid').onDelete('CASCADE');
+    table.uuid('partition_uuid').references('layer.uuid').onDelete('CASCADE');
     table.text('description').notNullable();
     table.timestamps(true, true);
   });

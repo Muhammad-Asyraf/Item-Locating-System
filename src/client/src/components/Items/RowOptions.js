@@ -63,12 +63,6 @@ const RowMenu = (props) => {
           },
         }}
       >
-        <MenuItem onClick={() => handleDelete(item.uuid)}>
-          <ListItemIcon sx={{ mr: 5, fontSize: '0.875rem !important' }}>
-            <DeleteRoundedIcon fontSize="small" sx={{ ml: 1, mr: 3, mt: 0.1 }} />
-            Delete
-          </ListItemIcon>
-        </MenuItem>
         <MenuItem
           onClick={handleEdit}
           component={Link}
@@ -77,6 +71,12 @@ const RowMenu = (props) => {
           <ListItemIcon sx={{ mr: 5, fontSize: '0.875rem !important' }}>
             <EditRoundedIcon fontSize="small" sx={{ ml: 1, mr: 3, mt: 0.1 }} />
             Edit
+          </ListItemIcon>
+        </MenuItem>
+        <MenuItem onClick={() => handleDelete(item.uuid)}>
+          <ListItemIcon sx={{ mr: 5, fontSize: '0.875rem !important' }}>
+            <DeleteRoundedIcon fontSize="small" sx={{ ml: 1, mr: 3, mt: 0.1 }} />
+            Delete
           </ListItemIcon>
         </MenuItem>
       </Menu>

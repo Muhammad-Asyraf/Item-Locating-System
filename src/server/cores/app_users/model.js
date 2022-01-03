@@ -92,6 +92,11 @@ class AppUser extends Model {
           type: 'string',
           title: 'The users phone number.',
         },
+        phone_country_code: {
+          $id: '#/properties/phone_country_code',
+          type: 'string',
+          title: 'The users phone number with country code.',
+        },
         created_at: {
           $id: '#/properties/created_at',
           type: 'string',

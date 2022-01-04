@@ -35,6 +35,7 @@ const errorHandler = (error, req, res, next) => {
   res.status(statusCode);
   const response = {
     status: statusCode,
+    code: error.code || undefined,
     message:
       error.name === 'UniqueViolationError'
         ? errorMessages[error.name][error.nativeError.constraint]

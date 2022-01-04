@@ -36,20 +36,31 @@ import Loading from './components/Loading';
 import AuthTabsNavigator from './navigation/AuthTabsNavigator';
 import MainStackNavigator from './navigation/MainStackNavigator';
 
-// Geolocation
-import BackgroundGeolocation from '@mauron85/react-native-background-geolocation';
-
-// Auth modules
+// Utilities
+import { getUser } from './services/BackendService';
 import auth from '@react-native-firebase/auth';
+
+// Redux
+import { useDispatch } from 'react-redux';
+import { setUserObject } from './redux/user/userSlice';
 
 export default function App() {
   // Authentication states
   const [isInitializing, setInitializing] = useState(true);
   const [user, setUser] = useState();
+  const dispatch = useDispatch();
 
   // Handle user state changes
   function onAuthStateChanged(user) {
+    // TODO:  Implement fetching all redux data here from MainStackNavigator
+    if (user) {
+      getUser(user.uid).then((data) => {
+        console.log(`[Root] data: ${JSON.stringify(data)}`);
+        dispatch(setUserObject(data));
+      });
+    }
     setUser(user);
+
     if (isInitializing) setInitializing(false);
   }
 

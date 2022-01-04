@@ -5,28 +5,28 @@ import getStore from './storeThunk';
 import { processed } from '../features/storeSlice';
 import { setNewNotification } from '../features/notificationSlice';
 
-export const setHeader = createAsyncThunk('auth/setHeader', async (firebase) => {
-  const user = firebase.currentUser;
-  const token = user && (await user.getIdToken(true));
-  const payloadHeader = {
-    headers: {
-      'Content-Type': 'application/json',
-      authorization: `Bearer ${token}`,
-    },
-  };
-  return {
-    payloadHeader,
-    message: 'Successfully set the payload header',
-    status: 'ok',
-  };
-});
+// export const setHeader = createAsyncThunk('auth/setHeader', async (firebase) => {
+//   const user = firebase.currentUser;
+//   const token = user && (await user.getIdToken(true));
+//   const payloadHeader = {
+//     headers: {
+//       'Content-Type': 'application/json',
+//       authorization: `Bearer ${token}`,
+//     },
+//   };
+//   return {
+//     payloadHeader,
+//     message: 'Successfully set the payload header',
+//     status: 'ok',
+//   };
+// });
 
 export const login = createAsyncThunk(
   'auth/login',
   async ({ firebase, email, password }, { rejectWithValue, dispatch }) => {
     try {
       const { user } = await firebase.signInWithEmailAndPassword(email, password);
-      await dispatch(setHeader(firebase));
+      // await dispatch(setHeader(firebase));
       await dispatch(getStore({ userUUID: user.toJSON().uid }));
       await dispatch(processed());
 

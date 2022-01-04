@@ -288,8 +288,6 @@ const ProductMapping = (props) => {
   };
 
   const preparedPayload = () => {
-    console.log('products', products);
-    console.log('originalProducts', originalProducts);
     let updatedProducts = [];
 
     products.forEach((product, index) => {
@@ -320,15 +318,12 @@ const ProductMapping = (props) => {
       }
     });
 
-    console.log('updatedProducts', updatedProducts);
-
     return { updatedProducts };
   };
 
   const handleSave = async () => {
     const payload = preparedPayload();
 
-    console.log('payload', payload);
     const { type: saveStatus, payload: resPayload } = await dispatch(
       saveProductMapping({ payload })
     );

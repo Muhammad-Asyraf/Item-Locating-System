@@ -957,6 +957,7 @@ const ProductForm = (props) => {
                         id="tags-outlined"
                         multiple={productType.bundle_checked}
                         disableCloseOnSelect
+                        limitTags={1}
                         onChange={handleSelectItem}
                         filterOptions={filterOptions}
                         options={itemOptions}
@@ -1440,6 +1441,9 @@ const ProductForm = (props) => {
             <Grid container spacing={2}>
               <Grid item xs={12} sm={12} md={4}>
                 <h3 style={{ marginBottom: 5, marginTop: 0 }}>Price</h3>
+                <span style={{ fontSize: '0.9rem' }}>
+                  Set up the markup percentage for the <br /> product
+                </span>
               </Grid>
               <Grid item xs={12} sm={12} md={8} container spacing={2}>
                 <Grid item xs={12} sm={8}>

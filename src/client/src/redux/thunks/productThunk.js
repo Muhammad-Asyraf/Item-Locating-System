@@ -1,11 +1,13 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
+import getHeader from '../../services/firebase/getHeader';
 
 export const getSingleProduct = createAsyncThunk(
   'product/getSingleProduct',
-  async ({ uuid }, { rejectWithValue, getState }) => {
+  async ({ uuid }, { rejectWithValue }) => {
     try {
-      const { authHeader } = await getState().auth;
+      // const { authHeader } = await getState().auth;
+      const authHeader = await getHeader();
       const endpointURL = `/api/backoffice/product-service/product/${uuid}`;
 
       const { data } = await axios.get(endpointURL, authHeader);
@@ -29,10 +31,10 @@ export const getSingleProduct = createAsyncThunk(
 
 export const getProducts = createAsyncThunk(
   'product/getProducts',
-  async (args, { rejectWithValue, getState }) => {
+  async (args, { rejectWithValue }) => {
     try {
       const storeUuid = localStorage.getItem('storeUUID');
-      const { authHeader } = await getState().auth;
+      const authHeader = await getHeader();
       const endpointURL = `/api/backoffice/product-service/products/${storeUuid}`;
 
       let res;
@@ -41,8 +43,6 @@ export const getProducts = createAsyncThunk(
         const { params } = args;
         const { headers } = authHeader;
         const reqConfig = { headers, params };
-
-        console.log('reqConfig', reqConfig);
 
         res = await axios.get(endpointURL, reqConfig);
       } else {
@@ -69,9 +69,9 @@ export const getProducts = createAsyncThunk(
 
 export const addProduct = createAsyncThunk(
   'product/addProduct',
-  async ({ payload }, { rejectWithValue, getState }) => {
+  async ({ payload }, { rejectWithValue }) => {
     try {
-      const { authHeader } = await getState().auth;
+      const authHeader = await getHeader();
       const endpointURL = '/api/backoffice/product-service/product';
 
       await axios.post(endpointURL, payload, authHeader);
@@ -91,9 +91,9 @@ export const addProduct = createAsyncThunk(
 
 export const deleteProduct = createAsyncThunk(
   'product/deleteProduct',
-  async ({ uuid }, { rejectWithValue, getState }) => {
+  async ({ uuid }, { rejectWithValue }) => {
     try {
-      const { authHeader } = await getState().auth;
+      const authHeader = await getHeader();
       const endpointURL = `/api/backoffice/product-service/product/${uuid}`;
 
       await axios.delete(endpointURL, authHeader);
@@ -114,9 +114,9 @@ export const deleteProduct = createAsyncThunk(
 
 export const deleteMultipleProducts = createAsyncThunk(
   'product/deleteMultipleProducts',
-  async ({ payload }, { rejectWithValue, getState }) => {
+  async ({ payload }, { rejectWithValue }) => {
     try {
-      const { authHeader } = await getState().auth;
+      const authHeader = await getHeader();
       const endpointURL = '/api/backoffice/product-service/product/delete';
 
       await axios.post(endpointURL, payload, authHeader);
@@ -137,9 +137,9 @@ export const deleteMultipleProducts = createAsyncThunk(
 
 export const updateProduct = createAsyncThunk(
   'product/updateProduct',
-  async ({ uuid, payload }, { rejectWithValue, getState }) => {
+  async ({ uuid, payload }, { rejectWithValue }) => {
     try {
-      const { authHeader } = await getState().auth;
+      const authHeader = await getHeader();
       const endpointURL = `/api/backoffice/product-service/product/${uuid}`;
 
       await axios.put(endpointURL, payload, authHeader);
@@ -159,9 +159,9 @@ export const updateProduct = createAsyncThunk(
 
 export const patchSingleProduct = createAsyncThunk(
   'product/patchSingleProduct',
-  async ({ uuid, payload }, { rejectWithValue, getState }) => {
+  async ({ uuid, payload }, { rejectWithValue }) => {
     try {
-      const { authHeader } = await getState().auth;
+      const authHeader = await getHeader();
       const endpointURL = `/api/backoffice/product-service/product/${uuid}`;
 
       await axios.patch(endpointURL, payload, authHeader);
@@ -181,9 +181,9 @@ export const patchSingleProduct = createAsyncThunk(
 
 export const patchMultipleProducts = createAsyncThunk(
   'product/patchMultipleProducts',
-  async ({ payload }, { rejectWithValue, getState }) => {
+  async ({ payload }, { rejectWithValue }) => {
     try {
-      const { authHeader } = await getState().auth;
+      const authHeader = await getHeader();
       const endpointURL = '/api/backoffice/product-service/product/multiple';
 
       await axios.patch(endpointURL, payload, authHeader);
@@ -203,9 +203,9 @@ export const patchMultipleProducts = createAsyncThunk(
 
 export const saveProductMapping = createAsyncThunk(
   'product/saveProductMapping',
-  async ({ payload }, { rejectWithValue, getState }) => {
+  async ({ payload }, { rejectWithValue }) => {
     try {
-      const { authHeader } = await getState().auth;
+      const authHeader = await getHeader();
       const endpointURL = '/api/backoffice/product-service/product/mapping';
 
       await axios.post(endpointURL, payload, authHeader);

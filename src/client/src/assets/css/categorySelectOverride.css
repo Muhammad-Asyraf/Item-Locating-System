@@ -1,5 +1,5 @@
-.css-dd2h8b-MuiAutocomplete-root .MuiAutocomplete-tag,
-.css-16awh2u-MuiAutocomplete-root .MuiAutocomplete-tag {
+div.css-dd2h8b-MuiAutocomplete-root div.MuiAutocomplete-tag,
+div.css-16awh2u-MuiAutocomplete-root div.MuiAutocomplete-tag {
   background-color: #003366;
   color: white;
   padding-left: 5px;
@@ -13,8 +13,8 @@
   color: white !important;
 }
 
-.css-dd2h8b-MuiAutocomplete-root .MuiAutocomplete-tag::before,
-.css-16awh2u-MuiAutocomplete-root .MuiAutocomplete-tag::before {
+div.css-dd2h8b-MuiAutocomplete-root div.MuiAutocomplete-tag::before,
+div.css-16awh2u-MuiAutocomplete-root div.MuiAutocomplete-tag::before {
   top: 0px;
   left: 0px;
   width: 15px;

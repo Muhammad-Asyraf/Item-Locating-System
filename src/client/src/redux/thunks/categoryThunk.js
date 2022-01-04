@@ -1,12 +1,13 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
+import getHeader from '../../services/firebase/getHeader';
 
 export const getSubcategories = createAsyncThunk(
   'category/getSubcategories',
-  async (args, { rejectWithValue, getState }) => {
+  async (args, { rejectWithValue }) => {
     try {
+      const authHeader = await getHeader();
       const endpointURL = '/api/backoffice/sub-category-service/sub-category';
-      const { authHeader } = await getState().auth;
 
       const { data } = await axios.get(endpointURL, authHeader);
 
@@ -28,10 +29,10 @@ export const getSubcategories = createAsyncThunk(
 
 export const getCategories = createAsyncThunk(
   'category/getCategories',
-  async (args, { rejectWithValue, getState }) => {
+  async (args, { rejectWithValue }) => {
     try {
       const endpointURL = '/api/backoffice/category-service/category';
-      const { authHeader } = await getState().auth;
+      const authHeader = await getHeader();
 
       const { data } = await axios.get(endpointURL, authHeader);
 

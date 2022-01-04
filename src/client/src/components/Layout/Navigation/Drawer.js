@@ -30,7 +30,7 @@ import LocalOfferTwoToneIcon from '@mui/icons-material/LocalOfferTwoTone';
 import LocalMallTwoToneIcon from '@mui/icons-material/LocalMallTwoTone';
 import FormatListBulletedRoundedIcon from '@mui/icons-material/FormatListBulletedRounded';
 import AddCircleTwoToneIcon from '@mui/icons-material/AddCircleTwoTone';
-import AddLocationAltRoundedIcon from '@mui/icons-material/AddLocationAltRounded';
+// import AddLocationAltRoundedIcon from '@mui/icons-material/AddLocationAltRounded';
 import Inventory2TwoToneIcon from '@mui/icons-material/Inventory2TwoTone';
 import CampaignTwoToneIcon from '@mui/icons-material/CampaignTwoTone';
 
@@ -189,14 +189,14 @@ const Drawer = (props) => {
               _icon: <AddCircleTwoToneIcon style={{ color: '#003366' }} fontSize="medium" />,
               _path: '/layout/create',
             },
-            {
-              _text: 'Product Mapping',
-              _key: 'layout-product-mapping',
-              _icon: (
-                <AddLocationAltRoundedIcon style={{ color: '#003366' }} fontSize="medium" />
-              ),
-              _path: '/layout/product-mapping',
-            },
+            // {
+            //   _text: 'Product Mapping',
+            //   _key: 'layout-product-mapping',
+            //   _icon: (
+            //     <AddLocationAltRoundedIcon style={{ color: '#003366' }} fontSize="medium" />
+            //   ),
+            //   _path: '/layout/product-mapping',
+            // },
 
             // {
             //   _text: 'Layout Editor',

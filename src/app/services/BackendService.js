@@ -22,7 +22,7 @@ export const getUser = async (userID) => {
 
     return data;
   } catch (error) {
-    console.log(error);
+    return Promise.reject(error.response.data.message);
   }
 };
 
@@ -36,7 +36,7 @@ export const updateUser = async (userID, userObject) => {
 
     return data;
   } catch (error) {
-    console.log(error);
+    return Promise.reject(error.response.data.message);
   }
 };
 
@@ -51,6 +51,24 @@ export const updatePassword = async (userID, passwordObject) => {
 
     return data;
   } catch (error) {
-    console.log(error);
+    return Promise.reject(error.response.data.message);
+  }
+};
+
+// emailObject = {new}
+export const updateEmail = async (userID, emailObject) => {
+  try {
+    console.log(emailObject);
+    let { data } = await axiosInstance.patch(
+      `/api/mobile/app-user-service/app-user/${userID}/email`,
+      emailObject
+    );
+
+    return data;
+  } catch (error) {
+    return Promise.reject(error.response.data.message);
+    // if (error.response.data.code == undefined) {
+    // }
+    // return Promise.reject(new Error(error.response.data.code));
   }
 };

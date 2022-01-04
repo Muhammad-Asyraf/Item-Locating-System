@@ -19,7 +19,11 @@ import ProfileImage from '../components/core/ProfileImage';
 
 // Utilities
 import auth from '@react-native-firebase/auth';
-import { updateUser, updatePassword } from '../services/BackendService';
+import {
+  updateUser,
+  updatePassword,
+  updateEmail,
+} from '../services/BackendService';
 
 // Redux
 import { useSelector, useDispatch } from 'react-redux';
@@ -31,10 +35,10 @@ import { Theme, GlobalStyle, TextStyle, AppbarStyle } from '../styles/Theme';
 export default function Profile({ navigation }) {
   const dispatch = useDispatch();
   const { uuid, userObject } = useSelector((state) => state.user);
-  const { authHeader } = useSelector((state) => state.auth);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarVisible, setSnackbarVisible] = useState(false);
   const [isQRDialogVisible, setQRDialogVisible] = useState(false);
+  const [isEmailDialogVisible, setEmailDialogVisible] = useState(false);
   const [isPwDialogVisible, setPwDialogVisible] = useState(false);
   const [isPhoneDialogVisible, setPhoneDialogVisible] = useState(false);
 
@@ -43,6 +47,8 @@ export default function Profile({ navigation }) {
   const [isPhoneValid, setPhoneValid] = useState(true);
   const [phoneNum, setPhoneNum] = useState();
   const [fullPhoneNum, setFullPhoneNum] = useState();
+
+  const [newEmail, setNewEmail] = useState();
 
   const [passwordErrorMessage, setPasswordErrorMessage] = useState('');
   const [password, setPassword] = useState({
@@ -86,13 +92,12 @@ export default function Profile({ navigation }) {
       updateUser(uuid, userObject)
         .then((user) => {
           dispatch(setUserObject(user));
-        })
-        .catch((error) => {
-          console.log(error);
-        })
-        .finally(() => {
           hidePhoneDialog();
           setSnackbarMessage('Phone number updated!');
+          setSnackbarVisible(true);
+        })
+        .catch((error) => {
+          setSnackbarMessage(`Error: ${error}`);
           setSnackbarVisible(true);
         });
     } else {
@@ -122,8 +127,7 @@ export default function Profile({ navigation }) {
             }
           })
           .catch((error) => {
-            console.log(error);
-            setSnackbarMessage(error);
+            setSnackbarMessage(`Error: ${error}`);
             setSnackbarVisible(true);
           })
           .finally(() => {
@@ -155,6 +159,23 @@ export default function Profile({ navigation }) {
     }
   };
 
+  const handleEmailChange = () => {
+    if (newEmail != userObject.email) {
+      let emailObject = { new: newEmail };
+      updateEmail(uuid, emailObject)
+        .then((user) => {
+          dispatch(setUserObject(user));
+          hideEmailDialog();
+          setSnackbarMessage('Email updated!');
+          setSnackbarVisible(true);
+        })
+        .catch((error) => {
+          setSnackbarMessage(`Error: ${error}`);
+          setSnackbarVisible(true);
+        });
+    }
+  };
+
   const showPasswordDialog = () => {
     setPwDialogVisible(true);
   };
@@ -175,6 +196,13 @@ export default function Profile({ navigation }) {
   };
   const hidePhoneDialog = () => {
     setPhoneDialogVisible(false);
+  };
+
+  const showEmailDialog = () => {
+    setEmailDialogVisible(true);
+  };
+  const hideEmailDialog = () => {
+    setEmailDialogVisible(false);
   };
 
   return (
@@ -218,6 +246,7 @@ export default function Profile({ navigation }) {
 
         <ScrollView style={styles.scrollViewContainer} scrollEnabled={false}>
           <Button onPress={showPhoneDialog}>Change Phone Number</Button>
+          <Button onPress={showEmailDialog}>Change Email</Button>
           <Button onPress={showPasswordDialog}>Change Password</Button>
           <Button icon="logout" onPress={logout}>
             Log Out
@@ -235,6 +264,28 @@ export default function Profile({ navigation }) {
         </Dialog.Content>
         <Dialog.Actions>
           <Button onPress={hideQRDialog}>Close</Button>
+        </Dialog.Actions>
+      </Dialog>
+
+      {/* Change email */}
+      <Dialog visible={isEmailDialogVisible} onDismiss={hideEmailDialog}>
+        <Dialog.Title>Change email</Dialog.Title>
+        <Dialog.Content>
+          <Text style={styles.dialogText}>
+            {`Current email : ${userObject.email}`}
+          </Text>
+          <TextInput
+            autoCapitalize="none"
+            label="New Email"
+            value={newEmail}
+            onChangeText={(text) => {
+              setNewEmail(text);
+            }}
+          />
+        </Dialog.Content>
+        <Dialog.Actions>
+          <Button onPress={hideEmailDialog}>Cancel</Button>
+          <Button onPress={handleEmailChange}>Confirm</Button>
         </Dialog.Actions>
       </Dialog>
 

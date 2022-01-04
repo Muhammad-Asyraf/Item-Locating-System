@@ -136,6 +136,13 @@ exports.updateUserPassword = async (req, res, next) => {
         "[password-incorrect] Old password does not match user's current password"
       );
     } else {
+      const appUserFirebase = await admin
+        .auth()
+        .updateUser(uuid, { password: newPassword });
+      appUserLogger.info(
+        `Successfully updated appUser password <${uuid}> at Firebase `
+      );
+
       const encryptedPassword = await bcrypt.hash(newPassword, 10);
       appUser = await AppUser.query().patchAndFetchById(uuid, {
         password: encryptedPassword,
@@ -144,17 +151,37 @@ exports.updateUserPassword = async (req, res, next) => {
         `Successfully updated appUser password <${uuid}> at Postgres `
       );
 
-      const appUserFirebase = await admin
-        .auth()
-        .updateUser(uuid, { password: newPassword });
-      appUserLogger.info(
-        `Successfully updated appUser password <${uuid}> at Firebase `
-      );
       // return userObject
       res.json(appUser);
     }
   } catch (err) {
     appUserLogger.warn(`Error updating appUser password`);
+    next(err);
+  }
+};
+
+exports.updateUserEmail = async (req, res, next) => {
+  try {
+    const { uuid } = req.params;
+    let emailObject = req.body;
+
+    const appUserFirebase = await admin
+      .auth()
+      .updateUser(uuid, { email: emailObject.new });
+    appUserLogger.info(
+      `Successfully updated email for user <${uuid}> at Firebase `
+    );
+    const appUser = await AppUser.query().patchAndFetchById(uuid, {
+      email: emailObject.new,
+    });
+    appUserLogger.info(
+      `Successfully updated email for user <${uuid}> at Postgres `
+    );
+
+    // return userObject
+    res.json(appUser);
+  } catch (err) {
+    appUserLogger.warn(`Error updating app user's email`);
     next(err);
   }
 };

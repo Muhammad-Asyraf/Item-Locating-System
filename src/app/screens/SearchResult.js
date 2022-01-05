@@ -2,12 +2,13 @@
 import React, { useState, useEffect } from 'react';
 import { View } from 'react-native';
 import { Appbar, Searchbar, Text } from 'react-native-paper';
-import ItemCardSmall from '../components/ItemCardSmall';
+import ProductCard from '../components/ProductCard';
 import { FlatGrid } from 'react-native-super-grid';
 import Loading from '../components/Loading';
 
 // Utilities
 import axios from 'axios';
+import { getProducts } from '../services/ProductService';
 
 // Environment configs
 import { environment } from '../environment';
@@ -22,24 +23,13 @@ export default function SearchResult({ navigation, route }) {
   const [searchResult, setSearchResult] = useState();
 
   useEffect(() => {
-    const fetchQuery = async () => {
-      try {
-        const { data } = await axios.get(
-          environment.host + '/api/mobile/product-service/products',
-          {
-            params: {
-              search: searchQuery,
-            },
-          }
-        );
-        setSearchResult(data);
-        setLoading(false);
-      } catch (err) {
-        console.log(err);
-      }
-    };
     if (isLoading) {
-      fetchQuery();
+      getProducts({ search: searchQuery })
+        .then((data) => {
+          setSearchResult(data);
+          setLoading(false);
+        })
+        .catch((error) => {});
     }
   });
 
@@ -48,7 +38,7 @@ export default function SearchResult({ navigation, route }) {
   };
 
   const runQuery = () => {
-    console.log('Running query : ' + searchQuery);
+    // console.log('Running query : ' + searchQuery);
     setLoading(true);
   };
 
@@ -72,19 +62,9 @@ export default function SearchResult({ navigation, route }) {
       ) : searchResult.length != 0 ? (
         <FlatGrid
           style={GlobalStyle.flatGrid}
-          itemDimension={140}
+          itemDimension={110}
           data={searchResult}
-          renderItem={({ item }) => (
-            <ItemCardSmall
-              itemId={item.uuid}
-              itemName={item.name}
-              merchant={'General Store'}
-              normalPrice={item.retail_price}
-              sellingPrice={item.selling_price}
-              quantityLeft={item.quantity}
-              imageUrl="https://tinyurl.com/cu8nm69m"
-            />
-          )}
+          renderItem={({ item }) => <ProductCard product={item} />}
         />
       ) : (
         <Text>No products found</Text>

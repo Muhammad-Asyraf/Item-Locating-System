@@ -13,6 +13,9 @@ export const Theme = {
     background: '#FFFFFF',
     text: '#001933',
     placeholder: 'rgba(0,25,51,0.5)',
+    error: '#E71D36',
+    warn: '#FF9F1C',
+    ok: '#2EC4B6',
   },
 };
 
@@ -33,9 +36,7 @@ export const GlobalStyle = StyleSheet.create({
     paddingHorizontal: 22,
     paddingVertical: 18,
   },
-  flatGrid: {
-    marginHorizontal: 8,
-  },
+  flatGrid: {},
 });
 
 export const TextStyle = StyleSheet.create({

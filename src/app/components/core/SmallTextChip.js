@@ -39,8 +39,8 @@ export default function SmallTextChip(
 // Dedicated styling
 const styles = StyleSheet.create({
   chip: {
-    paddingVertical: 2,
-    paddingHorizontal: 6,
+    paddingVertical: 1,
+    paddingHorizontal: 4,
     marginVertical: 2,
     borderRadius: 2,
     borderWidth: 1,

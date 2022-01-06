@@ -12,6 +12,7 @@ import ProfileEdit from '../screens/ProfileEdit';
 import auth from '@react-native-firebase/auth';
 import axios from 'axios';
 import BackgroundGeolocation from '@mauron85/react-native-background-geolocation';
+import { getAuthHeader } from '../services/AuthenticationService';
 
 // Redux
 import { useDispatch, useSelector } from 'react-redux';
@@ -173,18 +174,15 @@ export default function MainStackNavigator() {
 
   const fetch = async () => {
     try {
-      const token = await auth().currentUser.getIdToken(false);
-      console.log(`token: ${token}`);
-      console.log(`authHeader: ${JSON.stringify(authState.authHeader)}`);
       const uuid = auth().currentUser.uid;
+      const header = await getAuthHeader();
       const { data } = await axios.get(
         environment.host +
           '/api/mobile/planning-cart-service/cart/default/' +
           uuid,
-        authState.authHeader
+        header
       );
 
-      dispatch(setToken(token));
       dispatch(setUuid(uuid));
       dispatch(setDefaultCart(data.uuid));
       dispatch(loadAllItems(data.uuid));

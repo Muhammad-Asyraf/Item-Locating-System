@@ -7,6 +7,7 @@ import Loading from '../components/Loading';
 
 // Utilities
 import axios from 'axios';
+import { getAuthHeader } from '../services/AuthenticationService';
 
 // Redux
 import { useSelector, useDispatch } from 'react-redux';
@@ -33,9 +34,10 @@ export default function Loketlist({ navigation, route }) {
 
   useEffect(() => {
     const fetchProducts = async () => {
+      const header = await getAuthHeader();
       const { data } = await axios.get(
         environment.host + '/api/mobile/planning-cart-service/cart/' + cartUuid,
-        auth.authHeader
+        header
       );
       let totalPrice = 0;
       let DATA = [];

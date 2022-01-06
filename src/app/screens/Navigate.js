@@ -28,7 +28,6 @@ export default function Navigate({ navigation }) {
   const directionsProvider = DirectionsProvider({ accessToken: mapboxAPIKey });
 
   const { width: screenWidth } = Dimensions.get('window');
-  const { authHeader } = useSelector((state) => state.auth);
   const { uuid, position } = useSelector((state) => state.user);
   const [isCartLoading, setCartLoading] = useState(true);
   const [iconLoading, setIconLoading] = useState(true);
@@ -69,7 +68,7 @@ export default function Navigate({ navigation }) {
     setMessage('Getting your carts');
     setCartLoading(true);
 
-    let res = await getAllCartsForUser(authHeader, uuid);
+    let res = await getAllCartsForUser(uuid);
     let carts;
     if (res.length != 0) {
       carts = res.map((item) => {

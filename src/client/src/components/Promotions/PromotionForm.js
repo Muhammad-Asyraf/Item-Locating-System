@@ -1,5 +1,5 @@
 // import React, { useRef, useState, useEffect } from 'react';
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
@@ -14,8 +14,13 @@ import TableRow from '@mui/material/TableRow';
 
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
+import Badge from '@mui/material/Badge';
+import FormGroup from '@mui/material/FormGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Switch from '@mui/material/Switch';
 // import Chip from '@mui/material/Chip';
 // import Card from '@mui/material/Card';
+import Checkbox from '@mui/material/Checkbox';
 import IconButton from '@mui/material/IconButton';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
@@ -32,14 +37,18 @@ import LocalizationProvider from '@mui/lab/LocalizationProvider';
 // import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 
 // import SpeedIcon from '@mui/icons-material/Speed';
+import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
+import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import FilterAltRoundedIcon from '@mui/icons-material/FilterAltRounded';
 import InfoRoundedIcon from '@mui/icons-material/InfoRounded';
 import EditTwoToneIcon from '@mui/icons-material/EditTwoTone';
 import TodayIcon from '@mui/icons-material/Today';
 import InsertInvitationIcon from '@mui/icons-material/InsertInvitation';
+import CampaignIcon from '@mui/icons-material/Campaign';
 // import PercentRoundedIcon from '@mui/icons-material/PercentRounded';
 
 import { makeStyles } from '@mui/styles';
+import { styled } from '@mui/material/styles';
 
 import SwiperCore, { Pagination, Navigation } from 'swiper';
 import { Swiper, SwiperSlide } from 'swiper/react/swiper-react';
@@ -49,6 +58,10 @@ import 'swiper/swiper-bundle.min.css';
 import 'swiper/swiper.min.css';
 
 import ProductDetailsModal from '../Products/ProductDetailsModal';
+import ProductFilter from '../Products/ProductFilters';
+import CampaignLinkDialog from './CampaignLinkDialog';
+
+import linkImage from '../../assets/svg/link.svg';
 
 SwiperCore.use([Pagination, Navigation]);
 
@@ -102,6 +115,49 @@ const getEditorFormat = () => [
 //   };
 // }
 
+const CampaignLinkSwitch = styled(Switch)(({ theme }) => ({
+  width: 62,
+  height: 34,
+  padding: 7,
+  '& .MuiSwitch-switchBase': {
+    margin: 1,
+    padding: 0,
+    transform: 'translateX(6px)',
+    '&.Mui-checked': {
+      color: '#fff',
+      transform: 'translateX(22px)',
+      '& .MuiSwitch-thumb:before': {
+        borderRadius: 20,
+        backgroundColor: theme.palette.mode === 'dark' ? '#003892' : '#001e3c',
+        backgroundImage: `url(${linkImage})`,
+      },
+      '& + .MuiSwitch-track': {
+        opacity: 1,
+        backgroundColor: theme.palette.mode === 'dark' ? '#8796A5' : '#aab4be',
+      },
+    },
+  },
+  '& .MuiSwitch-thumb': {
+    backgroundColor: 'white',
+    // backgroundColor: theme.palette.mode === 'dark' ? '#003892' : '#001e3c',
+    width: 32,
+    height: 32,
+    '&:before': {
+      content: "''",
+      position: 'absolute',
+      width: '100%',
+      height: '100%',
+      left: 0,
+      top: 0,
+    },
+  },
+  '& .MuiSwitch-track': {
+    opacity: 1,
+    backgroundColor: theme.palette.mode === 'dark' ? '#8796A5' : '#aab4be',
+    borderRadius: 20 / 2,
+  },
+}));
+
 const useStyles = makeStyles((theme) => ({
   root: {
     width: '100%',
@@ -140,10 +196,10 @@ const useStyles = makeStyles((theme) => ({
   },
   inputTitle: {
     margin: '0px 0px 8px',
-    'font-weight': '600',
-    'line-height': '1.57143',
-    'font-size': '0.875rem',
-    'font-family': 'Public Sans, sans-serif',
+    fontWeight: '600',
+    lineHeight: '1.57143',
+    fontSize: '0.875rem',
+    fontFamily: 'Public Sans, sans-serif',
     color: 'rgb(99, 115, 129)',
   },
   inputImageBox: {
@@ -220,20 +276,35 @@ const useStyles = makeStyles((theme) => ({
 /* eslint-disable new-cap */
 /* eslint-disable react/jsx-no-duplicate-props */
 /* eslint-disable arrow-body-style */
+/* eslint-disable no-unneeded-ternary */
 const PromotionForm = (props) => {
   const classes = useStyles();
   // const defaultVal = getDefaultValues();
   const quillModules = getEditorModules();
   const quillFormats = getEditorFormat();
   const currentDateTime = new Date().toLocaleString();
+  const discountRef = useRef();
 
   const initPromotionType = getInitPromototionType();
   const initDiscountType = getInitDiscountType();
   const initApplicableProductType = getInitApplicableProductType();
 
-  const { products, categoryOptions } = props;
+  const { products: initProduct, categoryOptions } = props;
 
+  const [categoryFilterType, setCategoryFilterType] = useState('any');
+  const [selectedCategoryFilter, setSelectedCategoryFilter] = useState([]);
+  const [selectedActiveStatusFilter, setSelectedActiveStatusFilter] = useState(null);
+  const [selectedStockStatusFilter, setSelectedStockStatusFilter] = useState(null);
+  const [filterActivated, setFilterActivated] = useState(false);
+  const [applicableProducts, setApplicableProducts] = useState([]);
+  const [openFilter, setOpenFilter] = useState(false);
+  const [products, setProducts] = useState(initProduct);
+  const [selectedProducts, setSelectedProducts] = useState([]);
+
+  const [openCampaignDialog, setOpenCampaignDialog] = useState(false);
   const [openProductModal, setOpenProductModal] = useState(false);
+  const [campaignLinkFlag, setCampaignLinkFlag] = useState(false);
+  const [discount, setDiscount] = useState();
   const [productIndex, setProductIndex] = useState();
   const [dateRange, setDateRange] = useState([null, null]);
   const [startDateTime, setStartDateTime] = useState(currentDateTime);
@@ -241,7 +312,6 @@ const PromotionForm = (props) => {
   const [quillText, setQuillText] = useState({ editorHtml: '' });
   const [promotionType, setPromotionType] = useState(initPromotionType);
   const [discountType, setDiscountType] = useState(initDiscountType);
-  const [selectedProducts, setSelectedProducts] = useState([]);
   const [applicableProductType, setApplicableProductType] = useState(
     initApplicableProductType
   );
@@ -256,13 +326,86 @@ const PromotionForm = (props) => {
     bundleProductItem: false,
   });
 
+  const handleClickOpen = () => setOpenFilter(true);
+  const handleClose = () => setOpenFilter(false);
+  const handleClickOpenDialog = () => setOpenCampaignDialog(true);
+  const handleCloseDialog = () => setOpenCampaignDialog(false);
+  const toggleCampaignLink = () => setCampaignLinkFlag(!campaignLinkFlag);
+
+  const filterProduct = () => {
+    const categoryFilterActivated = selectedCategoryFilter.length > 0;
+    const activeStatusFilterActivated = selectedActiveStatusFilter !== null;
+    const stockStatusFilterActivated = selectedStockStatusFilter !== null;
+
+    if (categoryFilterActivated || activeStatusFilterActivated || stockStatusFilterActivated) {
+      setFilterActivated(true);
+      const selectedCatList = selectedCategoryFilter.map(({ uuid }) => uuid);
+
+      const filteredItem = applicableProducts.filter(
+        ({ sub_categories: subCat, is_active: isActive, stock_status: stockStatus }) => {
+          let validCategory = true;
+          let validActiveStatus = true;
+          let validStockStatus = true;
+
+          if (categoryFilterActivated) {
+            switch (categoryFilterType) {
+              case 'any':
+                validCategory = subCat.some(({ uuid }) => selectedCatList.includes(uuid));
+                break;
+              case 'all':
+                validCategory = subCat.every(({ uuid }) => selectedCatList.includes(uuid));
+                break;
+              default:
+              // no default
+            }
+          }
+
+          if (activeStatusFilterActivated) {
+            const selectedActiveStatusFlag =
+              selectedActiveStatusFilter === 'Active' ? true : false;
+            validActiveStatus = isActive === selectedActiveStatusFlag;
+          }
+
+          if (stockStatusFilterActivated) {
+            validStockStatus = stockStatus === selectedStockStatusFilter;
+          }
+
+          return validCategory && validActiveStatus && validStockStatus;
+        }
+      );
+      // setFilteredData(filteredItem);
+      setProducts(filteredItem);
+    } else {
+      setFilterActivated(false);
+      // setFilteredData(applicableProducts);
+      setProducts(applicableProducts);
+    }
+  };
+
+  useEffect(() => {
+    filterProduct();
+  }, [
+    applicableProducts,
+    selectedCategoryFilter,
+    selectedActiveStatusFilter,
+    selectedStockStatusFilter,
+    categoryFilterType,
+  ]);
+
+  const clearFilters = () => {
+    setCategoryFilterType('any');
+    setSelectedCategoryFilter([]);
+    setSelectedActiveStatusFilter(null);
+    setSelectedStockStatusFilter(null);
+  };
+
   const validateDescription = (value, currentError) => {
     const validQuillText = value;
 
     if (!validQuillText) {
       currentError = {
         ...currentError,
-        quillText: 'Please enter product descriptions for your customers reference',
+        quillText: 'Please enter promotion descriptions for your customers reference',
       };
     } else {
       currentError = {
@@ -277,24 +420,32 @@ const PromotionForm = (props) => {
   const handlePromotionType = ({ target }) => {
     const { id: selectedPromotionType } = target;
     let updatedPromotionType;
+    let applicableProduct;
+
+    console.log('initProduct', initProduct);
 
     if (selectedPromotionType === 'basic-sale') {
+      applicableProduct = initProduct.filter(({ product_type: type }) => type === 'Standard');
       updatedPromotionType = {
         ...initPromotionType,
         basic_checked: true,
       };
     } else if (selectedPromotionType === 'bundle-sale') {
+      applicableProduct = initProduct.filter(({ product_type: type }) => type === 'Bundle');
       updatedPromotionType = {
         ...initPromotionType,
         bundle_checked: true,
       };
     } else if (selectedPromotionType === 'buy-x-get-y') {
+      applicableProduct = initProduct;
       updatedPromotionType = {
         ...initPromotionType,
         bxgy_checked: true,
       };
     }
     setPromotionType(updatedPromotionType);
+    setApplicableProducts(applicableProduct);
+    setSelectedProducts([]);
   };
 
   const handleDiscountType = ({ target }) => {
@@ -312,9 +463,6 @@ const PromotionForm = (props) => {
         percentage_off_checked: true,
       };
     }
-
-    console.log('updatedDiscountType', updatedDiscountType);
-
     setDiscountType(updatedDiscountType);
   };
 
@@ -354,32 +502,67 @@ const PromotionForm = (props) => {
     setErrors(updatedError);
   };
 
-  const handleSelectProduct = (e, value) => {
-    setSelectedProducts(value);
+  const handleInputChange = ({ target }) => {
+    const { value } = target;
+
+    setDiscount(value);
   };
+
+  const handleSelectProduct = (e, selected) => {
+    const flag = promotionType.basic_checked || promotionType.bundle_checked;
+    if (flag) {
+      const currentDiscount = discountRef.current.value;
+      let saving;
+      let salePrice;
+
+      const updatedProducts = selected.map((product) => {
+        const { retail_price: retailPrice } = product;
+
+        if (discountType.percentage_off_checked) {
+          saving = (currentDiscount / 100) * parseFloat(retailPrice);
+        } else {
+          saving = currentDiscount;
+        }
+
+        salePrice = retailPrice - saving;
+
+        return {
+          ...product,
+          sale_price: salePrice,
+        };
+      });
+
+      setSelectedProducts(updatedProducts);
+    } else {
+      setSelectedProducts(selected);
+    }
+  };
+
+  useEffect(() => {
+    if (selectedProducts && discountRef.current) {
+      handleSelectProduct(null, selectedProducts);
+    }
+  }, [discountType, discount]);
 
   const filterOptions = createFilterOptions({
     matchFrom: 'any',
     stringify: (option) => option.name + option.barcode_number,
   });
 
-  console.log('products', products);
-  console.log('categoryOptions', categoryOptions);
-
-  const tableConditionChecked = () => {
-    const flag =
-      selectedProducts.length > 0 &&
-      applicableProductType.specific_checked &&
-      (promotionType.basic_checked || promotionType.bundle_checked);
-
-    return flag;
-  };
-
   const atleastOnePromotionTypeSelected = () => {
     const flag =
       promotionType.basic_checked ||
       promotionType.bundle_checked ||
       promotionType.bxgy_checked;
+
+    return flag;
+  };
+
+  const tableConditionChecked = () => {
+    const flag =
+      selectedProducts.length > 0 &&
+      applicableProductType.specific_checked &&
+      atleastOnePromotionTypeSelected();
 
     return flag;
   };
@@ -392,6 +575,19 @@ const PromotionForm = (props) => {
     setProductIndex(index);
     setOpenProductModal(true);
   };
+
+  const linkLabel = () => (
+    <span style={{ position: 'relative', top: 1.5 }}>
+      Campaign
+      <IconButton onClick={handleClickOpenDialog}>
+        <InfoRoundedIcon fontSize="small" />
+      </IconButton>
+    </span>
+  );
+
+  const campaignSwitch = () => (
+    <CampaignLinkSwitch sx={{ m: 1, mr: 0.5 }} onChange={toggleCampaignLink} />
+  );
 
   return (
     <form
@@ -420,7 +616,7 @@ const PromotionForm = (props) => {
                 </span>
               </Grid>
               <Grid item sm={12} md={9} container spacing={3}>
-                <Grid item xs={12}>
+                <Grid item xs={8.5}>
                   <TextField
                     id="name"
                     label="Promotion Name"
@@ -440,12 +636,49 @@ const PromotionForm = (props) => {
                     }}
                   />
                 </Grid>
+                <Grid item xs={3.5}>
+                  <FormGroup>
+                    <FormControlLabel
+                      sx={{ mr: 0 }}
+                      control={campaignSwitch()}
+                      label={linkLabel()}
+                    />
+                  </FormGroup>
+                  <CampaignLinkDialog
+                    open={openCampaignDialog}
+                    handleClose={handleCloseDialog}
+                  />
+                </Grid>
+                {campaignLinkFlag && (
+                  <Grid item xs={12}>
+                    <Autocomplete
+                      disablePortal
+                      options={['1st Campaign', '2nd Campaign', '3rd Campaign']}
+                      sx={{ width: '100%' }}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          label="Campaign"
+                          InputProps={{
+                            ...params.InputProps,
+                            startAdornment: (
+                              <InputAdornment position="start">
+                                <CampaignIcon sx={{ fontSize: '1.8rem', ml: 0.5 }} />
+                              </InputAdornment>
+                            ),
+                          }}
+                        />
+                      )}
+                    />
+                  </Grid>
+                )}
+
                 <Grid item xs={12}>
                   <p
                     className={classes.inputTitle}
                     style={{ color: errors.quillText ? '#d32f2f' : 'black' }}
                   >
-                    Short Description
+                    Short description
                   </p>
                   <ReactQuill
                     value={quillText.editorHtml}
@@ -732,12 +965,12 @@ const PromotionForm = (props) => {
                               id="name"
                               variant="outlined"
                               size="small"
-                              // onChange={handleInputChange}
-                              // onBlur={handleInputChange}
+                              onChange={handleInputChange}
+                              onBlur={handleInputChange}
                               // error={productName.error !== false}
                               // helperText={productName.error}
                               className={classes.inputFields}
-                              // inputRef={nameRef}
+                              inputRef={discountRef}
                               inputProps={{
                                 style: { textAlign: 'right' },
                               }}
@@ -957,6 +1190,26 @@ const PromotionForm = (props) => {
                                 isOptionEqualToValue={(option, value) => {
                                   return option.uuid === value.uuid;
                                 }}
+                                renderOption={(productProps, option, { selected }) => (
+                                  <li {...productProps}>
+                                    <Checkbox
+                                      icon={<CheckBoxOutlineBlankIcon fontSize="small" />}
+                                      checkedIcon={<CheckBoxIcon fontSize="small" />}
+                                      style={{ marginRight: 8 }}
+                                      checked={selected}
+                                    />
+                                    {option.name}
+                                    <IconButton
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        handleOpenProductModal(option.uuid);
+                                        e.stopPropagation();
+                                      }}
+                                    >
+                                      <InfoRoundedIcon fontSize="small" />
+                                    </IconButton>
+                                  </li>
+                                )}
                                 renderInput={(params) => (
                                   <TextField {...params} placeholder="Product name/barcode" />
                                 )}
@@ -969,12 +1222,30 @@ const PromotionForm = (props) => {
                               justifyContent="center"
                               alignItems="center"
                             >
-                              <IconButton size="large">
-                                <FilterAltRoundedIcon
-                                  fontSize="small"
-                                  sx={{ fontSize: '1.6rem' }}
-                                />
+                              <IconButton size="large" onClick={handleClickOpen}>
+                                <Badge
+                                  badgeContent={filterActivated ? products.length : 0}
+                                  color="error"
+                                >
+                                  <FilterAltRoundedIcon sx={{ fontSize: '1.8rem' }} />
+                                </Badge>
                               </IconButton>
+                              <ProductFilter
+                                open={openFilter}
+                                handleClose={handleClose}
+                                categoryOptions={categoryOptions}
+                                setCategoryFilterType={setCategoryFilterType}
+                                setSelectedCategoryFilter={setSelectedCategoryFilter}
+                                setSelectedActiveStatusFilter={setSelectedActiveStatusFilter}
+                                setSelectedStockStatusFilter={setSelectedStockStatusFilter}
+                                categoryFilterType={categoryFilterType}
+                                selectedCategoryFilter={selectedCategoryFilter}
+                                selectedActiveStatusFilter={selectedActiveStatusFilter}
+                                selectedStockStatusFilter={selectedStockStatusFilter}
+                                filteredQuantity={products.length}
+                                filterActivated={filterActivated}
+                                clearFilters={clearFilters}
+                              />
                             </Grid>
                           </Grid>
                           <FormHelperText error={errors.quillText !== false}>
@@ -990,7 +1261,7 @@ const PromotionForm = (props) => {
                             <TableHead>
                               <TableRow>
                                 <TableCell
-                                  sx={{ width: '55%' }}
+                                  sx={{ width: '60%' }}
                                   style={{
                                     borderBottom: '1.5px solid rgba(224, 224, 224, 1)',
                                   }}
@@ -998,7 +1269,7 @@ const PromotionForm = (props) => {
                                   Product
                                 </TableCell>
                                 <TableCell
-                                  sx={{ width: '25%' }}
+                                  sx={{ width: '20%' }}
                                   align="right"
                                   style={{
                                     borderBottom: '1.5px solid rgba(224, 224, 224, 1)',
@@ -1006,20 +1277,27 @@ const PromotionForm = (props) => {
                                 >
                                   Retail Price
                                 </TableCell>
-                                <TableCell
-                                  sx={{ width: '25%' }}
-                                  align="right"
-                                  style={{
-                                    borderBottom: '1.5px solid rgba(224, 224, 224, 1)',
-                                  }}
-                                >
-                                  Discount Price
-                                </TableCell>
+                                {!promotionType.bxgy_checked && (
+                                  <TableCell
+                                    sx={{ width: '20%' }}
+                                    align="right"
+                                    style={{
+                                      borderBottom: '1.5px solid rgba(224, 224, 224, 1)',
+                                    }}
+                                  >
+                                    Sale Price
+                                  </TableCell>
+                                )}
                               </TableRow>
                             </TableHead>
                             <TableBody>
                               {selectedProducts.map(
-                                ({ name, retail_price: retailPrice, uuid }) => (
+                                ({
+                                  name,
+                                  retail_price: retailPrice,
+                                  sale_price: salePrice,
+                                  uuid,
+                                }) => (
                                   <TableRow
                                     key={uuid}
                                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
@@ -1044,16 +1322,17 @@ const PromotionForm = (props) => {
                                       }}
                                     >
                                       RM {retailPrice}
-                                      {/* RM {retailPrice.toFixed(2)} */}
                                     </TableCell>
-                                    <TableCell
-                                      align="right"
-                                      style={{
-                                        borderBottom: '0.5px solid rgba(224, 224, 224, 0.7)',
-                                      }}
-                                    >
-                                      0
-                                    </TableCell>
+                                    {!promotionType.bxgy_checked && (
+                                      <TableCell
+                                        align="right"
+                                        style={{
+                                          borderBottom: '0.5px solid rgba(224, 224, 224, 0.7)',
+                                        }}
+                                      >
+                                        RM {salePrice.toFixed(2)}
+                                      </TableCell>
+                                    )}
                                   </TableRow>
                                 )
                               )}

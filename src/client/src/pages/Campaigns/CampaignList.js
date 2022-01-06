@@ -163,7 +163,7 @@ const CampaignList = () => {
               boxShadow: 'rgba(53, 132, 167, 0.44) 0px 8px 16px 0px !important',
             }}
             component={Link}
-            to={`/${storeUrl}/item/create`}
+            to={`/${storeUrl}/marketing-campaign/create`}
           >
             <AddIcon style={{ marginRight: 10 }} fontSize="small" /> Add Campaign
           </Button>

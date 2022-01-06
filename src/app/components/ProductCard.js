@@ -159,12 +159,13 @@ export default function ProductCard({ style, product }) {
 
       <View style={styles.content}>
         {renderChips()}
-        <Text style={[TextStyle.body2, styles.productName]} numberOfLines={2}>
-          {product.name}
-        </Text>
         <Text style={[TextStyle.subhead2, styles.sellingPriceText]}>
           {'RM' + product.retail_price}
         </Text>
+        <Text style={[TextStyle.body2, styles.productName]} numberOfLines={2}>
+          {product.name}
+        </Text>
+
         <LocationText
           style={{ alignSelf: 'flex-start', marginTop: 4 }}
           text={product.stores.store_name}
@@ -198,10 +199,11 @@ const styles = StyleSheet.create({
     aspectRatio: 1,
   },
   chip: {
-    marginBottom: 8,
+    marginBottom: 4,
   },
   productName: {
     height: 40,
+    marginVertical: 4,
   },
   text: {
     fontSize: 12,
@@ -209,7 +211,7 @@ const styles = StyleSheet.create({
   },
   sellingPriceText: {
     color: Theme.colors.primary,
-    marginVertical: 4,
+    marginBottom: 2,
   },
   addToCartContainer: {
     position: 'absolute',

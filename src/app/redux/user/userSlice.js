@@ -5,7 +5,6 @@ export const userSlice = createSlice({
   initialState: {
     uuid: '',
     userObject: {},
-    token: 'test',
     default_cart_uuid: '',
     cart_uuid: '',
     position: [],
@@ -13,9 +12,6 @@ export const userSlice = createSlice({
   reducers: {
     setUserObject: (state, action) => {
       state.userObject = action.payload;
-    },
-    setToken: (state, action) => {
-      state.token = action.payload;
     },
     setUuid: (state, action) => {
       state.uuid = action.payload;
@@ -40,7 +36,6 @@ export const userSlice = createSlice({
 });
 export const {
   setUserObject,
-  setToken,
   setUuid,
   setDefaultCart,
   setCurrentCart,

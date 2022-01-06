@@ -9,8 +9,7 @@ import {
 } from 'react-native-paper';
 
 // Utilites
-import auth from '@react-native-firebase/auth';
-import axios from 'axios';
+import { register } from '../services/AuthenticationService';
 
 // Redux
 import { useSelector, useDispatch } from 'react-redux';
@@ -79,46 +78,11 @@ export default function Registration() {
   const handleSignUp = () => {
     console.log(credentials);
     if (isPasswordConfirmed) {
-      axios
-        .post(environment.host + '/api/mobile/app-user-service/signup/email', {
-          username: credentials.username,
-          email: credentials.email,
-          password: credentials.password,
-        })
-        .then((res) => {
-          console.log(res.data.user.uuid);
-          dispatch(setUuid(res.data.user.uuid));
-          // Authenticate
-          auth()
-            .signInWithEmailAndPassword(credentials.email, credentials.password)
-            .then(() => {
-              auth()
-                .currentUser.getIdToken(true)
-                .then((idToken) => {
-                  dispatch(setToken(idToken));
-                })
-                .finally(() => {
-                  console.log('Signed in : ' + token);
-                });
-            })
-            .catch((error) => {
-              if (error.code === 'auth/email-already-in-use') {
-                console.log('That email address is already in use!');
-              }
-
-              if (error.code === 'auth/invalid-email') {
-                console.log('That email address is invalid!');
-              }
-
-              if (error.code === 'auth/user-not-found') {
-                // Error handling here
-              }
-
-              console.error(error);
-            });
-        })
-        .catch((err) => {
-          console.log(err);
+      register(credentials)
+        .then((data) => {})
+        .catch((error) => {
+          // TODO: Add snackbar for error handling
+          console.log(error);
         });
     }
   };

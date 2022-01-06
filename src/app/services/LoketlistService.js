@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { getAuthHeader } from './AuthenticationService';
 
 // Environment config
 import { environment } from '../environment';
@@ -35,13 +36,12 @@ const axiosInstance = axios.create({
 //   }
 // };
 
-export const getAllCartsForUser = async (authHeader, appUserID) => {
+export const getAllCartsForUser = async (appUserID) => {
+  const header = await getAuthHeader();
   try {
     let { data } = await axiosInstance.get(
       `/api/mobile/planning-cart-service/carts/${appUserID}`,
-      {
-        authHeader,
-      }
+      header
     );
     return data;
   } catch (error) {

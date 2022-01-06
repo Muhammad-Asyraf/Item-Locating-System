@@ -13,19 +13,19 @@ exports.signup = async (req, res, next) => {
   const encryptedPassword = await bcrypt.hash(password, 10);
 
   try {
-    appUser = await AppUser.query().insert({
-      ...req.body,
-      uuid: appUserUUID,
-      password: encryptedPassword,
-    });
-    appUserLogger.info(`New appUser in postgresDB created: ${appUser.uuid}`);
-
     const appUserFirebase = await admin.auth().createUser({
       uid: appUserUUID,
       email,
       password,
     });
     appUserLogger.info(`New user at Firebase created: ${appUserFirebase.uid}`);
+
+    appUser = await AppUser.query().insert({
+      ...req.body,
+      uuid: appUserUUID,
+      password: encryptedPassword,
+    });
+    appUserLogger.info(`New appUser in postgresDB created: ${appUser.uuid}`);
 
     res.status(201).json({
       status: 'successful',
@@ -36,7 +36,7 @@ exports.signup = async (req, res, next) => {
     if (appUser) {
       await AppUser.query().deleteById(appUser.uuid);
     }
-    appUserLogger.warn(`Error creating new merchant: ${error}`);
+    appUserLogger.warn(`Error creating new user: ${error}`);
     next(error);
   }
 };

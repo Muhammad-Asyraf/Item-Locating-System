@@ -62,7 +62,7 @@ export default function SearchResult({ navigation, route }) {
       ) : searchResult.length != 0 ? (
         <FlatGrid
           style={GlobalStyle.flatGrid}
-          itemDimension={110}
+          itemDimension={120}
           data={searchResult}
           renderItem={({ item }) => <ProductCard product={item} />}
         />

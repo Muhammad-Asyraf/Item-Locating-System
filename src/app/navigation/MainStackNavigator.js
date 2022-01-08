@@ -7,6 +7,7 @@ import SearchResult from '../screens/SearchResult';
 import Loketlist from '../screens/Loketlist';
 import FloorPlan from '../screens/FloorPlan';
 import ProfileEdit from '../screens/ProfileEdit';
+import ProductDetails from '../screens/ProductDetails';
 
 // Utilities
 import auth from '@react-native-firebase/auth';
@@ -207,10 +208,11 @@ export default function MainStackNavigator() {
       }}
     >
       <Stack.Screen name="LOKETLA" component={MainTabsNavigator} />
-      <Stack.Screen name="Search Result" component={SearchResult} />
       <Stack.Screen name="Loketlist" component={Loketlist} />
       <Stack.Screen name="Floor Plan" component={FloorPlan} />
-
+      {/* Products */}
+      <Stack.Screen name="Search Result" component={SearchResult} />
+      <Stack.Screen name="Product Page" component={ProductDetails} />
       {/* Profiles */}
       <Stack.Screen name="Edit Profile" component={ProfileEdit} />
     </Stack.Navigator>

@@ -11,6 +11,7 @@ exports.searchProducts = async (req, res, next) => {
     if ('uuid' in query && query.uuid != '') {
       products = await Product.query()
         .where('store_uuid', query.uuid)
+        .where('is_active', true)
         .where('name', 'ilike', `%${query.search}%`)
         .withGraphFetched('stores');
 
@@ -23,6 +24,7 @@ exports.searchProducts = async (req, res, next) => {
       res.json(products);
     } else {
       products = await Product.query()
+        .where('is_active', true)
         .where('name', 'ilike', `%${query.search}%`)
         .withGraphFetched('stores');
       productLogger.info(

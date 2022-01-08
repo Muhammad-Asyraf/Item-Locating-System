@@ -1,6 +1,7 @@
 // Components
 import React, { useState, useEffect } from 'react';
-import { View, Image, StyleSheet } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { View, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { Card, Text, Button } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import NumericInput from 'react-native-numeric-input';
@@ -18,6 +19,7 @@ export default function ProductCard({ style, product }) {
   const cart = useSelector((state) => state.cart);
   const user = useSelector((state) => state.user);
   const auth = useSelector((state) => state.auth);
+  const navigation = useNavigation();
   const dispatch = useDispatch();
 
   const [productInCart, setProductInCart] = useState(false);
@@ -104,8 +106,13 @@ export default function ProductCard({ style, product }) {
     };
   });
 
+  const openProductDetails = () => {
+    console.log(`[ProductCard.js] Open product ${product.uuid} details`);
+    navigation.navigate('Product Page', { product });
+  };
+
   return (
-    <View>
+    <TouchableOpacity onPress={openProductDetails}>
       <View style={styles.cover}>
         <Image
           style={styles.image}
@@ -172,7 +179,7 @@ export default function ProductCard({ style, product }) {
           color="#707070"
         />
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }
 

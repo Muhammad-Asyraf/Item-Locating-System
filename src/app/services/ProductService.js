@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { getAuthHeader } from '../services/AuthenticationService';
 
 // Environment config
 import { environment } from '../environment';
@@ -12,11 +13,12 @@ const axiosInstance = axios.create({
 });
 
 /**
- *
+ * Get products with query params
  * @param {*} queryObject = {search, uuid}
  * @returns JSONObject[]
  */
 export const getProducts = async (queryObject) => {
+  const header = await getAuthHeader();
   try {
     let paramsObject = { search: queryObject.search };
     if ('uuid' in queryObject) {
@@ -26,9 +28,47 @@ export const getProducts = async (queryObject) => {
       `/api/mobile/product-service/products`,
       {
         params: paramsObject,
+        ...header,
       }
     );
     return data;
+  } catch (error) {
+    return Promise.reject(error.response.data.message);
+  }
+};
+
+/**
+ * Get list of categories
+ * @returns Array of Category objects
+ */
+export const getCategories = async () => {
+  const header = await getAuthHeader();
+  try {
+    const { categories } = await axiosInstance.get(
+      `/api/mobile/product-service/categories`,
+      header
+    );
+
+    return categories;
+  } catch (error) {
+    return Promise.reject(error.response.data.message);
+  }
+};
+
+/**
+ * Get list of subcategories from a category
+ * @param {*} categoryUUID
+ * @returns Array of SubCategory objects
+ */
+export const getSubCategories = async (categoryUUID) => {
+  const header = await getAuthHeader();
+  try {
+    const { subCategories } = await axiosInstance.get(
+      `/api/mobile/product-service/categories/${categoryUUID}`,
+      header
+    );
+
+    return subCategories;
   } catch (error) {
     return Promise.reject(error.response.data.message);
   }

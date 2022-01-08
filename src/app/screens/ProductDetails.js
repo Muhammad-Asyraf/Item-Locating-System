@@ -105,7 +105,7 @@ export default function ProductDetails({ navigation, route }) {
         renderToolBar={renderHeader}
       />
       <Surface style={styles.addToCartSheet}>
-        <CartSheet />
+        <CartSheet product={product} />
       </Surface>
     </View>
   );

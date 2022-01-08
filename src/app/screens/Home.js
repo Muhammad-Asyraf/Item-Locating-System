@@ -48,7 +48,7 @@ export default function Home({ navigation }) {
           renderItem={({ item }, parallaxProps) => (
             <View style={styles.item}>
               <ParallaxImage
-                source={{ uri: 'https://tinyurl.com/cu8nm69m' }}
+                source={{ uri: 'https://via.placeholder.com/1024x720' }}
                 containerStyle={styles.imageContainer}
                 style={styles.image}
                 parallaxFactor={0.4}

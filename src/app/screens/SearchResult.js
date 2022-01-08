@@ -1,7 +1,7 @@
 // Components
 import React, { useState, useEffect } from 'react';
 import { View } from 'react-native';
-import { Appbar, Searchbar, Text } from 'react-native-paper';
+import { Appbar, Button, Searchbar, Text, Dialog } from 'react-native-paper';
 import ProductCard from '../components/ProductCard';
 import { FlatGrid } from 'react-native-super-grid';
 import Loading from '../components/Loading';
@@ -21,6 +21,7 @@ export default function SearchResult({ navigation, route }) {
   const [isLoading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState(route.params.query);
   const [searchResult, setSearchResult] = useState();
+  const [filterDialogVisible, setFilterDialogVisible] = useState(false);
 
   useEffect(() => {
     if (isLoading) {
@@ -42,6 +43,13 @@ export default function SearchResult({ navigation, route }) {
     setLoading(true);
   };
 
+  const showFilterDialog = () => setFilterDialogVisible(true);
+  const hideFilterDialog = () => setFilterDialogVisible(false);
+
+  const handleFilter = () => {};
+
+  const clearFilters = () => {};
+
   return (
     <View style={GlobalStyle.screenContainer}>
       <Appbar.Header style={[appBarStyles.appBarContainer]}>
@@ -56,6 +64,7 @@ export default function SearchResult({ navigation, route }) {
           autoCorrect={false}
           autoCapitalize="none"
         />
+        <Appbar.Action icon="filter-variant" onPress={showFilterDialog} />
       </Appbar.Header>
       {isLoading ? (
         <Loading />
@@ -69,6 +78,16 @@ export default function SearchResult({ navigation, route }) {
       ) : (
         <Text>No products found</Text>
       )}
+
+      <Dialog visible={filterDialogVisible} onDismiss={hideFilterDialog}>
+        <Dialog.Title>Filter search</Dialog.Title>
+
+        <Dialog.Actions>
+          <Button onPress={hideFilterDialog}>Cancel</Button>
+          <Button onPress={clearFilters}>Clear</Button>
+          <Button onPress={handleFilter}>Filter</Button>
+        </Dialog.Actions>
+      </Dialog>
     </View>
   );
 }

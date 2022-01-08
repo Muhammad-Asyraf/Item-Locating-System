@@ -3,13 +3,29 @@ import { View, StyleSheet } from 'react-native';
 import { Button } from 'react-native-paper';
 import NumericInput from 'react-native-numeric-input';
 
+import { useDispatch, useSelector } from 'react-redux';
+import { addItemThunk } from '../../redux/cart/cartThunk';
+
 // Styling
 import { Theme } from '../../styles/Theme';
 
-export default function CartSheet() {
+export default function CartSheet({ product }) {
   const [addQuantity, setAddQuantity] = useState(1);
+  const user = useSelector((state) => state.user);
+  const dispatch = useDispatch();
   const handleQuantityChange = (value) => {
     setAddQuantity(value);
+  };
+
+  const addQuantityToCart = () => {
+    console.log(`[CartSheet.js] Add product ${addQuantity} ${product.uuid}`);
+    dispatch(
+      addItemThunk({
+        cart_uuid: user.default_cart_uuid,
+        product_uuid: product.uuid,
+        quantity: addQuantity,
+      })
+    );
   };
 
   return (
@@ -24,7 +40,11 @@ export default function CartSheet() {
         onChange={handleQuantityChange}
         rounded={true}
       />
-      <Button style={styles.button} mode="contained">
+      <Button
+        style={styles.button}
+        mode="contained"
+        onPress={addQuantityToCart}
+      >
         Add To Cart
       </Button>
     </View>

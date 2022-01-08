@@ -183,19 +183,53 @@ exports.addCartItem = async (req, res, next) => {
     );
     const select = await Product.query()
       .findById(product_uuid)
-      .select('selling_price');
+      .select('retail_price');
 
-    const planningCarts = await PlanningCart.relatedQuery('products')
+    // Check if the product already exists
+    const productCheckQuery = PlanningCart.relatedQuery('products')
       .for(cart_uuid)
-      .relate({
-        uuid: product_uuid,
-        quantity,
-        total_price: quantity * select.selling_price,
-      });
+      .where('product_uuid', product_uuid);
+    const isProductExist =
+      (await productCheckQuery.resultSize()) == 0 ? false : true;
+    let planningCarts;
+
+    if (isProductExist) {
+      let storedQuantityQuery = await productCheckQuery.select('quantity');
+      let storedQuantity = storedQuantityQuery[0].quantity;
+      console.log(`storedQuantity: ${JSON.stringify(storedQuantity)}`);
+
+      // Update cart item
+      planningCarts = await PlanningCart.relatedQuery('products')
+        .for(cart_uuid)
+        .unrelate()
+        .where({ uuid: product_uuid });
+
+      if (quantity !== 0) {
+        const select = await Product.query()
+          .findById(product_uuid)
+          .select('retail_price');
+
+        planningCarts = await PlanningCart.relatedQuery('products')
+          .for(cart_uuid)
+          .relate({
+            uuid: product_uuid,
+            quantity: quantity + storedQuantity,
+            total_price: (quantity + storedQuantity) * select.retail_price,
+          });
+      }
+    } else {
+      planningCarts = await PlanningCart.relatedQuery('products')
+        .for(cart_uuid)
+        .relate({
+          uuid: product_uuid,
+          quantity,
+          total_price: quantity * select.retail_price,
+        });
+    }
 
     res.json(planningCarts);
   } catch (err) {
-    planningCartLogger.warn(`Error adding cart item into cart`);
+    planningCartLogger.warn(`Error adding product into cart`);
     next(err);
   }
 };
@@ -232,7 +266,7 @@ exports.updateCartItem = async (req, res, next) => {
     if (quantity !== 0) {
       const select = await Product.query()
         .findById(product_uuid)
-        .select('selling_price');
+        .select('retail_price');
 
       planningCarts = await PlanningCart.relatedQuery('products')
         .for(cart_uuid)

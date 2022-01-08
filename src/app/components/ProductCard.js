@@ -10,7 +10,8 @@ import LocationText from './LocationText';
 
 // Redux
 import { useSelector, useDispatch } from 'react-redux';
-import { addItem, changeItemQuantity, update } from '../redux/cart/cartSlice';
+import { changeItemQuantity, update } from '../redux/cart/cartSlice';
+import { addItemThunk } from '../redux/cart/cartThunk';
 
 // Styling
 import { Theme, TextStyle } from '../styles/Theme';
@@ -30,7 +31,7 @@ export default function ProductCard({ style, product }) {
   const addToCart = () => {
     console.log('Add product #' + product.uuid + ' to cart');
     dispatch(
-      addItem({
+      addItemThunk({
         cart_uuid: user.default_cart_uuid,
         product_uuid: product.uuid,
         quantity: 1,

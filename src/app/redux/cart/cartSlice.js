@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { addItemReducer, updateItemReducer } from './cartReducers';
+import { addItemThunk } from '../cart/cartThunk';
 import { getAuthHeader } from '../../services/AuthenticationService';
 
 // Environment configs
@@ -15,25 +16,6 @@ export const loadAllItems = createAsyncThunk(
       header
     );
     return data.products;
-  }
-);
-
-export const addItem = createAsyncThunk(
-  'cart/addItem',
-  async (params, thunkAPI) => {
-    const header = await getAuthHeader();
-    const { data } = await axios.post(
-      environment.host + '/api/mobile/planning-cart-service/cart/items/add',
-      {
-        cart_uuid: params.cart_uuid,
-        product_uuid: params.product_uuid,
-        quantity: params.quantity,
-      },
-      header
-    );
-    if (data === 1) console.log('Database updated');
-
-    return params;
   }
 );
 
@@ -111,8 +93,11 @@ export const cartSlice = createSlice({
     [changeItemQuantity.rejected]: (state, { payload }) => {
       console.log('changeItemQuantity rejected');
     },
-    [addItem.fulfilled]: (state, { payload }) => {
+    [addItemThunk.fulfilled]: (state, { payload }) => {
       addItemReducer(state, payload);
+    },
+    [addItemThunk.rejected]: (state, { payload }) => {
+      console.log(payload);
     },
   },
 });

@@ -45,7 +45,7 @@ export const getAllCartsForUser = async (appUserID) => {
     );
     return data;
   } catch (error) {
-    console.log(error);
+    return Promise.reject(error.response.data.message);
   }
 };
 
@@ -146,30 +146,29 @@ export const getAllCartsForUser = async (appUserID) => {
 // };
 
 // /**
-//  * Item CRUD methods
+//  * CartItem CRUD methods
 //  */
 
-// export const addItemForCart = (authHeader, cartID, productID, quantity) => {
-//   try {
-//     let carts;
-//     carts = await axiosInstance.post(
-//       '/api/mobile/planning-cart-service/cart/items/add',
-//       {
-//         cart_uuid: cartID,
-//         product_uuid: productID,
-//         quantity,
-//       },
-//       {
-//         authHeader,
-//       }
-//     );
-//     return carts;
-//   } catch (error) {
-//     console.log(error);
-//   }
-// };
+export const addItemIntoCart = async (cartID, productID, quantity) => {
+  const header = await getAuthHeader();
+  try {
+    let carts;
+    carts = await axiosInstance.post(
+      '/api/mobile/planning-cart-service/cart/items/add',
+      {
+        cart_uuid: cartID,
+        product_uuid: productID,
+        quantity,
+      },
+      header
+    );
+    return carts;
+  } catch (error) {
+    return Promise.reject(error.response.data.message);
+  }
+};
 
-// export const modifyItemForCart = (authHeader, cartID, productID, quantity) => {
+// export const modifyItemInCart = (authHeader, cartID, productID, quantity) => {
 //   try {
 //     let carts;
 //     carts = await axiosInstance.post(
@@ -189,7 +188,7 @@ export const getAllCartsForUser = async (appUserID) => {
 //   }
 // };
 
-// export const removeItemForCart = (authHeader, cartID, productID) => {
+// export const removeItemFromCart = (authHeader, cartID, productID) => {
 //   try {
 //     let carts;
 //     carts = await axiosInstance.delete(

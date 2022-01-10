@@ -249,11 +249,6 @@ const useStyles = makeStyles((theme) => ({
     cursor: 'pointer',
     paddingTop: 19,
     paddingBottom: 19,
-    // '&:hover': {
-    //   backgroundColor: 'rgba(0, 51, 102, 0.1) !important',
-    //   border: '1px dashed rgba(145, 158, 171, 0.32) !important',
-    //   color: 'black !important',
-    // },
   },
 }));
 
@@ -265,7 +260,8 @@ const PromotionForm = (props) => {
   const classes = useStyles();
   const quillModules = getEditorModules();
   const quillFormats = getEditorFormat();
-  const currentDateTime = new Date().toLocaleString();
+  const storeUUID = localStorage.getItem('storeUUID');
+
   const discountRef = useRef();
 
   const initPromotionType = getInitPromototionType();
@@ -273,7 +269,7 @@ const PromotionForm = (props) => {
   const initApplicableProductType = getInitApplicableProductType();
   const initBxGy = getInitBxGy();
 
-  const { products: initProduct, categoryOptions } = props;
+  const { products: initProduct, campaigns, categoryOptions, onSubmit } = props;
 
   const [categoryFilterType, setCategoryFilterType] = useState('any');
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState([]);
@@ -291,13 +287,14 @@ const PromotionForm = (props) => {
   const [promotionName, setPromotionName] = useState(null);
   const [description, setDescription] = useState({ editorHtml: '' });
   const [dateRange, setDateRange] = useState([null, null]);
-  const [startDateTime, setStartDateTime] = useState(currentDateTime);
+  const [startDateTime, setStartDateTime] = useState(null);
   const [endDateTime, setEndDateTime] = useState(null);
   const [promotionType, setPromotionType] = useState(initPromotionType);
   const [BxGy, setBxGy] = useState(initBxGy);
-  const [discount, setDiscount] = useState();
+  const [discount, setDiscount] = useState(null);
   const [discountType, setDiscountType] = useState(initDiscountType);
   const [selectedProducts, setSelectedProducts] = useState([]);
+  const [selectedCampaign, setSelectedCampaign] = useState(null);
   const [applicableProductType, setApplicableProductType] = useState(
     initApplicableProductType
   );
@@ -306,7 +303,8 @@ const PromotionForm = (props) => {
     promotionNameError: false,
     campaignError: false,
     descriptionError: false,
-    dateError: false,
+    startDateError: false,
+    endDateError: false,
     startTimeError: false,
     endTimeError: false,
     promotionTypeError: false,
@@ -318,32 +316,22 @@ const PromotionForm = (props) => {
     productsError: false,
   });
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    console.log('promotionName', promotionName);
-    console.log('BxGy', BxGy);
-    console.log('discount', discount);
-  };
-
   /// /////////////////////////// validators //////////////////////////////////////////////
 
   const validateDescription = (value, currentError) => {
-    const validDescription = value;
+    let descriptionError;
 
-    if (!validDescription) {
-      currentError = {
-        ...currentError,
-        description: 'Please enter promotion descriptions for your reference',
-      };
+    if (!value) {
+      descriptionError =
+        'Please provide short descriptions of the promotion for your reference';
     } else {
-      currentError = {
-        ...currentError,
-        description: false,
-      };
+      descriptionError = false;
     }
 
-    return currentError;
+    return {
+      ...currentError,
+      descriptionError,
+    };
   };
 
   const validatePromotionName = (value, currentError) => {
@@ -374,9 +362,6 @@ const PromotionForm = (props) => {
     } else {
       discountError = false;
     }
-
-    console.log('discountError', discountError);
-    console.log('isValidValue', isValidValue);
 
     return {
       ...currentError,
@@ -422,6 +407,211 @@ const PromotionForm = (props) => {
       ...currentError,
       GyError,
     };
+  };
+
+  const validatePromotionType = (value, currentError) => {
+    const validPromotionType =
+      value.basic_checked || value.bundle_checked || value.bxgy_checked;
+    let promotionTypeError;
+
+    if (!validPromotionType) {
+      promotionTypeError = 'Please select the type of promotion you want to create';
+    } else {
+      promotionTypeError = false;
+    }
+
+    return {
+      ...currentError,
+      promotionTypeError,
+    };
+  };
+
+  const validateSelectedCampaign = (value, currentError) => {
+    let campaignError;
+
+    if (!value) {
+      campaignError = 'Please select the campaign that this promotion will be linked to';
+    } else {
+      campaignError = false;
+    }
+
+    return {
+      ...currentError,
+      campaignError,
+    };
+  };
+
+  const validateDiscountType = (value, currentError) => {
+    const validDiscountType = value.percentage_off_checked || value.dollars_off_checked;
+    let discountTypeError;
+
+    if (!validDiscountType) {
+      discountTypeError = 'Select the discount type';
+    } else {
+      discountTypeError = false;
+    }
+
+    return {
+      ...currentError,
+      discountTypeError,
+    };
+  };
+
+  const validateProductType = (value, currentError) => {
+    const validProductType = value.all_checked || value.specific_checked;
+    let productTypeError;
+
+    if (!validProductType) {
+      productTypeError = 'Select either all or specific product';
+    } else {
+      productTypeError = false;
+    }
+
+    return {
+      ...currentError,
+      productTypeError,
+    };
+  };
+
+  const validateApplicableProducts = (value, currentError) => {
+    let productsError;
+
+    if (value.length < 1) {
+      productsError = 'Select applicable products for this promotion';
+    } else {
+      productsError = false;
+    }
+
+    return {
+      ...currentError,
+      productsError,
+    };
+  };
+
+  /// /////////////////////////// handle submission //////////////////////////////////////////////
+
+  const preparedPayload = () => {
+    const formData = new FormData();
+
+    const eitherBasicOrBundle = promotionType.basic_checked || promotionType.bundle_checked;
+    const basicPromo = promotionType.basic_checked;
+    const bundlePromo = promotionType.bundle_checked;
+    const ByGxPromo = promotionType.bxgy_checked;
+    const linkToCampaign = campaignLinkFlag === true;
+
+    let selectedPromotionType;
+    let promotionMetaData;
+
+    if (eitherBasicOrBundle) {
+      if (basicPromo) {
+        selectedPromotionType = 'Basic';
+      } else if (bundlePromo) {
+        selectedPromotionType = 'Bundle';
+      }
+
+      promotionMetaData = {
+        discountType,
+        discount,
+        campaignLinkFlag,
+        applicableProductType,
+      };
+    } else if (ByGxPromo) {
+      selectedPromotionType = 'Buy X Get Y';
+
+      promotionMetaData = {
+        BxGy,
+        campaignLinkFlag,
+        applicableProductType,
+      };
+    }
+
+    const promoProducts = selectedProducts.map(({ uuid }) => {
+      return { uuid };
+    });
+
+    // const payload = {
+    //   name: promotionName,
+    //   description: description.editorHtml,
+    //   start_date: dateRange[0],
+    //   end_date: dateRange[1],
+    //   start_time: startDateTime,
+    //   end_time: endDateTime,
+    //   promotion_type: selectedPromotionType,
+    //   meta_data: promotionMetaData,
+    //   products: promoProducts,
+    //   store_uuid: storeUUID,
+    //   campaign_uuid: linkToCampaign ? selectedCampaign.uuid : null,
+    // };
+
+    // console.log(payload);
+    // return payload;
+
+    formData.append('name', promotionName);
+    formData.append('description', description.editorHtml);
+    formData.append('start_date', dateRange[0]);
+    formData.append('end_date', dateRange[1]);
+    formData.append('start_time', startDateTime);
+    formData.append('end_time', endDateTime);
+    formData.append('promotion_type', selectedPromotionType);
+    formData.append('meta_data', JSON.stringify(promotionMetaData));
+    formData.append('products', JSON.stringify(promoProducts));
+    formData.append('store_uuid', storeUUID);
+
+    if (linkToCampaign) {
+      formData.append('campaign_uuid', selectedCampaign.uuid);
+    }
+
+    return formData;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const eitherBasicOrBundle = promotionType.basic_checked || promotionType.bundle_checked;
+    let updatedError = errors;
+
+    updatedError = validatePromotionName(promotionName, updatedError);
+    updatedError = validateSelectedCampaign(selectedCampaign, updatedError);
+    updatedError = validateDescription(description.editorHtml, updatedError);
+    updatedError = validatePromotionType(promotionType, updatedError);
+    updatedError = validateDiscountType(discountType, updatedError);
+    updatedError = validateDiscount(discount, updatedError);
+    updatedError = validateBx(BxGy.buyQty, updatedError);
+    updatedError = validateGy(BxGy.freeQty, updatedError);
+    updatedError = validateProductType(applicableProductType, updatedError);
+    updatedError = validateApplicableProducts(selectedProducts, updatedError);
+
+    const noCampaignError = campaignLinkFlag === true ? !updatedError.campaignError : true;
+    const noDiscountTypeError = eitherBasicOrBundle ? !updatedError.discountTypeError : true;
+    const noDiscountValueError = eitherBasicOrBundle ? !updatedError.discountError : true;
+    const noBxError = promotionType.bxgy_checked ? !updatedError.BxError : true;
+    const noByError = promotionType.bxgy_checked ? !updatedError.GyError : true;
+    const noProductsError = applicableProductType.specific_checked
+      ? !updatedError.productsError
+      : true;
+
+    const passedTheTest =
+      !updatedError.promotionNameError &&
+      !updatedError.descriptionError &&
+      !updatedError.dateError &&
+      !updatedError.startTimeError &&
+      !updatedError.endTimeError &&
+      !updatedError.promotionTypeError &&
+      !updatedError.productTypeError &&
+      noCampaignError &&
+      noDiscountTypeError &&
+      noDiscountValueError &&
+      noBxError &&
+      noByError &&
+      noProductsError;
+
+    if (passedTheTest) {
+      const payload = preparedPayload();
+
+      onSubmit(payload);
+    } else {
+      setErrors(updatedError);
+    }
   };
 
   /// /////////////////////////// Handlers //////////////////////////////////////////////
@@ -496,9 +686,42 @@ const PromotionForm = (props) => {
         bxgy_checked: true,
       };
     }
+
+    const updatedError = validatePromotionType(updatedPromotionType, errors);
+
+    if (applicableProductType.all_checked) {
+      setSelectedProducts([...applicableProduct]);
+    } else {
+      setSelectedProducts([]);
+    }
+
+    setErrors(updatedError);
     setPromotionType(updatedPromotionType);
     setApplicableProducts(applicableProduct);
-    setSelectedProducts([]);
+  };
+
+  const handleApplicableProductType = ({ target }) => {
+    const { id: selectedApplicableProductType } = target;
+    let updatedApplicableProductType;
+
+    if (selectedApplicableProductType === 'all-products') {
+      updatedApplicableProductType = {
+        ...initApplicableProductType,
+        all_checked: true,
+      };
+      setSelectedProducts([...applicableProducts]);
+    } else if (selectedApplicableProductType === 'specific-products') {
+      updatedApplicableProductType = {
+        ...initApplicableProductType,
+        specific_checked: true,
+      };
+      setSelectedProducts([]);
+    }
+
+    const updatedError = validateProductType(updatedApplicableProductType, errors);
+
+    setErrors(updatedError);
+    setApplicableProductType(updatedApplicableProductType);
   };
 
   const handleDiscountType = ({ target }) => {
@@ -516,26 +739,11 @@ const PromotionForm = (props) => {
         percentage_off_checked: true,
       };
     }
+
+    const updatedError = validateDiscountType(updatedDiscountType, errors);
+
+    setErrors(updatedError);
     setDiscountType(updatedDiscountType);
-  };
-
-  const handleApplicableProductType = ({ target }) => {
-    const { id: selectedApplicableProductType } = target;
-    let updatedApplicableProductType;
-
-    if (selectedApplicableProductType === 'all-products') {
-      updatedApplicableProductType = {
-        ...initApplicableProductType,
-        all_checked: true,
-      };
-    } else if (selectedApplicableProductType === 'specific-products') {
-      updatedApplicableProductType = {
-        ...initApplicableProductType,
-        specific_checked: true,
-      };
-    }
-
-    setApplicableProductType(updatedApplicableProductType);
   };
 
   const handleChange = (content, delta, source, editor) => {
@@ -547,7 +755,7 @@ const PromotionForm = (props) => {
     } else {
       setDescription({ editorHtml: content });
 
-      if (errors.description !== false) {
+      if (errors.descriptionError !== false) {
         updatedError = validateDescription(content, errors);
       }
     }
@@ -556,11 +764,16 @@ const PromotionForm = (props) => {
   };
 
   const handleSelectCampaign = (e, selected) => {
-    console.log('selected', selected);
+    const updatedError = validateSelectedCampaign(selected, errors);
+
+    setErrors(updatedError);
+    setSelectedCampaign(selected);
   };
 
   const handleSelectProduct = (e, selected) => {
     const flag = promotionType.basic_checked || promotionType.bundle_checked;
+    let updatedError;
+
     if (flag) {
       const currentDiscount = discountRef.current.value;
       let saving;
@@ -583,8 +796,12 @@ const PromotionForm = (props) => {
         };
       });
 
+      updatedError = validateApplicableProducts(updatedProducts, errors);
+      setErrors(updatedError);
       setSelectedProducts(updatedProducts);
     } else {
+      updatedError = validateApplicableProducts(selected, errors);
+      setErrors(updatedError);
       setSelectedProducts(selected);
     }
   };
@@ -594,6 +811,59 @@ const PromotionForm = (props) => {
       handleSelectProduct(null, selectedProducts);
     }
   }, [discountType, discount]);
+
+  const handleDateError = (error) => {
+    let { startDateError, endDateError } = errors;
+    const [startErr, endErr] = error;
+
+    if (startErr) {
+      startDateError = 'Invalid start date';
+    } else if (!startErr) {
+      startDateError = false;
+    }
+
+    if (endErr) {
+      endDateError = 'Invalid end date';
+    } else if (!endErr) {
+      endDateError = false;
+    }
+
+    setErrors({
+      ...errors,
+      startDateError,
+      endDateError,
+    });
+  };
+
+  const handleStartTimeError = (error) => {
+    let { startTimeError } = errors;
+
+    if (error) {
+      startTimeError = 'Invalid start time';
+    } else {
+      startTimeError = false;
+    }
+
+    setErrors({
+      ...errors,
+      startTimeError,
+    });
+  };
+
+  const handleEndTimeError = (error) => {
+    let { endTimeError } = errors;
+
+    if (error) {
+      endTimeError = 'Invalid end time';
+    } else {
+      endTimeError = false;
+    }
+
+    setErrors({
+      ...errors,
+      endTimeError,
+    });
+  };
 
   /// /////////////////////////// filters //////////////////////////////////////////////
 
@@ -706,6 +976,7 @@ const PromotionForm = (props) => {
   return (
     <form
       id="promotion-form"
+      encType="multipart/form-data"
       className={classes.form}
       onSubmit={handleSubmit}
       autoComplete="off"
@@ -740,7 +1011,6 @@ const PromotionForm = (props) => {
                     error={errors.promotionNameError !== false}
                     helperText={errors.promotionNameError}
                     className={classes.inputFields}
-                    // inputRef={nameRef}
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">
@@ -767,7 +1037,11 @@ const PromotionForm = (props) => {
                   <Grid item xs={12}>
                     <Autocomplete
                       disablePortal
-                      options={['1st Campaign', '2nd Campaign', '3rd Campaign']}
+                      options={campaigns}
+                      getOptionLabel={(option) => option.name}
+                      isOptionEqualToValue={(option, value) => {
+                        return option.uuid === value.uuid;
+                      }}
                       onChange={handleSelectCampaign}
                       sx={{ width: '100%' }}
                       renderInput={(params) => (
@@ -785,13 +1059,16 @@ const PromotionForm = (props) => {
                         />
                       )}
                     />
+                    <FormHelperText error={errors.campaignError !== false}>
+                      {errors.campaignError ? errors.campaignError : null}
+                    </FormHelperText>
                   </Grid>
                 )}
 
                 <Grid item xs={12}>
                   <p
                     className={classes.inputTitle}
-                    style={{ color: errors.description ? '#d32f2f' : 'black' }}
+                    style={{ color: errors.descriptionError ? '#d32f2f' : 'black' }}
                   >
                     Short description
                   </p>
@@ -802,8 +1079,8 @@ const PromotionForm = (props) => {
                     formats={quillFormats}
                     placeholder="Provide a short description to explain this promotion"
                   />
-                  <FormHelperText error={errors.description !== false}>
-                    {errors.description ? errors.description : null}
+                  <FormHelperText error={errors.descriptionError !== false}>
+                    {errors.descriptionError ? errors.descriptionError : null}
                   </FormHelperText>
                 </Grid>
                 <Grid item xs={12}>
@@ -814,6 +1091,7 @@ const PromotionForm = (props) => {
                       endText="End Date"
                       inputFormat="dd/MM/yyyy"
                       value={dateRange}
+                      onError={handleDateError}
                       onChange={(newValue) => {
                         setDateRange(newValue);
                       }}
@@ -827,6 +1105,8 @@ const PromotionForm = (props) => {
                           <TextField
                             {...startProps}
                             className={classes.inputFields}
+                            error={errors.startDateError !== false}
+                            helperText={errors.startDateError}
                             required
                             InputProps={{
                               startAdornment: (
@@ -840,6 +1120,8 @@ const PromotionForm = (props) => {
                           <TextField
                             {...endProps}
                             className={classes.inputFields}
+                            error={errors.endDateError !== false}
+                            helperText={errors.endDateError}
                             required
                             InputProps={{
                               startAdornment: (
@@ -860,24 +1142,37 @@ const PromotionForm = (props) => {
                       <DesktopTimePicker
                         label="Start Time"
                         value={startDateTime}
+                        onError={handleStartTimeError}
                         onChange={(newValue) => {
                           setStartDateTime(newValue);
                         }}
-                        // onError={handleStartDateError}
                         renderInput={(params) => (
-                          <TextField {...params} style={{ width: '93%' }} required />
+                          <TextField
+                            {...params}
+                            style={{ width: '93%' }}
+                            required
+                            error={errors.startTimeError !== false}
+                            helperText={errors.startTimeError}
+                          />
                         )}
                       />
                     </Grid>
-                    <Grid item xs={6} container alignItems="center" justifyContent="flex-end">
+                    <Grid item xs={6} sx={{ pl: 3 }}>
                       <DesktopTimePicker
                         label="End Time"
                         value={endDateTime}
+                        onError={handleEndTimeError}
                         onChange={(newValue) => {
                           setEndDateTime(newValue);
                         }}
                         renderInput={(params) => (
-                          <TextField {...params} style={{ width: '93%' }} required />
+                          <TextField
+                            {...params}
+                            style={{ width: '100%' }}
+                            required
+                            error={errors.endTimeError !== false}
+                            helperText={errors.endTimeError}
+                          />
                         )}
                       />
                     </Grid>
@@ -1003,8 +1298,8 @@ const PromotionForm = (props) => {
                       </span>
                     </Box>
                   </Grid>
-                  <FormHelperText error={errors.productType !== false}>
-                    {errors.productType ? errors.productType : null}
+                  <FormHelperText error={errors.promotionTypeError !== false}>
+                    {errors.promotionTypeError ? errors.promotionTypeError : null}
                   </FormHelperText>
                 </Grid>
                 {atleastOnePromotionTypeSelected() && (
@@ -1073,12 +1368,16 @@ const PromotionForm = (props) => {
                                 RM
                               </Box>
                             </Grid>
+                            <FormHelperText error={errors.discountTypeError !== false}>
+                              {errors.discountTypeError ? errors.discountTypeError : null}
+                            </FormHelperText>
                           </Grid>
                           <Grid item xs={8} sx={{ paddingLeft: 2 }}>
                             <TextField
                               id="discount"
                               variant="outlined"
                               size="small"
+                              value={discount === null ? '' : discount}
                               onChange={handleInputChange}
                               onBlur={handleInputChange}
                               error={errors.discountError !== false}
@@ -1148,6 +1447,9 @@ const PromotionForm = (props) => {
                                 Specific
                               </Box>
                             </Grid>
+                            <FormHelperText error={errors.productTypeError !== false}>
+                              {errors.productTypeError ? errors.productTypeError : null}
+                            </FormHelperText>
                           </Grid>
                         </Grid>
                       </Grid>
@@ -1268,17 +1570,24 @@ const PromotionForm = (props) => {
                             </Grid>
                           </Grid>
                         </Grid>
-                        {(errors.BxError || errors.GyError) && (
+                        {(errors.BxError || errors.GyError || errors.productTypeError) && (
                           <Grid item xs={3} sx={{ pt: '10px !important' }}>
-                            <FormHelperText error={errors.BxError} sx={{ pl: 1.5 }}>
+                            <FormHelperText error={errors.BxError !== false} sx={{ pl: 1.5 }}>
                               {errors.BxError}
                             </FormHelperText>
                           </Grid>
                         )}
-                        {errors.GyError && (
+                        {(errors.GyError || errors.productTypeError) && (
                           <Grid item xs={3} sx={{ pt: '10px !important' }}>
-                            <FormHelperText error={errors.GyError}>
+                            <FormHelperText error={errors.GyError !== false}>
                               {errors.GyError}
+                            </FormHelperText>
+                          </Grid>
+                        )}
+                        {errors.productTypeError && (
+                          <Grid item xs={6} sx={{ pt: '10px !important' }}>
+                            <FormHelperText error={errors.productTypeError !== false}>
+                              {errors.productTypeError ? errors.productTypeError : null}
                             </FormHelperText>
                           </Grid>
                         )}
@@ -1370,8 +1679,8 @@ const PromotionForm = (props) => {
                               />
                             </Grid>
                           </Grid>
-                          <FormHelperText error={errors.description !== false}>
-                            {errors.description ? errors.description : null}
+                          <FormHelperText error={errors.productsError !== false}>
+                            {errors.productsError ? errors.productsError : null}
                           </FormHelperText>
                         </>
                       )}

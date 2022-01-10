@@ -12,7 +12,7 @@ appLogger.info('🏁 entering LOKETLA request response cycle 🏁');
 appLogger.info(_publicFolderPath);
 
 loketla.use(express.json());
-loketla.use(express.urlencoded({ extended: false }));
+loketla.use(express.urlencoded({ extended: true }));
 
 loketla.use(morganMiddleware.request);
 loketla.use(morganMiddleware.response);

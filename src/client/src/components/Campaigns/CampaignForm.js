@@ -120,7 +120,6 @@ const CampaignForm = (props) => {
   const classes = useStyles();
   const quillModules = getEditorModules();
   const quillFormats = getEditorFormat();
-  // const currentDateTime = new Date().toLocaleString();
   const storeUUID = localStorage.getItem('storeUUID');
   const campaignTitleRef = useRef(null);
 
@@ -133,7 +132,6 @@ const CampaignForm = (props) => {
   const [description, setDescription] = useState({ editorHtml: '' });
   const [termsNconditions, setTermsNconditions] = useState({ editorHtml: '' });
   const [openModal, setOpenModal] = useState(false);
-  // const [validationComplete, setValidationComplete] = useState(false);
   const [image, setImage] = useState({
     img: null,
     imgFile: null,
@@ -316,7 +314,7 @@ const CampaignForm = (props) => {
     } else {
       setDescription({ editorHtml: content });
 
-      if (errors.description !== false) {
+      if (errors.descriptionError !== false) {
         updatedError = validateDescription(content, errors);
       }
     }
@@ -333,7 +331,7 @@ const CampaignForm = (props) => {
     } else {
       setTermsNconditions({ editorHtml: content });
 
-      if (errors.description !== false) {
+      if (errors.termsNconditionError !== false) {
         updatedError = validateTermsNCondition(content, errors);
       }
     }
@@ -376,8 +374,6 @@ const CampaignForm = (props) => {
 
     handleImgPreviewNValidation(file);
   };
-
-  // console.log('errors', errors);
 
   const handleDateError = (error) => {
     let { startDateError, endDateError } = errors;

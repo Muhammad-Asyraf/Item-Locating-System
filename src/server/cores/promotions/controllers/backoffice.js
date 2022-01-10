@@ -1,3 +1,4 @@
+const momentTz = require('moment-timezone');
 const Promotion = require('../model');
 const getLogger = require('../../../utils/logger');
 
@@ -8,7 +9,7 @@ exports.getAllPromotions = async (req, res, next) => {
     const { store_uuid } = req.params;
     const promotions = await Promotion.query()
       .where('store_uuid', store_uuid)
-      .withGraphFetched('[products ]');
+      .withGraphFetched('[products, campaign]');
 
     // .modifyGraph('images', (builder) => {
     //   builder.select('path');
@@ -81,72 +82,101 @@ exports.getAllPromotions = async (req, res, next) => {
 //   }
 // };
 
-// exports.createProduct = async (req, res, next) => {
-//   try {
-//     const {
-//       name,
-//       barcode_number,
-//       description,
-//       sub_category,
-//       stock_status,
-//       measurement_value,
-//       measurement_unit,
-//       product_item: items,
-//       markup_percentage,
-//       retail_price,
-//       store_uuid,
-//       product_type,
-//       supply_price,
-//     } = req.body;
-//     const { files: imgFiles } = req;
-//     const product_sub_category = JSON.parse(sub_category);
-//     const product_item = JSON.parse(items);
+exports.createPromotion = async (req, res, next) => {
+  try {
+    const {
+      name,
+      description,
+      start_date,
+      end_date,
+      start_time,
+      end_time,
+      promotion_type,
+      store_uuid,
+      campaign_uuid,
+      meta_data: metaData,
+      products: selectedProducts,
+    } = req.body;
+    const products = JSON.parse(selectedProducts);
+    const meta_data = JSON.parse(metaData);
 
-//     const new_images = imgFiles.map(
-//       ({
-//         fieldname,
-//         originalname,
-//         encoding,
-//         mimetype,
-//         destination,
-//         filename,
-//         size,
-//         ...keepAttrs
-//       }) => keepAttrs
-//     );
+    console.log('name', name);
+    console.log('description', description);
+    console.log('start_date', start_date);
+    console.log('end_date', end_date);
+    console.log('start_time', start_time);
+    console.log('end_time', end_time);
+    console.log('promotion_type', promotion_type);
+    console.log('store_uuid', store_uuid);
+    console.log('campaign_uuid', campaign_uuid);
+    console.log('products', products);
+    console.log('meta_data', meta_data);
 
-//     const product = await Product.query().insertGraph(
-//       {
-//         name,
-//         description,
-//         store_uuid,
-//         stock_status,
-//         measurement_unit,
-//         product_type,
-//         is_active: false,
-//         barcode_number: parseInt(barcode_number, 10),
-//         measurement_value: parseFloat(measurement_value),
-//         markup_percentage: parseFloat(markup_percentage),
-//         retail_price: parseFloat(retail_price),
-//         supply_price: parseFloat(supply_price),
-//         items: product_item,
-//         sub_categories: product_sub_category,
-//         images: new_images,
-//       },
-//       { relate: ['items', 'sub_categories'] }
-//     );
+    const startDate = momentTz
+      .tz(new Date(start_date), 'Asia/Kuala_Lumpur')
+      .format('YYYY-MM-DD');
+    const startTime = momentTz
+      .tz(new Date(start_time), 'Asia/Kuala_Lumpur')
+      .format('HH:mm:ss');
 
-//     promotionLogger.info(
-//       `product successfully created with [UUID -${product.uuid}]`
-//     );
+    const endDate = momentTz
+      .tz(new Date(end_date), 'Asia/Kuala_Lumpur')
+      .format('YYYY-MM-DD');
+    const endTime = momentTz
+      .tz(new Date(end_time), 'Asia/Kuala_Lumpur')
+      .format('HH:mm:ss');
 
-//     res.json(product);
-//   } catch (err) {
-//     promotionLogger.warn(`Error creating product`);
-//     await removeFiles(req.files);
-//     next(err);
-//   }
-// };
+    const startDateTime = new Date(
+      `${startDate} ${startTime} GMT+0800`
+    ).toISOString();
+
+    const endDateTime = new Date(
+      `${endDate} ${endTime} GMT+0800`
+    ).toISOString();
+
+    console.log(
+      momentTz
+        .tz(new Date(startDateTime), 'Asia/Kuala_Lumpur')
+        .format('DD/MM/YYYY HH:mm:ss')
+    );
+    console.log(
+      momentTz
+        .tz(new Date(endDateTime), 'Asia/Kuala_Lumpur')
+        .format('DD/MM/YYYY HH:mm:ss')
+    );
+
+    console.log(startDateTime);
+    console.log(endDateTime);
+
+    // res.json('YAY');
+
+    const promotion = await Promotion.query().insertGraph(
+      {
+        name,
+        start_date: startDateTime,
+        end_date: endDateTime,
+        promotion_type,
+        meta_data,
+        store_uuid,
+        campaign_uuid,
+        description,
+        products,
+      },
+      { relate: ['products'] }
+    );
+
+    promotionLogger.info(
+      `promotion successfully created with [UUID -${promotion.uuid}]`
+    );
+
+    console.log(promotion);
+
+    res.json(promotion);
+  } catch (err) {
+    promotionLogger.warn(`Error creating promotion`);
+    next(err);
+  }
+};
 
 // exports.createMultipleProducts = async (req, res, next) => {
 //   try {

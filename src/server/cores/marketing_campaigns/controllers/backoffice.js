@@ -1,4 +1,3 @@
-const moment = require('moment');
 const momentTz = require('moment-timezone');
 const Campaign = require('../model');
 const getLogger = require('../../../utils/logger');

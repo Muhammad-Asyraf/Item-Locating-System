@@ -17,7 +17,12 @@ import { makeStyles } from '@mui/styles';
 import { addPromotion } from '../../redux/thunks/promotionThunk';
 import { getProducts } from '../../redux/thunks/productThunk';
 import { getSubcategories } from '../../redux/thunks/categoryThunk';
+import { getCampaigns } from '../../redux/thunks/campaignThunk';
 
+import {
+  selectCampaigns,
+  processed as campaignProcessed,
+} from '../../redux/features/campaignSlice';
 import {
   selectIsLoading as promotionLoading,
   processingRequest,
@@ -60,23 +65,32 @@ const PromotionCreate = () => {
   const isProductLoading = useSelector(productLoading);
   const isPromotionLoading = useSelector(promotionLoading);
   const products = useSelector(selectProducts);
+  const campaigns = useSelector(selectCampaigns);
   const categoryOptions = useSelector(selectSubcategory);
 
   useEffect(async () => {
     dispatch(promotionProcessed());
     await dispatch(getProducts());
     await dispatch(getSubcategories());
+    await dispatch(getCampaigns());
     dispatch(productProcessed());
+    dispatch(campaignProcessed());
     dispatch(categoryProcessed());
   }, []);
 
+  /* eslint-disable no-restricted-syntax */
   const handleSubmit = async (payload) => {
     dispatch(processingRequest());
+
+    for (const pair of payload.entries()) {
+      console.log('check => ', pair[0], pair[1]);
+    }
 
     const { type, payload: resPayload } = await dispatch(addPromotion({ payload }));
 
     if (type.includes('fulfilled')) {
-      history.push(`/${storeUrl}/promotion/list`);
+      // history.push(`/${storeUrl}/promotion/list`);
+      console.log(history);
       await dispatch(
         setNewNotification({
           message: 'Promotion successfully created',
@@ -168,6 +182,7 @@ const PromotionCreate = () => {
           <PromotionForm
             onSubmit={handleSubmit}
             products={products}
+            campaigns={campaigns}
             categoryOptions={categoryOptions}
           />
         </Grid>

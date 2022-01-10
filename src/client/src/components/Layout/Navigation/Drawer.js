@@ -250,7 +250,7 @@ const Drawer = (props) => {
       key: 'marketing',
       items: [
         {
-          text: 'Campaign',
+          text: 'Campaigns',
           itemKey: 'campaigns',
           path: '/marketing-campaign/list',
           icon: (

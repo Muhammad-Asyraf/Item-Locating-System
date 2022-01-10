@@ -116,29 +116,35 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const CampaignForm = (props) => {
+const CampaignEditForm = (props) => {
   const classes = useStyles();
   const quillModules = getEditorModules();
   const quillFormats = getEditorFormat();
-  // const currentDateTime = new Date().toLocaleString();
   const storeUUID = localStorage.getItem('storeUUID');
   const campaignTitleRef = useRef(null);
 
-  const { onSubmit } = props;
+  const { currentCampaign, initImage, onSubmit } = props;
 
-  const [campaignTitle, setCampaignTitle] = useState(null);
-  const [dateRange, setDateRange] = useState([null, null]);
-  const [startDateTime, setStartDateTime] = useState(null);
-  const [endDateTime, setEndDateTime] = useState(null);
-  const [description, setDescription] = useState({ editorHtml: '' });
-  const [termsNconditions, setTermsNconditions] = useState({ editorHtml: '' });
-  const [openModal, setOpenModal] = useState(false);
-  // const [validationComplete, setValidationComplete] = useState(false);
-  const [image, setImage] = useState({
-    img: null,
-    imgFile: null,
-    imgPreview: null,
+  // const startDateTimeInit = new Date(currentCampaign.start_date).toLocaleString();
+  // const endDateTimeInit = new Date(currentCampaign.end_date).toLocaleString();
+  // console.log('startDateTimeInit', startDateTimeInit);
+  // console.log('endDateTimeInit', endDateTimeInit);
+
+  const startDateInit = new Date(currentCampaign.startDate);
+  const endDateInit = new Date(currentCampaign.endDate);
+  const startTimeInit = new Date(currentCampaign.startTime);
+  const endTimeInit = new Date(currentCampaign.endTime);
+
+  const [campaignTitle, setCampaignTitle] = useState(currentCampaign.name);
+  const [description, setDescription] = useState({ editorHtml: currentCampaign.description });
+  const [termsNconditions, setTermsNconditions] = useState({
+    editorHtml: currentCampaign.terms_conditions,
   });
+  const [dateRange, setDateRange] = useState([startDateInit, endDateInit]);
+  const [startDateTime, setStartDateTime] = useState(startTimeInit);
+  const [endDateTime, setEndDateTime] = useState(endTimeInit);
+  const [openModal, setOpenModal] = useState(false);
+  const [image, setImage] = useState(initImage);
 
   const [errors, setErrors] = useState({
     campaignTitleError: false,
@@ -237,15 +243,6 @@ const CampaignForm = (props) => {
   const preparedPayload = () => {
     const formData = new FormData();
 
-    // console.log('campaignTitle', campaignTitle);
-    // console.log('description.editorHtml', description.editorHtml);
-    // console.log('termsNconditions.editorHtml', termsNconditions.editorHtml);
-    // console.log('dateRange[0]', dateRange[0]);
-    // console.log('dateRange[1]', dateRange[1]);
-    // console.log('startDateTime', startDateTime.getTime());
-    // console.log('endDateTime', endDateTime.getTime());
-    // console.log('image', image);
-
     formData.append('name', campaignTitle);
     formData.append('description', description.editorHtml);
     formData.append('terms_conditions', termsNconditions.editorHtml);
@@ -254,6 +251,7 @@ const CampaignForm = (props) => {
     formData.append('start_time', startDateTime);
     formData.append('end_time', endDateTime);
     formData.append('multer_type', 'ads');
+    formData.append('old_Banner', JSON.stringify({ path: currentCampaign.banner_ad_path }));
     formData.append('adsBanner', image.imgFile, image.imgFile.name);
     formData.append('store_uuid', storeUUID);
 
@@ -377,8 +375,6 @@ const CampaignForm = (props) => {
     handleImgPreviewNValidation(file);
   };
 
-  // console.log('errors', errors);
-
   const handleDateError = (error) => {
     let { startDateError, endDateError } = errors;
     const [startErr, endErr] = error;
@@ -493,6 +489,7 @@ const CampaignForm = (props) => {
                     error={errors.campaignTitleError !== false}
                     helperText={errors.campaignTitleError}
                     className={classes.inputFields}
+                    value={campaignTitle}
                     inputRef={campaignTitleRef}
                     InputProps={{
                       startAdornment: (
@@ -764,4 +761,4 @@ const CampaignForm = (props) => {
   );
 };
 
-export default CampaignForm;
+export default CampaignEditForm;

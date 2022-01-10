@@ -1,46 +1,31 @@
 const router = require('express').Router();
 const campaignController = require('../controllers/backoffice');
 const checkAuth = require('../../../middlewares/checkAuth');
+const { upload } = require('../../../middlewares/multer');
 
 router.get(
   '/campaigns/:store_uuid',
   checkAuth,
   campaignController.getAllCampaigns
 );
-// router.get('/product/:uuid', checkAuth, campaignController.findPromotion);
-// router.post(
-//   '/product',
-//   checkAuth,
-//   upload.array('imgCollection', 12),
-//   campaignController.createPromotion
-// );
-// router.post(
-//   '/product/multiple',
-//   checkAuth,
-//   campaignController.createMultiplePromotions
-// );
-// router.post(
-//   '/product/mapping',
-//   checkAuth,
-//   campaignController.savePromotionMapping
-// );
-// router.post(
-//   '/product/delete',
-//   checkAuth,
-//   campaignController.removeMultiplePromotion
-// );
-// router.put(
-//   '/product/:uuid',
-//   checkAuth,
-//   upload.array('imgCollection', 12),
-//   campaignController.editPromotion
-// );
-// router.patch(
-//   '/product/multiple',
-//   checkAuth,
-//   campaignController.patchMultiplePromotion
-// );
-// router.patch('/product/:uuid', checkAuth, campaignController.patchPromotion);
-// router.delete('/product/:uuid', checkAuth, campaignController.removePromotion);
+router.get('/campaign/:uuid', checkAuth, campaignController.findCampaign);
+router.post(
+  '/campaign',
+  checkAuth,
+  upload.single('adsBanner'),
+  campaignController.addCampaign
+);
+router.put(
+  '/campaign/:uuid',
+  checkAuth,
+  upload.single('adsBanner'),
+  campaignController.editCampaign
+);
+router.delete('/campaign/:uuid', checkAuth, campaignController.removeCampaign);
+router.post(
+  '/campaign/delete',
+  checkAuth,
+  campaignController.removeMultipleCampaign
+);
 
 module.exports = router;

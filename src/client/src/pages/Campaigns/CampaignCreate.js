@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-// import { Link } from 'react-router-dom';
 import { useHistory, Link } from 'react-router-dom';
 
 import IconButton from '@mui/material/IconButton';
@@ -18,7 +17,7 @@ import { addCampaign } from '../../redux/thunks/campaignThunk';
 import {
   selectIsLoading as campaignLoading,
   processingRequest,
-  processed as promotionProcessed,
+  processed as campaignProcessed,
 } from '../../redux/features/campaignSlice';
 import { setNewNotification } from '../../redux/features/notificationSlice';
 
@@ -48,7 +47,7 @@ const CampaignCreate = () => {
   const isCampaignLoading = useSelector(campaignLoading);
 
   useEffect(() => {
-    dispatch(promotionProcessed());
+    dispatch(campaignProcessed());
   }, []);
 
   const handleSubmit = async (payload) => {
@@ -57,7 +56,8 @@ const CampaignCreate = () => {
     const { type, payload: resPayload } = await dispatch(addCampaign({ payload }));
 
     if (type.includes('fulfilled')) {
-      history.push(`/${storeUrl}/campaign/list`);
+      history.push(`/${storeUrl}/marketing-campaign/list`);
+
       await dispatch(
         setNewNotification({
           message: 'Campaign successfully created',
@@ -74,7 +74,7 @@ const CampaignCreate = () => {
         })
       );
     }
-    dispatch(promotionProcessed());
+    dispatch(campaignProcessed());
   };
 
   return (
@@ -84,7 +84,7 @@ const CampaignCreate = () => {
         <Grid item xs={7} container>
           <Grid item xs={12}>
             <h1 style={{ marginBottom: 1, marginTop: 3, fontSize: '2em' }}>
-              <span> Set up marketing campaign</span>
+              <span> New marketing campaign</span>
               <IconButton
                 component={Link}
                 to={`/${storeUrl}/marketing-campaign/list`}

@@ -2,8 +2,10 @@ const multer = require('multer');
 const { v4: uuidv4 } = require('uuid');
 const path = require('path').resolve('./');
 
-const img_dir = path + '/public/uploaded_images/';
+const ads_dir = path + '/public/uploaded_ads_banner/';
+const item_dir = path + '/public/uploaded_item_images/';
 const layout_dir = path + '/public/uploaded_layout/';
+const product_dir = path + '/public/uploaded_product_images/';
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -15,8 +17,14 @@ const storage = multer.diskStorage({
       case 'layout':
         cb(null, layout_dir);
         break;
-      case 'image':
-        cb(null, img_dir);
+      case 'item':
+        cb(null, item_dir);
+        break;
+      case 'product':
+        cb(null, product_dir);
+        break;
+      case 'ads':
+        cb(null, ads_dir);
         break;
       default:
       // code block
@@ -30,18 +38,6 @@ const storage = multer.diskStorage({
 
 var upload = multer({
   storage: storage,
-  // fileFilter: (req, file, cb) => {
-  //   if (
-  //     file.mimetype == 'image/png' ||
-  //     file.mimetype == 'image/jpg' ||
-  //     file.mimetype == 'image/jpeg'
-  //   ) {
-  //     cb(null, true);
-  //   } else {
-  //     cb(null, false);
-  //     return cb(new Error('Only .png, .jpg and .jpeg format allowed!'));
-  //   }
-  // },
 });
 
 module.exports = {

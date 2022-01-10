@@ -41,6 +41,14 @@ class Promotion extends Model {
           to: 'store.uuid',
         },
       },
+      campaign: {
+        relation: Model.BelongsToOneRelation,
+        modelClass: require('../marketing_campaigns/model'),
+        join: {
+          from: 'promotion.campaign_uuid',
+          to: 'marketing_campaign.uuid',
+        },
+      },
     };
   }
 }

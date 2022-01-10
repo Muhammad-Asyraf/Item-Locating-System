@@ -114,7 +114,7 @@ const CampaignList = () => {
   };
 
   const handleEdit = () => {
-    // dispatch(processingCategory());
+    dispatch(processingRequest());
   };
 
   if (isLoading) {

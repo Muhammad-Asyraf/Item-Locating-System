@@ -14,8 +14,8 @@ import TablePagination from '@mui/material/TablePagination';
 import { makeStyles } from '@mui/styles';
 
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
-import LocalOfferRoundedIcon from '@mui/icons-material/LocalOfferRounded';
 import TodayIcon from '@mui/icons-material/Today';
+import CampaignIcon from '@mui/icons-material/Campaign';
 
 import EnhancedTableHead from '../Table/EnhancedTableHead';
 import EnhancedTableToolbar from '../Table/EnhancedTableToolbar';
@@ -28,8 +28,8 @@ const getCampaignHeadCells = () => [
     id: 'campaign',
     align: 'left',
     disablePadding: true,
-    label: 'campaign',
-    icon: <LocalOfferRoundedIcon fontSize="medium" />,
+    label: 'Campaign',
+    icon: <CampaignIcon sx={{ fontSize: '1.8rem' }} />,
   },
   {
     id: 'start_date',
@@ -107,7 +107,7 @@ const PromotionListTable = (props) => {
     handleChangeTab,
     initCampaign,
     campaigns,
-    setCampaign,
+    setCampaigns,
     handleDelete,
     onMultipleDelete,
     handleEdit,
@@ -117,18 +117,16 @@ const PromotionListTable = (props) => {
   const handleSearch = (event) => {
     const searchKeywords = event.target.value.toLowerCase();
 
-    const filteredPromotions = initCampaign.filter((promotion) => {
-      const firstCondi = promotion.name.toLowerCase().includes(searchKeywords);
-      const secCondi = promotion.wholesale_price.includes(searchKeywords);
-      const thirdCondi = promotion.barcode_number.includes(searchKeywords);
+    const filteredCampaigns = initCampaign.filter((campaign) => {
+      const firstCondi = campaign.name.toLowerCase().includes(searchKeywords);
 
-      if (firstCondi || secCondi || thirdCondi) {
+      if (firstCondi) {
         return true;
       }
       return false;
     });
 
-    setCampaign(filteredPromotions);
+    setCampaigns(filteredCampaigns);
   };
 
   const handleMultipleDelete = () => {
@@ -173,6 +171,40 @@ const PromotionListTable = (props) => {
     setPage(newPage);
   };
 
+  const checkCampaignPeriod = (campaign, promotionPeriod) => {
+    const currentDateTime = new Date().getTime();
+    const startDateTime = new Date(campaign.start_date).getTime();
+    const endDateTime = new Date(campaign.end_date).getTime();
+
+    // console.log('currentDateTime', currentDateTime);
+    // console.log('startDateTime', startDateTime);
+    // console.log('endDateTime', endDateTime);
+
+    // const currentDateTimeBabi = new Date();
+    // const startDateTimeBabi = new Date(campaign.start_date);
+    // const endDateTimeBabi = new Date(campaign.end_date);
+    // console.log('currentDateTimeBabi', currentDateTimeBabi);
+    // console.log('startDateTimeBabi', startDateTimeBabi);
+    // console.log('endDateTimeBabi', endDateTimeBabi);
+
+    if (promotionPeriod === 'Current & Upcoming') {
+      if (
+        (currentDateTime >= startDateTime && currentDateTime <= endDateTime) ||
+        (currentDateTime <= startDateTime && currentDateTime <= endDateTime)
+      ) {
+        return true;
+      }
+    } else if (promotionPeriod === 'Past') {
+      if (currentDateTime >= startDateTime && currentDateTime >= endDateTime) {
+        return true;
+      }
+    } else if (promotionPeriod === 'All') {
+      return true;
+    }
+
+    return false;
+  };
+
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
@@ -190,7 +222,7 @@ const PromotionListTable = (props) => {
         className={classes.tabContainer}
       >
         {campaignPeriods.map((promotionPeriod) => {
-          const labelId = `promotion-tab-${promotionPeriod}`;
+          const labelId = `campaign-tab-${promotionPeriod}`;
 
           return (
             <Tab
@@ -205,7 +237,7 @@ const PromotionListTable = (props) => {
       </TabList>
       <Paper className={classes.paper} elevation={4}>
         <EnhancedTableToolbar
-          type="promotion"
+          type="campaign"
           numSelected={selected.length}
           handleMultipleDelete={handleMultipleDelete}
           handleSearch={handleSearch}
@@ -237,21 +269,26 @@ const PromotionListTable = (props) => {
                     <TableRow style={{ height: '10px' }} />
                     {stableSort(campaigns, getComparator(order, orderBy))
                       .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                      .map((promotion, index) => {
-                        const isPromotionSelected = isSelected(promotion.uuid);
+                      .map((campaign, index) => {
+                        const isCampaignSelected = isSelected(campaign.uuid);
                         const labelId = `enhanced-table-checkbox-${index}`;
 
-                        return (
-                          <CampaignTableRow
-                            key={labelId}
-                            promotion={promotion}
-                            isPromotionSelected={isPromotionSelected}
-                            labelId={labelId}
-                            handleClick={handleClick}
-                            handleDelete={handleDelete}
-                            handleEdit={handleEdit}
-                          />
-                        );
+                        const currentPeriod = checkCampaignPeriod(campaign, promotionPeriod);
+
+                        if (currentPeriod) {
+                          return (
+                            <CampaignTableRow
+                              key={labelId}
+                              campaign={campaign}
+                              isCampaignSelected={isCampaignSelected}
+                              labelId={labelId}
+                              handleClick={handleClick}
+                              handleDelete={handleDelete}
+                              handleEdit={handleEdit}
+                            />
+                          );
+                        }
+                        return null;
                       })}
                     {emptyRows > 0 && (
                       <TableRow style={{ height: 53 * emptyRows }}>

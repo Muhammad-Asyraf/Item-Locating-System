@@ -269,7 +269,28 @@ const PromotionForm = (props) => {
   const initApplicableProductType = getInitApplicableProductType();
   const initBxGy = getInitBxGy();
 
-  const { products: initProduct, campaigns, categoryOptions, onSubmit } = props;
+  const {
+    products: initProduct,
+    currentPromotion,
+    campaigns,
+    categoryOptions,
+    onSubmit,
+  } = props;
+
+  const startDateInit = new Date(currentPromotion.startDate);
+  const endDateInit = new Date(currentPromotion.endDate);
+  const startTimeInit = new Date(currentPromotion.startTime);
+  const endTimeInit = new Date(currentPromotion.endTime);
+  const promotionTypeInit = currentPromotion.meta_data.promotionType
+    ? currentPromotion.meta_data.promotionType
+    : initPromotionType;
+
+  const BxGyInit = currentPromotion.meta_data.BxGy
+    ? currentPromotion.meta_data.BxGy
+    : initBxGy;
+  const discountTypeInit = currentPromotion.meta_data.discountType
+    ? currentPromotion.meta_data.discountType
+    : initDiscountType;
 
   const [categoryFilterType, setCategoryFilterType] = useState('any');
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState([]);
@@ -279,24 +300,26 @@ const PromotionForm = (props) => {
   const [openFilter, setOpenFilter] = useState(false);
   const [openCampaignDialog, setOpenCampaignDialog] = useState(false);
   const [openProductModal, setOpenProductModal] = useState(false);
-  const [campaignLinkFlag, setCampaignLinkFlag] = useState(false);
+  const [campaignLinkFlag, setCampaignLinkFlag] = useState(
+    currentPromotion.meta_data.campaignLinkFlag
+  );
   const [productIndex, setProductIndex] = useState();
   const [applicableProducts, setApplicableProducts] = useState([]);
   const [products, setProducts] = useState(initProduct);
 
-  const [promotionName, setPromotionName] = useState(null);
-  const [description, setDescription] = useState({ editorHtml: '' });
-  const [dateRange, setDateRange] = useState([null, null]);
-  const [startDateTime, setStartDateTime] = useState(null);
-  const [endDateTime, setEndDateTime] = useState(null);
-  const [promotionType, setPromotionType] = useState(initPromotionType);
-  const [BxGy, setBxGy] = useState(initBxGy);
-  const [discount, setDiscount] = useState(null);
-  const [discountType, setDiscountType] = useState(initDiscountType);
+  const [promotionName, setPromotionName] = useState(currentPromotion.name);
+  const [description, setDescription] = useState({ editorHtml: currentPromotion.description });
+  const [dateRange, setDateRange] = useState([startDateInit, endDateInit]);
+  const [startDateTime, setStartDateTime] = useState(startTimeInit);
+  const [endDateTime, setEndDateTime] = useState(endTimeInit);
+  const [promotionType, setPromotionType] = useState(promotionTypeInit);
+  const [BxGy, setBxGy] = useState(BxGyInit);
+  const [discount, setDiscount] = useState(currentPromotion.meta_data.discount);
+  const [discountType, setDiscountType] = useState(discountTypeInit);
   const [selectedProducts, setSelectedProducts] = useState([]);
-  const [selectedCampaign, setSelectedCampaign] = useState(null);
+  const [selectedCampaign, setSelectedCampaign] = useState(currentPromotion.campaign);
   const [applicableProductType, setApplicableProductType] = useState(
-    initApplicableProductType
+    currentPromotion.meta_data.applicableProductType
   );
 
   const [errors, setErrors] = useState({
@@ -348,7 +371,7 @@ const PromotionForm = (props) => {
       promotionNameError,
     };
   };
-
+  // code block
   const validateDiscount = (value, currentError) => {
     let discountError;
 
@@ -514,7 +537,6 @@ const PromotionForm = (props) => {
         discount,
         campaignLinkFlag,
         applicableProductType,
-        promotionType,
       };
     } else if (ByGxPromo) {
       selectedPromotionType = 'Buy X Get Y';
@@ -523,30 +545,12 @@ const PromotionForm = (props) => {
         BxGy,
         campaignLinkFlag,
         applicableProductType,
-        promotionType,
       };
     }
 
     const promoProducts = selectedProducts.map(({ uuid }) => {
       return { uuid };
     });
-
-    // const payload = {
-    //   name: promotionName,
-    //   description: description.editorHtml,
-    //   start_date: dateRange[0],
-    //   end_date: dateRange[1],
-    //   start_time: startDateTime,
-    //   end_time: endDateTime,
-    //   promotion_type: selectedPromotionType,
-    //   meta_data: promotionMetaData,
-    //   products: promoProducts,
-    //   store_uuid: storeUUID,
-    //   campaign_uuid: linkToCampaign ? selectedCampaign.uuid : null,
-    // };
-
-    // console.log(payload);
-    // return payload;
 
     formData.append('name', promotionName);
     formData.append('description', description.editorHtml);
@@ -947,7 +951,11 @@ const PromotionForm = (props) => {
   );
 
   const campaignSwitch = () => (
-    <CampaignLinkSwitch sx={{ m: 1, mr: 0.5 }} onChange={toggleCampaignLink} />
+    <CampaignLinkSwitch
+      sx={{ m: 1, mr: 0.5 }}
+      onChange={toggleCampaignLink}
+      checked={campaignLinkFlag}
+    />
   );
 
   /// /////////////////////////// Others //////////////////////////////////////////////
@@ -974,6 +982,25 @@ const PromotionForm = (props) => {
 
     return flag;
   };
+
+  /// /////////////////////////// Load up data //////////////////////////////////////////////
+
+  // console.log('currentPromotion', currentPromotion);
+
+  useEffect(() => {
+    switch (currentPromotion.promotion_type) {
+      case 'Basic':
+        handlePromotionType({ target: { id: 'basic-sale' } });
+        break;
+      case 'Bundle':
+        handlePromotionType({ target: { id: 'bundle-sale' } });
+        break;
+      default:
+        handlePromotionType({ target: { id: 'buy-x-get-y' } });
+    }
+
+    handleSelectProduct(null, currentPromotion.products);
+  }, []);
 
   return (
     <form
@@ -1008,6 +1035,7 @@ const PromotionForm = (props) => {
                     id="name"
                     label="Promotion Name"
                     variant="outlined"
+                    value={promotionName}
                     onChange={handleInputChange}
                     onBlur={handleInputChange}
                     error={errors.promotionNameError !== false}
@@ -1045,6 +1073,7 @@ const PromotionForm = (props) => {
                         return option.uuid === value.uuid;
                       }}
                       onChange={handleSelectCampaign}
+                      defaultValue={selectedCampaign}
                       sx={{ width: '100%' }}
                       renderInput={(params) => (
                         <TextField
@@ -1483,6 +1512,7 @@ const PromotionForm = (props) => {
                               onChange={handleInputChange}
                               onBlur={handleInputChange}
                               error={errors.BxError !== false}
+                              value={BxGy.buyQty}
                               // helperText={errors.BxError}
                               className={classes.inputFields}
                               // inputRef={nameRef}
@@ -1516,6 +1546,7 @@ const PromotionForm = (props) => {
                               size="small"
                               onChange={handleInputChange}
                               onBlur={handleInputChange}
+                              value={BxGy.freeQty}
                               error={errors.GyError !== false}
                               // className={classes.inputFields}
                               // inputRef={nameRef}

@@ -31,42 +31,71 @@ exports.getAllPromotions = async (req, res, next) => {
   }
 };
 
-// exports.findProduct = async (req, res, next) => {
-//   try {
-//     const { uuid } = req.params;
-//     const product = await Product.query()
-//       .findById(uuid)
-//       .withGraphFetched('[items, sub_categories.category, images]')
-//       .modifyGraph('images', (builder) => {
-//         builder.select('path');
-//       })
-//       .modifyGraph('sub_categories.category', (builder) => {
-//         builder.select('uuid', 'name');
-//       })
-//       .modifyGraph('sub_categories', (builder) => {
-//         builder.select('uuid', 'name');
-//       });
+exports.findPromotion = async (req, res, next) => {
+  try {
+    const { uuid } = req.params;
+    const promotion = await Promotion.query()
+      .findById(uuid)
+      .withGraphFetched('[products, campaign]');
 
-//     promotionLogger.info(`Successfully retrieve product: ${product.uuid}`);
-//     res.json(product);
-//   } catch (err) {
-//     promotionLogger.warn(`Error retrieving product`);
-//     next(err);
-//   }
-// };
+    // .modifyGraph('products', (builder) => {
+    //   builder.select('path');
+    // })
+    // .modifyGraph('campaign', (builder) => {
+    //   builder.select('uuid', 'name');
+    // })
 
-// exports.removeProduct = async (req, res, next) => {
-//   try {
-//     const { uuid } = req.params;
-//     await Product.query().deleteById(uuid);
-//     const logMessage = `Successfully delete product: ${uuid}`;
-//     promotionLogger.info(logMessage);
-//     res.json({ message: logMessage });
-//   } catch (err) {
-//     promotionLogger.warn(`Error deleting product`);
-//     next(err);
-//   }
-// };
+    const { start_date, end_date } = promotion;
+
+    let startDate = momentTz
+      .tz(new Date(start_date), 'Asia/Kuala_Lumpur')
+      .format('MMM DD YYYY');
+
+    let endDate = momentTz
+      .tz(new Date(end_date), 'Asia/Kuala_Lumpur')
+      .format('MMM DD YYYY');
+
+    let startTime = momentTz
+      .tz(new Date(start_date), 'Asia/Kuala_Lumpur')
+      .format('MMM DD YYYY HH:mm:ss');
+
+    let endTime = momentTz
+      .tz(new Date(end_date), 'Asia/Kuala_Lumpur')
+      .format('MMM DD YYYY HH:mm:ss');
+
+    startDate = `${startDate} 00:00:00 GMT+0800`;
+    endDate = `${endDate} 00:00:00 GMT+0800`;
+    startTime = `${startTime} GMT+0800`;
+    endTime = `${endTime} GMT+0800`;
+
+    const resPayload = {
+      ...promotion,
+      startDate,
+      endDate,
+      startTime,
+      endTime,
+    };
+
+    promotionLogger.info(`Successfully retrieve promotion: ${promotion.uuid}`);
+    res.json(resPayload);
+  } catch (err) {
+    promotionLogger.warn(`Error retrieving promotion`);
+    next(err);
+  }
+};
+
+exports.removePromotion = async (req, res, next) => {
+  try {
+    const { uuid } = req.params;
+    await Promotion.query().deleteById(uuid);
+    const logMessage = `Successfully delete promotion: ${uuid}`;
+    promotionLogger.info(logMessage);
+    res.json({ message: logMessage });
+  } catch (err) {
+    promotionLogger.warn(`Error deleting promotion`);
+    next(err);
+  }
+};
 
 // exports.removeMultipleProduct = async (req, res, next) => {
 //   try {
@@ -83,6 +112,74 @@ exports.getAllPromotions = async (req, res, next) => {
 // };
 
 exports.createPromotion = async (req, res, next) => {
+  try {
+    const {
+      name,
+      description,
+      start_date,
+      end_date,
+      start_time,
+      end_time,
+      promotion_type,
+      store_uuid,
+      campaign_uuid,
+      meta_data: metaData,
+      products: selectedProducts,
+    } = req.body;
+    const products = JSON.parse(selectedProducts);
+    const meta_data = JSON.parse(metaData);
+
+    const startDate = momentTz
+      .tz(new Date(start_date), 'Asia/Kuala_Lumpur')
+      .format('YYYY-MM-DD');
+    const startTime = momentTz
+      .tz(new Date(start_time), 'Asia/Kuala_Lumpur')
+      .format('HH:mm:ss');
+
+    const endDate = momentTz
+      .tz(new Date(end_date), 'Asia/Kuala_Lumpur')
+      .format('YYYY-MM-DD');
+    const endTime = momentTz
+      .tz(new Date(end_time), 'Asia/Kuala_Lumpur')
+      .format('HH:mm:ss');
+
+    const startDateTime = new Date(
+      `${startDate} ${startTime} GMT+0800`
+    ).toISOString();
+
+    const endDateTime = new Date(
+      `${endDate} ${endTime} GMT+0800`
+    ).toISOString();
+
+    const promotion = await Promotion.query().insertGraph(
+      {
+        name,
+        start_date: startDateTime,
+        end_date: endDateTime,
+        promotion_type,
+        meta_data,
+        store_uuid,
+        campaign_uuid,
+        description,
+        products,
+      },
+      { relate: ['products'] }
+    );
+
+    promotionLogger.info(
+      `promotion successfully created with [UUID -${promotion.uuid}]`
+    );
+
+    console.log(promotion);
+
+    res.json(promotion);
+  } catch (err) {
+    promotionLogger.warn(`Error creating promotion`);
+    next(err);
+  }
+};
+
+exports.editPromotion = async (req, res, next) => {
   try {
     const {
       name,
@@ -148,9 +245,8 @@ exports.createPromotion = async (req, res, next) => {
     console.log(startDateTime);
     console.log(endDateTime);
 
-    // res.json('YAY');
-
-    const promotion = await Promotion.query().insertGraph(
+    const promotion = await Promotion.query().patchAndFetchById(
+      uuid,
       {
         name,
         start_date: startDateTime,
@@ -166,174 +262,17 @@ exports.createPromotion = async (req, res, next) => {
     );
 
     promotionLogger.info(
-      `promotion successfully created with [UUID -${promotion.uuid}]`
+      `promotion  with [UUID -${promotion.uuid}] successfully updated`
     );
 
     console.log(promotion);
 
     res.json(promotion);
   } catch (err) {
-    promotionLogger.warn(`Error creating promotion`);
+    promotionLogger.warn(`Error updating promotion`);
     next(err);
   }
 };
-
-// exports.createMultipleProducts = async (req, res, next) => {
-//   try {
-//     const { body: payloadList } = req;
-//     let subCatList = [];
-//     let itemList = [];
-
-//     payloadList.forEach(({ sub_categories, items }) => {
-//       subCatList = [...new Set([...subCatList, ...sub_categories])];
-
-//       barcodeNumberList = items.map(({ barcode_number }) => barcode_number);
-//       itemList = [...new Set([...itemList, ...barcodeNumberList])];
-//     });
-
-//     const subCatIds = await SubCategory.query()
-//       .select('uuid', 'name')
-//       .whereIn('name', subCatList);
-
-//     const itemsIds = await Item.query()
-//       .select('uuid', 'barcode_number')
-//       .whereIn('barcode_number', itemList);
-
-//     const multipleProductsPayload = payloadList.map((payload) => {
-//       const {
-//         items,
-//         sub_categories,
-//         barcode_number,
-//         measurement_value,
-//         markup_percentage,
-//         retail_price,
-//         supply_price,
-//       } = payload;
-
-//       const subCatByUUID = sub_categories.map((subCat) => {
-//         // get the UUID of the subcat by name
-//         const subCatUUID = subCatIds.find((obj) => obj.name === subCat).uuid;
-//         return { uuid: subCatUUID };
-//       });
-
-//       const itemsByUUID = items.map(({ barcode_number, quantity }) => {
-//         // get the UUID of the items by barcode number
-//         const itemUUID = itemsIds.find(
-//           (obj) => obj.barcode_number === barcode_number
-//         ).uuid;
-
-//         return { uuid: itemUUID, quantity };
-//       });
-
-//       return {
-//         ...payload,
-//         barcode_number: parseInt(barcode_number, 10),
-//         measurement_value: parseFloat(measurement_value),
-//         markup_percentage: parseFloat(markup_percentage),
-//         retail_price: parseFloat(retail_price),
-//         supply_price: parseFloat(supply_price),
-//         sub_categories: subCatByUUID,
-//         items: itemsByUUID,
-//       };
-//     });
-
-//     const products = await Product.query().insertGraph(
-//       multipleProductsPayload,
-//       {
-//         relate: ['items', 'sub_categories'],
-//       }
-//     );
-
-//     promotionLogger.info(
-//       `Multiple products [${products.length}] successfully inserted with!`
-//     );
-
-//     res.json(products);
-//   } catch (err) {
-//     promotionLogger.warn(`Error creating product`);
-//     next(err);
-//   }
-// };
-
-// exports.editProduct = async (req, res, next) => {
-//   try {
-//     const {
-//       name,
-//       barcode_number,
-//       description,
-//       sub_category,
-//       stock_status,
-//       measurement_value,
-//       measurement_unit,
-//       product_item: items,
-//       markup_percentage,
-//       retail_price,
-//       store_uuid,
-//       product_type,
-//       supply_price,
-//       old_imgs,
-//     } = req.body;
-//     const { uuid } = req.params;
-//     const { files: imgFiles } = req;
-//     const product_sub_category = JSON.parse(sub_category);
-//     const product_item = JSON.parse(items);
-//     const product_old_imgs = JSON.parse(old_imgs);
-
-//     const new_images = imgFiles.map(
-//       ({
-//         fieldname,
-//         originalname,
-//         encoding,
-//         mimetype,
-//         destination,
-//         filename,
-//         size,
-//         ...keepAttrs
-//       }) => keepAttrs
-//     );
-
-//     const product = await Product.query().patchAndFetchById(uuid, {
-//       name,
-//       description,
-//       store_uuid,
-//       stock_status,
-//       measurement_unit,
-//       product_type,
-//       barcode_number: parseInt(barcode_number, 10),
-//       measurement_value: parseFloat(measurement_value),
-//       markup_percentage: parseFloat(markup_percentage),
-//       retail_price: parseFloat(retail_price),
-//       supply_price: parseFloat(supply_price),
-//     });
-
-//     // if no duplicates, then proceed with relationship query
-//     await Product.query().upsertGraph(
-//       {
-//         uuid,
-//         items: product_item,
-//         sub_categories: product_sub_category,
-//         images: new_images,
-//       },
-//       {
-//         relate: ['items', 'sub_categories'],
-//         unrelate: ['items', 'sub_categories'],
-//       }
-//     );
-
-//     if (product_old_imgs && product) {
-//       await removeFiles(product_old_imgs);
-//     }
-
-//     promotionLogger.info(
-//       `product successfully updated with [UUID -${product.uuid}]`
-//     );
-//     res.json(product);
-//   } catch (err) {
-//     promotionLogger.warn(`Error updating the product`);
-//     await removeFiles(req.files);
-//     next(err);
-//   }
-// };
 
 // exports.patchProduct = async (req, res, next) => {
 //   try {

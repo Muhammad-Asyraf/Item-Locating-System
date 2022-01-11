@@ -125,11 +125,6 @@ const CampaignEditForm = (props) => {
 
   const { currentCampaign, initImage, onSubmit } = props;
 
-  // const startDateTimeInit = new Date(currentCampaign.start_date).toLocaleString();
-  // const endDateTimeInit = new Date(currentCampaign.end_date).toLocaleString();
-  // console.log('startDateTimeInit', startDateTimeInit);
-  // console.log('endDateTimeInit', endDateTimeInit);
-
   const startDateInit = new Date(currentCampaign.startDate);
   const endDateInit = new Date(currentCampaign.endDate);
   const startTimeInit = new Date(currentCampaign.startTime);

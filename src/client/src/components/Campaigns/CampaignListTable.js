@@ -171,34 +171,23 @@ const PromotionListTable = (props) => {
     setPage(newPage);
   };
 
-  const checkCampaignPeriod = (campaign, promotionPeriod) => {
+  const checkCampaignPeriod = (campaign, campaignPeriod) => {
     const currentDateTime = new Date().getTime();
     const startDateTime = new Date(campaign.start_date).getTime();
     const endDateTime = new Date(campaign.end_date).getTime();
 
-    // console.log('currentDateTime', currentDateTime);
-    // console.log('startDateTime', startDateTime);
-    // console.log('endDateTime', endDateTime);
-
-    // const currentDateTimeBabi = new Date();
-    // const startDateTimeBabi = new Date(campaign.start_date);
-    // const endDateTimeBabi = new Date(campaign.end_date);
-    // console.log('currentDateTimeBabi', currentDateTimeBabi);
-    // console.log('startDateTimeBabi', startDateTimeBabi);
-    // console.log('endDateTimeBabi', endDateTimeBabi);
-
-    if (promotionPeriod === 'Current & Upcoming') {
+    if (campaignPeriod === 'Current & Upcoming') {
       if (
         (currentDateTime >= startDateTime && currentDateTime <= endDateTime) ||
         (currentDateTime <= startDateTime && currentDateTime <= endDateTime)
       ) {
         return true;
       }
-    } else if (promotionPeriod === 'Past') {
+    } else if (campaignPeriod === 'Past') {
       if (currentDateTime >= startDateTime && currentDateTime >= endDateTime) {
         return true;
       }
-    } else if (promotionPeriod === 'All') {
+    } else if (campaignPeriod === 'All') {
       return true;
     }
 
@@ -221,15 +210,15 @@ const PromotionListTable = (props) => {
         classes={{ indicator: classes.selectedTab }}
         className={classes.tabContainer}
       >
-        {campaignPeriods.map((promotionPeriod) => {
-          const labelId = `campaign-tab-${promotionPeriod}`;
+        {campaignPeriods.map((campaignPeriod) => {
+          const labelId = `campaign-tab-${campaignPeriod}`;
 
           return (
             <Tab
               key={labelId}
               disableRipple
-              label={promotionPeriod}
-              value={promotionPeriod}
+              label={campaignPeriod}
+              value={campaignPeriod}
               className={classes.tabRoot}
             />
           );
@@ -242,14 +231,10 @@ const PromotionListTable = (props) => {
           handleMultipleDelete={handleMultipleDelete}
           handleSearch={handleSearch}
         />
-        {campaignPeriods.map((promotionPeriod) => {
-          const tabKey = `tab-panel-${promotionPeriod}`;
+        {campaignPeriods.map((campaignPeriod) => {
+          const tabKey = `tab-panel-${campaignPeriod}`;
           return (
-            <TabPanel
-              key={tabKey}
-              value={promotionPeriod}
-              style={{ marginTop: 0, padding: 0 }}
-            >
+            <TabPanel key={tabKey} value={campaignPeriod} style={{ marginTop: 0, padding: 0 }}>
               <TableContainer>
                 <Table
                   className={classes.table}
@@ -273,7 +258,7 @@ const PromotionListTable = (props) => {
                         const isCampaignSelected = isSelected(campaign.uuid);
                         const labelId = `enhanced-table-checkbox-${index}`;
 
-                        const currentPeriod = checkCampaignPeriod(campaign, promotionPeriod);
+                        const currentPeriod = checkCampaignPeriod(campaign, campaignPeriod);
 
                         if (currentPeriod) {
                           return (

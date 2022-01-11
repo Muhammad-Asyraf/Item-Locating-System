@@ -78,13 +78,8 @@ const PromotionCreate = () => {
     dispatch(categoryProcessed());
   }, []);
 
-  /* eslint-disable no-restricted-syntax */
   const handleSubmit = async (payload) => {
     dispatch(processingRequest());
-
-    for (const pair of payload.entries()) {
-      console.log('check => ', pair[0], pair[1]);
-    }
 
     const { type, payload: resPayload } = await dispatch(addPromotion({ payload }));
 

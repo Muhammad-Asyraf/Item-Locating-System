@@ -17,6 +17,7 @@ import {
   processingRequest,
   quickUpdatePromotions,
 } from '../../redux/features/promotionSlice';
+import { processingRequest as productProcessing } from '../../redux/features/productSlice';
 import { setNewNotification } from '../../redux/features/notificationSlice';
 
 import {
@@ -114,7 +115,7 @@ const PromotionList = () => {
   };
 
   const handleEdit = () => {
-    // dispatch(processingCategory());
+    dispatch(productProcessing());
   };
 
   if (isLoading) {

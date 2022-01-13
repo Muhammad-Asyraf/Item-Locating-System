@@ -3,6 +3,7 @@ div.css-16awh2u-MuiAutocomplete-root div.MuiAutocomplete-tag {
   background-color: #003366;
   color: white;
   padding-left: 5px;
+  max-width: calc(100% - 250px);
 }
 
 .css-5adnd6-MuiButtonBase-root-MuiChip-root .MuiChip-deleteIcon:hover {

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 // import { Link } from 'react-router-dom';
 import { useHistory, Link } from 'react-router-dom';
@@ -62,6 +62,8 @@ const PromotionCreate = () => {
   const storeUrl = localStorage.getItem('storeUrl');
   const storeName = localStorage.getItem('storeName');
 
+  const [overlapDateError, setOverlapDateError] = useState([]);
+
   const isProductLoading = useSelector(productLoading);
   const isPromotionLoading = useSelector(promotionLoading);
   const products = useSelector(selectProducts);
@@ -77,6 +79,8 @@ const PromotionCreate = () => {
     dispatch(campaignProcessed());
     dispatch(categoryProcessed());
   }, []);
+
+  console.log('products', products);
 
   const handleSubmit = async (payload) => {
     dispatch(processingRequest());
@@ -94,9 +98,12 @@ const PromotionCreate = () => {
         })
       );
     } else if (type.includes('rejected')) {
+      const err = JSON.parse(resPayload.message);
+      // console.log('resPayload', err);
+      setOverlapDateError(err.message);
       await dispatch(
         setNewNotification({
-          message: resPayload.message,
+          message: 'Overlap Promotional Dates Error',
           backgroundColor: '#be0000',
           severity: 'error',
         })
@@ -179,6 +186,7 @@ const PromotionCreate = () => {
             products={products}
             campaigns={campaigns}
             categoryOptions={categoryOptions}
+            overlapDateError={overlapDateError}
           />
         </Grid>
       </Grid>

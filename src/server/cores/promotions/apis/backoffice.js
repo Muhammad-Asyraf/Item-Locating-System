@@ -22,11 +22,11 @@ router.delete(
   checkAuth,
   promotionController.removePromotion
 );
-// router.post(
-//   '/product/delete',
-//   checkAuth,
-//   promotionController.removeMultiplePromotion
-// );
+router.post(
+  '/promotion/delete',
+  checkAuth,
+  promotionController.removeMultiplePromotion
+);
 router.put(
   '/promotion',
   checkAuth,

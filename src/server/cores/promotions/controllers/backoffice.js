@@ -97,19 +97,18 @@ exports.removePromotion = async (req, res, next) => {
   }
 };
 
-// exports.removeMultipleProduct = async (req, res, next) => {
-//   try {
-//     const { listToDelete } = req.body;
-//     // promotionLogger.debug(`Checking payload ${JSON.stringify(listToDelete)}`);
-//     await Product.query().delete().whereIn('uuid', listToDelete);
+exports.removeMultiplePromotion = async (req, res, next) => {
+  try {
+    const { listToDelete } = req.body;
+    await Promotion.query().delete().whereIn('uuid', listToDelete);
 
-//     const logMessage = `Successfully deleted following products: ${listToDelete}`;
-//     res.json({ message: logMessage });
-//   } catch (err) {
-//     promotionLogger.warn(`Error deleting products`);
-//     next(err);
-//   }
-// };
+    const logMessage = `Successfully deleted following promotions: ${listToDelete}`;
+    res.json({ message: logMessage });
+  } catch (err) {
+    promotionLogger.warn(`Error deleting promotions`);
+    next(err);
+  }
+};
 
 exports.createPromotion = async (req, res, next) => {
   try {
@@ -123,10 +122,10 @@ exports.createPromotion = async (req, res, next) => {
       promotion_type,
       store_uuid,
       campaign_uuid,
+      selectedPromoProducts,
       meta_data: metaData,
-      products: selectedProducts,
     } = req.body;
-    const products = JSON.parse(selectedProducts);
+    const selectedProducts = JSON.parse(selectedPromoProducts);
     const meta_data = JSON.parse(metaData);
 
     const startDate = momentTz
@@ -143,13 +142,72 @@ exports.createPromotion = async (req, res, next) => {
       .tz(new Date(end_time), 'Asia/Kuala_Lumpur')
       .format('HH:mm:ss');
 
-    const startDateTime = new Date(
-      `${startDate} ${startTime} GMT+0800`
-    ).toISOString();
+    const startDateTime = new Date(`${startDate} ${startTime} GMT+0800`);
+    const endDateTime = new Date(`${endDate} ${endTime} GMT+0800`);
 
-    const endDateTime = new Date(
-      `${endDate} ${endTime} GMT+0800`
-    ).toISOString();
+    // const startDateTime = new Date(
+    //   `${startDate} ${startTime} GMT+0800`
+    // ).toISOString();
+
+    // const endDateTime = new Date(
+    //   `${endDate} ${endTime} GMT+0800`
+    // ).toISOString();
+
+    if (name) {
+      // console.log('selectedProducts', selectedProducts);
+      // console.log('startDateTime', startDateTime);
+      // console.log('endDateTime', endDateTime);
+      // console.log('promotions', promotions);
+      const currentPromotionStartDateTime = startDateTime.getTime();
+      const currentPromotionEndDateTime = endDateTime.getTime();
+
+      console.log('currentPromotionStart', currentPromotionStartDateTime);
+      console.log('currentPromotionEnd', currentPromotionEndDateTime);
+
+      const errorMessages = [];
+
+      // (StartA <= EndB)  and  (EndA >= StartB) => if true mean overlapping promotion date with same promo type
+      selectedProducts.forEach(({ promotions, name: productName }) => {
+        if (promotions.length > 0) {
+          promotions.forEach(
+            ({
+              start_date,
+              end_date,
+              promotion_type: currentPromoType,
+              name: promoName,
+            }) => {
+              const start__Date = new Date(start_date).getTime();
+              const end__Date = new Date(end_date).getTime();
+
+              console.log('productName', productName);
+              console.log('currentPromoType', currentPromoType);
+              console.log('promotion_type', promotion_type);
+              console.log('start__Date', start__Date);
+              console.log('end__Date', end__Date);
+
+              if (
+                currentPromotionStartDateTime <= end__Date &&
+                currentPromotionEndDateTime >= start__Date &&
+                currentPromoType === promotion_type
+              ) {
+                const errMessage = `Product "${productName}" already has a ${currentPromoType.toLowerCase()} promotion applied on the chosen dates. Please refer to promotion "${promoName}" for further details`;
+                errorMessages.push(errMessage);
+              }
+              console.log('\n');
+            }
+          );
+        }
+      });
+
+      console.log(errorMessages);
+
+      res.status(422);
+      throw new Error(JSON.stringify({ message: errorMessages }));
+    }
+
+    const products = selectedProducts.map(({ uuid }) => {
+      return { uuid };
+    });
 
     const promotion = await Promotion.query().insertGraph(
       {

@@ -36,6 +36,18 @@ class Product extends Model {
           to: 'item.uuid',
         },
       },
+      promotions: {
+        relation: Model.ManyToManyRelation,
+        modelClass: require('../promotions/model'),
+        join: {
+          from: 'product.uuid',
+          through: {
+            from: 'promotion_product.product_uuid',
+            to: 'promotion_product.promotion_uuid',
+          },
+          to: 'promotion.uuid',
+        },
+      },
       planning_carts: {
         relation: Model.ManyToManyRelation,
         modelClass: require('../planning_carts/model'),

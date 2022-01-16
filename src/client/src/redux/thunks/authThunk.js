@@ -58,7 +58,7 @@ export const signup = createAsyncThunk(
   async ({ firebase, storePayload, userPayload }, { rejectWithValue, dispatch }) => {
     try {
       const storeEndpointURL = '/api/backoffice/store-service/store';
-      const userEndpointURL = '/api/backoffice/backoffice-user-service/signup/email';
+      const userEndpointURL = '/api/backoffice/user-service/signup/email';
 
       const { data: store } = await axios.post(storeEndpointURL, storePayload);
       await axios.post(userEndpointURL, {

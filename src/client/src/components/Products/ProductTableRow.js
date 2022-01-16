@@ -219,7 +219,8 @@ const ProductTableRow = (props) => {
       </TableRow>
       <TableRow>
         <TableCell style={{ padding: 0, borderBottom: 'none' }} colSpan={12}>
-          <Collapse in={open} timeout="auto" unmountOnExit>
+          <Collapse in={open} timeout={600} unmountOnExit>
+            {/* {open && ( */}
             <Paper
               sx={{
                 ml: 3,
@@ -323,6 +324,7 @@ const ProductTableRow = (props) => {
                 </Grid>
               </Grid>
             </Paper>
+            {/* )} */}
           </Collapse>
         </TableCell>
         <ImageModal

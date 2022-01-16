@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 // import { Link } from 'react-router-dom';
 import { useHistory, Link } from 'react-router-dom';
@@ -65,14 +65,14 @@ const PromotionCreate = (props) => {
   const storeUrl = localStorage.getItem('storeUrl');
   const storeName = localStorage.getItem('storeName');
 
+  const [overlapDateError, setOverlapDateError] = useState([]);
+
   const isProductLoading = useSelector(productLoading);
   const isPromotionLoading = useSelector(promotionLoading);
   const products = useSelector(selectProducts);
   const currentPromotion = useSelector(selectSinglePromotion);
   const campaigns = useSelector(selectCampaigns);
   const categoryOptions = useSelector(selectSubcategory);
-
-  console.log('currentPromotion', currentPromotion);
 
   useEffect(async () => {
     await dispatch(getSinglePromo({ uuid: match.params.uuid }));
@@ -98,8 +98,8 @@ const PromotionCreate = (props) => {
     );
 
     if (type.includes('fulfilled')) {
-      // history.push(`/${storeUrl}/promotion/list`);
-      console.log(history);
+      history.push(`/${storeUrl}/promotion/list`);
+
       await dispatch(
         setNewNotification({
           message: 'Promotion successfully created',
@@ -108,9 +108,20 @@ const PromotionCreate = (props) => {
         })
       );
     } else if (type.includes('rejected')) {
+      const { status, message } = resPayload;
+      let notiMessage;
+
+      if (status === 409) {
+        const errMessage = JSON.parse(message);
+        setOverlapDateError(errMessage);
+        notiMessage = 'Overlap Promotional Dates Error';
+      } else {
+        notiMessage = message;
+      }
+
       await dispatch(
         setNewNotification({
-          message: resPayload.message,
+          message: notiMessage,
           backgroundColor: '#be0000',
           severity: 'error',
         })
@@ -194,6 +205,7 @@ const PromotionCreate = (props) => {
             products={products}
             campaigns={campaigns}
             categoryOptions={categoryOptions}
+            overlapDateError={overlapDateError}
           />
         </Grid>
       </Grid>

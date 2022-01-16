@@ -526,23 +526,6 @@ const PromotionForm = (props) => {
       return { uuid, name, promotions };
     });
 
-    // const payload = {
-    //   name: promotionName,
-    //   description: description.editorHtml,
-    //   start_date: dateRange[0],
-    //   end_date: dateRange[1],
-    //   start_time: startDateTime,
-    //   end_time: endDateTime,
-    //   promotion_type: selectedPromotionType,
-    //   meta_data: promotionMetaData,
-    //   products: promoProducts,
-    //   store_uuid: storeUUID,
-    //   campaign_uuid: linkToCampaign ? selectedCampaign.uuid : null,
-    // };
-
-    // console.log(payload);
-    // return payload;
-
     formData.append('name', promotionName);
     formData.append('description', description.editorHtml);
     formData.append('start_date', dateRange[0]);
@@ -930,8 +913,6 @@ const PromotionForm = (props) => {
     setSelectedActiveStatusFilter(null);
     setSelectedStockStatusFilter(null);
   };
-
-  console.log('overlapDateError', overlapDateError);
 
   /// /////////////////////////// component  //////////////////////////////////////////////
 
@@ -1545,7 +1526,6 @@ const PromotionForm = (props) => {
                         </Grid>
                       </Grid>
                     )}
-
                     <Grid item xs={12} container sx={{ pt: '15px !important' }}>
                       <Grid item xs={12} container>
                         <Grid

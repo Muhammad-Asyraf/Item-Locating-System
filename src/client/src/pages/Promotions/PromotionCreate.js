@@ -88,8 +88,8 @@ const PromotionCreate = () => {
     const { type, payload: resPayload } = await dispatch(addPromotion({ payload }));
 
     if (type.includes('fulfilled')) {
-      // history.push(`/${storeUrl}/promotion/list`);
-      console.log(history);
+      history.push(`/${storeUrl}/promotion/list`);
+
       await dispatch(
         setNewNotification({
           message: 'Promotion successfully created',
@@ -98,12 +98,20 @@ const PromotionCreate = () => {
         })
       );
     } else if (type.includes('rejected')) {
-      const err = JSON.parse(resPayload.message);
-      // console.log('resPayload', err);
-      setOverlapDateError(err.message);
+      const { status, message } = resPayload;
+      let notiMessage;
+
+      if (status === 409) {
+        const errMessage = JSON.parse(message);
+        setOverlapDateError(errMessage);
+        notiMessage = 'Overlap Promotional Dates Error';
+      } else {
+        notiMessage = message;
+      }
+
       await dispatch(
         setNewNotification({
-          message: 'Overlap Promotional Dates Error',
+          message: notiMessage,
           backgroundColor: '#be0000',
           severity: 'error',
         })

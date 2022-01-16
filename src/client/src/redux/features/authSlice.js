@@ -36,8 +36,6 @@ const auth = createSlice({
     }),
   },
   extraReducers: {
-    // [setHeader.fulfilled]: withHeaderState,
-    // [setHeader.pending]: loadingState,
     [login.fulfilled]: activeUserState,
     [login.pending]: loadingState,
     [login.rejected]: errorState,

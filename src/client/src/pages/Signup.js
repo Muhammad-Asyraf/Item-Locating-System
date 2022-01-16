@@ -76,8 +76,6 @@ const SignUp = () => {
   //   });
   // };
 
-  console.log(authErrors);
-
   return (
     <div>
       <Grid

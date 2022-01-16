@@ -272,6 +272,7 @@ const PromotionEditForm = (props) => {
     campaigns,
     categoryOptions,
     onSubmit,
+    overlapDateError,
   } = props;
 
   const startDateInit = new Date(currentPromotion.startDate);
@@ -542,6 +543,8 @@ const PromotionEditForm = (props) => {
     const promoProducts = selectedProducts.map(({ uuid, name, promotions }) => {
       return { uuid, name, promotions };
     });
+
+    console.log('JSON.stringify(promoProducts)', JSON.stringify(promoProducts));
 
     formData.append('name', promotionName);
     formData.append('description', description.editorHtml);
@@ -999,8 +1002,6 @@ const PromotionEditForm = (props) => {
   };
 
   /// /////////////////////////// Load up data //////////////////////////////////////////////
-
-  // console.log('currentPromotion', currentPromotion);
 
   useEffect(() => {
     let applicableProduct;
@@ -1526,39 +1527,51 @@ const PromotionEditForm = (props) => {
                     >
                       <Divider sx={{ width: '100%' }} />
                     </Grid>
-                    <Grid item xs={12} container>
-                      <Grid item xs={12}>
-                        <Box
-                          style={{
-                            border: '2px solid red',
-                            borderRadius: 10,
-                            backgroundColor: 'rgba(255, 0, 0, 0.1)',
-                            color: 'rgb(95, 33, 32)',
-                            padding: 20,
-                          }}
-                        >
-                          <Grid container spacing={1}>
-                            <Grid item xs={12}>
-                              <b style={{ fontSize: '1.0rem' }}>Product Selection Error</b>
+                    {overlapDateError && overlapDateError.length > 0 && (
+                      <Grid item xs={12} container>
+                        <Grid item xs={12}>
+                          <Box
+                            style={{
+                              border: '2px solid red',
+                              borderRadius: 10,
+                              backgroundColor: 'rgba(255, 0, 0, 0.1)',
+                              color: 'rgb(95, 33, 32)',
+                              padding: 22,
+                            }}
+                          >
+                            <Grid container spacing={1}>
+                              <Grid item xs={12} sx={{ pb: '5px !important' }}>
+                                <b style={{ fontSize: '1.0rem' }}>
+                                  Overlap Promotional Dates Error
+                                </b>
+                              </Grid>
+                              {overlapDateError.map((msg, index) => {
+                                const labelID = `overlap-date-error-${index}`;
+                                return (
+                                  <Grid item xs={12} container key={labelID}>
+                                    <Grid item xs={0.5}>
+                                      <ErrorOutlineIcon />
+                                    </Grid>
+                                    <Grid item xs={11.5}>
+                                      <span
+                                        style={{
+                                          fontSize: '0.875rem',
+                                          position: 'relative',
+                                          bottom: 7,
+                                          left: 5,
+                                        }}
+                                      >
+                                        {msg}
+                                      </span>
+                                    </Grid>
+                                  </Grid>
+                                );
+                              })}
                             </Grid>
-                            <Grid item xs={12}>
-                              <ErrorOutlineIcon />
-                              <span
-                                style={{
-                                  fontSize: '0.875rem',
-                                  position: 'relative',
-                                  bottom: 7,
-                                  left: 5,
-                                }}
-                              >
-                                Aussie, Miracle Curls, Shampoo, with Coconut & Australian
-                                Jojoba Oil, 12.1 fl oz (360 ml)
-                              </span>
-                            </Grid>
-                          </Grid>
-                        </Box>
+                          </Box>
+                        </Grid>
                       </Grid>
-                    </Grid>
+                    )}
                     <Grid item xs={12} container sx={{ pt: '15px !important' }}>
                       <Grid item xs={12} container>
                         <Grid

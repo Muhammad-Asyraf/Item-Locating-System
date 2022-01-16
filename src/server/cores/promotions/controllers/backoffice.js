@@ -145,92 +145,76 @@ exports.createPromotion = async (req, res, next) => {
     const startDateTime = new Date(`${startDate} ${startTime} GMT+0800`);
     const endDateTime = new Date(`${endDate} ${endTime} GMT+0800`);
 
-    // const startDateTime = new Date(
-    //   `${startDate} ${startTime} GMT+0800`
-    // ).toISOString();
+    const currentPromotionStartDateTime = startDateTime.getTime();
+    const currentPromotionEndDateTime = endDateTime.getTime();
+    const errorMessages = [];
 
-    // const endDateTime = new Date(
-    //   `${endDate} ${endTime} GMT+0800`
-    // ).toISOString();
+    // (StartA <= EndB)  and  (EndA >= StartB) => if true mean overlapping promotion date with same promo type
+    selectedProducts.forEach(({ promotions, name: productName }) => {
+      if (promotions && promotions.length > 0) {
+        promotions.forEach(
+          ({
+            start_date,
+            end_date,
+            promotion_type: currentPromoType,
+            name: promoName,
+          }) => {
+            const start__Date = new Date(start_date).getTime();
+            const end__Date = new Date(end_date).getTime();
 
-    if (name) {
-      // console.log('selectedProducts', selectedProducts);
-      // console.log('startDateTime', startDateTime);
-      // console.log('endDateTime', endDateTime);
-      // console.log('promotions', promotions);
-      const currentPromotionStartDateTime = startDateTime.getTime();
-      const currentPromotionEndDateTime = endDateTime.getTime();
+            if (
+              currentPromotionStartDateTime <= end__Date &&
+              currentPromotionEndDateTime >= start__Date &&
+              currentPromoType === promotion_type
+            ) {
+              const formattedStartDate = momentTz
+                .tz(new Date(start__Date), 'Asia/Kuala_Lumpur')
+                .format('DD/MM/YYYY hh:mm a');
 
-      console.log('currentPromotionStart', currentPromotionStartDateTime);
-      console.log('currentPromotionEnd', currentPromotionEndDateTime);
+              const formattedEndDate = momentTz
+                .tz(new Date(end__Date), 'Asia/Kuala_Lumpur')
+                .format('DD/MM/YYYY hh:mm A');
 
-      const errorMessages = [];
-
-      // (StartA <= EndB)  and  (EndA >= StartB) => if true mean overlapping promotion date with same promo type
-      selectedProducts.forEach(({ promotions, name: productName }) => {
-        if (promotions.length > 0) {
-          promotions.forEach(
-            ({
-              start_date,
-              end_date,
-              promotion_type: currentPromoType,
-              name: promoName,
-            }) => {
-              const start__Date = new Date(start_date).getTime();
-              const end__Date = new Date(end_date).getTime();
-
-              console.log('productName', productName);
-              console.log('currentPromoType', currentPromoType);
-              console.log('promotion_type', promotion_type);
-              console.log('start__Date', start__Date);
-              console.log('end__Date', end__Date);
-
-              if (
-                currentPromotionStartDateTime <= end__Date &&
-                currentPromotionEndDateTime >= start__Date &&
-                currentPromoType === promotion_type
-              ) {
-                const errMessage = `Product "${productName}" already has a ${currentPromoType.toLowerCase()} promotion applied on the chosen dates. Please refer to promotion "${promoName}" for further details`;
-                errorMessages.push(errMessage);
-              }
-              console.log('\n');
+              const errMessage = `Product "${productName}" already has a ${currentPromoType.toLowerCase()} promotion applied on the chosen dates. The conflicted promotion "${promoName}" effective date is as follows: ${formattedStartDate} — ${formattedEndDate}`;
+              // const errMessage = `Product "${productName}" already has a ${currentPromoType.toLowerCase()} promotion applied on the chosen dates. Please refer to promotion "${promoName}" (${formattedStartDate} — ${formattedEndDate}) for further details`;
+              errorMessages.push(errMessage);
             }
-          );
-        }
-      });
-
-      console.log(errorMessages);
-
-      res.status(422);
-      throw new Error(JSON.stringify({ message: errorMessages }));
-    }
-
-    const products = selectedProducts.map(({ uuid }) => {
-      return { uuid };
+          }
+        );
+      }
     });
 
-    const promotion = await Promotion.query().insertGraph(
-      {
-        name,
-        start_date: startDateTime,
-        end_date: endDateTime,
-        promotion_type,
-        meta_data,
-        store_uuid,
-        campaign_uuid,
-        description,
-        products,
-      },
-      { relate: ['products'] }
-    );
+    if (errorMessages.length > 0) {
+      throw {
+        name: 'ConflictError',
+        message: JSON.stringify(errorMessages),
+      };
+    } else {
+      const products = selectedProducts.map(({ uuid }) => {
+        return { uuid };
+      });
 
-    promotionLogger.info(
-      `promotion successfully created with [UUID -${promotion.uuid}]`
-    );
+      const promotion = await Promotion.query().insertGraph(
+        {
+          name,
+          start_date: startDateTime.toISOString(),
+          end_date: endDateTime.toISOString(),
+          promotion_type,
+          meta_data,
+          store_uuid,
+          campaign_uuid,
+          description,
+          products,
+        },
+        { relate: ['products'] }
+      );
 
-    console.log(promotion);
+      promotionLogger.info(
+        `promotion successfully created with [UUID -${promotion.uuid}]`
+      );
 
-    res.json(promotion);
+      res.json(promotion);
+    }
   } catch (err) {
     promotionLogger.warn(`Error creating promotion`);
     next(err);
@@ -249,23 +233,12 @@ exports.editPromotion = async (req, res, next) => {
       promotion_type,
       store_uuid,
       campaign_uuid,
+      selectedPromoProducts,
       meta_data: metaData,
-      products: selectedProducts,
     } = req.body;
-    const products = JSON.parse(selectedProducts);
+    const selectedProducts = JSON.parse(selectedPromoProducts);
     const meta_data = JSON.parse(metaData);
-
-    console.log('name', name);
-    console.log('description', description);
-    console.log('start_date', start_date);
-    console.log('end_date', end_date);
-    console.log('start_time', start_time);
-    console.log('end_time', end_time);
-    console.log('promotion_type', promotion_type);
-    console.log('store_uuid', store_uuid);
-    console.log('campaign_uuid', campaign_uuid);
-    console.log('products', products);
-    console.log('meta_data', meta_data);
+    const { uuid } = req.params;
 
     const startDate = momentTz
       .tz(new Date(start_date), 'Asia/Kuala_Lumpur')
@@ -281,51 +254,80 @@ exports.editPromotion = async (req, res, next) => {
       .tz(new Date(end_time), 'Asia/Kuala_Lumpur')
       .format('HH:mm:ss');
 
-    const startDateTime = new Date(
-      `${startDate} ${startTime} GMT+0800`
-    ).toISOString();
+    const startDateTime = new Date(`${startDate} ${startTime} GMT+0800`);
+    const endDateTime = new Date(`${endDate} ${endTime} GMT+0800`);
 
-    const endDateTime = new Date(
-      `${endDate} ${endTime} GMT+0800`
-    ).toISOString();
+    const currentPromotionStartDateTime = startDateTime.getTime();
+    const currentPromotionEndDateTime = endDateTime.getTime();
+    const errorMessages = [];
 
-    console.log(
-      momentTz
-        .tz(new Date(startDateTime), 'Asia/Kuala_Lumpur')
-        .format('DD/MM/YYYY HH:mm:ss')
-    );
-    console.log(
-      momentTz
-        .tz(new Date(endDateTime), 'Asia/Kuala_Lumpur')
-        .format('DD/MM/YYYY HH:mm:ss')
-    );
+    // (StartA <= EndB)  and  (EndA >= StartB) => if true mean overlapping promotion date with same promo type
+    selectedProducts.forEach(({ promotions, name: productName }) => {
+      if (promotions && promotions.length > 0) {
+        promotions.forEach(
+          ({
+            start_date,
+            end_date,
+            promotion_type: currentPromoType,
+            name: promoName,
+          }) => {
+            const start__Date = new Date(start_date).getTime();
+            const end__Date = new Date(end_date).getTime();
 
-    console.log(startDateTime);
-    console.log(endDateTime);
+            if (
+              currentPromotionStartDateTime <= end__Date &&
+              currentPromotionEndDateTime >= start__Date &&
+              currentPromoType === promotion_type
+            ) {
+              const formattedStartDate = momentTz
+                .tz(new Date(start__Date), 'Asia/Kuala_Lumpur')
+                .format('DD/MM/YYYY hh:mm a');
 
-    const promotion = await Promotion.query().patchAndFetchById(
-      uuid,
-      {
-        name,
-        start_date: startDateTime,
-        end_date: endDateTime,
-        promotion_type,
-        meta_data,
-        store_uuid,
-        campaign_uuid,
-        description,
-        products,
-      },
-      { relate: ['products'] }
-    );
+              const formattedEndDate = momentTz
+                .tz(new Date(end__Date), 'Asia/Kuala_Lumpur')
+                .format('DD/MM/YYYY hh:mm A');
 
-    promotionLogger.info(
-      `promotion  with [UUID -${promotion.uuid}] successfully updated`
-    );
+              const errMessage = `Product "${productName}" already has a ${currentPromoType.toLowerCase()} promotion applied on the chosen dates. The conflicted promotion "${promoName}" effective date is as follows: ${formattedStartDate} — ${formattedEndDate}`;
+              // const errMessage = `Product "${productName}" already has a ${currentPromoType.toLowerCase()} promotion applied on the chosen dates. Please refer to promotion "${promoName}" (${formattedStartDate} — ${formattedEndDate}) for further details`;
+              errorMessages.push(errMessage);
+            }
+          }
+        );
+      }
+    });
 
-    console.log(promotion);
+    if (errorMessages.length > 0) {
+      throw {
+        name: 'ConflictError',
+        message: JSON.stringify(errorMessages),
+      };
+    } else {
+      const products = selectedProducts.map(({ uuid: productUUID, name }) => {
+        return { uuid: productUUID };
+      });
 
-    res.json(promotion);
+      const promotion = await Promotion.query().upsertGraph(
+        {
+          uuid,
+          name,
+          start_date: startDateTime.toISOString(),
+          end_date: endDateTime.toISOString(),
+          promotion_type,
+          meta_data,
+          store_uuid,
+          campaign_uuid,
+          description,
+          products,
+        },
+        { relate: ['products'] }
+      );
+
+      promotionLogger.info(
+        `promotion  with [UUID -${promotion.uuid}] successfully updated`
+      );
+
+      res.json(promotion);
+    }
   } catch (err) {
     promotionLogger.warn(`Error updating promotion`);
     next(err);

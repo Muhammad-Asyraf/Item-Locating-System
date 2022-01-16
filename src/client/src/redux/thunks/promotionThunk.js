@@ -66,12 +66,11 @@ export const addPromotion = createAsyncThunk(
 
       return true;
     } catch (err) {
-      const { data } = err.response;
+      const { data, status } = err.response;
 
       return rejectWithValue({
         message: data.message,
-        status: 'Error!',
-        error: data.code,
+        status,
       });
     }
   }
@@ -134,13 +133,11 @@ export const updatePromotion = createAsyncThunk(
 
       return true;
     } catch (err) {
-      console.log('error', err);
-      const { data } = err.response;
+      const { data, status } = err.response;
 
       return rejectWithValue({
         message: data.message,
-        status: 'Error!',
-        error: data.code,
+        status,
       });
     }
   }

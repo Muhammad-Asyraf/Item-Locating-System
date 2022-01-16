@@ -28,7 +28,7 @@ router.post(
   promotionController.removeMultiplePromotion
 );
 router.put(
-  '/promotion',
+  '/promotion/:uuid',
   checkAuth,
   upload.fields([]),
   promotionController.editPromotion

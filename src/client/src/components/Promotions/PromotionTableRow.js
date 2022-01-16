@@ -141,7 +141,7 @@ const PromotionTableRow = (props) => {
       </TableRow>
       <TableRow>
         <TableCell style={{ padding: 0, borderBottom: 'none' }} colSpan={12}>
-          <Collapse in={open} timeout="auto" unmountOnExit>
+          <Collapse in={open} timeout={600} unmountOnExit>
             <Paper
               sx={{
                 ml: 3,

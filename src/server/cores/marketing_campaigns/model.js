@@ -21,12 +21,12 @@ class MarketingCampaign extends Model {
 
   static get relationMappings() {
     return {
-      image: {
-        relation: Model.BelongsToOneRelation,
-        modelClass: require('../images/model'),
+      promotions: {
+        relation: Model.HasManyRelation,
+        modelClass: require('../promotions/model'),
         join: {
-          from: 'marketing_campaign.image_uuid',
-          to: 'image.uuid',
+          from: 'marketing_campaign.uuid',
+          to: 'promotion.campaign_uuid',
         },
       },
       store: {

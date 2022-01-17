@@ -5,6 +5,7 @@ const errorLogger = getLogger(__filename, 'server');
 const errorTypes = {
   ValidationError: 422,
   UniqueViolationError: 409,
+  ConflictError: 409,
 };
 const errorMessages = {
   UniqueViolationError: {
@@ -29,7 +30,6 @@ const endpointNotFound = (req, res, next) => {
 
 // eslint-disable-next-line no-unused-vars
 const errorHandler = (error, req, res, next) => {
-  errorLogger.error(JSON.stringify(error));
   const statusCode =
     res.statusCode === 200 ? errorTypes[error.name] || 500 : res.statusCode;
   res.status(statusCode);

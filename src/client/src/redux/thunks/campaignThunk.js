@@ -1,11 +1,12 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
+import getHeader from '../../services/firebase/getHeader';
 
 export const getSingleCampaign = createAsyncThunk(
   'campaign/getSingleCampaign',
-  async ({ uuid }, { rejectWithValue, getState }) => {
+  async ({ uuid }, { rejectWithValue }) => {
     try {
-      const { authHeader } = await getState().auth;
+      const authHeader = await getHeader();
       const endpointURL = `/api/backoffice/marketing-campaign-service/campaign/${uuid}`;
 
       const { data } = await axios.get(endpointURL, authHeader);
@@ -29,11 +30,11 @@ export const getSingleCampaign = createAsyncThunk(
 
 export const getCampaigns = createAsyncThunk(
   'campaign/getCampaigns',
-  async (args, { rejectWithValue, getState }) => {
+  async (args, { rejectWithValue }) => {
     try {
       const storeUuid = localStorage.getItem('storeUUID');
       const endpointURL = `/api/backoffice/marketing-campaign-service/campaigns/${storeUuid}`;
-      const { authHeader } = await getState().auth;
+      const authHeader = await getHeader();
 
       const { data } = await axios.get(endpointURL, authHeader);
 
@@ -56,10 +57,10 @@ export const getCampaigns = createAsyncThunk(
 
 export const addCampaign = createAsyncThunk(
   'campaign/addCampaign',
-  async ({ payload }, { rejectWithValue, getState }) => {
+  async ({ payload }, { rejectWithValue }) => {
     try {
       const endpointURL = '/api/backoffice/marketing-campaign-service/campaign';
-      const { authHeader } = await getState().auth;
+      const authHeader = await getHeader();
 
       await axios.post(endpointURL, payload, authHeader);
 
@@ -78,9 +79,9 @@ export const addCampaign = createAsyncThunk(
 
 export const deleteCampaign = createAsyncThunk(
   'campaign/deleteCampaign',
-  async ({ uuid }, { rejectWithValue, getState }) => {
+  async ({ uuid }, { rejectWithValue }) => {
     try {
-      const { authHeader } = await getState().auth;
+      const authHeader = await getHeader();
       const endpointURL = `/api/backoffice/marketing-campaign-service/campaign/${uuid}`;
 
       await axios.delete(endpointURL, authHeader);
@@ -101,9 +102,9 @@ export const deleteCampaign = createAsyncThunk(
 
 export const deleteMultipleCampaigns = createAsyncThunk(
   'campaign/deleteMultipleCampaigns',
-  async ({ listToDelete }, { rejectWithValue, getState }) => {
+  async ({ listToDelete }, { rejectWithValue }) => {
     try {
-      const { authHeader } = await getState().auth;
+      const authHeader = await getHeader();
       const endpointURL = '/api/backoffice/marketing-campaign-service/campaign/delete';
 
       await axios.post(endpointURL, { listToDelete }, authHeader);
@@ -124,10 +125,10 @@ export const deleteMultipleCampaigns = createAsyncThunk(
 
 export const updateCampaign = createAsyncThunk(
   'campaign/updateCampaign',
-  async ({ uuid, payload }, { rejectWithValue, getState }) => {
+  async ({ uuid, payload }, { rejectWithValue }) => {
     try {
       const endpointURL = `/api/backoffice/marketing-campaign-service/campaign/${uuid}`;
-      const { authHeader } = await getState().auth;
+      const authHeader = await getHeader();
 
       await axios.put(endpointURL, payload, authHeader);
 

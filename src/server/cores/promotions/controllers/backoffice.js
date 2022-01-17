@@ -1,3 +1,4 @@
+const momentTz = require('moment-timezone');
 const Promotion = require('../model');
 const getLogger = require('../../../utils/logger');
 
@@ -8,7 +9,7 @@ exports.getAllPromotions = async (req, res, next) => {
     const { store_uuid } = req.params;
     const promotions = await Promotion.query()
       .where('store_uuid', store_uuid)
-      .withGraphFetched('[products ]');
+      .withGraphFetched('[products, campaign]');
 
     // .modifyGraph('images', (builder) => {
     //   builder.select('path');
@@ -30,280 +31,308 @@ exports.getAllPromotions = async (req, res, next) => {
   }
 };
 
-// exports.findProduct = async (req, res, next) => {
-//   try {
-//     const { uuid } = req.params;
-//     const product = await Product.query()
-//       .findById(uuid)
-//       .withGraphFetched('[items, sub_categories.category, images]')
-//       .modifyGraph('images', (builder) => {
-//         builder.select('path');
-//       })
-//       .modifyGraph('sub_categories.category', (builder) => {
-//         builder.select('uuid', 'name');
-//       })
-//       .modifyGraph('sub_categories', (builder) => {
-//         builder.select('uuid', 'name');
-//       });
+exports.findPromotion = async (req, res, next) => {
+  try {
+    const { uuid } = req.params;
+    const promotion = await Promotion.query()
+      .findById(uuid)
+      .withGraphFetched('[products, campaign]');
 
-//     promotionLogger.info(`Successfully retrieve product: ${product.uuid}`);
-//     res.json(product);
-//   } catch (err) {
-//     promotionLogger.warn(`Error retrieving product`);
-//     next(err);
-//   }
-// };
+    // .modifyGraph('products', (builder) => {
+    //   builder.select('path');
+    // })
+    // .modifyGraph('campaign', (builder) => {
+    //   builder.select('uuid', 'name');
+    // })
 
-// exports.removeProduct = async (req, res, next) => {
-//   try {
-//     const { uuid } = req.params;
-//     await Product.query().deleteById(uuid);
-//     const logMessage = `Successfully delete product: ${uuid}`;
-//     promotionLogger.info(logMessage);
-//     res.json({ message: logMessage });
-//   } catch (err) {
-//     promotionLogger.warn(`Error deleting product`);
-//     next(err);
-//   }
-// };
+    const { start_date, end_date } = promotion;
 
-// exports.removeMultipleProduct = async (req, res, next) => {
-//   try {
-//     const { listToDelete } = req.body;
-//     // promotionLogger.debug(`Checking payload ${JSON.stringify(listToDelete)}`);
-//     await Product.query().delete().whereIn('uuid', listToDelete);
+    let startDate = momentTz
+      .tz(new Date(start_date), 'Asia/Kuala_Lumpur')
+      .format('MMM DD YYYY');
 
-//     const logMessage = `Successfully deleted following products: ${listToDelete}`;
-//     res.json({ message: logMessage });
-//   } catch (err) {
-//     promotionLogger.warn(`Error deleting products`);
-//     next(err);
-//   }
-// };
+    let endDate = momentTz
+      .tz(new Date(end_date), 'Asia/Kuala_Lumpur')
+      .format('MMM DD YYYY');
 
-// exports.createProduct = async (req, res, next) => {
-//   try {
-//     const {
-//       name,
-//       barcode_number,
-//       description,
-//       sub_category,
-//       stock_status,
-//       measurement_value,
-//       measurement_unit,
-//       product_item: items,
-//       markup_percentage,
-//       retail_price,
-//       store_uuid,
-//       product_type,
-//       supply_price,
-//     } = req.body;
-//     const { files: imgFiles } = req;
-//     const product_sub_category = JSON.parse(sub_category);
-//     const product_item = JSON.parse(items);
+    let startTime = momentTz
+      .tz(new Date(start_date), 'Asia/Kuala_Lumpur')
+      .format('MMM DD YYYY HH:mm:ss');
 
-//     const new_images = imgFiles.map(
-//       ({
-//         fieldname,
-//         originalname,
-//         encoding,
-//         mimetype,
-//         destination,
-//         filename,
-//         size,
-//         ...keepAttrs
-//       }) => keepAttrs
-//     );
+    let endTime = momentTz
+      .tz(new Date(end_date), 'Asia/Kuala_Lumpur')
+      .format('MMM DD YYYY HH:mm:ss');
 
-//     const product = await Product.query().insertGraph(
-//       {
-//         name,
-//         description,
-//         store_uuid,
-//         stock_status,
-//         measurement_unit,
-//         product_type,
-//         is_active: false,
-//         barcode_number: parseInt(barcode_number, 10),
-//         measurement_value: parseFloat(measurement_value),
-//         markup_percentage: parseFloat(markup_percentage),
-//         retail_price: parseFloat(retail_price),
-//         supply_price: parseFloat(supply_price),
-//         items: product_item,
-//         sub_categories: product_sub_category,
-//         images: new_images,
-//       },
-//       { relate: ['items', 'sub_categories'] }
-//     );
+    startDate = `${startDate} 00:00:00 GMT+0800`;
+    endDate = `${endDate} 00:00:00 GMT+0800`;
+    startTime = `${startTime} GMT+0800`;
+    endTime = `${endTime} GMT+0800`;
 
-//     promotionLogger.info(
-//       `product successfully created with [UUID -${product.uuid}]`
-//     );
+    const resPayload = {
+      ...promotion,
+      startDate,
+      endDate,
+      startTime,
+      endTime,
+    };
 
-//     res.json(product);
-//   } catch (err) {
-//     promotionLogger.warn(`Error creating product`);
-//     await removeFiles(req.files);
-//     next(err);
-//   }
-// };
+    promotionLogger.info(`Successfully retrieve promotion: ${promotion.uuid}`);
+    res.json(resPayload);
+  } catch (err) {
+    promotionLogger.warn(`Error retrieving promotion`);
+    next(err);
+  }
+};
 
-// exports.createMultipleProducts = async (req, res, next) => {
-//   try {
-//     const { body: payloadList } = req;
-//     let subCatList = [];
-//     let itemList = [];
+exports.removePromotion = async (req, res, next) => {
+  try {
+    const { uuid } = req.params;
+    await Promotion.query().deleteById(uuid);
+    const logMessage = `Successfully delete promotion: ${uuid}`;
+    promotionLogger.info(logMessage);
+    res.json({ message: logMessage });
+  } catch (err) {
+    promotionLogger.warn(`Error deleting promotion`);
+    next(err);
+  }
+};
 
-//     payloadList.forEach(({ sub_categories, items }) => {
-//       subCatList = [...new Set([...subCatList, ...sub_categories])];
+exports.removeMultiplePromotion = async (req, res, next) => {
+  try {
+    const { listToDelete } = req.body;
+    await Promotion.query().delete().whereIn('uuid', listToDelete);
 
-//       barcodeNumberList = items.map(({ barcode_number }) => barcode_number);
-//       itemList = [...new Set([...itemList, ...barcodeNumberList])];
-//     });
+    const logMessage = `Successfully deleted following promotions: ${listToDelete}`;
+    res.json({ message: logMessage });
+  } catch (err) {
+    promotionLogger.warn(`Error deleting promotions`);
+    next(err);
+  }
+};
 
-//     const subCatIds = await SubCategory.query()
-//       .select('uuid', 'name')
-//       .whereIn('name', subCatList);
+exports.createPromotion = async (req, res, next) => {
+  try {
+    const {
+      name,
+      description,
+      start_date,
+      end_date,
+      start_time,
+      end_time,
+      promotion_type,
+      store_uuid,
+      campaign_uuid,
+      selectedPromoProducts,
+      meta_data: metaData,
+    } = req.body;
+    const selectedProducts = JSON.parse(selectedPromoProducts);
+    const meta_data = JSON.parse(metaData);
 
-//     const itemsIds = await Item.query()
-//       .select('uuid', 'barcode_number')
-//       .whereIn('barcode_number', itemList);
+    const startDate = momentTz
+      .tz(new Date(start_date), 'Asia/Kuala_Lumpur')
+      .format('YYYY-MM-DD');
+    const startTime = momentTz
+      .tz(new Date(start_time), 'Asia/Kuala_Lumpur')
+      .format('HH:mm:ss');
 
-//     const multipleProductsPayload = payloadList.map((payload) => {
-//       const {
-//         items,
-//         sub_categories,
-//         barcode_number,
-//         measurement_value,
-//         markup_percentage,
-//         retail_price,
-//         supply_price,
-//       } = payload;
+    const endDate = momentTz
+      .tz(new Date(end_date), 'Asia/Kuala_Lumpur')
+      .format('YYYY-MM-DD');
+    const endTime = momentTz
+      .tz(new Date(end_time), 'Asia/Kuala_Lumpur')
+      .format('HH:mm:ss');
 
-//       const subCatByUUID = sub_categories.map((subCat) => {
-//         // get the UUID of the subcat by name
-//         const subCatUUID = subCatIds.find((obj) => obj.name === subCat).uuid;
-//         return { uuid: subCatUUID };
-//       });
+    const startDateTime = new Date(`${startDate} ${startTime} GMT+0800`);
+    const endDateTime = new Date(`${endDate} ${endTime} GMT+0800`);
 
-//       const itemsByUUID = items.map(({ barcode_number, quantity }) => {
-//         // get the UUID of the items by barcode number
-//         const itemUUID = itemsIds.find(
-//           (obj) => obj.barcode_number === barcode_number
-//         ).uuid;
+    const currentPromotionStartDateTime = startDateTime.getTime();
+    const currentPromotionEndDateTime = endDateTime.getTime();
+    const errorMessages = [];
 
-//         return { uuid: itemUUID, quantity };
-//       });
+    // (StartA <= EndB)  and  (EndA >= StartB) => if true mean overlapping promotion date with same promo type
+    selectedProducts.forEach(({ promotions, name: productName }) => {
+      if (promotions && promotions.length > 0) {
+        promotions.forEach(
+          ({
+            start_date,
+            end_date,
+            promotion_type: currentPromoType,
+            name: promoName,
+          }) => {
+            const start__Date = new Date(start_date).getTime();
+            const end__Date = new Date(end_date).getTime();
 
-//       return {
-//         ...payload,
-//         barcode_number: parseInt(barcode_number, 10),
-//         measurement_value: parseFloat(measurement_value),
-//         markup_percentage: parseFloat(markup_percentage),
-//         retail_price: parseFloat(retail_price),
-//         supply_price: parseFloat(supply_price),
-//         sub_categories: subCatByUUID,
-//         items: itemsByUUID,
-//       };
-//     });
+            if (
+              currentPromotionStartDateTime <= end__Date &&
+              currentPromotionEndDateTime >= start__Date &&
+              currentPromoType === promotion_type
+            ) {
+              const formattedStartDate = momentTz
+                .tz(new Date(start__Date), 'Asia/Kuala_Lumpur')
+                .format('DD/MM/YYYY hh:mm a');
 
-//     const products = await Product.query().insertGraph(
-//       multipleProductsPayload,
-//       {
-//         relate: ['items', 'sub_categories'],
-//       }
-//     );
+              const formattedEndDate = momentTz
+                .tz(new Date(end__Date), 'Asia/Kuala_Lumpur')
+                .format('DD/MM/YYYY hh:mm A');
 
-//     promotionLogger.info(
-//       `Multiple products [${products.length}] successfully inserted with!`
-//     );
+              const errMessage = `Product "${productName}" already has a ${currentPromoType.toLowerCase()} promotion applied on the chosen dates. The conflicted promotion "${promoName}" effective date is as follows: ${formattedStartDate} — ${formattedEndDate}`;
+              // const errMessage = `Product "${productName}" already has a ${currentPromoType.toLowerCase()} promotion applied on the chosen dates. Please refer to promotion "${promoName}" (${formattedStartDate} — ${formattedEndDate}) for further details`;
+              errorMessages.push(errMessage);
+            }
+          }
+        );
+      }
+    });
 
-//     res.json(products);
-//   } catch (err) {
-//     promotionLogger.warn(`Error creating product`);
-//     next(err);
-//   }
-// };
+    if (errorMessages.length > 0) {
+      throw {
+        name: 'ConflictError',
+        message: JSON.stringify(errorMessages),
+      };
+    } else {
+      const products = selectedProducts.map(({ uuid }) => {
+        return { uuid };
+      });
 
-// exports.editProduct = async (req, res, next) => {
-//   try {
-//     const {
-//       name,
-//       barcode_number,
-//       description,
-//       sub_category,
-//       stock_status,
-//       measurement_value,
-//       measurement_unit,
-//       product_item: items,
-//       markup_percentage,
-//       retail_price,
-//       store_uuid,
-//       product_type,
-//       supply_price,
-//       old_imgs,
-//     } = req.body;
-//     const { uuid } = req.params;
-//     const { files: imgFiles } = req;
-//     const product_sub_category = JSON.parse(sub_category);
-//     const product_item = JSON.parse(items);
-//     const product_old_imgs = JSON.parse(old_imgs);
+      const promotion = await Promotion.query().insertGraph(
+        {
+          name,
+          start_date: startDateTime.toISOString(),
+          end_date: endDateTime.toISOString(),
+          promotion_type,
+          meta_data,
+          store_uuid,
+          campaign_uuid,
+          description,
+          products,
+        },
+        { relate: ['products'] }
+      );
 
-//     const new_images = imgFiles.map(
-//       ({
-//         fieldname,
-//         originalname,
-//         encoding,
-//         mimetype,
-//         destination,
-//         filename,
-//         size,
-//         ...keepAttrs
-//       }) => keepAttrs
-//     );
+      promotionLogger.info(
+        `promotion successfully created with [UUID -${promotion.uuid}]`
+      );
 
-//     const product = await Product.query().patchAndFetchById(uuid, {
-//       name,
-//       description,
-//       store_uuid,
-//       stock_status,
-//       measurement_unit,
-//       product_type,
-//       barcode_number: parseInt(barcode_number, 10),
-//       measurement_value: parseFloat(measurement_value),
-//       markup_percentage: parseFloat(markup_percentage),
-//       retail_price: parseFloat(retail_price),
-//       supply_price: parseFloat(supply_price),
-//     });
+      res.json(promotion);
+    }
+  } catch (err) {
+    promotionLogger.warn(`Error creating promotion`);
+    next(err);
+  }
+};
 
-//     // if no duplicates, then proceed with relationship query
-//     await Product.query().upsertGraph(
-//       {
-//         uuid,
-//         items: product_item,
-//         sub_categories: product_sub_category,
-//         images: new_images,
-//       },
-//       {
-//         relate: ['items', 'sub_categories'],
-//         unrelate: ['items', 'sub_categories'],
-//       }
-//     );
+exports.editPromotion = async (req, res, next) => {
+  try {
+    const {
+      name,
+      description,
+      start_date,
+      end_date,
+      start_time,
+      end_time,
+      promotion_type,
+      store_uuid,
+      campaign_uuid,
+      selectedPromoProducts,
+      meta_data: metaData,
+    } = req.body;
+    const selectedProducts = JSON.parse(selectedPromoProducts);
+    const meta_data = JSON.parse(metaData);
+    const { uuid } = req.params;
 
-//     if (product_old_imgs && product) {
-//       await removeFiles(product_old_imgs);
-//     }
+    const startDate = momentTz
+      .tz(new Date(start_date), 'Asia/Kuala_Lumpur')
+      .format('YYYY-MM-DD');
+    const startTime = momentTz
+      .tz(new Date(start_time), 'Asia/Kuala_Lumpur')
+      .format('HH:mm:ss');
 
-//     promotionLogger.info(
-//       `product successfully updated with [UUID -${product.uuid}]`
-//     );
-//     res.json(product);
-//   } catch (err) {
-//     promotionLogger.warn(`Error updating the product`);
-//     await removeFiles(req.files);
-//     next(err);
-//   }
-// };
+    const endDate = momentTz
+      .tz(new Date(end_date), 'Asia/Kuala_Lumpur')
+      .format('YYYY-MM-DD');
+    const endTime = momentTz
+      .tz(new Date(end_time), 'Asia/Kuala_Lumpur')
+      .format('HH:mm:ss');
+
+    const startDateTime = new Date(`${startDate} ${startTime} GMT+0800`);
+    const endDateTime = new Date(`${endDate} ${endTime} GMT+0800`);
+
+    const currentPromotionStartDateTime = startDateTime.getTime();
+    const currentPromotionEndDateTime = endDateTime.getTime();
+    const errorMessages = [];
+
+    // (StartA <= EndB)  and  (EndA >= StartB) => if true mean overlapping promotion date with same promo type
+    selectedProducts.forEach(({ promotions, name: productName }) => {
+      if (promotions && promotions.length > 0) {
+        promotions.forEach(
+          ({
+            start_date,
+            end_date,
+            promotion_type: currentPromoType,
+            name: promoName,
+          }) => {
+            const start__Date = new Date(start_date).getTime();
+            const end__Date = new Date(end_date).getTime();
+
+            if (
+              currentPromotionStartDateTime <= end__Date &&
+              currentPromotionEndDateTime >= start__Date &&
+              currentPromoType === promotion_type
+            ) {
+              const formattedStartDate = momentTz
+                .tz(new Date(start__Date), 'Asia/Kuala_Lumpur')
+                .format('DD/MM/YYYY hh:mm a');
+
+              const formattedEndDate = momentTz
+                .tz(new Date(end__Date), 'Asia/Kuala_Lumpur')
+                .format('DD/MM/YYYY hh:mm A');
+
+              const errMessage = `Product "${productName}" already has a ${currentPromoType.toLowerCase()} promotion applied on the chosen dates. The conflicted promotion "${promoName}" effective date is as follows: ${formattedStartDate} — ${formattedEndDate}`;
+              // const errMessage = `Product "${productName}" already has a ${currentPromoType.toLowerCase()} promotion applied on the chosen dates. Please refer to promotion "${promoName}" (${formattedStartDate} — ${formattedEndDate}) for further details`;
+              errorMessages.push(errMessage);
+            }
+          }
+        );
+      }
+    });
+
+    if (errorMessages.length > 0) {
+      throw {
+        name: 'ConflictError',
+        message: JSON.stringify(errorMessages),
+      };
+    } else {
+      const products = selectedProducts.map(({ uuid: productUUID, name }) => {
+        return { uuid: productUUID };
+      });
+
+      const promotion = await Promotion.query().upsertGraph(
+        {
+          uuid,
+          name,
+          start_date: startDateTime.toISOString(),
+          end_date: endDateTime.toISOString(),
+          promotion_type,
+          meta_data,
+          store_uuid,
+          campaign_uuid,
+          description,
+          products,
+        },
+        { relate: ['products'] }
+      );
+
+      promotionLogger.info(
+        `promotion  with [UUID -${promotion.uuid}] successfully updated`
+      );
+
+      res.json(promotion);
+    }
+  } catch (err) {
+    promotionLogger.warn(`Error updating promotion`);
+    next(err);
+  }
+};
 
 // exports.patchProduct = async (req, res, next) => {
 //   try {

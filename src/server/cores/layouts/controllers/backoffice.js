@@ -109,9 +109,6 @@ exports.UpdateLayout = async (req, res, next) => {
       ? JSON.parse(oldFloorPlanPath)
       : null;
 
-    console.log(floorPlanFile);
-    console.log(layers);
-
     const layout = await Layout.query().upsertGraph(
       {
         uuid,

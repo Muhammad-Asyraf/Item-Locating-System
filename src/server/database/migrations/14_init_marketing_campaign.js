@@ -8,12 +8,12 @@ exports.up = async (knex) => {
     table.text('terms_conditions').notNullable();
     table.datetime('start_date').notNullable();
     table.datetime('end_date').notNullable();
+    table.text('banner_ad_path');
     table
       .uuid('store_uuid')
       .references('store.uuid')
       .onDelete('CASCADE')
       .notNullable();
-    table.uuid('image_uuid').references('image.uuid').onDelete('CASCADE');
     table.timestamps(true, true);
   });
 };

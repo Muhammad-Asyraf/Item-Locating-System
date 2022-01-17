@@ -1,11 +1,12 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
+import getHeader from '../../services/firebase/getHeader';
 
 export const getSinglePromo = createAsyncThunk(
   'promotion/getSinglePromo',
-  async ({ uuid }, { rejectWithValue, getState }) => {
+  async ({ uuid }, { rejectWithValue }) => {
     try {
-      const { authHeader } = await getState().auth;
+      const authHeader = await getHeader();
       const endpointURL = `/api/backoffice/promotion-service/promotion/${uuid}`;
 
       const { data } = await axios.get(endpointURL, authHeader);
@@ -29,11 +30,11 @@ export const getSinglePromo = createAsyncThunk(
 
 export const getPromotions = createAsyncThunk(
   'promotion/getPromotions',
-  async (args, { rejectWithValue, getState }) => {
+  async (args, { rejectWithValue }) => {
     try {
       const storeUuid = localStorage.getItem('storeUUID');
       const endpointURL = `/api/backoffice/promotion-service/promotions/${storeUuid}`;
-      const { authHeader } = await getState().auth;
+      const authHeader = await getHeader();
 
       const { data } = await axios.get(endpointURL, authHeader);
 
@@ -56,21 +57,20 @@ export const getPromotions = createAsyncThunk(
 
 export const addPromotion = createAsyncThunk(
   'promotion/addPromotion',
-  async ({ payload }, { rejectWithValue, getState }) => {
+  async ({ payload }, { rejectWithValue }) => {
     try {
       const endpointURL = '/api/backoffice/promotion-service/promotion';
-      const { authHeader } = await getState().auth;
+      const authHeader = await getHeader();
 
       await axios.post(endpointURL, payload, authHeader);
 
       return true;
     } catch (err) {
-      const { data } = err.response;
+      const { data, status } = err.response;
 
       return rejectWithValue({
         message: data.message,
-        status: 'Error!',
-        error: data.code,
+        status,
       });
     }
   }
@@ -78,9 +78,9 @@ export const addPromotion = createAsyncThunk(
 
 export const deletePromotion = createAsyncThunk(
   'promotion/deletePromotion',
-  async ({ uuid }, { rejectWithValue, getState }) => {
+  async ({ uuid }, { rejectWithValue }) => {
     try {
-      const { authHeader } = await getState().auth;
+      const authHeader = await getHeader();
       const endpointURL = `/api/backoffice/promotion-service/promotion/${uuid}`;
 
       await axios.delete(endpointURL, authHeader);
@@ -101,9 +101,9 @@ export const deletePromotion = createAsyncThunk(
 
 export const deleteMultiplePromotions = createAsyncThunk(
   'promotion/deleteMultiplePromotions',
-  async ({ listToDelete }, { rejectWithValue, getState }) => {
+  async ({ listToDelete }, { rejectWithValue }) => {
     try {
-      const { authHeader } = await getState().auth;
+      const authHeader = await getHeader();
       const endpointURL = '/api/backoffice/promotion-service/promotion/delete';
 
       await axios.post(endpointURL, { listToDelete }, authHeader);
@@ -124,22 +124,20 @@ export const deleteMultiplePromotions = createAsyncThunk(
 
 export const updatePromotion = createAsyncThunk(
   'promotion/updatePromotion',
-  async ({ uuid, payload }, { rejectWithValue, getState }) => {
+  async ({ uuid, payload }, { rejectWithValue }) => {
     try {
       const endpointURL = `/api/backoffice/promotion-service/promotion/${uuid}`;
-      const { authHeader } = await getState().auth;
+      const authHeader = await getHeader();
 
       await axios.put(endpointURL, payload, authHeader);
 
       return true;
     } catch (err) {
-      console.log('error', err);
-      const { data } = err.response;
+      const { data, status } = err.response;
 
       return rejectWithValue({
         message: data.message,
-        status: 'Error!',
-        error: data.code,
+        status,
       });
     }
   }

@@ -8,7 +8,7 @@ import IconButton from '@mui/material/IconButton';
 import Button from '@mui/material/Button';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Grid from '@mui/material/Grid';
-// import CircularProgress from '@mui/material/CircularProgress';
+import CircularProgress from '@mui/material/CircularProgress';
 import KeyboardReturnRoundedIcon from '@mui/icons-material/KeyboardReturnRounded';
 import ModeEditOutlineRoundedIcon from '@mui/icons-material/ModeEditOutlineRounded';
 import SaveRoundedIcon from '@mui/icons-material/SaveRounded';
@@ -24,7 +24,7 @@ import {
 } from '../../redux/features/layoutSlice';
 import {
   selectProducts,
-  // selectIsLoading as productLoading,
+  selectIsLoading as productLoading,
   processed as productProccessed,
 } from '../../redux/features/productSlice';
 import {
@@ -144,7 +144,7 @@ const ProductMapping = (props) => {
   const layouts = useSelector(selectLayouts);
   const originalProducts = useSelector(selectProducts);
   const categoryOptions = useSelector(selectSubcategory);
-  // const isProductLoading = useSelector(productLoading);
+  const isProductLoading = useSelector(productLoading);
   const isLayoutLoading = useSelector(selectIsLoading);
 
   const storeUrl = localStorage.getItem('storeUrl');
@@ -213,34 +213,6 @@ const ProductMapping = (props) => {
     }
   }, []);
 
-  // const handleOpenDetailsDialog = () => setOpenDetailsDialog(true);
-  // const handleCloseDetailsDialog = () => setOpenDetailsDialog(false);
-
-  const updateProducts = async (payload) => {
-    const { type, payload: resPayload } = await dispatch();
-    // updateLayout({ uuid: match.params.uuid, payload })
-    console.log(payload);
-
-    if (type.includes('fulfilled')) {
-      await dispatch(
-        setNewNotification({
-          message: 'Product mapping successfully updated',
-          backgroundColor: 'green',
-          severity: 'success',
-        })
-      );
-    } else if (type.includes('rejected')) {
-      await dispatch(
-        setNewNotification({
-          message: resPayload.message,
-          backgroundColor: '#be0000',
-          severity: 'error',
-        })
-      );
-    }
-    dispatch(productProccessed());
-  };
-
   const toProductEditor = () => {
     dispatch(processingRequest());
   };
@@ -273,8 +245,6 @@ const ProductMapping = (props) => {
   };
 
   const handleChangeLayout = async (e, selectedLayout) => {
-    console.log('selectedLayout', selectedLayout);
-
     const { layers, floor_plan_path: path } = selectedLayout;
 
     if (path) {
@@ -288,8 +258,6 @@ const ProductMapping = (props) => {
   };
 
   const preparedPayload = () => {
-    console.log('products', products);
-    console.log('originalProducts', originalProducts);
     let updatedProducts = [];
 
     products.forEach((product, index) => {
@@ -320,15 +288,12 @@ const ProductMapping = (props) => {
       }
     });
 
-    console.log('updatedProducts', updatedProducts);
-
     return { updatedProducts };
   };
 
   const handleSave = async () => {
     const payload = preparedPayload();
 
-    console.log('payload', payload);
     const { type: saveStatus, payload: resPayload } = await dispatch(
       saveProductMapping({ payload })
     );
@@ -447,12 +412,18 @@ const ProductMapping = (props) => {
               fontSize: '0.95rem',
               borderRadius: 3,
               height: 50,
+              width: 105,
               paddingRight: 3,
               boxShadow: 'rgba(53, 132, 167, 0.44) 0px 8px 16px 0px !important',
             }}
           >
-            <SaveRoundedIcon style={{ marginRight: 10 }} fontSize="small" />
-            Save
+            {isProductLoading ? (
+              <CircularProgress size={25} style={{ color: 'white' }} />
+            ) : (
+              <>
+                <SaveRoundedIcon style={{ marginRight: 10 }} fontSize="small" /> Save
+              </>
+            )}
           </Button>
         </Grid>
       </Grid>
@@ -464,7 +435,6 @@ const ProductMapping = (props) => {
           leafletLayers={leafletLayers}
           floorPlan={floorPlan}
           setZoomLevel={setZoomLevel}
-          updateProducts={updateProducts}
           productsRef={productsRef}
           initProducts={products}
           setInitProducts={setProducts}

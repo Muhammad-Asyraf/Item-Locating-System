@@ -1,12 +1,13 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
+import getHeader from '../../services/firebase/getHeader';
 
 const getStore = createAsyncThunk(
   'store/getStore',
-  async ({ userUUID }, { rejectWithValue, getState }) => {
+  async ({ userUUID }, { rejectWithValue }) => {
     try {
       const endpointURL = `/api/backoffice/store-service/store/user/${userUUID}`;
-      const { authHeader } = await getState().auth;
+      const authHeader = await getHeader();
 
       const res = await axios.get(endpointURL, authHeader);
 

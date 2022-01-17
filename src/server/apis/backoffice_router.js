@@ -9,7 +9,7 @@ const layoutService = require('../cores/layouts/apis/backoffice');
 const promotionService = require('../cores/promotions/apis/backoffice');
 const marketingCampaignService = require('../cores/marketing_campaigns/apis/backoffice');
 
-router.use('/backoffice-user-service', backofficeUserService);
+router.use('/user-service', backofficeUserService);
 router.use('/item-service', itemService);
 router.use('/product-service', productService);
 router.use('/store-service', storeService);

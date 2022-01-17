@@ -44,10 +44,8 @@ const ProductMapper = (props) => {
     floorPlan,
     setZoomLevel,
     productsRef,
-    // initProducts,
     setInitProducts,
     addPartitionBucket,
-    // updateProducts,
   } = props;
 
   // const productsRef = useRef(initProducts);

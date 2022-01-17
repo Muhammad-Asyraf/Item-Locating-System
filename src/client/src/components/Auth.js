@@ -16,7 +16,7 @@ import {
 } from '../redux/features/authSlice';
 import { processed as processedStore } from '../redux/features/storeSlice';
 import getStore from '../redux/thunks/storeThunk';
-import { setHeader } from '../redux/thunks/authThunk';
+// import { setHeader } from '../redux/thunks/authThunk';
 
 const useStyles = makeStyles({
   root: {
@@ -36,7 +36,6 @@ const Auth = ({ children }) => {
     dispatch(verifying());
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
       if (user) {
-        console.log("I'm triggered and here's my ID:", user.toJSON().uid);
         await dispatch(
           setActiveUser({
             user: user.toJSON(),
@@ -44,7 +43,7 @@ const Auth = ({ children }) => {
             status: 'ok',
           })
         );
-        await dispatch(setHeader(auth));
+        // await dispatch(setHeader(auth));
 
         await dispatch(getStore({ userUUID: user.toJSON().uid }));
         dispatch(processedStore());
@@ -68,8 +67,7 @@ const Auth = ({ children }) => {
         <LinearProgress
           sx={{
             height: 6,
-            backgroundImage:
-              'linear-gradient(-225deg, #473B7B 0%, #3584A7 51%, #30D2BE 100%)',
+            backgroundImage: 'linear-gradient(-225deg, #473B7B 0%, #3584A7 51%, #30D2BE 100%)',
           }}
         />
       </div>

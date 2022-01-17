@@ -85,7 +85,6 @@ const useStyles = makeStyles((theme) => ({
   },
   form: {
     '& > *': {
-      marginTop: '20px',
       marginBottom: '20px',
       '& fieldset': {
         borderRadius: '8px',
@@ -206,7 +205,7 @@ const ItemCreate = (props) => {
       formData.append('note', quillText.editorHtml);
       formData.append('sub_category', JSON.stringify(selectedCategory));
       formData.append('store_uuid', storeUUID);
-      formData.append('multer_type', 'image');
+      formData.append('multer_type', 'item');
       for (const key of Object.keys(image.imgFiles)) {
         formData.append('imgCollection', image.imgFiles[key]);
       }

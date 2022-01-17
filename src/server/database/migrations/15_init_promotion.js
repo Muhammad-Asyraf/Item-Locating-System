@@ -13,6 +13,11 @@ exports.up = async (knex) => {
       .references('store.uuid')
       .onDelete('CASCADE')
       .notNullable();
+    table
+      .uuid('campaign_uuid')
+      .references('marketing_campaign.uuid')
+      .onDelete('CASCADE')
+      .notNullable();
     table.text('description').notNullable();
     table.timestamps(true, true);
   });

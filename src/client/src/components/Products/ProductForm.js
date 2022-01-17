@@ -100,7 +100,6 @@ const useStyles = makeStyles((theme) => ({
   },
   form: {
     '& > *': {
-      marginTop: '20px',
       marginBottom: '20px',
       '& fieldset': {
         borderRadius: '8px',
@@ -537,7 +536,7 @@ const ProductForm = (props) => {
           ? product.standard.supplyPrice
           : product.bundle.totalSupplyPrice
       );
-      formData.append('multer_type', 'image');
+      formData.append('multer_type', 'product');
       for (const key of Object.keys(image.imgFiles)) {
         formData.append('imgCollection', image.imgFiles[key]);
       }
@@ -567,8 +566,8 @@ const ProductForm = (props) => {
       errors: updatedError,
       validPicQty: image.imgFiles.length > 0,
     });
-    setErrors(updatedError);
 
+    setErrors(updatedError);
     setValidationComplete(true);
   };
 
@@ -957,6 +956,7 @@ const ProductForm = (props) => {
                         id="tags-outlined"
                         multiple={productType.bundle_checked}
                         disableCloseOnSelect
+                        limitTags={1}
                         onChange={handleSelectItem}
                         filterOptions={filterOptions}
                         options={itemOptions}
@@ -1440,6 +1440,9 @@ const ProductForm = (props) => {
             <Grid container spacing={2}>
               <Grid item xs={12} sm={12} md={4}>
                 <h3 style={{ marginBottom: 5, marginTop: 0 }}>Price</h3>
+                <span style={{ fontSize: '0.9rem' }}>
+                  Set up the markup percentage for the <br /> product
+                </span>
               </Grid>
               <Grid item xs={12} sm={12} md={8} container spacing={2}>
                 <Grid item xs={12} sm={8}>

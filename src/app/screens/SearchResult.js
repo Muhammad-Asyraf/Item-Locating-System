@@ -1,38 +1,111 @@
 // Components
-import React, { useState, useEffect } from 'react';
-import { View } from 'react-native';
-import { Appbar, Button, Searchbar, Text, Dialog } from 'react-native-paper';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { View, Image, StyleSheet } from 'react-native';
+import {
+  Appbar,
+  Button,
+  Searchbar,
+  Text,
+  Dialog,
+  Chip,
+} from 'react-native-paper';
+import Slider from 'rn-range-slider';
+import Thumb from '../components/core/rangeslider/Thumb';
+import Rail from '../components/core/rangeslider/Rail';
+import RailSelected from '../components/core/rangeslider/RailSelected';
+import Label from '../components/core/rangeslider/Label';
+import Notch from '../components/core/rangeslider/Notch';
 import ProductCard from '../components/ProductCard';
 import { FlatGrid } from 'react-native-super-grid';
 import Loading from '../components/Loading';
 
 // Utilities
-import axios from 'axios';
-import { getProducts } from '../services/ProductService';
-
-// Environment configs
-import { environment } from '../environment';
+import {
+  getProducts,
+  getCategories,
+  getSubCategories,
+} from '../services/ProductService';
 
 // Style imports
-import { GlobalStyle } from '../styles/Theme';
+import { Theme, GlobalStyle, TextStyle } from '../styles/Theme';
 import { appBarStyles } from '../styles/appBarStyles';
+import { FlatList } from 'react-native-gesture-handler';
 
 export default function SearchResult({ navigation, route }) {
+  const [minPrice, setMinPrice] = useState(Infinity);
+  const [maxPrice, setMaxPrice] = useState(-Infinity);
   const [isLoading, setLoading] = useState(true);
+
+  // Search states
   const [searchQuery, setSearchQuery] = useState(route.params.query);
   const [searchResult, setSearchResult] = useState();
+  const [showResult, setShowResult] = useState(false);
+
+  // Filter states
+  const [filters, setFilters] = useState({ ...route.params?.filters });
+  const [categories, setCategories] = useState();
+  const [subCategories, setSubCategories] = useState();
   const [filterDialogVisible, setFilterDialogVisible] = useState(false);
 
+  // Filter dialog states
+  const [dialogFilters, setDialogFilters] = useState({
+    ...route.params?.filters,
+  });
+
+  // RangeSlider components
+  const renderThumb = useCallback(() => <Thumb />, []);
+  const renderRail = useCallback(() => <Rail />, []);
+  const renderRailSelected = useCallback(() => <RailSelected />, []);
+  const renderLabel = useCallback((value) => <Label text={value} />, []);
+  const renderNotch = useCallback(() => <Notch />, []);
+
   useEffect(() => {
+    console.log(
+      `[SearchResult.js/useEffect] searchQuery: ${searchQuery} | Filters: ${JSON.stringify(
+        filters
+      )}`
+    );
+    console.log(
+      `[SearchResult.js/useEffect] Price Range : ${minPrice}/${maxPrice}}`
+    );
+
+    // Load everything during loading
     if (isLoading) {
-      getProducts({ search: searchQuery })
+      let queryObject = { search: searchQuery };
+
+      getCategories()
         .then((data) => {
+          setCategories(data);
+        })
+        .catch((error) => {
+          console.log(`[SearchResult.js/useEffect] ${error}`);
+        });
+      // Check if there is filter
+      if (typeof filters != 'undefined' && Object.keys(filters).length != 0) {
+        if ('subcategory' in filters) {
+          queryObject.subcategory = filters.subcategory[0].uuid;
+        } else if ('category' in filters) {
+          queryObject.category = filters.category[0].uuid;
+          getSubCategories(filters.category[0].uuid)
+            .then((data) => setSubCategories(data))
+            .catch((error) => {
+              console.log(`[SearchResult.js/useEffect] ${error}`);
+            });
+        }
+      }
+
+      getProducts(queryObject)
+        .then((data) => {
+          setMinPrice(Math.min(...data.map((product) => product.retail_price)));
+          setMaxPrice(Math.max(...data.map((product) => product.retail_price)));
           setSearchResult(data);
           setLoading(false);
         })
-        .catch((error) => {});
+        .catch((error) => {
+          console.log(`[SearchResult.js/useEffect] ${error}`);
+        });
     }
-  });
+  }, [isLoading]);
 
   const handleQueryChange = (query) => {
     setSearchQuery(query);
@@ -41,14 +114,130 @@ export default function SearchResult({ navigation, route }) {
   const runQuery = () => {
     // console.log('Running query : ' + searchQuery);
     setLoading(true);
+    setShowResult(true);
   };
 
   const showFilterDialog = () => setFilterDialogVisible(true);
   const hideFilterDialog = () => setFilterDialogVisible(false);
 
-  const handleFilter = () => {};
+  const handleFilter = () => {
+    hideFilterDialog();
+    setFilters(dialogFilters);
+    setLoading(true);
+  };
+  const clearFilters = () => {
+    hideFilterDialog();
+    setDialogFilters({});
+    setFilters({});
+    setLoading(true);
+  };
 
-  const clearFilters = () => {};
+  const handleCategorySelect = (categoryUUID) => {
+    if (
+      filters?.category &&
+      filters?.category.map((val) => val.uuid).includes(categoryUUID)
+    ) {
+      console.log(
+        `[SearchResult.js/handleCategorySelect] Deleting ${categoryUUID} from filters`
+      );
+      let idx = filters.category.map((val) => val.uuid).indexOf(categoryUUID);
+      let category = filters.category.slice();
+      category.splice(idx, 1);
+      console.log(
+        `[SearchResult.js/handleCategorySelect] Index: ${idx} Category: ${JSON.stringify(
+          category
+        )}`
+      );
+      let filterState = { ...filters, category };
+      if (category.length == 0) {
+        delete filterState.category;
+      }
+      setFilters(filterState);
+      setDialogFilters(filterState);
+    } else {
+      let idx = categories.map((val) => val.uuid).indexOf(categoryUUID);
+      setFilters({
+        ...filters,
+        category: [categories[idx]],
+      });
+      setDialogFilters({
+        ...filters,
+        category: [categories[idx]],
+      });
+      setLoading(true);
+    }
+  };
+
+  const handleDialogCategorySelect = (categoryUUID) => {
+    if (
+      dialogFilters?.category &&
+      dialogFilters?.category.map((val) => val.uuid).includes(categoryUUID)
+    ) {
+      console.log(
+        `[SearchResult.js/handleDialogCategorySelect] Deleting ${categoryUUID} from dialog filters`
+      );
+      let idx = dialogFilters.category
+        .map((val) => val.uuid)
+        .indexOf(categoryUUID);
+      let category = dialogFilters.category.slice();
+      category.splice(idx, 1);
+      console.log(
+        `[SearchResult.js/handleDialogCategorySelect] Index: ${idx} Category: ${JSON.stringify(
+          category
+        )}`
+      );
+      let filterState = { ...dialogFilters, category };
+      if (category.length == 0) {
+        delete filterState.category;
+      }
+      setDialogFilters(filterState);
+    } else {
+      let idx = categories.map((val) => val.uuid).indexOf(categoryUUID);
+      setDialogFilters({
+        ...dialogFilters,
+        category: [categories[idx]],
+      });
+    }
+  };
+
+  const renderFilterBar = () => {
+    let filterChips = [...filters?.category];
+    return (
+      <View>
+        <Text style={[TextStyle.subhead2, styles.filterChipTitle]}>
+          Filters
+        </Text>
+        <FlatList
+          style={styles.filterChipList}
+          horizontal
+          data={filterChips}
+          renderItem={({ item }) => (
+            <Chip
+              mode="outlined"
+              selected={
+                'category' in filters &&
+                filters.category.map((val) => val.uuid).includes(item.uuid)
+              }
+              style={{ marginEnd: 8 }}
+              onPress={() => handleCategorySelect(item.uuid)}
+            >
+              {item.name}
+            </Chip>
+          )}
+        />
+      </View>
+    );
+  };
+
+  const updatePriceRange = (low, high, fromUser) => {
+    setFilters({
+      ...filters,
+      price: {
+        low,
+        high,
+      },
+    });
+  };
 
   return (
     <View style={GlobalStyle.screenContainer}>
@@ -58,6 +247,7 @@ export default function SearchResult({ navigation, route }) {
         ) : null}
         <Searchbar
           style={appBarStyles.appBarSearchbar}
+          placeholder="Search"
           defaultValue={searchQuery}
           onChangeText={handleQueryChange}
           onSubmitEditing={runQuery}
@@ -68,8 +258,44 @@ export default function SearchResult({ navigation, route }) {
       </Appbar.Header>
       {isLoading ? (
         <Loading />
+      ) : Object.keys(filters).length == 0 && !showResult ? (
+        <View style={styles.filterScreen}>
+          <View style={styles.filterChipContainer}>
+            <Text style={[TextStyle.subhead2, styles.filterChipTitle]}>
+              Categories
+            </Text>
+            <FlatList
+              style={styles.filterChipList}
+              horizontal
+              data={categories}
+              renderItem={({ item }) => (
+                <Chip
+                  mode="outlined"
+                  selected={
+                    'category' in filters &&
+                    filters.category.map((val) => val.uuid).includes(item.uuid)
+                  }
+                  style={{ marginEnd: 8 }}
+                  onPress={() => handleCategorySelect(item.uuid)}
+                >
+                  {item.name}
+                </Chip>
+              )}
+            />
+          </View>
+          <View style={styles.searchMessageContainer}>
+            <Image
+              style={styles.searchMessageIcon}
+              source={require('../assets/icons/search.png')}
+            />
+            <Text style={[TextStyle.headline6, styles.searchMessageText]}>
+              Search anything near you
+            </Text>
+          </View>
+        </View>
       ) : searchResult.length != 0 ? (
         <FlatGrid
+          ListHeaderComponent={'category' in filters != 0 && renderFilterBar}
           style={GlobalStyle.flatGrid}
           itemDimension={120}
           data={searchResult}
@@ -81,7 +307,48 @@ export default function SearchResult({ navigation, route }) {
 
       <Dialog visible={filterDialogVisible} onDismiss={hideFilterDialog}>
         <Dialog.Title>Filter search</Dialog.Title>
-
+        <Dialog.Content>
+          <View>
+            <View>
+              <Text style={[TextStyle.subhead2]}>Categories</Text>
+              <FlatList
+                style={styles.filterDialogChipList}
+                horizontal
+                data={categories}
+                renderItem={({ item }) => (
+                  <Chip
+                    mode="outlined"
+                    selected={
+                      'category' in dialogFilters &&
+                      dialogFilters.category
+                        .map((val) => val.uuid)
+                        .includes(item.uuid)
+                    }
+                    style={{
+                      marginEnd: 8,
+                      backgroundColor: Theme.colors.primary,
+                    }}
+                    textStyle={{ color: 'white' }}
+                    onPress={() => handleDialogCategorySelect(item.uuid)}
+                  >
+                    {item.name}
+                  </Chip>
+                )}
+              />
+            </View>
+            {/* <Slider
+              step={1}
+              min={0}
+              max={100}
+              renderThumb={renderThumb}
+              renderRail={renderRail}
+              renderRailSelected={renderRailSelected}
+              renderLabel={renderLabel}
+              renderNotch={renderNotch}
+              onValueChanged={updatePriceRange}
+            /> */}
+          </View>
+        </Dialog.Content>
         <Dialog.Actions>
           <Button onPress={hideFilterDialog}>Cancel</Button>
           <Button onPress={clearFilters}>Clear</Button>
@@ -91,3 +358,38 @@ export default function SearchResult({ navigation, route }) {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  filterScreen: {
+    flexDirection: 'column',
+    flexGrow: 1,
+  },
+  // Filter screen
+  filterChipContainer: {
+    marginVertical: 18,
+  },
+  filterChipTitle: {
+    marginHorizontal: 18,
+  },
+  filterChipList: {
+    marginVertical: 12,
+    paddingHorizontal: 18,
+  },
+  // Filter dialog
+  filterDialogChipList: {
+    marginVertical: 8,
+  },
+  searchMessageContainer: {
+    alignItems: 'center',
+    marginVertical: 16,
+  },
+  searchMessageIcon: {
+    width: 96,
+    height: 96,
+    margin: 16,
+  },
+  searchMessageText: {
+    textAlign: 'center',
+    margin: 8,
+  },
+});

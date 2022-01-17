@@ -44,6 +44,18 @@ class SubCategory extends Model {
           to: 'item.uuid',
         },
       },
+      products: {
+        relation: Model.ManyToManyRelation,
+        modelClass: require('../../products/model'),
+        join: {
+          from: 'sub_category.uuid',
+          through: {
+            from: 'product_sub_category.sub_category_uuid',
+            to: 'product_sub_category.product_uuid',
+          },
+          to: 'product.uuid',
+        },
+      },
     };
   }
 }

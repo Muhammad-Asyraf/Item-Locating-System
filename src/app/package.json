@@ -61,7 +61,8 @@
     "react-native-webview": "11.2.3",
     "react-native-webview-quilljs": "^2.0.0",
     "react-redux": "^7.2.4",
-    "redux-persist": "^6.0.0"
+    "redux-persist": "^6.0.0",
+    "rn-range-slider": "^2.1.1"
   },
   "devDependencies": {
     "@babel/core": "^7.9.0"

@@ -21,17 +21,17 @@ export const Theme = {
 
 export const GlobalStyle = StyleSheet.create({
   screenContainer: {
+    flex: 1,
     flexGrow: 1,
-    height: '100%',
     backgroundColor: '#F5F5F5',
   },
   searchBar: {
     marginHorizontal: 18,
     marginVertical: 24,
-    flexGrow: 1,
     elevation: 1,
   },
   contentContainer: {
+    flex: 1,
     flexGrow: 1,
     paddingHorizontal: 22,
     paddingVertical: 18,

@@ -18,7 +18,7 @@ export default function AppbarScreen(props) {
           {navigation.canGoBack() ? (
             <Appbar.BackAction color="#FFFFFF" onPress={navigation.goBack} />
           ) : null}
-          <Text style={[AppbarStyle.appBarTitle, TextStyle.subhead2]}>
+          <Text style={[AppbarStyle.appBarTitle, TextStyle.subhead1]}>
             {props.name}
           </Text>
         </Appbar.Header>
@@ -31,9 +31,9 @@ export default function AppbarScreen(props) {
     <View style={GlobalStyle.screenContainer}>
       <Appbar.Header style={[AppbarStyle.appBarContainer]}>
         {navigation.canGoBack() ? (
-          <Appbar.BackAction color="#007AFF" onPress={navigation.goBack} />
+          <Appbar.BackAction color="#FFFFFF" onPress={navigation.goBack} />
         ) : null}
-        <Text style={[AppbarStyle.appBarTitle, TextStyle.subhead2]}>
+        <Text style={[AppbarStyle.appBarTitle, TextStyle.subhead1]}>
           {props.name}
         </Text>
       </Appbar.Header>

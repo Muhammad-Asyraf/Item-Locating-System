@@ -24,6 +24,12 @@ export const getProducts = async (queryObject) => {
     if ('uuid' in queryObject) {
       paramsObject.uuid = queryObject.uuid;
     }
+    if ('category' in queryObject) {
+      paramsObject.category = queryObject.category;
+    } else if ('subcategory' in queryObject) {
+      paramsObject.subcategory = queryObject.subcategory;
+    }
+
     const { data } = await axiosInstance.get(
       `/api/mobile/product-service/products`,
       {
@@ -44,12 +50,13 @@ export const getProducts = async (queryObject) => {
 export const getCategories = async () => {
   const header = await getAuthHeader();
   try {
-    const { categories } = await axiosInstance.get(
+    const { data } = await axiosInstance.get(
       `/api/mobile/product-service/categories`,
       header
     );
 
-    return categories;
+    //console.log(`[ProductService.js/getCategories] ${data}`);
+    return data;
   } catch (error) {
     return Promise.reject(error.response.data.message);
   }
@@ -63,12 +70,12 @@ export const getCategories = async () => {
 export const getSubCategories = async (categoryUUID) => {
   const header = await getAuthHeader();
   try {
-    const { subCategories } = await axiosInstance.get(
+    const { data } = await axiosInstance.get(
       `/api/mobile/product-service/categories/${categoryUUID}`,
       header
     );
 
-    return subCategories;
+    return data;
   } catch (error) {
     return Promise.reject(error.response.data.message);
   }

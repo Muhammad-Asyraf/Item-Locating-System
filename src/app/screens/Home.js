@@ -5,53 +5,88 @@ import {
   ScrollView,
   FlatList,
   View,
-  Image,
+  TouchableOpacity,
 } from 'react-native';
-import { Appbar, Title, Searchbar } from 'react-native-paper';
+import {
+  Appbar,
+  Text,
+  Surface,
+  Button,
+  TouchableRipple,
+} from 'react-native-paper';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import Carousel, { ParallaxImage } from 'react-native-snap-carousel';
+import CategoryCard from '../components/products/CategoryCard';
+
+// Utilities
+import { getCategories } from '../services/ProductService';
 
 // Styling
-import { GlobalStyle } from '../styles/Theme';
+import { Theme, GlobalStyle, TextStyle } from '../styles/Theme';
 
 const { width: screenWidth } = Dimensions.get('window');
 export default function Home({ navigation }) {
-  const [searchQuery, setSearchQuery] = useState('');
+  const [isLoading, setLoading] = useState(true);
+  const [categories, setCategories] = useState();
   const [banners, setBanners] = useState([1, 2, 3]);
 
-  // Handle query state changes
-  const handleQueryChange = (query) => setSearchQuery(query);
-
   // Push a search result screen
-  const search = () => {
+  const openSearch = () => {
     navigation.dangerouslyGetParent().navigate('Search Result', {
-      query: searchQuery,
+      query: '',
     });
   };
+
+  // Open category list screen
+  const viewCategories = () => {
+    navigation.dangerouslyGetParent().navigate('Categories');
+  };
+
+  useEffect(() => {
+    getCategories()
+      .then((data) => {
+        setLoading(false);
+        setCategories(data.slice(0, 9));
+        //console.log(`[Home.js/useEffect] ${JSON.stringify(data)}`);
+      })
+      .catch((error) => {
+        console.log(`[Home.js/useEffect] ${error}`);
+      });
+  }, [isLoading]);
 
   return (
     <View style={GlobalStyle.screenContainer}>
       <Appbar.Header style={{ backgroundColor: 'transparent' }}>
-        <Searchbar
-          style={GlobalStyle.searchBar}
-          placeholder="Search for something"
-          onChangeText={handleQueryChange}
-          onSubmitEditing={search}
-          autoCorrect={false}
-          autoCapitalize="none"
-        />
+        <TouchableOpacity style={{ flex: 1, flexGrow: 1 }} onPress={openSearch}>
+          <Surface style={styles.searchBar}>
+            <Icon name="search" size={24} color={Theme.colors.text} />
+            <Text style={[TextStyle.body1, styles.searchBarText]}>
+              Search for something
+            </Text>
+          </Surface>
+          {/* <Searchbar
+            editable={false}
+            style={GlobalStyle.searchBar}
+            placeholder="Search for something"
+            onChangeText={handleQueryChange}
+            onSubmitEditing={openSearch}
+            autoCorrect={false}
+            autoCapitalize="none"
+          /> */}
+        </TouchableOpacity>
       </Appbar.Header>
       <ScrollView style={styles.container}>
         <Carousel
           sliderWidth={screenWidth}
-          itemWidth={screenWidth - 44}
+          itemWidth={screenWidth - 40}
           data={banners}
           renderItem={({ item }, parallaxProps) => (
             <View style={styles.item}>
               <ParallaxImage
-                source={{ uri: 'https://via.placeholder.com/1024x720' }}
+                source={{ uri: 'https://via.placeholder.com/670x320' }}
                 containerStyle={styles.imageContainer}
                 style={styles.image}
-                parallaxFactor={0.4}
+                parallaxFactor={0.1}
                 {...parallaxProps}
               />
             </View>
@@ -60,23 +95,25 @@ export default function Home({ navigation }) {
         />
         {/* Horizontal list mockup */}
         <View style={styles.horizontalProductContainer}>
-          <Title style={styles.horizontalListTitle}>Trending items!</Title>
+          <View style={styles.horizontalTitleContainer}>
+            <Text style={[TextStyle.subhead1, styles.horizontalListTitle]}>
+              Categories
+            </Text>
+            <Button compact={true} onPress={viewCategories}>
+              See All
+            </Button>
+          </View>
           <FlatList
             style={styles.horizontalListContainer}
             horizontal={true}
-            data={banners}
+            data={categories}
             renderItem={({ item }) => (
-              <View style={styles.listItemContainer}>
-                <Image
-                  style={styles.horizontalProductImage}
-                  source={{ uri: 'https://tinyurl.com/urszpsxs' }}
-                />
-              </View>
+              <CategoryCard type="category" category={item} />
             )}
           />
         </View>
         {/* Horizontal list mockup */}
-        <View style={styles.horizontalProductContainer}>
+        {/* <View style={styles.horizontalProductContainer}>
           <Title style={styles.horizontalListTitle}>
             Hot Products near you!
           </Title>
@@ -93,7 +130,7 @@ export default function Home({ navigation }) {
               </View>
             )}
           />
-        </View>
+        </View> */}
       </ScrollView>
     </View>
   );
@@ -112,7 +149,7 @@ const styles = StyleSheet.create({
   },
   image: {
     ...StyleSheet.absoluteFillObject,
-    resizeMode: 'cover',
+    resizeMode: 'center',
   },
   // Parallax end
 
@@ -121,16 +158,34 @@ const styles = StyleSheet.create({
     paddingTop: 12,
   },
 
+  // Searchbar
+  searchBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: Theme.roundness,
+    marginHorizontal: 18,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    elevation: 1,
+  },
+  searchBarText: {
+    marginLeft: 18,
+    color: Theme.colors.placeholder,
+  },
+
   // Horizontal item list
-  horizontalProductContainer: {
-    marginVertical: 12,
-  },
-  horizontalListTitle: {
-    marginStart: 22,
-  },
-  horizontalListContainer: {
+  horizontalProductContainer: {},
+  horizontalTitleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 18,
     paddingVertical: 8,
-    paddingHorizontal: 22,
+  },
+  horizontalListTitle: {},
+  horizontalListContainer: {
+    paddingHorizontal: 18,
+    paddingVertical: 4,
     backgroundColor: '#F5F5F5',
   },
   horizontalProductImage: {

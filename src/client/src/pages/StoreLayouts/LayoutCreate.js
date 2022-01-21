@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useHistory, Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 import IconButton from '@mui/material/IconButton';
 import Box from '@mui/material/Box';
@@ -63,7 +63,7 @@ const useStyles = makeStyles(() => ({
 const LayoutCreate = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const [floorIsLocked, setFloorIsLocked] = useState(false);
   const [zoomLevel, setZoomLevel] = useState(0);
@@ -84,7 +84,7 @@ const LayoutCreate = () => {
 
     if (type.includes('fulfilled')) {
       dispatch(processed());
-      history.push(`/${storeUrl}/layout/edit/${resPayload}`);
+      navigate(`/${storeUrl}/layout/edit/${resPayload}`);
 
       await dispatch(
         setNewNotification({

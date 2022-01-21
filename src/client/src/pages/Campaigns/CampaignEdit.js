@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 // import { Link } from 'react-router-dom';
-import { useHistory, Link } from 'react-router-dom';
+import { useNavigate, Link, useParams } from 'react-router-dom';
 
 import IconButton from '@mui/material/IconButton';
 import Button from '@mui/material/Button';
@@ -41,10 +41,12 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const CampaignEdit = (props) => {
+const CampaignEdit = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
-  const history = useHistory();
+  const navigate = useNavigate();
+
+  const { uuid: CampaignUUID } = useParams();
 
   const storeUrl = localStorage.getItem('storeUrl');
   const storeName = localStorage.getItem('storeName');
@@ -55,11 +57,9 @@ const CampaignEdit = (props) => {
   const [refresh, setRefresh] = useState(true);
   const [initImage, setInitImage] = useState(null);
 
-  const { match } = props;
-
   useEffect(async () => {
     const { type: requestStatus, payload: campaignPayload } = await dispatch(
-      getSingleCampaign({ uuid: match.params.uuid })
+      getSingleCampaign({ uuid: CampaignUUID })
     );
     const requestStatusOk = requestStatus.includes('fulfilled');
     const { campaign } = campaignPayload;
@@ -88,11 +88,11 @@ const CampaignEdit = (props) => {
     dispatch(processingRequest());
 
     const { type, payload: resPayload } = await dispatch(
-      updateCampaign({ uuid: match.params.uuid, payload })
+      updateCampaign({ uuid: CampaignUUID, payload })
     );
 
     if (type.includes('fulfilled')) {
-      history.push(`/${storeUrl}/marketing-campaign/list`);
+      navigate(`/${storeUrl}/marketing-campaign/list`);
       // console.log(history);
       await dispatch(
         setNewNotification({

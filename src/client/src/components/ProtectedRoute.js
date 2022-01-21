@@ -1,5 +1,5 @@
 import React from 'react';
-import { Route, Redirect } from 'react-router-dom';
+import { Route, Navigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
 import { selectIsAuthenticated } from '../redux/features/authSlice';
@@ -7,19 +7,18 @@ import { selectIsAuthenticated } from '../redux/features/authSlice';
 /* eslint-disable arrow-body-style */
 /* eslint-disable react/prop-types */
 /* eslint-disable react/jsx-props-no-spreading */
-export default function ProtectedRoute({ component: Component, ...restOfProps }) {
+const ProtectedRoute = ({ element: Component, path: protectedPath }) => {
   const isAuthenticated = useSelector(selectIsAuthenticated);
+
+  console.log('Component', Component);
+  console.log('protectedPath', protectedPath);
 
   return (
     <Route
-      {...restOfProps}
-      render={(props) => {
-        return isAuthenticated ? (
-          <Component {...props} />
-        ) : (
-          <Redirect to="/auth/login" />
-        );
-      }}
+      path={protectedPath}
+      element={isAuthenticated ? <Component /> : <Navigate to="/auth/login" />}
     />
   );
-}
+};
+
+export default ProtectedRoute;

@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 // import { Link } from 'react-router-dom';
-import { useHistory, Link } from 'react-router-dom';
+import { useNavigate, Link, useParams } from 'react-router-dom';
 
 import IconButton from '@mui/material/IconButton';
 import Button from '@mui/material/Button';
@@ -48,10 +48,12 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const ProductEdit = (props) => {
+const ProductEdit = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
-  const history = useHistory();
+  const navigate = useNavigate();
+
+  const { uuid: ProductUUID } = useParams();
 
   const storeUrl = localStorage.getItem('storeUrl');
   const storeName = localStorage.getItem('storeName');
@@ -62,11 +64,9 @@ const ProductEdit = (props) => {
   const inventoryItems = useSelector(selectItems);
   const currentProduct = useSelector(selectSingleProduct);
 
-  const { match } = props;
-
   useEffect(async () => {
     dispatch(processingCatRequest());
-    await dispatch(getSingleProduct({ uuid: match.params.uuid }));
+    await dispatch(getSingleProduct({ uuid: ProductUUID }));
     await dispatch(getItems());
     await dispatch(getSubcategories());
     dispatch(catProcessed());
@@ -75,7 +75,7 @@ const ProductEdit = (props) => {
 
   const handleSubmit = async (payload) => {
     const { type, payload: resPayload } = await dispatch(
-      updateProduct({ uuid: match.params.uuid, payload })
+      updateProduct({ uuid: ProductUUID, payload })
     );
 
     if (type.includes('fulfilled')) {
@@ -86,7 +86,7 @@ const ProductEdit = (props) => {
           severity: 'success',
         })
       );
-      history.push(`/${storeUrl}/product/list`);
+      navigate(`/${storeUrl}/product/list`);
     } else if (type.includes('rejected')) {
       await dispatch(
         setNewNotification({

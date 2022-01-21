@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { withRouter } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
 
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -12,10 +12,7 @@ import Slide from '@mui/material/Slide';
 import Drawer from './Navigation/Drawer';
 import AppBar from './Navigation/AppBar';
 
-import {
-  selectNotification,
-  clearNotification,
-} from '../../redux/features/notificationSlice';
+import { selectNotification, clearNotification } from '../../redux/features/notificationSlice';
 
 import '../../assets/css/overrideSnackbar.css';
 
@@ -47,11 +44,12 @@ function SlideTransition(props) {
 }
 
 /* eslint-disable react/prop-types */
-const Layout = (props) => {
+const Layout = () => {
   const classes = useStyles();
-  const { children } = props;
   const dispatch = useDispatch();
+
   const { message, backgroundColor, severity } = useSelector(selectNotification);
+
   const [mobileOpen, setMobileOpen] = useState(false);
   const [openSnackBar, setOpenSnackBar] = useState({
     open: false,
@@ -86,18 +84,14 @@ const Layout = (props) => {
     <div className={classes.root}>
       <AppBar handleDrawerToggle={handleDrawerToggle} />
       <nav className={classes.drawer}>
-        <Drawer
-          type="Mobile"
-          status={mobileOpen}
-          handleDrawerToggle={handleDrawerToggle}
-        />
+        <Drawer type="Mobile" status={mobileOpen} handleDrawerToggle={handleDrawerToggle} />
         <Drawer type="Desktop" />
       </nav>
       <Container maxWidth="xl" className={classes.container}>
-        {children}
+        <Outlet />
         <Snackbar
           open={openSnackBar.open}
-          autoHideDuration={6000}
+          autoHideDuration={4000}
           anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
           onClose={handleCloseSnackBar}
           TransitionComponent={openSnackBar.transition}
@@ -135,4 +129,5 @@ const Layout = (props) => {
   );
 };
 
-export default withRouter(Layout);
+export default Layout;
+// export default withRouter(Layout);

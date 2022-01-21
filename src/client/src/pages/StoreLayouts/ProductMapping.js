@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
@@ -40,7 +40,6 @@ import { getSubcategories } from '../../redux/thunks/categoryThunk';
 
 import ProductMapper from '../../components/StoreLayout/ProductMapper_';
 import PartitionBucket from '../../components/StoreLayout/PartitionBucket';
-// import ProductMapper from '../../components/StoreLayout/ProductMapper/index';
 
 import SideMenu from '../../components/StoreLayout/SideMenu';
 import { getFileObject } from '../../utils/general';
@@ -123,7 +122,7 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const ProductMapping = (props) => {
+const ProductMapping = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
 
@@ -135,7 +134,8 @@ const ProductMapping = (props) => {
   const productsRef = useRef([]);
   const [products, setProducts] = useState([]);
 
-  const [firstRefresh, setFirstRefresh] = useState(true);
+  const { uuid: LayoutUUID } = useParams();
+
   const [zoomLevel, setZoomLevel] = useState(0);
   const [floorPlan, setFloorPlan] = useState(null);
   const [leafletLayers, setLeafletLayers] = useState([]);
@@ -150,33 +150,11 @@ const ProductMapping = (props) => {
   const storeUrl = localStorage.getItem('storeUrl');
   const storeName = localStorage.getItem('storeName');
 
-  const {
-    match: {
-      params: { uuid },
-    },
-  } = props;
-
-  // console.log('layouts', layouts);
-  // console.log('currentLayout', currentLayout);
-
-  // console.log('products', products);
-  // console.log('layouts', layouts);
-  // console.log('initProducts', initProducts);
-  // console.log('leafletLayers', leafletLayers);
-  // console.log('setZoomLevel', setZoomLevel);
-  // console.log('currentLayout', currentLayout);
-  // console.log('floorPlan', floorPlan);
-  // console.log('products', products);
-  // console.log('///////////////////////////');
-  // console.log('isProductLoading', isProductLoading);
-  console.log('firstRefresh', firstRefresh);
-  // console.log('isLayoutLoading', isLayoutLoading);
-
   const initLayoutLayers = async (layouts_) => {
     let selectedLayout;
 
-    if (uuid) {
-      selectedLayout = layouts_.find((layout) => layout.uuid === uuid);
+    if (LayoutUUID) {
+      selectedLayout = layouts_.find((layout) => layout.uuid === LayoutUUID);
     } else {
       [selectedLayout] = layouts_;
     }
@@ -193,7 +171,7 @@ const ProductMapping = (props) => {
     dispatch(categoryProcessed());
     dispatch(productProccessed());
     dispatch(layoutProcessed());
-    setFirstRefresh(false);
+    // setFirstRefresh(false);
   };
 
   useEffect(async () => {
@@ -264,25 +242,23 @@ const ProductMapping = (props) => {
       const {
         uuid: productId,
         partition_uuid: currentPartitionId,
-        layout_uuid: currentLayoutId,
+        // layout_uuid: currentLayoutId,
       } = product;
-      const oldPartitionId = originalProducts[index].partition_uuid;
-      const oldLayoutId = originalProducts[index].layout_uuid;
 
-      // console.log('compare partition', oldPartitionId, currentPartitionId);
-      // console.log('compare layout', oldLayoutId, currentLayoutId);
+      const oldPartitionId = originalProducts[index].partition_uuid;
+      // const oldLayoutId = originalProducts[index].layout_uuid;
 
       const partitionChanged = oldPartitionId !== currentPartitionId;
-      const layoutChanged = oldLayoutId !== currentLayoutId;
+      // const layoutChanged = oldLayoutId !== currentLayoutId;
 
-      if (partitionChanged || layoutChanged) {
-        // console.log('Changed', partitionChanged, layoutChanged);
+      if (partitionChanged) {
+        // if (partitionChanged || layoutChanged) {
         updatedProducts = [
           ...updatedProducts,
           {
             uuid: productId,
             partition_uuid: currentPartitionId,
-            layout_uuid: currentLayoutId,
+            // layout_uuid: currentLayoutId,
           },
         ];
       }

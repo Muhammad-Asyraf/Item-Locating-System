@@ -158,7 +158,7 @@ const StoreLocator = (props) => {
         <Marker
           latitude={stepsData.storeCoordinate.latitude}
           longitude={stepsData.storeCoordinate.longitude}
-          offsetTop={-30}
+          offsetTop={-50}
           offsetLeft={-20}
           draggable
           onDragEnd={onDragEnd}

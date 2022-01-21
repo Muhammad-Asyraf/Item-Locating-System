@@ -138,7 +138,8 @@ const Content = (props) => {
       );
 
       const updatedSelectedProduct = { ...updatedProducts[selectedProductIndex] };
-      updatedSelectedProduct.layout_uuid = null;
+      // updatedSelectedProduct.layout_uuid = null;
+      updatedSelectedProduct.layer = null;
       updatedSelectedProduct.partition_uuid = null;
 
       // patch and replace update product

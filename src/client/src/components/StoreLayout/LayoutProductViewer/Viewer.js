@@ -16,15 +16,14 @@ import {
   floorPlanBounds,
   mapComponent,
   mapDefaultConfig,
-  mapStyles,
-  firstBtn,
+  recenterBtn,
 } from '../utils/mapConfig';
 
 const useStyles = makeStyles(() => ({
   refreshButton: {
     position: 'absolute !important',
-    top: 300,
-    left: 296,
+    top: 100,
+    left: 10,
     zIndex: '400 !important',
     backgroundColor: 'white !important',
   },
@@ -33,15 +32,15 @@ const useStyles = makeStyles(() => ({
 /* eslint-disable camelcase */
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable arrow-body-style */
-const Layout = (props) => {
+const Viewer = (props) => {
   const classes = useStyles();
-  const storeUUID = localStorage.getItem('storeUUID');
+
+  const { leafletRef, currentLayout, leafletLayers, floorPlan, setZoomLevel } = props;
 
   const mapRef = useRef(null);
   const floorLayers = useRef([]);
   const shelfLayers = useRef([]);
   const shelfPartitionLayers = useRef([]);
-  const savedLayers = useRef([]);
   const storeViewport = [50, 50];
 
   const {
@@ -58,79 +57,24 @@ const Layout = (props) => {
   const shelfShapes = shelfConfig.shapes;
   const shelfPartitionShapes = shelfPartitionConfig.shapes;
 
-  const {
-    currentLayout,
-    leafletLayers,
-    floorPlan,
-    setZoomLevel,
-    // initProducts,
-    handleOnDrop,
-    addPartitionBucket,
-
-    // updateProducts,
-  } = props;
-
   const reCenter = () => {
     mapRef.current.flyTo(storeViewport, 2.8);
   };
 
-  // const mouseRelease = ({ currentTarget }) => {
-  //   const { myParam: layer } = currentTarget;
-  //   console.log('Mouse is over the  layer', layer);
-  // };
-
   const initShapeObj = (layer, shape) => {
     const isPartitionLayer = shelfPartitionShapes.includes(shape);
     const isShelfLayer = shelfShapes.includes(shape);
-
-    layer._path.ondrop = (event) => {
-      event.preventDefault();
-      handleOnDrop(event, layer);
-    };
-
-    layer._path.ondragover = (event) => {
-      event.preventDefault();
-      const zoomlevel = mapRef.current.getZoom();
-      const adjustedZoomLevel = (zoomlevel - 2).toFixed(1);
-
-      if (adjustedZoomLevel >= 0.8 && isPartitionLayer) {
-        layer.setStyle({ ...shelfPartitionStyles, fillColor: '#d7e75c' });
-      } else if (adjustedZoomLevel < 0.8 && isShelfLayer) {
-        layer.setStyle({ ...shelfStyles, fillColor: '#d7e75c' });
-      }
-    };
-
-    layer._path.ondragleave = () => {
-      const zoomlevel = mapRef.current.getZoom();
-      const adjustedZoomLevel = (zoomlevel - 2).toFixed(1);
-
-      if (adjustedZoomLevel >= 0.8 && isPartitionLayer) {
-        layer.setStyle({ ...shelfPartitionStyles });
-      } else if (adjustedZoomLevel < 0.8 && isShelfLayer) {
-        layer.setStyle({ ...shelfStyles });
-      }
-    };
-
-    layer._path.onclick = () => {
-      // setPartitionBucket([...partitionBucket, { layer }]);
-      // console.log('setPartitionBucket inside layer', setPartitionBucket);
-      console.log('Im click', layer, shape);
-      addPartitionBucket(layer);
-    };
 
     layer._path.onmouseover = () => {
       document.myParam = layer;
       const zoomlevel = mapRef.current.getZoom();
       const adjustedZoomLevel = (zoomlevel - 2).toFixed(1);
 
-      if (adjustedZoomLevel >= 0.8 && isPartitionLayer) {
+      if (adjustedZoomLevel >= 0.9 && isPartitionLayer) {
         layer.setStyle({ ...shelfPartitionStyles, fillColor: '#d7e75c' });
-      } else if (adjustedZoomLevel < 0.8 && isShelfLayer) {
+      } else if (adjustedZoomLevel < 0.9 && isShelfLayer) {
         layer.setStyle({ ...shelfStyles, fillColor: '#d7e75c' });
       }
-
-      // console.log('Mouse is over the  layer', layer);
-      // document.addEventListener('mouseup', mouseRelease);
     };
 
     layer._path.onmouseleave = () => {
@@ -138,14 +82,11 @@ const Layout = (props) => {
       const zoomlevel = mapRef.current.getZoom();
       const adjustedZoomLevel = (zoomlevel - 2).toFixed(1);
 
-      if (adjustedZoomLevel >= 0.8 && isPartitionLayer) {
+      if (adjustedZoomLevel >= 0.9 && isPartitionLayer) {
         layer.setStyle({ ...shelfPartitionStyles });
-      } else if (adjustedZoomLevel < 0.8 && isShelfLayer) {
+      } else if (adjustedZoomLevel < 0.9 && isShelfLayer) {
         layer.setStyle({ ...shelfStyles });
       }
-
-      // console.log('Mouse is leaving the  layer', layer);
-      // document.removeEventListener('mouseup', mouseRelease);
     };
   };
 
@@ -170,7 +111,6 @@ const Layout = (props) => {
     }
 
     newLayer.pm._shape = shape;
-    // newLayer.bindPopup(L.popup().setContent('<p>Hello world!<br />This is a nice popup.</p>'));
     newLayer.addTo(mapRef.current);
 
     // if its a rotated shape, adjust angle
@@ -179,46 +119,6 @@ const Layout = (props) => {
     }
 
     return newLayer;
-  };
-
-  const handleKeyDown = (evt) => {
-    const { shiftKey, key, repeat } = evt;
-
-    if (repeat) return;
-
-    console.log('key is pressed', key);
-
-    if (shiftKey) {
-      // get all layers except 1st index since its the floor plan layer
-      let allLayers;
-
-      if (floorPlan) {
-        allLayers = mapRef.current.pm.getGeomanLayers().slice(2);
-      } else {
-        allLayers = mapRef.current.pm.getGeomanLayers().slice(1);
-      }
-
-      allLayers.forEach(({ _path }) => {
-        _path.shiftKeyHold = true;
-      });
-    }
-  };
-
-  const handleKeyUp = ({ key }) => {
-    if (key === 'Alt') {
-      console.log('key is released', key);
-    }
-
-    if (key === 'Shift') {
-      console.log('key is released', key);
-    }
-  };
-
-  const handleDblClick = ({ target }) => {
-    console.log('double Click', target, target.className);
-    if (!target.className.baseVal) {
-      console.log('double Click outside');
-    }
   };
 
   const loadLayers = (layers) => {
@@ -251,61 +151,11 @@ const Layout = (props) => {
     });
   };
 
-  const reconstructLayers = (layer) => {
-    const {
-      pm: { _shape: shape },
-      id,
-      pm,
-    } = layer;
-
-    const isCircle = shape.includes('Circle');
-    const isPolyline = shape.includes('Line');
-
-    let latLngs = null;
-    let radius = null;
-    let initialAngle = null;
-
-    if (isCircle) {
-      latLngs = layer.getLatLng();
-      radius = layer.getRadius();
-    } else {
-      initialAngle = pm.getAngle();
-
-      // rotate to 0 degree to get oriLatLngs of the object
-      pm.rotateLayerToAngle(0);
-
-      if (isPolyline) {
-        latLngs = layer.getLatLngs();
-      } else {
-        [latLngs] = layer.getLatLngs();
-      }
-
-      // rotate back to previous rotation angle
-      pm.rotateLayerToAngle(initialAngle);
-    }
-
-    return {
-      uuid: id,
-      shape,
-      layer_coordinate: Array.isArray(latLngs) ? { ...latLngs } : latLngs,
-      meta_data: { radius, angle: initialAngle, parentShelf: layer.parentShelf },
-    };
-  };
-
-  const prepareSavedLayers = () => {
-    const _floorLayers = floorLayers.current.map((layer) => reconstructLayers(layer));
-    const _shelfLayers = shelfLayers.current.map((layer) => reconstructLayers(layer));
-    const _shelfPartitionLayers = shelfPartitionLayers.current.map((layer) => {
-      return reconstructLayers(layer);
-    });
-
-    return [..._floorLayers, ..._shelfLayers, ..._shelfPartitionLayers];
-  };
-
   const initMap = () => {
     const map = L.map('map', mapDefaultConfig).setView(storeViewport, 2);
     map.fitBounds(mapBounds);
 
+    leafletRef.current = { map, leaflet: L };
     mapRef.current = map;
   };
 
@@ -339,7 +189,7 @@ const Layout = (props) => {
       setZoomLevel(adjustedZoomLevel);
       console.log('zoomlevel', adjustedZoomLevel);
 
-      if (adjustedZoomLevel >= 0.8) {
+      if (adjustedZoomLevel >= 0.9) {
         shelfLayers.current.forEach((currentLayer) => {
           currentLayer.setStyle({ ...shelfStyles, weight: 0 });
         });
@@ -348,7 +198,7 @@ const Layout = (props) => {
           L.DomUtil.addClass(currentLayer._path, 'leaflet-interactive');
           currentLayer.setStyle({ ...shelfPartitionStyles });
         });
-      } else if (adjustedZoomLevel < 0.8) {
+      } else if (adjustedZoomLevel < 0.9) {
         shelfLayers.current.forEach((currentLayer) => {
           currentLayer.setStyle({ ...shelfStyles });
         });
@@ -372,51 +222,33 @@ const Layout = (props) => {
 
     loadLayers(leafletLayers);
 
-    if (savedLayers.current) {
-      loadLayers(savedLayers.current);
-    }
-
     setZoomBehavior();
 
-    document.addEventListener('keydown', handleKeyDown);
-    document.addEventListener('dblclick', handleDblClick);
-    document.addEventListener('keyup', handleKeyUp);
-
     return () => {
-      savedLayers.current = prepareSavedLayers();
-
       floorLayers.current = [];
       shelfLayers.current = [];
       shelfPartitionLayers.current = [];
 
-      document.removeEventListener('keydown', handleKeyDown);
-      document.removeEventListener('dblclick', handleDblClick);
-      document.removeEventListener('keyup', handleKeyUp);
-
       mapRef.current.remove();
     };
-  }, [floorPlan]);
-
-  /// save logic //////////////////
-
-  const handleSavelayout = (e) => {
-    e.preventDefault();
-    const layers = prepareSavedLayers();
-
-    console.log(layers);
-    console.log(storeUUID);
-    console.log(currentLayout);
-  };
+  }, [currentLayout]);
 
   return (
     <>
-      <div id="map" style={mapStyles} />
-      <Button onClick={reCenter} sx={firstBtn} className={classes.refreshButton}>
+      <div
+        id="map"
+        style={{
+          overflow: 'hidden',
+          width: '100vw',
+          height: '100vh',
+          backgroundColor: 'rgba(0,0,0,0)',
+        }}
+      />
+      <Button onClick={reCenter} sx={recenterBtn} className={classes.refreshButton}>
         <CenterFocusStrongIcon sx={{ color: 'black' }} />
       </Button>
-      <form id="layout-form" onSubmit={handleSavelayout} style={{ display: 'hidden' }} />
     </>
   );
 };
 
-export default Layout;
+export default Viewer;

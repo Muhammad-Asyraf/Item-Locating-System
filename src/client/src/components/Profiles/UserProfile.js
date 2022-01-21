@@ -27,7 +27,6 @@ const UserProfile = (props) => {
   const classes = useStyles();
 
   const { user } = props;
-  console.log('user', user);
 
   return (
     <Grid

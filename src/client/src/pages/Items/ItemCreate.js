@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useHistory, Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 import IconButton from '@mui/material/IconButton';
 import Button from '@mui/material/Button';
@@ -46,7 +46,7 @@ const useStyles = makeStyles(() => ({
 const ItemCreate = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const storeUrl = localStorage.getItem('storeUrl');
   const storeName = localStorage.getItem('storeName');
@@ -76,7 +76,7 @@ const ItemCreate = () => {
           severity: 'success',
         })
       );
-      history.push(`/${storeUrl}/item/list`);
+      navigate(`/${storeUrl}/item/list`);
     } else if (type.includes('rejected')) {
       dispatch(processed());
       await dispatch(

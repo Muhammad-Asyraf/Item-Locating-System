@@ -89,6 +89,14 @@ class Product extends Model {
           to: 'store.uuid',
         },
       },
+      layer: {
+        relation: Model.BelongsToOneRelation,
+        modelClass: require('../layers/model'),
+        join: {
+          from: 'product.partition_uuid',
+          to: 'layer.uuid',
+        },
+      },
     };
   }
 

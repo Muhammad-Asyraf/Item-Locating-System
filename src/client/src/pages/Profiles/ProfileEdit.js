@@ -1,7 +1,8 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
-// import { useHistory, Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+
+import axios from 'axios';
 
 import IconButton from '@mui/material/IconButton';
 import Button from '@mui/material/Button';
@@ -15,15 +16,19 @@ import SaveRoundedIcon from '@mui/icons-material/SaveRounded';
 
 import { makeStyles } from '@mui/styles';
 
-import { getUser } from '../../redux/thunks/userThunk';
+import { getUser, updateUser } from '../../redux/thunks/userThunk';
 import {
   processingRequest,
   processed,
   selectUser,
   selectIsLoading,
 } from '../../redux/features/userSlice';
+import { setActiveUser } from '../../redux/features/authSlice';
+import { setNewNotification } from '../../redux/features/notificationSlice';
 
 import UserProfileEdit from '../../components/Profiles/UserProfileEdit';
+
+import { auth } from '../../services/firebase';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -41,6 +46,7 @@ const useStyles = makeStyles(() => ({
 const ProfileEdit = (props) => {
   const classes = useStyles();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const {
     match: {
@@ -51,6 +57,8 @@ const ProfileEdit = (props) => {
   const storeUrl = localStorage.getItem('storeUrl');
   const storeName = localStorage.getItem('storeName');
 
+  const [firstRefresh, setFirstRefresh] = useState(true);
+
   const currentUser = useSelector(selectUser);
   const isUserLoading = useSelector(selectIsLoading);
 
@@ -58,9 +66,73 @@ const ProfileEdit = (props) => {
     dispatch(processingRequest());
     await dispatch(getUser({ uuid }));
     dispatch(processed());
+    setFirstRefresh(false);
   }, []);
 
-  if (isUserLoading) {
+  const handleSubmit = async (payload) => {
+    const { type, payload: resPayload } = await dispatch(updateUser({ uuid, payload }));
+
+    if (type.includes('fulfilled')) {
+      const password = payload.changePasswordRequest
+        ? payload.newPassword
+        : payload.currentPassword;
+
+      const { user } = await auth.signInWithEmailAndPassword(payload.email, password);
+
+      dispatch(
+        setActiveUser({
+          user: user.toJSON(),
+          message: 'Successfully set active user',
+          status: 'ok',
+        })
+      );
+
+      navigate(`/${storeUrl}/profile`);
+
+      await dispatch(
+        setNewNotification({
+          message: 'User successfully updated',
+          backgroundColor: 'green',
+          severity: 'success',
+        })
+      );
+    } else if (type.includes('rejected')) {
+      await dispatch(
+        setNewNotification({
+          message: resPayload.message,
+          backgroundColor: '#be0000',
+          severity: 'error',
+        })
+      );
+    }
+    dispatch(processed());
+  };
+
+  const checkEmailExist = async (email) => {
+    const userEndpoint = `/api/backoffice/user-service/user/email/${email}`;
+    let emailExist = false;
+
+    try {
+      dispatch(processingRequest());
+      const { data } = await axios.get(userEndpoint);
+
+      if (data.length > 0) {
+        const [fetchedUser] = data;
+
+        if (fetchedUser.uuid !== currentUser.uuid) {
+          emailExist = true;
+        }
+      }
+
+      dispatch(processed());
+    } catch (err) {
+      console.log('error', err);
+    }
+
+    return emailExist;
+  };
+
+  if (isUserLoading && firstRefresh) {
     return (
       <div>
         <LinearProgress
@@ -92,21 +164,21 @@ const ProfileEdit = (props) => {
             <Breadcrumbs separator="•" aria-label="breadcrumb">
               <div style={{ fontSize: '0.875rem' }}>{storeName}&nbsp;&nbsp;</div>,
               <div style={{ fontSize: '0.875rem' }}>&nbsp;&nbsp;User&nbsp;&nbsp;</div>,
-              <div style={{ fontSize: '0.875rem' }}>&nbsp;&nbsp;Profile</div>
+              <div style={{ fontSize: '0.875rem' }}>&nbsp;&nbsp;Profile&nbsp;&nbsp;</div>
               <div style={{ fontSize: '0.875rem' }}>&nbsp;&nbsp;{uuid}</div>
             </Breadcrumbs>
           </Grid>
         </Grid>
         <Grid
           item
-          sm={3.8}
+          xs={3.8}
           container
           direction="row"
           justifyContent="flex-end"
           alignItems="center"
         >
           <Button
-            form="product-form"
+            form="profile-form"
             variant="contained"
             color="primary"
             type="submit"
@@ -130,7 +202,11 @@ const ProfileEdit = (props) => {
           </Button>
         </Grid>
         <Grid item xs={12}>
-          <UserProfileEdit user={currentUser} />
+          <UserProfileEdit
+            user={currentUser}
+            checkEmailExist={checkEmailExist}
+            onSubmit={handleSubmit}
+          />
         </Grid>
       </Grid>
     </div>

@@ -264,10 +264,11 @@ const ProductDrawer = (props) => {
                 >
                   <Grid container spacing={1}>
                     {products.map((product) => {
-                      const { layout_uuid: layoutID, uuid: productUUID } = product;
+                      const { uuid: productUUID, layer } = product;
+                      // const { layout_uuid: layoutID, uuid: productUUID, layer } = product;
                       const isProductSelected = isSelected(productUUID);
 
-                      if (layoutID === layoutUUID) {
+                      if (layer.layout_uuid === layoutUUID) {
                         return (
                           <Grid item xs={12} key={productUUID}>
                             <ProductCard

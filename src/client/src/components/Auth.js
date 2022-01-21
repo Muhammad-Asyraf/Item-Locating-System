@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useHistory } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 import { makeStyles } from '@mui/styles';
 import LinearProgress from '@mui/material/LinearProgress';
@@ -29,7 +29,8 @@ const Auth = ({ children }) => {
   const dispatch = useDispatch();
   const classes = useStyles();
   const authLoading = useSelector(selectAuthIsLoading);
-  const history = useHistory();
+  const navigate = useNavigate();
+  const location = useLocation();
   const [firstRender, setFirstRender] = useState(true);
 
   useEffect(() => {
@@ -43,14 +44,23 @@ const Auth = ({ children }) => {
             status: 'ok',
           })
         );
-        // await dispatch(setHeader(auth));
 
-        await dispatch(getStore({ userUUID: user.toJSON().uid }));
+        const {
+          type,
+          payload: { data },
+        } = await dispatch(getStore({ userUUID: user.toJSON().uid }));
+
+        if (type.includes('fulfilled')) {
+          localStorage.setItem('storeUUID', data.uuid);
+          localStorage.setItem('storeUrl', data.store_url);
+          localStorage.setItem('storeName', data.store_name);
+        }
+
         dispatch(processedStore());
 
-        if (history.location.pathname === '/auth/login') {
+        if (location.pathname === '/auth/login') {
           const storeUrl = localStorage.getItem('storeUrl');
-          history.push(`/${storeUrl}/dashboard`);
+          navigate(`/${storeUrl}/product/list`);
         }
       }
       dispatch(clearState());

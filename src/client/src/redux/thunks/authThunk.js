@@ -26,8 +26,12 @@ export const login = createAsyncThunk(
   async ({ firebase, email, password }, { rejectWithValue, dispatch }) => {
     try {
       const { user } = await firebase.signInWithEmailAndPassword(email, password);
-      // await dispatch(setHeader(firebase));
-      await dispatch(getStore({ userUUID: user.toJSON().uid }));
+
+      const {
+        payload: {
+          data: { store_url: StoreURL },
+        },
+      } = await dispatch(getStore({ userUUID: user.toJSON().uid }));
       await dispatch(processed());
 
       await dispatch(
@@ -40,6 +44,7 @@ export const login = createAsyncThunk(
 
       return {
         user: user.toJSON(),
+        StoreURL,
         message: 'Successfully logged in',
         status: 'ok',
       };

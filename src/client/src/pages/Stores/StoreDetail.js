@@ -1,26 +1,26 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
+// import { Link } from 'react-router-dom';
 // import { useNavigate, Link } from 'react-router-dom';
 
-import IconButton from '@mui/material/IconButton';
+// import IconButton from '@mui/material/IconButton';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Grid from '@mui/material/Grid';
 import LinearProgress from '@mui/material/LinearProgress';
-import EditRoundedIcon from '@mui/icons-material/EditRounded';
+// import EditRoundedIcon from '@mui/icons-material/EditRounded';
 
 import { makeStyles } from '@mui/styles';
 
-import { getUser } from '../../redux/thunks/userThunk';
+import getStore from '../../redux/thunks/storeThunk';
 import {
   processingRequest,
   processed,
-  selectUser,
+  selectStore,
   selectIsLoading,
-} from '../../redux/features/userSlice';
+} from '../../redux/features/storeSlice';
 import { selectUser as selectAuthUser } from '../../redux/features/authSlice';
 
-import UserProfile from '../../components/Profiles/UserProfile';
+import StoreInfo from '../../components/Stores/StoreInfo';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -35,24 +35,24 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const ProfileDetail = () => {
+const StoreDetail = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
 
-  const storeUrl = localStorage.getItem('storeUrl');
+  // const storeUrl = localStorage.getItem('storeUrl');
   const storeName = localStorage.getItem('storeName');
 
   const authUser = useSelector(selectAuthUser);
-  const currentUser = useSelector(selectUser);
-  const isUserLoading = useSelector(selectIsLoading);
+  const currentStore = useSelector(selectStore);
+  const isStoreLoading = useSelector(selectIsLoading);
 
   useEffect(async () => {
     dispatch(processingRequest());
-    await dispatch(getUser({ uuid: authUser.uid }));
+    await dispatch(getStore({ userUUID: authUser.uid }));
     dispatch(processed());
   }, []);
 
-  if (isUserLoading) {
+  if (isStoreLoading) {
     return (
       <div>
         <LinearProgress
@@ -72,31 +72,31 @@ const ProfileDetail = () => {
         <Grid item xs={7} container>
           <Grid item xs={8}>
             <h1 style={{ marginBottom: 1, marginTop: 3, fontSize: '2em' }}>
-              <span> Profile</span>
-              <IconButton
+              <span>Store</span>
+              {/* <IconButton
                 component={Link}
-                to={`/${storeUrl}/profile/edit/${authUser.uid}`}
+                to={`/${storeUrl}/store/edit/${authUser.uid}`}
                 onClick={() => {
                   dispatch(processingRequest());
                 }}
                 sx={{ position: 'relative', top: -3, left: 5 }}
               >
                 <EditRoundedIcon fontSize="large" color="primary" />
-              </IconButton>
+              </IconButton> */}
             </h1>
             <Breadcrumbs separator="•" aria-label="breadcrumb">
               <div style={{ fontSize: '0.875rem' }}>{storeName}&nbsp;&nbsp;</div>,
-              <div style={{ fontSize: '0.875rem' }}>&nbsp;&nbsp;User&nbsp;&nbsp;</div>,
-              <div style={{ fontSize: '0.875rem' }}>&nbsp;&nbsp;Profile</div>
+              <div style={{ fontSize: '0.875rem' }}>&nbsp;&nbsp;Store&nbsp;&nbsp;</div>,
+              <div style={{ fontSize: '0.875rem' }}>&nbsp;&nbsp;Details</div>
             </Breadcrumbs>
           </Grid>
         </Grid>
         <Grid item xs={12}>
-          <UserProfile user={currentUser} />
+          <StoreInfo store={currentStore} />
         </Grid>
       </Grid>
     </div>
   );
 };
 
-export default ProfileDetail;
+export default StoreDetail;

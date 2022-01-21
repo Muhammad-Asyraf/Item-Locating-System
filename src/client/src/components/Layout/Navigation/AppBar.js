@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { withRouter } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 import { AppBar as MUIAppBar } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
@@ -69,7 +69,8 @@ const useStyles = makeStyles((theme) => ({
 const AppBar = (props) => {
   const dispatch = useDispatch();
   const classes = useStyles();
-  const { history, handleDrawerToggle } = props;
+  const navigate = useNavigate();
+  const { handleDrawerToggle } = props;
   const [anchorEl, setAnchorEl] = useState(null);
 
   const storeUrl = localStorage.getItem('storeUrl');
@@ -95,7 +96,7 @@ const AppBar = (props) => {
     localStorage.removeItem('storeUrl');
     localStorage.removeItem('storeName');
     dispatch(logout());
-    history.push('/auth/login');
+    navigate('/auth/login');
   };
 
   return (
@@ -236,7 +237,10 @@ const AppBar = (props) => {
           }}
         >
           <MenuItem
-            onClick={() => history.push(`/${storeUrl}/profile`)}
+            onClick={() => {
+              handleClose();
+              navigate(`/${storeUrl}/profile`);
+            }}
             sx={{
               '&:hover': {
                 borderRadius: '8px !important',
@@ -248,7 +252,10 @@ const AppBar = (props) => {
             </ListItemIcon>
           </MenuItem>
           <MenuItem
-            onClick={() => history.push(`/${storeUrl}/store`)}
+            onClick={() => {
+              handleClose();
+              navigate(`/${storeUrl}/store`);
+            }}
             sx={{
               '&:hover': {
                 borderRadius: '8px !important',
@@ -286,4 +293,5 @@ const AppBar = (props) => {
   );
 };
 
-export default withRouter(AppBar);
+export default AppBar;
+// export default withRouter(AppBar);

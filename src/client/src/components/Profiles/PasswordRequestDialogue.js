@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 
 import Dialog from '@mui/material/Dialog';
 import Slide from '@mui/material/Slide';
@@ -7,24 +7,43 @@ import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
 
-import SaveRoundedIcon from '@mui/icons-material/SaveRounded';
-import BookmarksRoundedIcon from '@mui/icons-material/BookmarksRounded';
-import BadgeRoundedIcon from '@mui/icons-material/BadgeRounded';
+import PasswordIcon from '@mui/icons-material/Password';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
 ));
 
-const LayoutDetailsDialogue = (props) => {
-  const { open, handleClose, name, label, setName, setLabel } = props;
+const PasswordRequestDialogue = (props) => {
+  const { open, handleClose, setUserPassword, proceed } = props;
+
+  const passwordRef = useRef();
+  const [passwordError, setPasswordError] = useState(false);
 
   const handleInputChange = ({ target }) => {
-    const { id, value } = target;
+    const { value } = target;
 
-    if (id === 'name') {
-      setName(value);
-    } else if (id === 'label') {
-      setLabel(value);
+    setUserPassword(value);
+  };
+
+  const validatePassword = (value) => {
+    let error;
+
+    if (!value) {
+      error = 'Please enter your password';
+    } else {
+      error = false;
+    }
+
+    return error;
+  };
+
+  const handleSubmit = () => {
+    const updatedPasswordError = validatePassword(passwordRef.current.value);
+    setPasswordError(updatedPasswordError);
+
+    if (!passwordError) {
+      handleClose();
+      proceed();
     }
   };
 
@@ -43,12 +62,10 @@ const LayoutDetailsDialogue = (props) => {
       }}
     >
       <h2 style={{ marginBottom: 10 }}>
-        <b>Layout Details</b>
+        <b>Confirm password to continue</b>
       </h2>
 
-      <div>
-        Please enter the layout&apos;s name and appropriate label for your customer reference.
-      </div>
+      <div>Please enter your password to proceed with these changes.</div>
       <Grid container justifyContent="center" alignItems="center" sx={{ mt: 3 }}>
         <Grid
           item
@@ -63,33 +80,20 @@ const LayoutDetailsDialogue = (props) => {
         >
           <Grid item xs={12}>
             <TextField
-              id="name"
-              label="Name"
+              id="password"
+              label="Password"
               variant="standard"
+              type="password"
+              inputRef={passwordRef}
+              onBlur={handleInputChange}
               onChange={handleInputChange}
+              error={passwordError !== false}
+              helperText={passwordError}
               style={{ width: '100%' }}
-              value={name}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <BadgeRoundedIcon />
-                  </InputAdornment>
-                ),
-              }}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              id="label"
-              label="Label"
-              variant="standard"
-              onChange={handleInputChange}
-              style={{ width: '100%' }}
-              value={label}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <BookmarksRoundedIcon />
+                    <PasswordIcon />
                   </InputAdornment>
                 ),
               }}
@@ -127,7 +131,7 @@ const LayoutDetailsDialogue = (props) => {
           </Grid>
           <Grid item>
             <Button
-              onClick={handleClose}
+              onClick={handleSubmit}
               variant="contained"
               color="primary"
               type="button"
@@ -137,11 +141,11 @@ const LayoutDetailsDialogue = (props) => {
                 borderRadius: 3,
                 height: 50,
 
-                width: 170,
+                width: 200,
                 boxShadow: 'rgba(53, 132, 167, 0.44) 0px 8px 16px 0px !important',
               }}
             >
-              <SaveRoundedIcon style={{ marginRight: 10 }} fontSize="small" /> Update Details
+              Confirm Password
             </Button>
           </Grid>
         </Grid>
@@ -150,4 +154,4 @@ const LayoutDetailsDialogue = (props) => {
   );
 };
 
-export default LayoutDetailsDialogue;
+export default PasswordRequestDialogue;

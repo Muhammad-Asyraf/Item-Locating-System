@@ -12,7 +12,9 @@ exports.getAllProducts = async (req, res, next) => {
     const { store_uuid } = req.params;
     const products = await Product.query()
       .where('store_uuid', store_uuid)
-      .withGraphFetched('[items, sub_categories.category, images, promotions]')
+      .withGraphFetched(
+        '[items, sub_categories.category, images, promotions, layer]'
+      )
       .modifyGraph('images', (builder) => {
         builder.select('path');
       })
@@ -31,6 +33,8 @@ exports.getAllProducts = async (req, res, next) => {
           'promotion_type'
         );
       });
+
+    console.log('products', products);
 
     productLogger.info(`Successfully retrieve: ${products.length} products`);
     res.json(products);

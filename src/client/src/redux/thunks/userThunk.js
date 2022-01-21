@@ -18,8 +18,10 @@ export const getUser = createAsyncThunk(
     } catch (err) {
       const { data } = err.response;
 
+      console.log('data', data);
+
       return rejectWithValue({
-        message: 'Failed in retrieving products',
+        message: 'Failed in retrieving user',
         status: 'Error!',
         error: data.code,
       });

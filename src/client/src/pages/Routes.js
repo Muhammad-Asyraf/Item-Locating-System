@@ -45,7 +45,7 @@ const Routes = (isAuthenticated, storeUrl) => [
     ],
   },
   {
-    path: '/store/:uuid/layout',
+    path: 'layout-product-viewer/store/:uuid',
     element: <MobileStoreLayout />,
   },
   {

@@ -35,7 +35,7 @@ const useStyles = makeStyles(() => ({
 const Viewer = (props) => {
   const classes = useStyles();
 
-  const { leafletRef, currentLayout, leafletLayers, floorPlan, setZoomLevel } = props;
+  const { leafletRef, currentLayout, leafletLayers, floorPlan, handleOpen } = props;
 
   const mapRef = useRef(null);
   const floorLayers = useRef([]);
@@ -58,12 +58,20 @@ const Viewer = (props) => {
   const shelfPartitionShapes = shelfPartitionConfig.shapes;
 
   const reCenter = () => {
-    mapRef.current.flyTo(storeViewport, 2.8);
+    mapRef.current.flyTo(storeViewport, 3.5);
   };
 
   const initShapeObj = (layer, shape) => {
     const isPartitionLayer = shelfPartitionShapes.includes(shape);
     const isShelfLayer = shelfShapes.includes(shape);
+
+    console.log(layer);
+    if (isPartitionLayer) {
+      layer._path.ontouchend = (e) => {
+        e.preventDefault();
+        handleOpen();
+      };
+    }
 
     layer._path.onmouseover = () => {
       document.myParam = layer;
@@ -152,7 +160,7 @@ const Viewer = (props) => {
   };
 
   const initMap = () => {
-    const map = L.map('map', mapDefaultConfig).setView(storeViewport, 2);
+    const map = L.map('map', mapDefaultConfig).setView(storeViewport, 3);
     map.fitBounds(mapBounds);
 
     leafletRef.current = { map, leaflet: L };
@@ -186,29 +194,19 @@ const Viewer = (props) => {
     map.on('zoomend', () => {
       const zoomlevel = map.getZoom();
       const adjustedZoomLevel = (zoomlevel - 2).toFixed(1);
-      setZoomLevel(adjustedZoomLevel);
       console.log('zoomlevel', adjustedZoomLevel);
 
       if (adjustedZoomLevel >= 0.9) {
-        shelfLayers.current.forEach((currentLayer) => {
-          currentLayer.setStyle({ ...shelfStyles, weight: 0 });
-        });
-
         shelfPartitionLayers.current.forEach((currentLayer) => {
           L.DomUtil.addClass(currentLayer._path, 'leaflet-interactive');
           currentLayer.setStyle({ ...shelfPartitionStyles });
         });
       } else if (adjustedZoomLevel < 0.9) {
-        shelfLayers.current.forEach((currentLayer) => {
-          currentLayer.setStyle({ ...shelfStyles });
-        });
-
         shelfPartitionLayers.current.forEach((currentLayer) => {
           L.DomUtil.removeClass(currentLayer._path, 'leaflet-interactive');
           currentLayer.setStyle({
             ...shelfPartitionStyles,
-            weight: 0,
-            fillColor: 'transparent',
+            weight: 0.5,
           });
         });
       }

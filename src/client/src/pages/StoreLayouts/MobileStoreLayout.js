@@ -3,6 +3,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useSearchParams, useParams } from 'react-router-dom';
 
 import Grid from '@mui/material/Grid';
+import Box from '@mui/material/Box';
+import TextField from '@mui/material/TextField';
+import Autocomplete from '@mui/material/Autocomplete';
 import LinearProgress from '@mui/material/LinearProgress';
 
 import { makeStyles } from '@mui/styles';
@@ -16,6 +19,7 @@ import {
 import { getLayouts } from '../../redux/thunks/layoutThunk';
 
 import LayoutProductViewer from '../../components/StoreLayout/LayoutProductViewer/Viewer';
+import PartitionProductModal from '../../components/StoreLayout/LayoutProductViewer/PartitionProductModal';
 
 import { getFileObject } from '../../utils/general';
 
@@ -27,18 +31,14 @@ const useStyles = makeStyles(() => ({
     width: '100vw',
     height: '7px !important',
   },
-  zoomLevel: {
-    fontSize: '0.875rem',
-    background: 'black',
-    padding: '5px 10px 5px 10px',
-    color: 'white',
-    borderRadius: '5px',
-    fontWeight: 'bold',
+  layoutDropdown: {
     position: 'absolute ',
-    top: 20,
+    top: 10,
     right: 10,
     zIndex: '450',
-    boxShadow: 'rgba(0, 0, 0, 0.24) 0px 3px 8px',
+    width: '32vw',
+    backgroundColor: 'white',
+    borderRadius: 5,
   },
 }));
 
@@ -49,18 +49,26 @@ const MobileStoreLayout = () => {
   const leafletRef = useRef(null);
 
   const [searchParams] = useSearchParams();
-  const [zoomLevel, setZoomLevel] = useState(0);
+
   const [floorPlan, setFloorPlan] = useState(null);
   const [leafletLayers, setLeafletLayers] = useState([]);
   const [currentLayout, setCurrentLayout] = useState(null);
+  const [openPartitionModal, setOpenPartitionModal] = useState(false);
 
   const { uuid: StoreUUID } = useParams();
   const authToken = searchParams.get('token');
+  const planningCartUUID = searchParams.get('planning-cart');
 
   const layouts = useSelector(selectLayouts);
   const isLayoutLoading = useSelector(selectIsLoading);
 
   console.log('layouts', layouts);
+  console.log('authToken', authToken);
+  console.log('StoreUUID', StoreUUID);
+  console.log('planningCartUUID', planningCartUUID);
+
+  const handleOpen = () => setOpenPartitionModal(true);
+  const handleClose = () => setOpenPartitionModal(false);
 
   const initLayoutLayers = async (layouts_) => {
     const [selectedLayout] = layouts_;
@@ -79,7 +87,7 @@ const MobileStoreLayout = () => {
 
   useEffect(async () => {
     const { type: layoutStatus, payload: layoutPayload } = await dispatch(
-      getLayouts({ uuid: StoreUUID })
+      getLayouts({ uuid: StoreUUID, authToken, planningCartUUID })
     );
 
     const requestStatusOk = layoutStatus.includes('fulfilled');
@@ -89,8 +97,18 @@ const MobileStoreLayout = () => {
     }
   }, []);
 
-  console.log('authToken', authToken);
-  console.log('StoreUUID', StoreUUID);
+  const handleChangeLayout = async (e, selectedLayout) => {
+    const { layers, floor_plan_path: path } = selectedLayout;
+
+    if (path) {
+      const file = await getFileObject(path);
+      setFloorPlan({ file, path });
+    } else {
+      setFloorPlan(null);
+    }
+    setLeafletLayers(layers);
+    setCurrentLayout(selectedLayout);
+  };
 
   if (isLayoutLoading) {
     return (
@@ -108,13 +126,27 @@ const MobileStoreLayout = () => {
   return (
     <Grid container justifyContent="center" alignItems="center">
       <Grid item xs={12}>
-        <div className={classes.zoomLevel}>Zoom Level: {zoomLevel}</div>
+        <Box className={classes.layoutDropdown}>
+          <Autocomplete
+            disablePortal
+            disableClearable
+            options={layouts}
+            getOptionLabel={(option) => option.name}
+            renderInput={(params) => <TextField {...params} size="small" />}
+            onChange={handleChangeLayout}
+            value={currentLayout}
+          />
+        </Box>
         <LayoutProductViewer
           leafletRef={leafletRef}
           currentLayout={currentLayout}
           leafletLayers={leafletLayers}
           floorPlan={floorPlan}
-          setZoomLevel={setZoomLevel}
+          handleOpen={handleOpen}
+        />
+        <PartitionProductModal
+          openPartitionModal={openPartitionModal}
+          handleClose={handleClose}
         />
       </Grid>
     </Grid>

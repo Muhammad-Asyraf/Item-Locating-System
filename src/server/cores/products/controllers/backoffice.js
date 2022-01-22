@@ -34,8 +34,6 @@ exports.getAllProducts = async (req, res, next) => {
         );
       });
 
-    console.log('products', products);
-
     productLogger.info(`Successfully retrieve: ${products.length} products`);
     res.json(products);
   } catch (err) {

@@ -22,19 +22,16 @@ export default function CategoryCard({ category }) {
   };
 
   return (
-    <TouchableOpacity onPress={proceed}>
-      <Surface style={styles.categoryCardContainer}>
+    <TouchableOpacity onPress={proceed} style={styles.categoryCardContainer}>
+      <Surface style={styles.categoryImageContainer}>
         <Image
           style={styles.categoryImage}
           source={{ uri: 'https://via.placeholder.com/96' }}
         />
-        <Text
-          style={[TextStyle.caption, styles.categoryName]}
-          numberOfLines={2}
-        >
-          {category.name}
-        </Text>
       </Surface>
+      <Text style={[TextStyle.caption, styles.categoryName]} numberOfLines={2}>
+        {category.name}
+      </Text>
     </TouchableOpacity>
   );
 }
@@ -42,19 +39,23 @@ export default function CategoryCard({ category }) {
 const styles = StyleSheet.create({
   categoryCardContainer: {
     flexDirection: 'column',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-start',
     alignItems: 'center',
     borderRadius: Theme.roundness,
-    marginEnd: 12,
-    width: 100,
+    width: 72,
     height: 133,
-    paddingVertical: 12,
-    paddingHorizontal: 8,
+    elevation: 1,
+    marginEnd: 16,
+  },
+  categoryImageContainer: {
+    paddingVertical: 20,
+    paddingHorizontal: 12,
+    borderRadius: Theme.roundness + 1,
     elevation: 1,
   },
   categoryImage: {
-    width: 64,
-    height: 64,
+    width: 48,
+    height: 48,
     resizeMode: 'contain',
     borderRadius: 1000,
   },

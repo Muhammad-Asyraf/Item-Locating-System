@@ -72,8 +72,7 @@ export default function CategoryList({ navigation, route }) {
                 autoCapitalize="none"
               />
             }
-            fixed
-            itemDimension={100}
+            itemDimension={64}
             spacing={18}
             data={data}
             renderItem={({ item }) => <CategoryCard category={item} />}

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
   Dimensions,
+  RefreshControl,
   ScrollView,
   FlatList,
   View,
@@ -17,9 +18,11 @@ import {
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Carousel, { ParallaxImage } from 'react-native-snap-carousel';
 import CategoryCard from '../components/products/CategoryCard';
+import StoreCard from '../components/stores/StoreCard';
 
 // Utilities
 import { getCategories } from '../services/ProductService';
+import { getStores } from '../services/StoreService';
 
 // Styling
 import { Theme, GlobalStyle, TextStyle } from '../styles/Theme';
@@ -27,8 +30,32 @@ import { Theme, GlobalStyle, TextStyle } from '../styles/Theme';
 const { width: screenWidth } = Dimensions.get('window');
 export default function Home({ navigation }) {
   const [isLoading, setLoading] = useState(true);
-  const [categories, setCategories] = useState();
+  const [categories, setCategories] = useState([]);
+  const [stores, setStores] = useState([]);
   const [banners, setBanners] = useState([1, 2, 3]);
+
+  useEffect(() => {
+    if (isLoading) {
+      getCategories()
+        .then((data) => {
+          setCategories(data.slice(0, 9));
+          //console.log(`[Home.js/useEffect] ${JSON.stringify(data)}`);
+        })
+        .catch((error) => {
+          console.log(`[Home.js/useEffect] ${error}`);
+        });
+
+      getStores()
+        .then((data) => {
+          setStores(data);
+          // console.log(`[Home.js/useEffect] Stores: ${JSON.stringify(data)}`);
+          setLoading(false);
+        })
+        .catch((error) => {
+          console.log(`[Home.js/useEffect] ${error}`);
+        });
+    }
+  }, [isLoading]);
 
   // Push a search result screen
   const openSearch = () => {
@@ -42,17 +69,7 @@ export default function Home({ navigation }) {
     navigation.dangerouslyGetParent().navigate('Categories');
   };
 
-  useEffect(() => {
-    getCategories()
-      .then((data) => {
-        setLoading(false);
-        setCategories(data.slice(0, 9));
-        //console.log(`[Home.js/useEffect] ${JSON.stringify(data)}`);
-      })
-      .catch((error) => {
-        console.log(`[Home.js/useEffect] ${error}`);
-      });
-  }, [isLoading]);
+  const viewStores = () => {};
 
   return (
     <View style={GlobalStyle.screenContainer}>
@@ -75,8 +92,19 @@ export default function Home({ navigation }) {
           /> */}
         </TouchableOpacity>
       </Appbar.Header>
-      <ScrollView style={styles.container}>
+      <ScrollView
+        style={styles.container}
+        refreshControl={
+          <RefreshControl
+            refreshing={isLoading}
+            onRefresh={() => {
+              setLoading(true);
+            }}
+          />
+        }
+      >
         <Carousel
+          containerCustomStyle={styles.carousel}
           sliderWidth={screenWidth}
           itemWidth={screenWidth - 40}
           data={banners}
@@ -104,7 +132,7 @@ export default function Home({ navigation }) {
             </Button>
           </View>
           <FlatList
-            style={styles.horizontalListContainer}
+            contentContainerStyle={styles.horizontalListContainer}
             horizontal={true}
             data={categories}
             renderItem={({ item }) => (
@@ -113,24 +141,29 @@ export default function Home({ navigation }) {
           />
         </View>
         {/* Horizontal list mockup */}
-        {/* <View style={styles.horizontalProductContainer}>
-          <Title style={styles.horizontalListTitle}>
-            Hot Products near you!
-          </Title>
-          <FlatList
-            style={styles.horizontalListContainer}
-            horizontal={true}
-            data={banners}
-            renderItem={({ item }) => (
-              <View style={styles.listItemContainer}>
-                <Image
-                  style={styles.horizontalProductImage}
-                  source={{ uri: 'https://tinyurl.com/268aa7js' }}
-                />
-              </View>
-            )}
-          />
-        </View> */}
+        {stores.length != 0 && (
+          <View style={styles.horizontalProductContainer}>
+            <View style={styles.horizontalTitleContainer}>
+              <Text style={[TextStyle.subhead1, styles.horizontalListTitle]}>
+                Shops around you
+              </Text>
+              <Button compact={true} onPress={viewStores}>
+                See All
+              </Button>
+            </View>
+            <FlatList
+              contentContainerStyle={styles.horizontalListContainer}
+              horizontal={true}
+              data={stores}
+              renderItem={({ item }) => <StoreCard store={item} />}
+            />
+          </View>
+        )}
+        <View style={styles.footer}>
+          <Text style={[TextStyle.body2, styles.footerMessage]}>
+            You have reached the end
+          </Text>
+        </View>
       </ScrollView>
     </View>
   );
@@ -138,6 +171,9 @@ export default function Home({ navigation }) {
 
 const styles = StyleSheet.create({
   // Parallax start
+  carousel: {
+    marginTop: 12,
+  },
   item: {
     height: 160,
   },
@@ -154,9 +190,7 @@ const styles = StyleSheet.create({
   // Parallax end
 
   // Main container
-  container: {
-    paddingTop: 12,
-  },
+  container: {},
 
   // Searchbar
   searchBar: {
@@ -174,7 +208,9 @@ const styles = StyleSheet.create({
   },
 
   // Horizontal item list
-  horizontalProductContainer: {},
+  horizontalProductContainer: {
+    marginVertical: 8,
+  },
   horizontalTitleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -185,7 +221,6 @@ const styles = StyleSheet.create({
   horizontalListTitle: {},
   horizontalListContainer: {
     paddingHorizontal: 18,
-    paddingVertical: 4,
     backgroundColor: '#F5F5F5',
   },
   horizontalProductImage: {
@@ -204,5 +239,15 @@ const styles = StyleSheet.create({
     shadowRadius: 1.41,
 
     elevation: 2,
+  },
+  footer: {
+    backgroundColor: Theme.colors.background,
+    margin: 18,
+    padding: 16,
+    borderRadius: Theme.roundness,
+  },
+  footerMessage: {
+    textAlign: 'center',
+    color: Theme.colors.placeholder,
   },
 });

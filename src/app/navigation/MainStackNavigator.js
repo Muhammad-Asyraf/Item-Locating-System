@@ -9,6 +9,7 @@ import FloorPlan from '../screens/FloorPlan';
 import ProfileEdit from '../screens/ProfileEdit';
 import ProductDetails from '../screens/ProductDetails';
 import CategoryList from '../screens/CategoryList';
+import StoreDetails from '../screens/StoreDetails';
 
 // Utilities
 import auth from '@react-native-firebase/auth';
@@ -215,6 +216,8 @@ export default function MainStackNavigator() {
       <Stack.Screen name="Search Result" component={SearchResult} />
       <Stack.Screen name="Product Page" component={ProductDetails} />
       <Stack.Screen name="Categories" component={CategoryList} />
+      {/* Stores */}
+      <Stack.Screen name="Store" component={StoreDetails} />
       {/* <Stack.Screen name="Subcategories" component={CategoryList} /> */}
       {/* Profiles */}
       <Stack.Screen name="Edit Profile" component={ProfileEdit} />

@@ -8,14 +8,15 @@ import {
   Text,
   Dialog,
   Chip,
+  Menu,
+  Divider,
 } from 'react-native-paper';
-import Slider from 'rn-range-slider';
 import Thumb from '../components/core/rangeslider/Thumb';
 import Rail from '../components/core/rangeslider/Rail';
 import RailSelected from '../components/core/rangeslider/RailSelected';
 import Label from '../components/core/rangeslider/Label';
 import Notch from '../components/core/rangeslider/Notch';
-import ProductCard from '../components/ProductCard';
+import ProductCard from '../components/products/ProductCard';
 import { FlatGrid } from 'react-native-super-grid';
 import Loading from '../components/Loading';
 
@@ -32,9 +33,15 @@ import { appBarStyles } from '../styles/appBarStyles';
 import { FlatList } from 'react-native-gesture-handler';
 
 export default function SearchResult({ navigation, route }) {
+  const params = useRef(route.params);
   const [minPrice, setMinPrice] = useState(Infinity);
   const [maxPrice, setMaxPrice] = useState(-Infinity);
   const [isLoading, setLoading] = useState(true);
+
+  // Sort menu states
+  const [isSortMenuVisible, setSortMenuVisible] = useState(false);
+  // 0 - unsorted, 1 - A-Z, 2 - Z-A, 3 - Price : low to high, 4 - Price : high to low
+  const sortType = useRef(0);
 
   // Search states
   const [searchQuery, setSearchQuery] = useState(route.params.query);
@@ -92,6 +99,10 @@ export default function SearchResult({ navigation, route }) {
               console.log(`[SearchResult.js/useEffect] ${error}`);
             });
         }
+
+        if ('store' in filters) {
+          queryObject.uuid = filters.store;
+        }
       }
 
       getProducts(queryObject)
@@ -117,6 +128,8 @@ export default function SearchResult({ navigation, route }) {
     setShowResult(true);
   };
 
+  const showSortMenu = () => setSortMenuVisible(true);
+  const hideSortMenu = () => setSortMenuVisible(false);
   const showFilterDialog = () => setFilterDialogVisible(true);
   const hideFilterDialog = () => setFilterDialogVisible(false);
 
@@ -130,6 +143,12 @@ export default function SearchResult({ navigation, route }) {
     setDialogFilters({});
     setFilters({});
     setLoading(true);
+  };
+
+  const handleSortMenu = (state) => {
+    sortType.current = state;
+    setSearchResult([...searchResult].sort(compareSort));
+    hideSortMenu();
   };
 
   const handleCategorySelect = (categoryUUID) => {
@@ -239,6 +258,36 @@ export default function SearchResult({ navigation, route }) {
     });
   };
 
+  const compareSort = (a, b) => {
+    let nameA = a.name.toUpperCase();
+    let nameB = b.name.toUpperCase();
+    let priceA = a.retail_price;
+    let priceB = b.retail_price;
+    let comparison = 0;
+    switch (sortType.current) {
+      case 1:
+        if (nameA > nameB) {
+          comparison = 1;
+        } else if (nameA < nameB) {
+          comparison = -1;
+        }
+        return comparison;
+      case 2:
+        if (nameA > nameB) {
+          comparison = 1;
+        } else if (nameA < nameB) {
+          comparison = -1;
+        }
+        return comparison * -1;
+      case 3:
+        return priceA - priceB;
+      case 4:
+        return priceB - priceA;
+      default:
+        return comparison;
+    }
+  };
+
   return (
     <View style={GlobalStyle.screenContainer}>
       <Appbar.Header style={[appBarStyles.appBarContainer]}>
@@ -255,6 +304,23 @@ export default function SearchResult({ navigation, route }) {
           autoCapitalize="none"
         />
         <Appbar.Action icon="filter-variant" onPress={showFilterDialog} />
+        <Menu
+          visible={isSortMenuVisible}
+          onDismiss={hideSortMenu}
+          anchor={<Appbar.Action icon="sort" onPress={showSortMenu} />}
+        >
+          <Menu.Item title="A-Z" onPress={() => handleSortMenu(1)} />
+          <Menu.Item title="Z-A" onPress={() => handleSortMenu(2)} />
+          <Divider />
+          <Menu.Item
+            title="Price : low to high"
+            onPress={() => handleSortMenu(3)}
+          />
+          <Menu.Item
+            title="Price : high to low"
+            onPress={() => handleSortMenu(4)}
+          />
+        </Menu>
       </Appbar.Header>
       {isLoading ? (
         <Loading />

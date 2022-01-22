@@ -18,7 +18,10 @@ export default function AppbarScreen(props) {
           {navigation.canGoBack() ? (
             <Appbar.BackAction color="#FFFFFF" onPress={navigation.goBack} />
           ) : null}
-          <Text style={[AppbarStyle.appBarTitle, TextStyle.subhead1]}>
+          <Text
+            style={[AppbarStyle.appBarTitle, TextStyle.subhead1]}
+            numberOfLines={2}
+          >
             {props.name}
           </Text>
         </Appbar.Header>
@@ -33,7 +36,10 @@ export default function AppbarScreen(props) {
         {navigation.canGoBack() ? (
           <Appbar.BackAction color="#FFFFFF" onPress={navigation.goBack} />
         ) : null}
-        <Text style={[AppbarStyle.appBarTitle, TextStyle.subhead1]}>
+        <Text
+          style={[AppbarStyle.appBarTitle, TextStyle.subhead1]}
+          numberOfLines={2}
+        >
           {props.name}
         </Text>
       </Appbar.Header>

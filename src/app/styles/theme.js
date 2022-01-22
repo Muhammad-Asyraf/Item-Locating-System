@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native';
 
 export const Theme = {
   ...DefaultTheme,
-  dark: true,
+  dark: false,
   mode: 'adaptive',
   roundness: 5,
   colors: {
@@ -21,6 +21,7 @@ export const Theme = {
 
 export const GlobalStyle = StyleSheet.create({
   screenContainer: {
+    height: '100%',
     flex: 1,
     flexGrow: 1,
     backgroundColor: '#F5F5F5',
@@ -171,6 +172,7 @@ export const AppbarStyle = StyleSheet.create({
   },
   appBarContainer: {
     backgroundColor: Theme.colors.primary,
+    flexShrink: 1,
     padding: 0,
   },
   appBarSearchbar: {
@@ -181,9 +183,9 @@ export const AppbarStyle = StyleSheet.create({
     margin: 12,
   },
   appBarTitle: {
-    flexGrow: 1,
+    flexShrink: 1,
     fontSize: 18,
     color: 'white',
-    marginLeft: 18,
+    marginHorizontal: 18,
   },
 });

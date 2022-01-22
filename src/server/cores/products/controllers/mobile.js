@@ -82,7 +82,7 @@ exports.getCategories = async (req, res, next) => {
     );
 
     res.json(categories);
-  } catch (error) {
+  } catch (err) {
     productLogger.warn(`Error retrieving categories`);
     next(err);
   }
@@ -96,8 +96,23 @@ exports.getSubCategories = async (req, res, next) => {
       .select('uuid', 'name', 'image_uuid');
 
     res.json(subcategories);
-  } catch (error) {
+  } catch (err) {
     productLogger.warn(`Error retrieving subcategories`);
+    next(err);
+  }
+};
+
+exports.getProductsGroupByStore = async (req, res, next) => {
+  try {
+    const query = req.query;
+    const products = await Store.query()
+      .withGraphFetched('products')
+      .modifyGraph('products', (builder) => {
+        builder.where('name', 'ilike', `%${query.search}%`);
+      });
+    res.json(products);
+  } catch (err) {
+    productLogger.warn(`Error retrieving grouped products`);
     next(err);
   }
 };

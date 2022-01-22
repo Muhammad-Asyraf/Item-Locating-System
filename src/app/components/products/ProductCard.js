@@ -5,18 +5,18 @@ import { View, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { Card, Text, Button } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import NumericInput from 'react-native-numeric-input';
-import SmallTextChip from './core/SmallTextChip';
-import LocationText from './LocationText';
+import SmallTextChip from '../core/SmallTextChip';
+import LocationText from '../LocationText';
 
 // Redux
 import { useSelector, useDispatch } from 'react-redux';
-import { changeItemQuantity, update } from '../redux/cart/cartSlice';
-import { addItemThunk } from '../redux/cart/cartThunk';
+import { changeItemQuantity, update } from '../../redux/cart/cartSlice';
+import { addItemThunk } from '../../redux/cart/cartThunk';
 
 // Styling
-import { Theme, TextStyle } from '../styles/Theme';
+import { Theme, TextStyle } from '../../styles/Theme';
 
-export default function ProductCard({ style, product }) {
+export default function ProductCard({ style, product, withStoreName = true }) {
   const cart = useSelector((state) => state.cart);
   const user = useSelector((state) => state.user);
   const auth = useSelector((state) => state.auth);
@@ -113,7 +113,7 @@ export default function ProductCard({ style, product }) {
   };
 
   return (
-    <TouchableOpacity onPress={openProductDetails}>
+    <TouchableOpacity onPress={openProductDetails} style={{ ...style }}>
       <View style={styles.cover}>
         <Image
           style={styles.image}
@@ -174,11 +174,13 @@ export default function ProductCard({ style, product }) {
           {product.name}
         </Text>
 
-        <LocationText
-          style={{ alignSelf: 'flex-start', marginTop: 4 }}
-          text={product.stores.store_name}
-          color="#707070"
-        />
+        {withStoreName && (
+          <LocationText
+            style={{ alignSelf: 'flex-start', marginTop: 4 }}
+            text={product.stores.store_name}
+            color="#707070"
+          />
+        )}
       </View>
     </TouchableOpacity>
   );

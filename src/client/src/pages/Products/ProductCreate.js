@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 // import { Link } from 'react-router-dom';
-import { useHistory, Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 import IconButton from '@mui/material/IconButton';
 import Button from '@mui/material/Button';
@@ -50,7 +50,7 @@ const useStyles = makeStyles(() => ({
 const ProductCreate = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const storeUrl = localStorage.getItem('storeUrl');
   const storeName = localStorage.getItem('storeName');
@@ -74,7 +74,7 @@ const ProductCreate = () => {
     const { type, payload: resPayload } = await dispatch(addProduct({ payload }));
 
     if (type.includes('fulfilled')) {
-      history.push(`/${storeUrl}/product/list`);
+      navigate(`/${storeUrl}/product/list`);
       await dispatch(
         setNewNotification({
           message: 'Product successfully created',

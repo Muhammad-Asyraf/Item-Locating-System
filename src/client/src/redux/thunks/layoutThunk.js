@@ -1,12 +1,13 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
+import getHeader from '../../services/firebase/getHeader';
 
 export const getLayout = createAsyncThunk(
   'layout/getLayout',
-  async ({ uuid }, { rejectWithValue, getState }) => {
+  async ({ uuid }, { rejectWithValue }) => {
     try {
       const endpointURL = `/api/backoffice/layout-service/layout/${uuid}`;
-      const { authHeader } = await getState().auth;
+      const authHeader = await getHeader();
       const { data } = await axios.get(endpointURL, authHeader);
 
       return {
@@ -28,10 +29,10 @@ export const getLayout = createAsyncThunk(
 
 export const getLayouts = createAsyncThunk(
   'layout/getLayouts',
-  async (args, { rejectWithValue, getState }) => {
+  async (args, { rejectWithValue }) => {
     try {
       const storeUuid = localStorage.getItem('storeUUID');
-      const { authHeader } = await getState().auth;
+      const authHeader = await getHeader();
       const endpointURL = `/api/backoffice/layout-service/layouts/${storeUuid}`;
 
       const res = await axios.get(endpointURL, authHeader);
@@ -55,10 +56,10 @@ export const getLayouts = createAsyncThunk(
 
 export const addLayout = createAsyncThunk(
   'layout/addLayout',
-  async ({ payload }, { rejectWithValue, getState }) => {
+  async ({ payload }, { rejectWithValue }) => {
     try {
       const endpointURL = '/api/backoffice/layout-service/layout';
-      const { authHeader } = await getState().auth;
+      const authHeader = await getHeader();
 
       const {
         data: { uuid },
@@ -79,9 +80,9 @@ export const addLayout = createAsyncThunk(
 
 export const deleteLayout = createAsyncThunk(
   'layout/deleteLayout',
-  async ({ uuid }, { rejectWithValue, getState }) => {
+  async ({ uuid }, { rejectWithValue }) => {
     try {
-      const { authHeader } = await getState().auth;
+      const authHeader = await getHeader();
       const endpointURL = `/api/backoffice/layout-service/layout/${uuid}`;
 
       await axios.delete(endpointURL, authHeader);
@@ -101,9 +102,9 @@ export const deleteLayout = createAsyncThunk(
 
 export const deleteMultipleLayouts = createAsyncThunk(
   'layout/deleteMultipleLayouts',
-  async ({ payload }, { rejectWithValue, getState }) => {
+  async ({ payload }, { rejectWithValue }) => {
     try {
-      const { authHeader } = await getState().auth;
+      const authHeader = await getHeader();
       const endpointURL = '/api/backoffice/layout-service/layout/delete';
 
       await axios.post(endpointURL, payload, authHeader);
@@ -123,9 +124,9 @@ export const deleteMultipleLayouts = createAsyncThunk(
 
 export const updateLayout = createAsyncThunk(
   'layout/updateLayout',
-  async ({ uuid, payload }, { rejectWithValue, getState }) => {
+  async ({ uuid, payload }, { rejectWithValue }) => {
     try {
-      const { authHeader } = await getState().auth;
+      const authHeader = await getHeader();
       const endpointURL = `/api/backoffice/layout-service/layout/${uuid}`;
 
       await axios.put(endpointURL, payload, authHeader);
@@ -145,9 +146,9 @@ export const updateLayout = createAsyncThunk(
 
 export const patchSingleLayout = createAsyncThunk(
   'layout/patchSingleLayout',
-  async ({ uuid, payload }, { rejectWithValue, getState }) => {
+  async ({ uuid, payload }, { rejectWithValue }) => {
     try {
-      const { authHeader } = await getState().auth;
+      const authHeader = await getHeader();
       const endpointURL = `/api/backoffice/layout-service/layout/${uuid}`;
 
       await axios.patch(endpointURL, payload, authHeader);
@@ -167,9 +168,9 @@ export const patchSingleLayout = createAsyncThunk(
 
 export const patchMultipleLayouts = createAsyncThunk(
   'layout/patchMultipleLayouts',
-  async ({ payload }, { rejectWithValue, getState }) => {
+  async ({ payload }, { rejectWithValue }) => {
     try {
-      const { authHeader } = await getState().auth;
+      const authHeader = await getHeader();
       const endpointURL = '/api/backoffice/layout-service/layout/multiple';
 
       await axios.patch(endpointURL, payload, authHeader);

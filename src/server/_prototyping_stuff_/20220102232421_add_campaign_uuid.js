@@ -1,4 +1,4 @@
-const tableNames = require('../table_names');
+const tableNames = require('../database/table_names');
 
 exports.up = async (knex) => {
   await knex.schema.alterTable(tableNames.image, (table) => {

@@ -238,7 +238,7 @@ const Stepper = (props) => {
   };
 
   const checkEmailExist = async (email) => {
-    const storeEndpointURL = `/api/backoffice/backoffice-user-service/user/email/${email}`;
+    const storeEndpointURL = `/api/backoffice/user-service/user/email/${email}`;
     let res;
 
     try {

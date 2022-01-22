@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 // import { Link } from 'react-router-dom';
-import { useHistory, Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 import IconButton from '@mui/material/IconButton';
 import Button from '@mui/material/Button';
@@ -17,7 +17,12 @@ import { makeStyles } from '@mui/styles';
 import { addPromotion } from '../../redux/thunks/promotionThunk';
 import { getProducts } from '../../redux/thunks/productThunk';
 import { getSubcategories } from '../../redux/thunks/categoryThunk';
+import { getCampaigns } from '../../redux/thunks/campaignThunk';
 
+import {
+  selectCampaigns,
+  processed as campaignProcessed,
+} from '../../redux/features/campaignSlice';
 import {
   selectIsLoading as promotionLoading,
   processingRequest,
@@ -52,23 +57,30 @@ const useStyles = makeStyles(() => ({
 const PromotionCreate = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const storeUrl = localStorage.getItem('storeUrl');
   const storeName = localStorage.getItem('storeName');
 
+  const [overlapDateError, setOverlapDateError] = useState([]);
+
   const isProductLoading = useSelector(productLoading);
   const isPromotionLoading = useSelector(promotionLoading);
   const products = useSelector(selectProducts);
+  const campaigns = useSelector(selectCampaigns);
   const categoryOptions = useSelector(selectSubcategory);
 
   useEffect(async () => {
     dispatch(promotionProcessed());
     await dispatch(getProducts());
     await dispatch(getSubcategories());
+    await dispatch(getCampaigns());
     dispatch(productProcessed());
+    dispatch(campaignProcessed());
     dispatch(categoryProcessed());
   }, []);
+
+  console.log('products', products);
 
   const handleSubmit = async (payload) => {
     dispatch(processingRequest());
@@ -76,7 +88,8 @@ const PromotionCreate = () => {
     const { type, payload: resPayload } = await dispatch(addPromotion({ payload }));
 
     if (type.includes('fulfilled')) {
-      history.push(`/${storeUrl}/promotion/list`);
+      navigate(`/${storeUrl}/promotion/list`);
+
       await dispatch(
         setNewNotification({
           message: 'Promotion successfully created',
@@ -85,9 +98,20 @@ const PromotionCreate = () => {
         })
       );
     } else if (type.includes('rejected')) {
+      const { status, message } = resPayload;
+      let notiMessage;
+
+      if (status === 409) {
+        const errMessage = JSON.parse(message);
+        setOverlapDateError(errMessage);
+        notiMessage = 'Overlap Promotional Dates Error';
+      } else {
+        notiMessage = message;
+      }
+
       await dispatch(
         setNewNotification({
-          message: resPayload.message,
+          message: notiMessage,
           backgroundColor: '#be0000',
           severity: 'error',
         })
@@ -168,7 +192,9 @@ const PromotionCreate = () => {
           <PromotionForm
             onSubmit={handleSubmit}
             products={products}
+            campaigns={campaigns}
             categoryOptions={categoryOptions}
+            overlapDateError={overlapDateError}
           />
         </Grid>
       </Grid>

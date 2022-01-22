@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 
 import IconButton from '@mui/material/IconButton';
 import Box from '@mui/material/Box';
@@ -67,9 +67,11 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const LayoutEdit = (props) => {
+const LayoutEdit = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
+
+  const { uuid: LayoutUUID } = useParams();
 
   const [floorIsLocked, setFloorIsLocked] = useState(false);
   const [firstRefresh, setFirstRefresh] = useState(true);
@@ -85,11 +87,9 @@ const LayoutEdit = (props) => {
   const storeUrl = localStorage.getItem('storeUrl');
   const storeName = localStorage.getItem('storeName');
 
-  const { match } = props;
-
   useEffect(async () => {
     const { type: layoutStatus, payload: layoutPayload } = await dispatch(
-      getLayout({ uuid: match.params.uuid })
+      getLayout({ uuid: LayoutUUID })
     );
 
     const requestStatusOk = layoutStatus.includes('fulfilled');
@@ -115,7 +115,7 @@ const LayoutEdit = (props) => {
 
   const patchLayout = async (payload) => {
     const { type, payload: resPayload } = await dispatch(
-      updateLayout({ uuid: match.params.uuid, payload })
+      updateLayout({ uuid: LayoutUUID, payload })
     );
 
     if (type.includes('fulfilled')) {
@@ -181,7 +181,7 @@ const LayoutEdit = (props) => {
               size="large"
               component={Link}
               onClick={toProductMapping}
-              to={`/${storeUrl}/layout/product-mapping/${match.params.uuid}`}
+              to={`/${storeUrl}/layout/product-mapping/${LayoutUUID}`}
               sx={{ position: 'relative', top: -5, left: 5 }}
             >
               <MyLocationRoundedIcon color="primary" sx={{ fontSize: '1.7rem' }} />

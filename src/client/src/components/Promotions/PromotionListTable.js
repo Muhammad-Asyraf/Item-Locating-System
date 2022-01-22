@@ -29,8 +29,8 @@ const getPromotionHeadCells = () => [
     id: 'name',
     align: 'left',
     disablePadding: true,
-    label: 'Name',
-    icon: <LocalOfferRoundedIcon fontSize="medium" />,
+    label: 'Promotion',
+    icon: <LocalOfferRoundedIcon fontSize="small" />,
   },
   {
     id: 'promotion_type',
@@ -158,6 +158,29 @@ const PromotionListTable = (props) => {
     setSelected([]);
   };
 
+  const checkPromotionPeriod = (promotion, promotionPeriod) => {
+    const currentDateTime = new Date().getTime();
+    const startDateTime = new Date(promotion.start_date).getTime();
+    const endDateTime = new Date(promotion.end_date).getTime();
+
+    if (promotionPeriod === 'Current & Upcoming') {
+      if (
+        (currentDateTime >= startDateTime && currentDateTime <= endDateTime) ||
+        (currentDateTime <= startDateTime && currentDateTime <= endDateTime)
+      ) {
+        return true;
+      }
+    } else if (promotionPeriod === 'Past') {
+      if (currentDateTime >= startDateTime && currentDateTime >= endDateTime) {
+        return true;
+      }
+    } else if (promotionPeriod === 'All') {
+      return true;
+    }
+
+    return false;
+  };
+
   const handleClick = (event, name) => {
     const selectedIndex = selected.indexOf(name);
     let newSelected = [];
@@ -249,18 +272,22 @@ const PromotionListTable = (props) => {
                       .map((promotion, index) => {
                         const isPromotionSelected = isSelected(promotion.uuid);
                         const labelId = `enhanced-table-checkbox-${index}`;
+                        const currentPeriod = checkPromotionPeriod(promotion, promotionPeriod);
 
-                        return (
-                          <PromotionTableRow
-                            key={labelId}
-                            promotion={promotion}
-                            isPromotionSelected={isPromotionSelected}
-                            labelId={labelId}
-                            handleClick={handleClick}
-                            handleDelete={handleDelete}
-                            handleEdit={handleEdit}
-                          />
-                        );
+                        if (currentPeriod) {
+                          return (
+                            <PromotionTableRow
+                              key={labelId}
+                              promotion={promotion}
+                              isPromotionSelected={isPromotionSelected}
+                              labelId={labelId}
+                              handleClick={handleClick}
+                              handleDelete={handleDelete}
+                              handleEdit={handleEdit}
+                            />
+                          );
+                        }
+                        return null;
                       })}
                     {emptyRows > 0 && (
                       <TableRow style={{ height: 53 * emptyRows }}>

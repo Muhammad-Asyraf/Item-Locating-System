@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { withRouter, Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 import { useDispatch } from 'react-redux';
 
@@ -30,7 +30,7 @@ import LocalOfferTwoToneIcon from '@mui/icons-material/LocalOfferTwoTone';
 import LocalMallTwoToneIcon from '@mui/icons-material/LocalMallTwoTone';
 import FormatListBulletedRoundedIcon from '@mui/icons-material/FormatListBulletedRounded';
 import AddCircleTwoToneIcon from '@mui/icons-material/AddCircleTwoTone';
-import AddLocationAltRoundedIcon from '@mui/icons-material/AddLocationAltRounded';
+// import AddLocationAltRoundedIcon from '@mui/icons-material/AddLocationAltRounded';
 import Inventory2TwoToneIcon from '@mui/icons-material/Inventory2TwoTone';
 import CampaignTwoToneIcon from '@mui/icons-material/CampaignTwoTone';
 
@@ -82,7 +82,8 @@ const useStyles = makeStyles((theme) => ({
 const Drawer = (props) => {
   const classes = useStyles();
   const dispatch = useDispatch();
-  const { window, type, status, handleDrawerToggle, location } = props;
+  const { window, type, status, handleDrawerToggle } = props;
+  const location = useLocation();
   const theme = useTheme();
   // const isDesktop = false;
   const isDesktop = useMediaQuery(theme.breakpoints.up('lg'));
@@ -189,14 +190,14 @@ const Drawer = (props) => {
               _icon: <AddCircleTwoToneIcon style={{ color: '#003366' }} fontSize="medium" />,
               _path: '/layout/create',
             },
-            {
-              _text: 'Product Mapping',
-              _key: 'layout-product-mapping',
-              _icon: (
-                <AddLocationAltRoundedIcon style={{ color: '#003366' }} fontSize="medium" />
-              ),
-              _path: '/layout/product-mapping',
-            },
+            // {
+            //   _text: 'Product Mapping',
+            //   _key: 'layout-product-mapping',
+            //   _icon: (
+            //     <AddLocationAltRoundedIcon style={{ color: '#003366' }} fontSize="medium" />
+            //   ),
+            //   _path: '/layout/product-mapping',
+            // },
 
             // {
             //   _text: 'Layout Editor',
@@ -250,7 +251,7 @@ const Drawer = (props) => {
       key: 'marketing',
       items: [
         {
-          text: 'Campaign',
+          text: 'Campaigns',
           itemKey: 'campaigns',
           path: '/marketing-campaign/list',
           icon: (
@@ -570,4 +571,5 @@ const Drawer = (props) => {
   );
 };
 
-export default withRouter(Drawer);
+export default Drawer;
+// export default withRouter(Drawer);

@@ -14,7 +14,7 @@ import '../../assets/css/categorySelectOverride.css';
 const RowMenu = (props) => {
   const storeUrl = localStorage.getItem('storeUrl');
   const [anchorEl, setAnchorEl] = useState();
-  const { promotion, Link, handleDelete, handleEdit } = props;
+  const { campaign, Link, handleDelete, handleEdit } = props;
 
   const handleClickOption = (event) => {
     setAnchorEl(event.currentTarget);
@@ -31,7 +31,7 @@ const RowMenu = (props) => {
       </IconButton>
       <Menu
         anchorEl={anchorEl}
-        id={`actions-${promotion.uuid}`}
+        id={`actions-${campaign.uuid}`}
         keepMounted
         open={Boolean(anchorEl)}
         onClose={handleCloseOption}
@@ -66,14 +66,14 @@ const RowMenu = (props) => {
         <MenuItem
           onClick={handleEdit}
           component={Link}
-          to={`/${storeUrl}/promotion/edit/${promotion.uuid}`}
+          to={`/${storeUrl}/marketing-campaign/edit/${campaign.uuid}`}
         >
           <ListItemIcon sx={{ mr: 5, fontSize: '0.875rem !important' }}>
             <EditRoundedIcon fontSize="small" sx={{ ml: 1, mr: 3, mt: 0.1 }} />
             Edit
           </ListItemIcon>
         </MenuItem>
-        <MenuItem onClick={() => handleDelete(promotion.uuid)}>
+        <MenuItem onClick={() => handleDelete(campaign.uuid)}>
           <ListItemIcon sx={{ mr: 5, fontSize: '0.875rem !important' }}>
             <DeleteRoundedIcon fontSize="small" sx={{ ml: 1, mr: 3, mt: 0.1 }} />
             Delete

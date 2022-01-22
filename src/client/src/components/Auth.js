@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useHistory } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 import { makeStyles } from '@mui/styles';
 import LinearProgress from '@mui/material/LinearProgress';
@@ -16,7 +16,7 @@ import {
 } from '../redux/features/authSlice';
 import { processed as processedStore } from '../redux/features/storeSlice';
 import getStore from '../redux/thunks/storeThunk';
-import { setHeader } from '../redux/thunks/authThunk';
+// import { setHeader } from '../redux/thunks/authThunk';
 
 const useStyles = makeStyles({
   root: {
@@ -29,14 +29,14 @@ const Auth = ({ children }) => {
   const dispatch = useDispatch();
   const classes = useStyles();
   const authLoading = useSelector(selectAuthIsLoading);
-  const history = useHistory();
+  const navigate = useNavigate();
+  const location = useLocation();
   const [firstRender, setFirstRender] = useState(true);
 
   useEffect(() => {
     dispatch(verifying());
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
       if (user) {
-        console.log("I'm triggered and here's my ID:", user.toJSON().uid);
         await dispatch(
           setActiveUser({
             user: user.toJSON(),
@@ -44,14 +44,23 @@ const Auth = ({ children }) => {
             status: 'ok',
           })
         );
-        await dispatch(setHeader(auth));
 
-        await dispatch(getStore({ userUUID: user.toJSON().uid }));
+        const {
+          type,
+          payload: { data },
+        } = await dispatch(getStore({ userUUID: user.toJSON().uid }));
+
+        if (type.includes('fulfilled')) {
+          localStorage.setItem('storeUUID', data.uuid);
+          localStorage.setItem('storeUrl', data.store_url);
+          localStorage.setItem('storeName', data.store_name);
+        }
+
         dispatch(processedStore());
 
-        if (history.location.pathname === '/auth/login') {
+        if (location.pathname === '/auth/login') {
           const storeUrl = localStorage.getItem('storeUrl');
-          history.push(`/${storeUrl}/dashboard`);
+          navigate(`/${storeUrl}/product/list`);
         }
       }
       dispatch(clearState());
@@ -68,8 +77,7 @@ const Auth = ({ children }) => {
         <LinearProgress
           sx={{
             height: 6,
-            backgroundImage:
-              'linear-gradient(-225deg, #473B7B 0%, #3584A7 51%, #30D2BE 100%)',
+            backgroundImage: 'linear-gradient(-225deg, #473B7B 0%, #3584A7 51%, #30D2BE 100%)',
           }}
         />
       </div>

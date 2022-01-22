@@ -93,7 +93,6 @@ const useStyles = makeStyles((theme) => ({
   },
   form: {
     '& > *': {
-      marginTop: '20px',
       marginBottom: '20px',
       '& fieldset': {
         borderRadius: '8px',
@@ -543,7 +542,7 @@ const ProductForm = (props) => {
           ? product.standard.supplyPrice
           : product.bundle.totalSupplyPrice
       );
-      formData.append('multer_type', 'image');
+      formData.append('multer_type', 'product');
       for (const key of Object.keys(image.imgFiles)) {
         formData.append('imgCollection', image.imgFiles[key], image.imgFiles[key].name);
       }

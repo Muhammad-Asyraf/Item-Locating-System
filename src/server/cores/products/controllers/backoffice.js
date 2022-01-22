@@ -12,7 +12,9 @@ exports.getAllProducts = async (req, res, next) => {
     const { store_uuid } = req.params;
     const products = await Product.query()
       .where('store_uuid', store_uuid)
-      .withGraphFetched('[items, sub_categories.category, images]')
+      .withGraphFetched(
+        '[items, sub_categories.category, images, promotions, layer]'
+      )
       .modifyGraph('images', (builder) => {
         builder.select('path');
       })
@@ -21,6 +23,15 @@ exports.getAllProducts = async (req, res, next) => {
       })
       .modifyGraph('sub_categories', (builder) => {
         builder.select('uuid', 'name');
+      })
+      .modifyGraph('promotions', (builder) => {
+        builder.select(
+          'uuid',
+          'name',
+          'start_date',
+          'end_date',
+          'promotion_type'
+        );
       });
 
     productLogger.info(`Successfully retrieve: ${products.length} products`);

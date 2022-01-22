@@ -1,6 +1,6 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
@@ -51,7 +51,7 @@ const useStyles = makeStyles((theme) => ({
 const SignUp = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const authErrors = useSelector(selectAuthMessage);
   const authLoading = useSelector(selectAuthIsLoading);
@@ -64,7 +64,7 @@ const SignUp = () => {
 
     if (type.includes('fulfilled')) {
       const storeUrl = localStorage.getItem('storeUrl');
-      history.push(`/${storeUrl}/dashboard`);
+      navigate(`/${storeUrl}/dashboard`);
     }
     dispatch(verified());
   };
@@ -75,8 +75,6 @@ const SignUp = () => {
   //     open: false,
   //   });
   // };
-
-  console.log(authErrors);
 
   return (
     <div>

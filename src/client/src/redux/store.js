@@ -9,6 +9,7 @@ import categoryReducer from './features/categorySlice';
 import layoutReducer from './features/layoutSlice';
 import promotionReducer from './features/promotionSlice';
 import campaignReducer from './features/campaignSlice';
+import userReducer from './features/userSlice';
 
 const combinedReducer = combineReducers({
   auth: authReducer,
@@ -21,6 +22,7 @@ const combinedReducer = combineReducers({
   layout: layoutReducer,
   promotion: promotionReducer,
   campaign: campaignReducer,
+  user: userReducer,
 });
 
 const rootReducer = (state, action) => {

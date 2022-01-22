@@ -5,18 +5,17 @@ import { errorState, noErrorState } from '../states/errorState';
 import {
   activeUserState,
   noUserState,
-  withHeaderState,
+  // withHeaderState,
   loginSuccessState,
 } from '../states/authState';
 
-import { setHeader, login, signup } from '../thunks/authThunk';
+import { login, signup } from '../thunks/authThunk';
 
 export const initialState = {
   isLoading: true,
   isAuthenticated: false,
   user: null,
   status: null,
-  authHeader: {},
   message: [],
   errors: [],
 };
@@ -37,8 +36,6 @@ const auth = createSlice({
     }),
   },
   extraReducers: {
-    [setHeader.fulfilled]: withHeaderState,
-    [setHeader.pending]: loadingState,
     [login.fulfilled]: activeUserState,
     [login.pending]: loadingState,
     [login.rejected]: errorState,

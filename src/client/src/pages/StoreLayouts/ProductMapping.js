@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
@@ -8,7 +8,7 @@ import IconButton from '@mui/material/IconButton';
 import Button from '@mui/material/Button';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Grid from '@mui/material/Grid';
-// import CircularProgress from '@mui/material/CircularProgress';
+import CircularProgress from '@mui/material/CircularProgress';
 import KeyboardReturnRoundedIcon from '@mui/icons-material/KeyboardReturnRounded';
 import ModeEditOutlineRoundedIcon from '@mui/icons-material/ModeEditOutlineRounded';
 import SaveRoundedIcon from '@mui/icons-material/SaveRounded';
@@ -24,7 +24,7 @@ import {
 } from '../../redux/features/layoutSlice';
 import {
   selectProducts,
-  // selectIsLoading as productLoading,
+  selectIsLoading as productLoading,
   processed as productProccessed,
 } from '../../redux/features/productSlice';
 import {
@@ -40,7 +40,6 @@ import { getSubcategories } from '../../redux/thunks/categoryThunk';
 
 import ProductMapper from '../../components/StoreLayout/ProductMapper_';
 import PartitionBucket from '../../components/StoreLayout/PartitionBucket';
-// import ProductMapper from '../../components/StoreLayout/ProductMapper/index';
 
 import SideMenu from '../../components/StoreLayout/SideMenu';
 import { getFileObject } from '../../utils/general';
@@ -123,7 +122,7 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const ProductMapping = (props) => {
+const ProductMapping = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
 
@@ -135,7 +134,8 @@ const ProductMapping = (props) => {
   const productsRef = useRef([]);
   const [products, setProducts] = useState([]);
 
-  const [firstRefresh, setFirstRefresh] = useState(true);
+  const { uuid: LayoutUUID } = useParams();
+
   const [zoomLevel, setZoomLevel] = useState(0);
   const [floorPlan, setFloorPlan] = useState(null);
   const [leafletLayers, setLeafletLayers] = useState([]);
@@ -144,39 +144,17 @@ const ProductMapping = (props) => {
   const layouts = useSelector(selectLayouts);
   const originalProducts = useSelector(selectProducts);
   const categoryOptions = useSelector(selectSubcategory);
-  // const isProductLoading = useSelector(productLoading);
+  const isProductLoading = useSelector(productLoading);
   const isLayoutLoading = useSelector(selectIsLoading);
 
   const storeUrl = localStorage.getItem('storeUrl');
   const storeName = localStorage.getItem('storeName');
 
-  const {
-    match: {
-      params: { uuid },
-    },
-  } = props;
-
-  // console.log('layouts', layouts);
-  // console.log('currentLayout', currentLayout);
-
-  // console.log('products', products);
-  // console.log('layouts', layouts);
-  // console.log('initProducts', initProducts);
-  // console.log('leafletLayers', leafletLayers);
-  // console.log('setZoomLevel', setZoomLevel);
-  // console.log('currentLayout', currentLayout);
-  // console.log('floorPlan', floorPlan);
-  // console.log('products', products);
-  // console.log('///////////////////////////');
-  // console.log('isProductLoading', isProductLoading);
-  console.log('firstRefresh', firstRefresh);
-  // console.log('isLayoutLoading', isLayoutLoading);
-
   const initLayoutLayers = async (layouts_) => {
     let selectedLayout;
 
-    if (uuid) {
-      selectedLayout = layouts_.find((layout) => layout.uuid === uuid);
+    if (LayoutUUID) {
+      selectedLayout = layouts_.find((layout) => layout.uuid === LayoutUUID);
     } else {
       [selectedLayout] = layouts_;
     }
@@ -193,7 +171,7 @@ const ProductMapping = (props) => {
     dispatch(categoryProcessed());
     dispatch(productProccessed());
     dispatch(layoutProcessed());
-    setFirstRefresh(false);
+    // setFirstRefresh(false);
   };
 
   useEffect(async () => {
@@ -212,34 +190,6 @@ const ProductMapping = (props) => {
       initLayoutLayers(layoutPayload.layouts);
     }
   }, []);
-
-  // const handleOpenDetailsDialog = () => setOpenDetailsDialog(true);
-  // const handleCloseDetailsDialog = () => setOpenDetailsDialog(false);
-
-  const updateProducts = async (payload) => {
-    const { type, payload: resPayload } = await dispatch();
-    // updateLayout({ uuid: match.params.uuid, payload })
-    console.log(payload);
-
-    if (type.includes('fulfilled')) {
-      await dispatch(
-        setNewNotification({
-          message: 'Product mapping successfully updated',
-          backgroundColor: 'green',
-          severity: 'success',
-        })
-      );
-    } else if (type.includes('rejected')) {
-      await dispatch(
-        setNewNotification({
-          message: resPayload.message,
-          backgroundColor: '#be0000',
-          severity: 'error',
-        })
-      );
-    }
-    dispatch(productProccessed());
-  };
 
   const toProductEditor = () => {
     dispatch(processingRequest());
@@ -273,8 +223,6 @@ const ProductMapping = (props) => {
   };
 
   const handleChangeLayout = async (e, selectedLayout) => {
-    console.log('selectedLayout', selectedLayout);
-
     const { layers, floor_plan_path: path } = selectedLayout;
 
     if (path) {
@@ -288,39 +236,33 @@ const ProductMapping = (props) => {
   };
 
   const preparedPayload = () => {
-    console.log('products', products);
-    console.log('originalProducts', originalProducts);
     let updatedProducts = [];
 
     products.forEach((product, index) => {
       const {
         uuid: productId,
         partition_uuid: currentPartitionId,
-        layout_uuid: currentLayoutId,
+        // layout_uuid: currentLayoutId,
       } = product;
-      const oldPartitionId = originalProducts[index].partition_uuid;
-      const oldLayoutId = originalProducts[index].layout_uuid;
 
-      // console.log('compare partition', oldPartitionId, currentPartitionId);
-      // console.log('compare layout', oldLayoutId, currentLayoutId);
+      const oldPartitionId = originalProducts[index].partition_uuid;
+      // const oldLayoutId = originalProducts[index].layout_uuid;
 
       const partitionChanged = oldPartitionId !== currentPartitionId;
-      const layoutChanged = oldLayoutId !== currentLayoutId;
+      // const layoutChanged = oldLayoutId !== currentLayoutId;
 
-      if (partitionChanged || layoutChanged) {
-        // console.log('Changed', partitionChanged, layoutChanged);
+      if (partitionChanged) {
+        // if (partitionChanged || layoutChanged) {
         updatedProducts = [
           ...updatedProducts,
           {
             uuid: productId,
             partition_uuid: currentPartitionId,
-            layout_uuid: currentLayoutId,
+            // layout_uuid: currentLayoutId,
           },
         ];
       }
     });
-
-    console.log('updatedProducts', updatedProducts);
 
     return { updatedProducts };
   };
@@ -328,7 +270,6 @@ const ProductMapping = (props) => {
   const handleSave = async () => {
     const payload = preparedPayload();
 
-    console.log('payload', payload);
     const { type: saveStatus, payload: resPayload } = await dispatch(
       saveProductMapping({ payload })
     );
@@ -447,12 +388,18 @@ const ProductMapping = (props) => {
               fontSize: '0.95rem',
               borderRadius: 3,
               height: 50,
+              width: 105,
               paddingRight: 3,
               boxShadow: 'rgba(53, 132, 167, 0.44) 0px 8px 16px 0px !important',
             }}
           >
-            <SaveRoundedIcon style={{ marginRight: 10 }} fontSize="small" />
-            Save
+            {isProductLoading ? (
+              <CircularProgress size={25} style={{ color: 'white' }} />
+            ) : (
+              <>
+                <SaveRoundedIcon style={{ marginRight: 10 }} fontSize="small" /> Save
+              </>
+            )}
           </Button>
         </Grid>
       </Grid>
@@ -464,7 +411,6 @@ const ProductMapping = (props) => {
           leafletLayers={leafletLayers}
           floorPlan={floorPlan}
           setZoomLevel={setZoomLevel}
-          updateProducts={updateProducts}
           productsRef={productsRef}
           initProducts={products}
           setInitProducts={setProducts}

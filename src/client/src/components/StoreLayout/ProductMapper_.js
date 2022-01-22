@@ -44,10 +44,8 @@ const ProductMapper = (props) => {
     floorPlan,
     setZoomLevel,
     productsRef,
-    // initProducts,
     setInitProducts,
     addPartitionBucket,
-    // updateProducts,
   } = props;
 
   // const productsRef = useRef(initProducts);
@@ -98,8 +96,11 @@ const ProductMapper = (props) => {
           );
 
           const updatedSelectedProduct = { ...updatedProducts[selectedProductIndex] };
-          updatedSelectedProduct.layout_uuid = currentLayout.uuid;
+          // updatedSelectedProduct.layout_uuid = currentLayout.uuid;
           updatedSelectedProduct.partition_uuid = layer.id;
+          updatedSelectedProduct.layer = {
+            layout_uuid: currentLayout.uuid,
+          };
           updatedProducts[selectedProductIndex] = updatedSelectedProduct;
         });
 

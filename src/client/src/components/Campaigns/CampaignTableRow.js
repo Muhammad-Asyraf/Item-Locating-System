@@ -34,7 +34,7 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const PromotionTableRow = (props) => {
+const CampaignTableRow = (props) => {
   const classes = useStyles();
   const [open, setOpen] = useState(false);
   const { campaign, isCampaignSelected, labelId, handleClick, handleDelete, handleEdit } =
@@ -126,7 +126,7 @@ const PromotionTableRow = (props) => {
       </TableRow>
       <TableRow>
         <TableCell style={{ padding: 0, borderBottom: 'none' }} colSpan={12}>
-          <Collapse in={open} timeout="auto" unmountOnExit>
+          <Collapse in={open} timeout={600} unmountOnExit>
             <Paper
               sx={{
                 ml: 3,
@@ -159,7 +159,7 @@ const PromotionTableRow = (props) => {
                             borderRadius: '20px 20px 0px 0px',
                           }}
                         >
-                          Promotion Overview
+                          Campaign Overview
                         </Box>
                       </Grid>
                       <Grid item xs={9}>
@@ -184,4 +184,4 @@ const PromotionTableRow = (props) => {
   );
 };
 
-export default PromotionTableRow;
+export default CampaignTableRow;

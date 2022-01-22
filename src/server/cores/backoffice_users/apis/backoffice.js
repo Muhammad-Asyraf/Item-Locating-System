@@ -7,5 +7,6 @@ router.get(
   '/user/email/:email',
   backofficeUserController.findBackofficeUserByEmail
 );
+router.put('/user/id/:uuid', backofficeUserController.updateBackofficeUser);
 
 module.exports = router;

@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
@@ -17,6 +17,7 @@ import {
   selectAuthMessage,
   selectAuthIsLoading,
 } from '../redux/features/authSlice';
+
 import { login } from '../redux/thunks/authThunk';
 
 const useStyles = makeStyles((theme) => ({
@@ -43,23 +44,24 @@ const useStyles = makeStyles((theme) => ({
 const Login = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const authErrors = useSelector(selectAuthMessage);
   const authLoading = useSelector(selectAuthIsLoading);
 
   const loginHandler = async (email, password) => {
-    const { type } = await dispatch(login({ firebase: auth, email, password }));
+    const {
+      type,
+      payload: { StoreURL },
+    } = await dispatch(login({ firebase: auth, email, password }));
 
     if (type.includes('fulfilled')) {
       dispatch(clearState());
-      const storeUrl = localStorage.getItem('storeUrl');
-      history.push(`/${storeUrl}/dashboard`);
+
+      navigate(`/${StoreURL}/product/list`);
     }
     dispatch(verified());
   };
-
-  useEffect(() => console.log('IMMMMMM activiated'));
 
   return (
     <>

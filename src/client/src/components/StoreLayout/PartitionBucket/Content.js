@@ -162,8 +162,11 @@ const Content = (props) => {
       );
 
       const updatedSelectedProduct = { ...updatedProducts[selectedProductIndex] };
-      updatedSelectedProduct.layout_uuid = currentLayoutId;
       updatedSelectedProduct.partition_uuid = layerId;
+      updatedSelectedProduct.layer = {
+        layout_uuid: currentLayoutId,
+      };
+      // updatedSelectedProduct.layout_uuid = currentLayoutId;
 
       // patch and replace update product
       updatedProducts[selectedProductIndex] = updatedSelectedProduct;
@@ -182,7 +185,8 @@ const Content = (props) => {
     const selectedProductIndex = updatedProducts.findIndex(({ uuid }) => uuid === productUUID);
 
     const updatedSelectedProduct = { ...updatedProducts[selectedProductIndex] };
-    updatedSelectedProduct.layout_uuid = null;
+    // updatedSelectedProduct.layout_uuid = null;
+    updatedSelectedProduct.layer = null;
     updatedSelectedProduct.partition_uuid = null;
 
     updatedProducts[selectedProductIndex] = updatedSelectedProduct;

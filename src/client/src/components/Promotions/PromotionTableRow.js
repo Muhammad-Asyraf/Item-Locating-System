@@ -99,21 +99,18 @@ const PromotionTableRow = (props) => {
         </TableCell>
         <TableCell
           style={{ borderBottom: 'none' }}
-          component="th"
-          id={labelId}
-          scope="row"
-          padding="none"
           align="center"
           sx={{
             fontSize: '0.95rem !important',
             padding: '10px 0px 10px 20px',
           }}
         >
-          <Grid container spacing={0.5}>
-            <Grid item>
-              <Chip color="primary" size="small" label={promotion.promotion_type} />
-            </Grid>
-          </Grid>
+          <Chip
+            color="primary"
+            size="small"
+            label={promotion.promotion_type}
+            sx={{ pl: 5, pr: 5, pt: 2, pb: 2 }}
+          />
         </TableCell>
         <TableCell
           style={{ borderBottom: 'none' }}
@@ -144,7 +141,7 @@ const PromotionTableRow = (props) => {
       </TableRow>
       <TableRow>
         <TableCell style={{ padding: 0, borderBottom: 'none' }} colSpan={12}>
-          <Collapse in={open} timeout="auto" unmountOnExit>
+          <Collapse in={open} timeout={600} unmountOnExit>
             <Paper
               sx={{
                 ml: 3,

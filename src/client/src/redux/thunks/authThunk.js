@@ -29,10 +29,15 @@ export const login = createAsyncThunk(
 
       const {
         payload: {
+          data,
           data: { store_url: StoreURL },
         },
       } = await dispatch(getStore({ userUUID: user.toJSON().uid }));
       await dispatch(processed());
+
+      localStorage.setItem('storeUUID', data.uuid);
+      localStorage.setItem('storeUrl', data.store_url);
+      localStorage.setItem('storeName', data.store_name);
 
       await dispatch(
         setNewNotification({

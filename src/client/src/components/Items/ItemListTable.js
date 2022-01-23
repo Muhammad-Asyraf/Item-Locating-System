@@ -13,7 +13,6 @@ import { makeStyles } from '@mui/styles';
 import AttachMoneyRoundedIcon from '@mui/icons-material/AttachMoneyRounded';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import CreditCardRoundedIcon from '@mui/icons-material/CreditCardRounded';
-import TodayIcon from '@mui/icons-material/Today';
 import CategoryIcon from '@mui/icons-material/Category';
 import QrCode2RoundedIcon from '@mui/icons-material/QrCode2Rounded';
 
@@ -59,13 +58,6 @@ const getItemHeadCells = () => [
     disablePadding: false,
     label: 'Updated',
     icon: <CalendarTodayIcon fontSize="small" />,
-  },
-  {
-    id: 'created_at',
-    align: 'center',
-    disablePadding: false,
-    label: 'Created',
-    icon: <TodayIcon fontSize="medium" />,
   },
   {
     id: 'action',

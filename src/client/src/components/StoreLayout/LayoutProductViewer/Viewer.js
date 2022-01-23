@@ -35,7 +35,7 @@ const useStyles = makeStyles(() => ({
 const Viewer = (props) => {
   const classes = useStyles();
 
-  const { leafletRef, currentLayout, leafletLayers, floorPlan, handleOpen } = props;
+  const { leafletRef, currentLayout, leafletLayers, floorPlan } = props;
 
   const mapRef = useRef(null);
   const floorLayers = useRef([]);
@@ -65,11 +65,9 @@ const Viewer = (props) => {
     const isPartitionLayer = shelfPartitionShapes.includes(shape);
     const isShelfLayer = shelfShapes.includes(shape);
 
-    console.log(layer);
     if (isPartitionLayer) {
       layer._path.ontouchend = (e) => {
         e.preventDefault();
-        handleOpen();
       };
     }
 
@@ -194,7 +192,6 @@ const Viewer = (props) => {
     map.on('zoomend', () => {
       const zoomlevel = map.getZoom();
       const adjustedZoomLevel = (zoomlevel - 2).toFixed(1);
-      console.log('zoomlevel', adjustedZoomLevel);
 
       if (adjustedZoomLevel >= 0.9) {
         shelfPartitionLayers.current.forEach((currentLayer) => {

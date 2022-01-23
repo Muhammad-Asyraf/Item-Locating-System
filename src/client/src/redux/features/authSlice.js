@@ -40,7 +40,6 @@ const auth = createSlice({
     [login.pending]: loadingState,
     [login.rejected]: errorState,
     [signup.pending]: loadingState,
-    [signup.rejected]: errorState,
   },
 });
 

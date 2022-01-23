@@ -544,8 +544,6 @@ const PromotionEditForm = (props) => {
       return { uuid, name, promotions };
     });
 
-    console.log('JSON.stringify(promoProducts)', JSON.stringify(promoProducts));
-
     formData.append('name', promotionName);
     formData.append('description', description.editorHtml);
     formData.append('start_date', dateRange[0]);
@@ -1019,6 +1017,7 @@ const PromotionEditForm = (props) => {
         applicableProduct = initProduct;
     }
 
+    console.log('currentPromotion.products', currentPromotion.products);
     handleSelectProduct(currentPromotion.products);
     setApplicableProducts(applicableProduct);
   }, []);

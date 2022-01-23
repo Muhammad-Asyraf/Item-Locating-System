@@ -33,6 +33,8 @@ import RowOptions from './RowOptions';
 import ImageModal from '../Images/ImageModal';
 import StockStatusDialog from './StockStatusDialog';
 
+import ImagePlaceholder from '../../assets/img/img_placeholder.jpg';
+
 SwiperCore.use([Pagination, Navigation]);
 
 const useStyles = makeStyles(() => ({
@@ -152,7 +154,12 @@ const ProductTableRow = (props) => {
           <Grid container spacing={0.5}>
             {product.sub_categories.map((cat) => (
               <Grid item key={cat.uuid}>
-                <Chip color="primary" size="small" label={cat.name} />
+                <Chip
+                  color="primary"
+                  size="small"
+                  label={cat.name}
+                  sx={{ fontWeight: 700, pl: 1, pr: 1, pt: 2, pb: 2 }}
+                />
               </Grid>
             ))}
           </Grid>
@@ -228,13 +235,7 @@ const ProductTableRow = (props) => {
               }}
               elevation={0}
             >
-              <Grid
-                container
-                direction="column"
-                alignItems="center"
-                justifyContent="center"
-                // sx={{ border: '1px solid red' }}
-              >
+              <Grid container direction="column" alignItems="center" justifyContent="center">
                 <Grid item sx={{ mt: 2, mb: 5 }}>
                   <Paper
                     elevation={0}
@@ -256,7 +257,13 @@ const ProductTableRow = (props) => {
                           Product Overview
                         </Box>
                       </Grid>
-                      <Grid item xs={3}>
+                      <Grid
+                        item
+                        xs={3}
+                        container
+                        justifyContent="center"
+                        alignItems="flex-start"
+                      >
                         <Swiper
                           pagination={{
                             dynamicBullets: true,
@@ -266,17 +273,31 @@ const ProductTableRow = (props) => {
                           loop
                           className="mySwiper"
                           style={{
-                            borderRadius: '0px 0px 0px 20px',
                             marginRight: 10,
+                            marginLeft: 10,
                             maxWidth: 1000,
-                            height: '100%',
+                            height: 400,
                           }}
                           grabCursor
                           centeredSlides
                           slidesPerView={1}
                         >
+                          {product.images.length === 0 && (
+                            <SwiperSlide onClick={handleOpenModal}>
+                              <img
+                                src={ImagePlaceholder}
+                                alt="Teset"
+                                style={{
+                                  width: '100%',
+                                  height: '100%',
+                                  objectFit: 'scale-down',
+                                  borderRadius: 5,
+                                }}
+                              />
+                            </SwiperSlide>
+                          )}
                           {product.images.map(({ path }) => (
-                            <SwiperSlide key={path} onClick={handleOpenModal} style={{}}>
+                            <SwiperSlide key={path} onClick={handleOpenModal}>
                               <img
                                 src={path}
                                 alt="Teset"
@@ -324,16 +345,18 @@ const ProductTableRow = (props) => {
                 </Grid>
               </Grid>
             </Paper>
-            {/* )} */}
           </Collapse>
         </TableCell>
-        <ImageModal
-          images={product.images}
-          Swiper={Swiper}
-          SwiperSlide={SwiperSlide}
-          openModal={openModal}
-          handleCloseModal={handleCloseModal}
-        />
+        {product.images.length > 0 && (
+          <ImageModal
+            images={product.images}
+            Swiper={Swiper}
+            SwiperSlide={SwiperSlide}
+            openModal={openModal}
+            handleCloseModal={handleCloseModal}
+          />
+        )}
+
         <StockStatusDialog
           open={openStockStatusDialog}
           handleClose={handleCloseStockStatusDialog}

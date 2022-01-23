@@ -64,7 +64,7 @@ const SignUp = () => {
 
     if (type.includes('fulfilled')) {
       const storeUrl = localStorage.getItem('storeUrl');
-      navigate(`/${storeUrl}/dashboard`);
+      navigate(`/${storeUrl}/product/list`);
     }
     dispatch(verified());
   };

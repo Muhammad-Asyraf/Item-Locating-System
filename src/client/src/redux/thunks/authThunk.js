@@ -26,9 +26,18 @@ export const login = createAsyncThunk(
   async ({ firebase, email, password }, { rejectWithValue, dispatch }) => {
     try {
       const { user } = await firebase.signInWithEmailAndPassword(email, password);
-      // await dispatch(setHeader(firebase));
-      await dispatch(getStore({ userUUID: user.toJSON().uid }));
+
+      const {
+        payload: {
+          data,
+          data: { store_url: StoreURL },
+        },
+      } = await dispatch(getStore({ userUUID: user.toJSON().uid }));
       await dispatch(processed());
+
+      localStorage.setItem('storeUUID', data.uuid);
+      localStorage.setItem('storeUrl', data.store_url);
+      localStorage.setItem('storeName', data.store_name);
 
       await dispatch(
         setNewNotification({
@@ -40,6 +49,7 @@ export const login = createAsyncThunk(
 
       return {
         user: user.toJSON(),
+        StoreURL,
         message: 'Successfully logged in',
         status: 'ok',
       };

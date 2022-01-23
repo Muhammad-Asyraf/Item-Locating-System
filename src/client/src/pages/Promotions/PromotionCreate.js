@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 // import { Link } from 'react-router-dom';
-import { useHistory, Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 import IconButton from '@mui/material/IconButton';
 import Button from '@mui/material/Button';
@@ -57,7 +57,7 @@ const useStyles = makeStyles(() => ({
 const PromotionCreate = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const storeUrl = localStorage.getItem('storeUrl');
   const storeName = localStorage.getItem('storeName');
@@ -88,7 +88,7 @@ const PromotionCreate = () => {
     const { type, payload: resPayload } = await dispatch(addPromotion({ payload }));
 
     if (type.includes('fulfilled')) {
-      history.push(`/${storeUrl}/promotion/list`);
+      navigate(`/${storeUrl}/promotion/list`);
 
       await dispatch(
         setNewNotification({

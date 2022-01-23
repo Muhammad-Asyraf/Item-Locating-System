@@ -9,7 +9,9 @@ exports.getAllPromotions = async (req, res, next) => {
     const { store_uuid } = req.params;
     const promotions = await Promotion.query()
       .where('store_uuid', store_uuid)
-      .withGraphFetched('[products, campaign]');
+      .withGraphFetched(
+        '[products, products.[images, sub_categories], campaign]'
+      );
 
     // .modifyGraph('images', (builder) => {
     //   builder.select('path');
@@ -17,14 +19,51 @@ exports.getAllPromotions = async (req, res, next) => {
     // .modifyGraph('sub_categories.category', (builder) => {
     //   builder.select('uuid', 'name');
     // })
-    // .modifyGraph('sub_categories', (builder) => {
-    //   builder.select('uuid', 'name');
-    // });
+
+    const updatedPromotions = promotions.map((promotion) => {
+      const { promotion_type } = promotion;
+
+      const isDiscountBasedPromo =
+        promotion_type === 'Basic' || promotion_type === 'Bundle';
+      let updatedProducts;
+
+      if (isDiscountBasedPromo) {
+        const { products, ...remainingAtts } = promotion;
+        const {
+          meta_data: { discount, discountType },
+        } = promotion;
+        0;
+
+        const updatedProducts = products.map((product) => {
+          const { retail_price: retailPrice } = product;
+
+          if (discountType.percentage_off_checked) {
+            saving = (parseFloat(discount) / 100) * parseFloat(retailPrice);
+          } else {
+            saving = parseFloat(discount);
+          }
+
+          salePrice = parseFloat(retailPrice) - saving;
+
+          return {
+            ...product,
+            sale_price: salePrice,
+          };
+        });
+
+        return {
+          ...remainingAtts,
+          products: updatedProducts,
+        };
+      }
+
+      return promotion;
+    });
 
     promotionLogger.info(
       `Successfully retrieve: ${promotions.length} promotions`
     );
-    res.json(promotions);
+    res.json(updatedPromotions);
   } catch (err) {
     promotionLogger.warn(`Error retrieving all promotions`);
     next(err);
@@ -173,7 +212,7 @@ exports.createPromotion = async (req, res, next) => {
 
               const formattedEndDate = momentTz
                 .tz(new Date(end__Date), 'Asia/Kuala_Lumpur')
-                .format('DD/MM/YYYY hh:mm A');
+                .format('DD/MM/YYYY hh:mm a');
 
               const errMessage = `Product "${productName}" already has a ${currentPromoType.toLowerCase()} promotion applied on the chosen dates. The conflicted promotion "${promoName}" effective date is as follows: ${formattedStartDate} — ${formattedEndDate}`;
               // const errMessage = `Product "${productName}" already has a ${currentPromoType.toLowerCase()} promotion applied on the chosen dates. Please refer to promotion "${promoName}" (${formattedStartDate} — ${formattedEndDate}) for further details`;

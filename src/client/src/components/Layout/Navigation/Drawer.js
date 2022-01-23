@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { withRouter, Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 import { useDispatch } from 'react-redux';
 
@@ -82,7 +82,8 @@ const useStyles = makeStyles((theme) => ({
 const Drawer = (props) => {
   const classes = useStyles();
   const dispatch = useDispatch();
-  const { window, type, status, handleDrawerToggle, location } = props;
+  const { window, type, status, handleDrawerToggle } = props;
+  const location = useLocation();
   const theme = useTheme();
   // const isDesktop = false;
   const isDesktop = useMediaQuery(theme.breakpoints.up('lg'));
@@ -570,4 +571,5 @@ const Drawer = (props) => {
   );
 };
 
-export default withRouter(Drawer);
+export default Drawer;
+// export default withRouter(Drawer);

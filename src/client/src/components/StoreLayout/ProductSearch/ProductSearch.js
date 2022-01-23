@@ -49,8 +49,10 @@ const ProductSearch = (props) => {
       );
 
       if (productSelected) {
-        const { partition_uuid: partitionUUID, layout_uuid: layoutUUID } = productSelected;
-        productsByLayer = [...productsByLayer, { partitionUUID, layoutUUID }];
+        const { partition_uuid: partitionUUID } = productSelected;
+        // const { partition_uuid: partitionUUID, layout_uuid: layoutUUID } = productSelected;
+        productsByLayer = [...productsByLayer, { partitionUUID }];
+        // productsByLayer = [...productsByLayer, { partitionUUID, layoutUUID }];
       }
     });
 

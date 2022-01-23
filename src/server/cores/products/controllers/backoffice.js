@@ -12,7 +12,9 @@ exports.getAllProducts = async (req, res, next) => {
     const { store_uuid } = req.params;
     const products = await Product.query()
       .where('store_uuid', store_uuid)
-      .withGraphFetched('[items, sub_categories.category, images, promotions]')
+      .withGraphFetched(
+        '[items, sub_categories.category, images, promotions, layer]'
+      )
       .modifyGraph('images', (builder) => {
         builder.select('path');
       })

@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useHistory, Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 import IconButton from '@mui/material/IconButton';
 import Button from '@mui/material/Button';
@@ -39,7 +39,7 @@ const useStyles = makeStyles(() => ({
 const CampaignCreate = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const storeUrl = localStorage.getItem('storeUrl');
   const storeName = localStorage.getItem('storeName');
@@ -56,7 +56,7 @@ const CampaignCreate = () => {
     const { type, payload: resPayload } = await dispatch(addCampaign({ payload }));
 
     if (type.includes('fulfilled')) {
-      history.push(`/${storeUrl}/marketing-campaign/list`);
+      navigate(`/${storeUrl}/marketing-campaign/list`);
 
       await dispatch(
         setNewNotification({

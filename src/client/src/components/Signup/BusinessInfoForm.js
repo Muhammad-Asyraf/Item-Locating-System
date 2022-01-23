@@ -113,11 +113,10 @@ const BusinessInfoForm = (props) => {
             label="Store Name"
             variant="outlined"
             color="gradient"
-            defaultValue={stepsData.storeName.value}
             value={stepsData.storeName.value}
             onChange={(e) => handleValidation(e.target.id, { ref: storeNameRef })}
             onBlur={(e) => handleValidation(e.target.id, { ref: storeNameRef })}
-            error={stepsData.storeName.error}
+            error={stepsData.storeName.error !== false}
             inputRef={storeNameRef}
             className={classes.inputFields}
             margin="none"
@@ -137,11 +136,10 @@ const BusinessInfoForm = (props) => {
             color="gradient"
             multiline
             maxRows={5}
-            defaultValue={stepsData.storeAddress.value}
             value={stepsData.storeAddress.value}
             onChange={(e) => handleValidation(e.target.id, { ref: storeAddressRef })}
             onBlur={(e) => handleValidation(e.target.id, { ref: storeAddressRef })}
-            error={stepsData.storeAddress.error}
+            error={stepsData.storeAddress.error !== false}
             inputRef={storeAddressRef}
             className={classes.inputFields}
             helperText="Please enter your store's address"

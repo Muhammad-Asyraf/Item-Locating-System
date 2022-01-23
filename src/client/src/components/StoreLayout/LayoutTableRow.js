@@ -98,7 +98,7 @@ const LayoutTableRow = (props) => {
             color="primary"
             size="small"
             label={layout.label}
-            style={{ padding: '8px 15px' }}
+            sx={{ fontWeight: 700, pl: 3, pr: 3, pt: 2, pb: 2 }}
           />
           {/* <Chip color="primary" size="small" label={layout.label} /> */}
         </TableCell>

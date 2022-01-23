@@ -152,8 +152,7 @@ const ItemEditForm = (props) => {
   const quillFormats = getEditorFormat();
   const storeUUID = localStorage.getItem('storeUUID');
 
-  const { match, onSubmit, currentItem, categoryOptions } = props;
-
+  const { ItemUUID, onSubmit, currentItem, categoryOptions } = props;
   const nameRef = useRef();
   const barcodeNumberRef = useRef();
   const wholesalePriceRef = useRef();
@@ -206,7 +205,7 @@ const ItemEditForm = (props) => {
       }
 
       const data = {
-        uuid: match.params.uuid,
+        uuid: ItemUUID,
         formData,
       };
 

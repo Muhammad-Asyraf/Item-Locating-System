@@ -90,7 +90,7 @@ const PersonalInfoForm = (props) => {
           defaultValue={stepsData.firstName.value}
           onChange={(e) => handleValidation(e, { ref: firstNameRef })}
           onBlur={(e) => handleValidation(e, { ref: firstNameRef })}
-          error={stepsData.firstName.error}
+          error={stepsData.firstName.error !== false}
           helperText="Please enter your first name"
           inputRef={firstNameRef}
           className={classes.inputFields}
@@ -105,7 +105,7 @@ const PersonalInfoForm = (props) => {
           defaultValue={stepsData.lastName.value}
           onChange={(e) => handleValidation(e, { ref: lastNameRef })}
           onBlur={(e) => handleValidation(e, { ref: lastNameRef })}
-          error={stepsData.lastName.error}
+          error={stepsData.lastName.error !== false}
           helperText="Please enter your last name"
           inputRef={lastNameRef}
           className={classes.inputFields}

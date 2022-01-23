@@ -272,6 +272,17 @@ const EnhancedTableToolbar = (props) => {
               )}
             </>
           )}
+          {(type === 'promotion' || type === 'campaign' || type === 'layout') && (
+            <Tooltip title="Delete">
+              <IconButton
+                className={classes.selected}
+                aria-label="delete"
+                onClick={handleMultipleDelete}
+              >
+                <DeleteIcon />
+              </IconButton>
+            </Tooltip>
+          )}
 
           {type === 'item' && (
             <>

@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-// import { useHistory, Link } from 'react-router-dom';
+// import { useNavigate, Link } from 'react-router-dom';
 
 import IconButton from '@mui/material/IconButton';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
@@ -76,6 +76,9 @@ const ProfileDetail = () => {
               <IconButton
                 component={Link}
                 to={`/${storeUrl}/profile/edit/${authUser.uid}`}
+                onClick={() => {
+                  dispatch(processingRequest());
+                }}
                 sx={{ position: 'relative', top: -3, left: 5 }}
               >
                 <EditRoundedIcon fontSize="large" color="primary" />

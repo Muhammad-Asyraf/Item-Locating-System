@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 // import { Link } from 'react-router-dom';
-import { useHistory, Link } from 'react-router-dom';
+import { useNavigate, Link, useParams } from 'react-router-dom';
 
 import IconButton from '@mui/material/IconButton';
 import Button from '@mui/material/Button';
@@ -55,12 +55,12 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const PromotionCreate = (props) => {
+const PromotionCreate = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
-  const history = useHistory();
+  const navigate = useNavigate();
 
-  const { match } = props;
+  const { uuid: PromotionUUID } = useParams();
 
   const storeUrl = localStorage.getItem('storeUrl');
   const storeName = localStorage.getItem('storeName');
@@ -75,7 +75,7 @@ const PromotionCreate = (props) => {
   const categoryOptions = useSelector(selectSubcategory);
 
   useEffect(async () => {
-    await dispatch(getSinglePromo({ uuid: match.params.uuid }));
+    await dispatch(getSinglePromo({ uuid: PromotionUUID }));
     await dispatch(getProducts());
     await dispatch(getSubcategories());
     await dispatch(getCampaigns());
@@ -94,11 +94,11 @@ const PromotionCreate = (props) => {
     }
 
     const { type, payload: resPayload } = await dispatch(
-      updatePromotion({ uuid: match.params.uuid, payload })
+      updatePromotion({ uuid: PromotionUUID, payload })
     );
 
     if (type.includes('fulfilled')) {
-      history.push(`/${storeUrl}/promotion/list`);
+      navigate(`/${storeUrl}/promotion/list`);
 
       await dispatch(
         setNewNotification({
@@ -162,7 +162,7 @@ const PromotionCreate = (props) => {
             <Breadcrumbs separator="•" aria-label="breadcrumb">
               <div style={{ fontSize: '0.875rem' }}>{storeName}&nbsp;&nbsp;</div>,
               <div style={{ fontSize: '0.875rem' }}>&nbsp;&nbsp;Edit Promotion</div>
-              <div style={{ fontSize: '0.875rem' }}>&nbsp;&nbsp;{match.params.uuid}</div>
+              <div style={{ fontSize: '0.875rem' }}>&nbsp;&nbsp;{PromotionUUID}</div>
             </Breadcrumbs>
           </Grid>
         </Grid>

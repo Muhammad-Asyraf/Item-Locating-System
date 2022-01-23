@@ -31,9 +31,17 @@ export const getLayouts = createAsyncThunk(
   'layout/getLayouts',
   async (args, { rejectWithValue }) => {
     try {
-      const storeUuid = localStorage.getItem('storeUUID');
-      const authHeader = await getHeader();
-      const endpointURL = `/api/backoffice/layout-service/layouts/${storeUuid}`;
+      const { storeUUID, authToken } = args || {};
+
+      const storeID = storeUUID || localStorage.getItem('storeUUID');
+      const payloadHeader = {
+        headers: {
+          'Content-Type': 'application/json',
+          authorization: `Bearer ${authToken}`,
+        },
+      };
+      const authHeader = authToken ? payloadHeader : await getHeader();
+      const endpointURL = `/api/backoffice/layout-service/layouts/${storeID}`;
 
       const res = await axios.get(endpointURL, authHeader);
 
@@ -43,6 +51,7 @@ export const getLayouts = createAsyncThunk(
         status: 'ok',
       };
     } catch (err) {
+      console.log('err', err);
       const { data } = err.response;
 
       return rejectWithValue({

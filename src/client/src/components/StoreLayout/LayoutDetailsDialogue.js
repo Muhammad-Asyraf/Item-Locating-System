@@ -69,11 +69,6 @@ const LayoutDetailsDialogue = (props) => {
               onChange={handleInputChange}
               style={{ width: '100%' }}
               value={name}
-              // onBlur={handleInputChange}
-              // error={productName.error !== false}
-              // helperText={productName.error}
-              // className={classes.inputFields}
-              // inputRef={nameRef}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -91,11 +86,6 @@ const LayoutDetailsDialogue = (props) => {
               onChange={handleInputChange}
               style={{ width: '100%' }}
               value={label}
-              // onBlur={handleInputChange}
-              // error={productName.error !== false}
-              // helperText={productName.error}
-              // className={classes.inputFields}
-              // inputRef={nameRef}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">

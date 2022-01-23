@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useHistory, Link } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import IconButton from '@mui/material/IconButton';
 import Button from '@mui/material/Button';
@@ -44,10 +44,12 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const ItemEdit = (props) => {
+const ItemEdit = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
-  const history = useHistory();
+  const navigate = useNavigate();
+
+  const { uuid: ItemUUID } = useParams();
 
   const storeUrl = localStorage.getItem('storeUrl');
   const storeName = localStorage.getItem('storeName');
@@ -57,12 +59,11 @@ const ItemEdit = (props) => {
   const currentItem = useSelector(selectSingleItem);
   const categoryOptions = useSelector(selectSubcategory);
 
-  const { match } = props;
   console.log(isCategoryLoading);
 
   useEffect(async () => {
     await dispatch(getSubcategories());
-    await dispatch(getSingleItem({ uuid: match.params.uuid }));
+    await dispatch(getSingleItem({ uuid: ItemUUID }));
     dispatch(categoryProcessed());
     dispatch(processed());
   }, []);
@@ -80,7 +81,7 @@ const ItemEdit = (props) => {
         })
       );
 
-      history.push(`/${storeUrl}/item/list`);
+      navigate(`/${storeUrl}/item/list`);
     } else if (type.includes('rejected')) {
       dispatch(processed());
       await dispatch(
@@ -114,8 +115,7 @@ const ItemEdit = (props) => {
             <h1 style={{ marginBottom: 1, marginTop: 3, fontSize: '2em' }}>
               <span> Edit item </span>
               <IconButton
-                component={Link}
-                to={`/${storeUrl}/item/list`}
+                onClick={() => navigate(-1)}
                 sx={{ position: 'relative', top: -3, left: 5 }}
               >
                 <KeyboardReturnRoundedIcon fontSize="large" color="primary" />
@@ -162,7 +162,7 @@ const ItemEdit = (props) => {
         </Grid>
         <Grid item xs={12}>
           <ItemEditForm
-            match={match}
+            ItemUUID={ItemUUID}
             onSubmit={handleSubmit}
             currentItem={currentItem}
             categoryOptions={categoryOptions}

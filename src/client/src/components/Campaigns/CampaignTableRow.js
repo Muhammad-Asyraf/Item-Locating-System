@@ -32,6 +32,21 @@ const useStyles = makeStyles(() => ({
     overflow: 'hidden !important',
     borderRadius: '15px !important',
   },
+  inputTitle: {
+    margin: '0px 0px 5px',
+    fontWeight: '600',
+    lineHeight: '1.57143',
+    fontSize: '0.875rem',
+    fontFamily: 'Public Sans, sans-serif',
+    color: 'black',
+    // color: 'rgb(99, 115, 129)',
+  },
+  dateTag: {
+    backgroundColor: '#D63B49',
+    color: 'white',
+    padding: '5px 20px',
+    borderRadius: 8,
+  },
 }));
 
 const CampaignTableRow = (props) => {
@@ -162,14 +177,79 @@ const CampaignTableRow = (props) => {
                           Campaign Overview
                         </Box>
                       </Grid>
-                      <Grid item xs={9}>
+                      <Grid item xs={12}>
                         <Box
                           style={{
-                            padding: '20px 25px 20px 10px',
+                            padding: '20px 20px 20px 20px',
                             borderRadius: '0px 0px 20px 0px',
                           }}
                         >
-                          <ReactQuill value={campaign.description} readOnly theme="bubble" />
+                          <img
+                            src={campaign.banner_ad_path}
+                            alt="Teset"
+                            style={{
+                              width: '100%',
+                              objectFit: 'scale-down',
+                              borderRadius: '20px',
+                            }}
+                          />
+                        </Box>
+                      </Grid>
+                      <Grid item xs={12}>
+                        <Box
+                          style={{
+                            padding: '0px 35px 20px 35px',
+                          }}
+                        >
+                          <p className={classes.inputTitle}>Effective Date</p>
+                          <span className={classes.dateTag}>
+                            <b>
+                              {moment(new Date(campaign.start_date)).format(
+                                'MMM Do YYYY, hh:mm a'
+                              )}
+                            </b>
+                          </span>
+                          &nbsp;—&nbsp;
+                          <span className={classes.dateTag}>
+                            <b>
+                              {moment(new Date(campaign.end_date)).format(
+                                'MMM Do YYYY, hh:mm a'
+                              )}
+                            </b>
+                          </span>
+                        </Box>
+                      </Grid>
+                      <Grid item xs={12}>
+                        <Box
+                          style={{
+                            padding: '0px 20px 15px 20px',
+                          }}
+                        >
+                          <p className={classes.inputTitle} style={{ paddingLeft: '15px' }}>
+                            Descriptions
+                          </p>
+                          <ReactQuill
+                            value={campaign.description}
+                            readOnly
+                            theme="bubble"
+                            style={{ paddingTop: '0px' }}
+                          />
+                        </Box>
+                      </Grid>
+                      <Grid item xs={12}>
+                        <Box
+                          style={{
+                            padding: '0px 20px 30px 20px',
+                          }}
+                        >
+                          <p className={classes.inputTitle} style={{ paddingLeft: '15px' }}>
+                            Terms & Conditions
+                          </p>
+                          <ReactQuill
+                            value={campaign.terms_conditions}
+                            readOnly
+                            theme="bubble"
+                          />
                         </Box>
                       </Grid>
                     </Grid>

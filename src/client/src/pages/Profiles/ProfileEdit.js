@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useParams } from 'react-router-dom';
 
 import axios from 'axios';
 
@@ -43,16 +43,12 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const ProfileEdit = (props) => {
+const ProfileEdit = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const {
-    match: {
-      params: { uuid },
-    },
-  } = props;
+  const { uuid: ProfileUUID } = useParams();
 
   const storeUrl = localStorage.getItem('storeUrl');
   const storeName = localStorage.getItem('storeName');
@@ -64,13 +60,15 @@ const ProfileEdit = (props) => {
 
   useEffect(async () => {
     dispatch(processingRequest());
-    await dispatch(getUser({ uuid }));
+    await dispatch(getUser({ uuid: ProfileUUID }));
     dispatch(processed());
     setFirstRefresh(false);
   }, []);
 
   const handleSubmit = async (payload) => {
-    const { type, payload: resPayload } = await dispatch(updateUser({ uuid, payload }));
+    const { type, payload: resPayload } = await dispatch(
+      updateUser({ uuid: ProfileUUID, payload })
+    );
 
     if (type.includes('fulfilled')) {
       const password = payload.changePasswordRequest
@@ -165,7 +163,7 @@ const ProfileEdit = (props) => {
               <div style={{ fontSize: '0.875rem' }}>{storeName}&nbsp;&nbsp;</div>,
               <div style={{ fontSize: '0.875rem' }}>&nbsp;&nbsp;User&nbsp;&nbsp;</div>,
               <div style={{ fontSize: '0.875rem' }}>&nbsp;&nbsp;Profile&nbsp;&nbsp;</div>
-              <div style={{ fontSize: '0.875rem' }}>&nbsp;&nbsp;{uuid}</div>
+              <div style={{ fontSize: '0.875rem' }}>&nbsp;&nbsp;{ProfileUUID}</div>
             </Breadcrumbs>
           </Grid>
         </Grid>

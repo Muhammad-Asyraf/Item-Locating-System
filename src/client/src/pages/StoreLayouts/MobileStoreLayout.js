@@ -87,7 +87,7 @@ const MobileStoreLayout = () => {
 
   useEffect(async () => {
     const { type: layoutStatus, payload: layoutPayload } = await dispatch(
-      getLayouts({ uuid: StoreUUID, authToken, planningCartUUID })
+      getLayouts({ uuid: StoreUUID, authToken })
     );
 
     const requestStatusOk = layoutStatus.includes('fulfilled');

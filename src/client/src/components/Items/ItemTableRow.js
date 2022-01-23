@@ -30,7 +30,7 @@ import { makeStyles } from '@mui/styles';
 import RowOptions from './RowOptions';
 import ImageModal from '../Images/ImageModal';
 
-// import { isSameDay } from '../../utils/general';
+import ImagePlaceholder from '../../assets/img/img_placeholder.jpg';
 
 SwiperCore.use([Pagination, Navigation]);
 
@@ -134,7 +134,12 @@ const ItemTableRow = (props) => {
           <Grid container spacing={0.5}>
             {item.sub_categories.map((cat) => (
               <Grid item key={cat.uuid}>
-                <Chip color="primary" size="small" label={cat.name} />
+                <Chip
+                  color="primary"
+                  size="small"
+                  label={cat.name}
+                  sx={{ fontWeight: 700, pl: 1, pr: 1, pt: 2, pb: 2 }}
+                />
               </Grid>
             ))}
           </Grid>
@@ -152,13 +157,6 @@ const ItemTableRow = (props) => {
           sx={{ fontSize: '0.95rem !important', letterSpacing: 0.8 }}
         >
           {moment(new Date(item.updated_at)).format('DD/MM/YYYY')}
-        </TableCell>
-        <TableCell
-          style={{ borderBottom: 'none' }}
-          align="center"
-          sx={{ fontSize: '0.95rem !important', letterSpacing: 0.8 }}
-        >
-          {moment(new Date(item.created_at)).format('DD/MM/YYYY')}
         </TableCell>
         <TableCell
           style={{ borderBottom: 'none' }}
@@ -211,7 +209,13 @@ const ItemTableRow = (props) => {
                           Item Overview
                         </Box>
                       </Grid>
-                      <Grid item xs={3}>
+                      <Grid
+                        item
+                        xs={3}
+                        container
+                        justifyContent="center"
+                        alignItems="flex-start"
+                      >
                         <Swiper
                           pagination={{
                             dynamicBullets: true,
@@ -221,15 +225,28 @@ const ItemTableRow = (props) => {
                           loop
                           className="mySwiper"
                           style={{
-                            borderRadius: '0px 0px 0px 20px',
+                            marginLeft: 10,
                             marginRight: 10,
                             maxWidth: 1000,
-                            height: '100%',
+                            height: 400,
                           }}
                           grabCursor
                           centeredSlides
                           slidesPerView={1}
                         >
+                          {item.images.length === 0 && (
+                            <SwiperSlide onClick={handleOpenModal}>
+                              <img
+                                src={ImagePlaceholder}
+                                alt="Teset"
+                                style={{
+                                  width: '100%',
+                                  height: '100%',
+                                  objectFit: 'scale-down',
+                                }}
+                              />
+                            </SwiperSlide>
+                          )}
                           {item.images.map(({ path }) => (
                             <SwiperSlide key={path} onClick={handleOpenModal} style={{}}>
                               <img
@@ -249,9 +266,6 @@ const ItemTableRow = (props) => {
                         <Box
                           style={{
                             padding: '20px 25px 20px 10px',
-                            // maxHeight: 300,
-                            // overflow: 'scroll',
-                            // overflowX: 'hidden',
                             borderRadius: '0px 0px 20px 0px',
                           }}
                         >
@@ -265,13 +279,15 @@ const ItemTableRow = (props) => {
             </Paper>
           </Collapse>
         </TableCell>
-        <ImageModal
-          images={item.images}
-          Swiper={Swiper}
-          SwiperSlide={SwiperSlide}
-          openModal={openModal}
-          handleCloseModal={handleCloseModal}
-        />
+        {item.images.length > 0 && (
+          <ImageModal
+            images={item.images}
+            Swiper={Swiper}
+            SwiperSlide={SwiperSlide}
+            openModal={openModal}
+            handleCloseModal={handleCloseModal}
+          />
+        )}
       </TableRow>
     </>
   );

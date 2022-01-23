@@ -222,3 +222,35 @@ export const saveProductMapping = createAsyncThunk(
     }
   }
 );
+
+export const getProductsByPlanningCart = createAsyncThunk(
+  'product/getProducts',
+  async ({ authToken, storeUUID, planningCartUUID }, { rejectWithValue }) => {
+    try {
+      const headers = {
+        'Content-Type': 'application/json',
+        authorization: `Bearer ${authToken}`,
+      };
+      const params = { storeUUID };
+      const endpointURL = `/api/backoffice/planning-cart-service/cart/${planningCartUUID}`;
+      const reqConfig = { headers, params };
+
+      const res = await axios.get(endpointURL, reqConfig);
+
+      return {
+        products: res.data,
+        message: 'Successfully retrieved products',
+        status: 'ok',
+      };
+    } catch (err) {
+      console.log('error', err);
+      const { data } = err.response;
+
+      return rejectWithValue({
+        message: 'Failed in retrieving products',
+        status: 'Error!',
+        error: data.code,
+      });
+    }
+  }
+);

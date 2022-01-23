@@ -18,8 +18,7 @@ const AccountForm = (props) => {
   const classes = useStyles();
   const storeUrlRef = useRef();
   const passwordRef = useRef();
-  const { handleNext, stepsData, setStepsData, setError, formRef, checkStoreUrlExist } =
-    props;
+  const { handleNext, stepsData, setStepsData, setError, formRef, checkStoreUrlExist } = props;
 
   const handleGate = (newStepsData, direction) => {
     const { storeUrl, storeAddress } = newStepsData;
@@ -145,7 +144,7 @@ const AccountForm = (props) => {
           defaultValue={stepsData.storeUrl.value}
           onChange={(e) => handleValidation(e)}
           onBlur={(e) => handleValidation(e)}
-          error={stepsData.storeUrl.error}
+          error={stepsData.storeUrl.error !== false}
           helperText={
             stepsData.storeUrl.error
               ? stepsData.storeUrl.error
@@ -154,9 +153,7 @@ const AccountForm = (props) => {
           inputRef={storeUrlRef}
           className={classes.inputFields}
           InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">loketla.com.my/</InputAdornment>
-            ),
+            startAdornment: <InputAdornment position="start">loketla.com.my/</InputAdornment>,
           }}
         />
       </Grid>
@@ -170,11 +167,9 @@ const AccountForm = (props) => {
           defaultValue={stepsData.password.value}
           onChange={(e) => handleValidation(e)}
           onBlur={(e) => handleValidation(e)}
-          error={stepsData.password.error}
+          error={stepsData.password.error !== false}
           helperText={
-            stepsData.password.error
-              ? stepsData.password.error
-              : 'Please enter your password'
+            stepsData.password.error ? stepsData.password.error : 'Please enter your password'
           }
           inputRef={passwordRef}
           className={classes.inputFields}

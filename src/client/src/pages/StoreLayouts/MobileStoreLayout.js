@@ -17,6 +17,7 @@ import {
 } from '../../redux/features/layoutSlice';
 
 import { getLayouts } from '../../redux/thunks/layoutThunk';
+import { getProductsByPlanningCart } from '../../redux/thunks/productThunk';
 
 import LayoutProductViewer from '../../components/StoreLayout/LayoutProductViewer/Viewer';
 import PartitionProductModal from '../../components/StoreLayout/LayoutProductViewer/PartitionProductModal';
@@ -55,17 +56,17 @@ const MobileStoreLayout = () => {
   const [currentLayout, setCurrentLayout] = useState(null);
   const [openPartitionModal, setOpenPartitionModal] = useState(false);
 
-  const { uuid: StoreUUID } = useParams();
+  const { uuid: storeUUID } = useParams();
   const authToken = searchParams.get('token');
-  const planningCartUUID = searchParams.get('planning-cart');
+  const planningCartUUID = searchParams.get('cart');
 
   const layouts = useSelector(selectLayouts);
   const isLayoutLoading = useSelector(selectIsLoading);
 
-  console.log('layouts', layouts);
-  console.log('authToken', authToken);
-  console.log('StoreUUID', StoreUUID);
-  console.log('planningCartUUID', planningCartUUID);
+  // console.log('layouts', layouts);
+  // console.log('authToken', authToken);
+  // console.log('storeUUID', storeUUID);
+  // console.log('planningCartUUID', planningCartUUID);
 
   const handleOpen = () => setOpenPartitionModal(true);
   const handleClose = () => setOpenPartitionModal(false);
@@ -87,13 +88,18 @@ const MobileStoreLayout = () => {
 
   useEffect(async () => {
     const { type: layoutStatus, payload: layoutPayload } = await dispatch(
-      getLayouts({ uuid: StoreUUID, authToken })
+      getLayouts({ storeUUID, authToken })
+    );
+    const { type: productStatus, payload: productPayload } = await dispatch(
+      getProductsByPlanningCart({ storeUUID, planningCartUUID, authToken })
     );
 
-    const requestStatusOk = layoutStatus.includes('fulfilled');
+    const requestStatusOk =
+      layoutStatus.includes('fulfilled') && productStatus.includes('fulfilled');
 
     if (requestStatusOk) {
       initLayoutLayers(layoutPayload.layouts);
+      console.log('productPayload', productPayload);
     }
   }, []);
 

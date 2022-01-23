@@ -8,6 +8,7 @@ const subCategoryService = require('../cores/categories/sub_categories/apis/back
 const layoutService = require('../cores/layouts/apis/backoffice');
 const promotionService = require('../cores/promotions/apis/backoffice');
 const marketingCampaignService = require('../cores/marketing_campaigns/apis/backoffice');
+const planningCartService = require('../cores/planning_carts/apis/backoffice');
 
 router.use('/user-service', backofficeUserService);
 router.use('/item-service', itemService);
@@ -18,5 +19,6 @@ router.use('/sub-category-service', subCategoryService);
 router.use('/layout-service', layoutService);
 router.use('/promotion-service', promotionService);
 router.use('/marketing-campaign-service', marketingCampaignService);
+router.use('/planning-cart-service', planningCartService);
 
 module.exports = router;

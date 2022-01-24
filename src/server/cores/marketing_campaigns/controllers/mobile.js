@@ -1,16 +1,40 @@
-const Product = require('../model');
+const Campaign = require('../model');
+const Promotion = require('../../promotions/model');
+const Product = require('../../products/model');
 const getLogger = require('../../../utils/logger');
 
-const productLogger = getLogger(__filename, 'product');
+const campaignLogger = getLogger(__filename, 'campaign');
 
-exports.searchProducts = async (req, res, next) => {
-    try {
-        const { search } = req.query
-        const products = await Product.query().where('name','ilike',`%${search}%`)
-        productLogger.info(`Successfully retrieve: ${products.length} products on ${search}`);
-        res.json(products);
-      } catch (err) {
-        productLogger.warn(`Error retrieving all products`);
-        next(err);
-      }
-}
+exports.getAllCampaigns = async (req, res, next) => {
+  try {
+    let campaigns = await Campaign.query().withGraphFetched('store');
+    res.json(campaigns);
+  } catch (err) {
+    campaignLogger.warn(`Error retrieving all campaigns`);
+    next(err);
+  }
+};
+
+exports.getCampaign = async (req, res, next) => {
+  try {
+    const uuid = req.params.uuid;
+    let campaign = await Campaign.query().for(uuid).withGraphFetched('store');
+    res.json(campaign);
+  } catch (err) {
+    campaignLogger.warn(`Error retrieving all campaigns`);
+    next(err);
+  }
+};
+
+exports.getCampaignProducts = async (req, res, next) => {
+  try {
+    const uuid = req.params.uuid;
+    let products = await Promotion.query()
+      .where('campaign_uuid', uuid)
+      .withGraphFetched('products.stores');
+    res.json(products);
+  } catch (err) {
+    campaignLogger.warn(`Error retrieving all campaigns`);
+    next(err);
+  }
+};

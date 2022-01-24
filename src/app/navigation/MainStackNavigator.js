@@ -7,11 +7,17 @@ import SearchResult from '../screens/SearchResult';
 import Loketlist from '../screens/Loketlist';
 import FloorPlan from '../screens/FloorPlan';
 import ProfileEdit from '../screens/ProfileEdit';
+import ProductDetails from '../screens/ProductDetails';
+import CategoryList from '../screens/CategoryList';
+import StoreDetails from '../screens/StoreDetails';
+import CampaignDetails from '../screens/CampaignDetails';
+import CampaignProducts from '../screens/CampaignProducts';
 
 // Utilities
 import auth from '@react-native-firebase/auth';
 import axios from 'axios';
 import BackgroundGeolocation from '@mauron85/react-native-background-geolocation';
+import { getAuthHeader } from '../services/AuthenticationService';
 
 // Redux
 import { useDispatch, useSelector } from 'react-redux';
@@ -173,18 +179,15 @@ export default function MainStackNavigator() {
 
   const fetch = async () => {
     try {
-      const token = await auth().currentUser.getIdToken(false);
-      console.log(`token: ${token}`);
-      console.log(`authHeader: ${JSON.stringify(authState.authHeader)}`);
       const uuid = auth().currentUser.uid;
+      const header = await getAuthHeader();
       const { data } = await axios.get(
         environment.host +
           '/api/mobile/planning-cart-service/cart/default/' +
           uuid,
-        authState.authHeader
+        header
       );
 
-      dispatch(setToken(token));
       dispatch(setUuid(uuid));
       dispatch(setDefaultCart(data.uuid));
       dispatch(loadAllItems(data.uuid));
@@ -209,12 +212,20 @@ export default function MainStackNavigator() {
       }}
     >
       <Stack.Screen name="LOKETLA" component={MainTabsNavigator} />
-      <Stack.Screen name="Search Result" component={SearchResult} />
       <Stack.Screen name="Loketlist" component={Loketlist} />
       <Stack.Screen name="Floor Plan" component={FloorPlan} />
-
+      {/* Products */}
+      <Stack.Screen name="Search Result" component={SearchResult} />
+      <Stack.Screen name="Product Page" component={ProductDetails} />
+      <Stack.Screen name="Categories" component={CategoryList} />
+      {/* Stores */}
+      <Stack.Screen name="Store" component={StoreDetails} />
+      {/* <Stack.Screen name="Subcategories" component={CategoryList} /> */}
       {/* Profiles */}
       <Stack.Screen name="Edit Profile" component={ProfileEdit} />
+      {/* Campaigns */}
+      <Stack.Screen name="Campaign" component={CampaignDetails} />
+      <Stack.Screen name="Campaign Products" component={CampaignProducts} />
     </Stack.Navigator>
   );
 }

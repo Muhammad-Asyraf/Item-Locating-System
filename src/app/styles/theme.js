@@ -3,39 +3,41 @@ import { StyleSheet } from 'react-native';
 
 export const Theme = {
   ...DefaultTheme,
-  dark: true,
+  dark: false,
   mode: 'adaptive',
   roundness: 5,
   colors: {
     ...DefaultTheme.colors,
     primary: '#007FFF',
     accent: '#003366',
-    background: '#FFFFFF',
+    background: '#F5F5F5',
     text: '#001933',
     placeholder: 'rgba(0,25,51,0.5)',
+    error: '#E71D36',
+    warn: '#FF9F1C',
+    ok: '#2EC4B6',
   },
 };
 
 export const GlobalStyle = StyleSheet.create({
   screenContainer: {
-    flexGrow: 1,
     height: '100%',
+    flex: 1,
+    flexGrow: 1,
     backgroundColor: '#F5F5F5',
   },
   searchBar: {
     marginHorizontal: 18,
     marginVertical: 24,
-    flexGrow: 1,
     elevation: 1,
   },
   contentContainer: {
+    flex: 1,
     flexGrow: 1,
     paddingHorizontal: 22,
     paddingVertical: 18,
   },
-  flatGrid: {
-    marginHorizontal: 8,
-  },
+  flatGrid: {},
 });
 
 export const TextStyle = StyleSheet.create({
@@ -170,6 +172,7 @@ export const AppbarStyle = StyleSheet.create({
   },
   appBarContainer: {
     backgroundColor: Theme.colors.primary,
+    flexShrink: 1,
     padding: 0,
   },
   appBarSearchbar: {
@@ -180,9 +183,9 @@ export const AppbarStyle = StyleSheet.create({
     margin: 12,
   },
   appBarTitle: {
-    flexGrow: 1,
+    flexShrink: 1,
     fontSize: 18,
     color: 'white',
-    marginLeft: 18,
+    marginHorizontal: 18,
   },
 });

@@ -2,97 +2,191 @@ import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
   Dimensions,
+  RefreshControl,
   ScrollView,
   FlatList,
   View,
-  Image,
+  TouchableOpacity,
 } from 'react-native';
-import { Appbar, Title, Searchbar } from 'react-native-paper';
+import {
+  Appbar,
+  Text,
+  Surface,
+  Button,
+  TouchableRipple,
+} from 'react-native-paper';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import Carousel, { ParallaxImage } from 'react-native-snap-carousel';
+import CategoryCard from '../components/products/CategoryCard';
+import StoreCard from '../components/stores/StoreCard';
+
+// Utilities
+import { getImage } from '../services/BackendService';
+import { getCategories } from '../services/ProductService';
+import { getStores } from '../services/StoreService';
+import { getAllCampaigns } from '../services/CampaignService';
+
+import { environment } from '../environment';
 
 // Styling
-import { GlobalStyle } from '../styles/Theme';
+import { Theme, GlobalStyle, TextStyle } from '../styles/Theme';
 
 const { width: screenWidth } = Dimensions.get('window');
 export default function Home({ navigation }) {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [banners, setBanners] = useState([1, 2, 3]);
+  const [isLoading, setLoading] = useState(true);
+  const [categories, setCategories] = useState([]);
+  const [stores, setStores] = useState([]);
+  const [banners, setBanners] = useState([]);
 
-  // Handle query state changes
-  const handleQueryChange = (query) => setSearchQuery(query);
+  useEffect(() => {
+    if (isLoading) {
+      getAllCampaigns()
+        .then((data) => {
+          setBanners(data);
+        })
+        .catch((error) => {
+          console.log(`[Home.js/useEffect] ${error}`);
+        });
+      getCategories()
+        .then((data) => {
+          setCategories(data.slice(0, 9));
+          //console.log(`[Home.js/useEffect] ${JSON.stringify(data)}`);
+        })
+        .catch((error) => {
+          console.log(`[Home.js/useEffect] ${error}`);
+        });
+
+      getStores()
+        .then((data) => {
+          setStores(data);
+          // console.log(`[Home.js/useEffect] Stores: ${JSON.stringify(data)}`);
+          setLoading(false);
+        })
+        .catch((error) => {
+          console.log(`[Home.js/useEffect] ${error}`);
+        });
+    }
+  }, [isLoading]);
 
   // Push a search result screen
-  const search = () => {
+  const openSearch = () => {
     navigation.dangerouslyGetParent().navigate('Search Result', {
-      query: searchQuery,
+      query: '',
     });
+  };
+
+  // Open category list screen
+  const viewCategories = () => {
+    navigation.dangerouslyGetParent().navigate('Categories');
+  };
+
+  // Open store list screen
+  const viewStores = () => {};
+
+  const viewCampaign = (campaign) => {
+    // console.log(
+    //   `[Home.js/viewCampaign] Campaign object : ${JSON.stringify(campaign)}`
+    // );
+    navigation.dangerouslyGetParent().navigate('Campaign', { campaign });
   };
 
   return (
     <View style={GlobalStyle.screenContainer}>
       <Appbar.Header style={{ backgroundColor: 'transparent' }}>
-        <Searchbar
-          style={GlobalStyle.searchBar}
-          placeholder="Search for something"
-          onChangeText={handleQueryChange}
-          onSubmitEditing={search}
-          autoCorrect={false}
-          autoCapitalize="none"
-        />
+        <TouchableOpacity style={{ flex: 1, flexGrow: 1 }} onPress={openSearch}>
+          <Surface style={styles.searchBar}>
+            <Icon name="search" size={24} color={Theme.colors.text} />
+            <Text style={[TextStyle.body1, styles.searchBarText]}>
+              Search for something
+            </Text>
+          </Surface>
+          {/* <Searchbar
+            editable={false}
+            style={GlobalStyle.searchBar}
+            placeholder="Search for something"
+            onChangeText={handleQueryChange}
+            onSubmitEditing={openSearch}
+            autoCorrect={false}
+            autoCapitalize="none"
+          /> */}
+        </TouchableOpacity>
       </Appbar.Header>
-      <ScrollView style={styles.container}>
-        <Carousel
-          sliderWidth={screenWidth}
-          itemWidth={screenWidth - 44}
-          data={banners}
-          renderItem={({ item }, parallaxProps) => (
-            <View style={styles.item}>
-              <ParallaxImage
-                source={{ uri: 'https://tinyurl.com/cu8nm69m' }}
-                containerStyle={styles.imageContainer}
-                style={styles.image}
-                parallaxFactor={0.4}
-                {...parallaxProps}
-              />
-            </View>
-          )}
-          hasParallaxImages={true}
-        />
+      <ScrollView
+        style={styles.container}
+        refreshControl={
+          <RefreshControl
+            refreshing={isLoading}
+            onRefresh={() => {
+              setLoading(true);
+            }}
+          />
+        }
+      >
+        {banners.length != 0 && (
+          <Carousel
+            containerCustomStyle={styles.carousel}
+            sliderWidth={screenWidth}
+            itemWidth={screenWidth - 40}
+            data={banners}
+            renderItem={({ item }, parallaxProps) => (
+              <TouchableOpacity
+                style={styles.item}
+                onPress={() => viewCampaign(item)}
+              >
+                <ParallaxImage
+                  source={{ uri: `${environment.host}${item.banner_ad_path}` }}
+                  containerStyle={styles.imageContainer}
+                  style={styles.image}
+                  parallaxFactor={0.1}
+                  {...parallaxProps}
+                />
+              </TouchableOpacity>
+            )}
+            hasParallaxImages={true}
+          />
+        )}
         {/* Horizontal list mockup */}
         <View style={styles.horizontalProductContainer}>
-          <Title style={styles.horizontalListTitle}>Trending items!</Title>
+          <View style={styles.horizontalTitleContainer}>
+            <Text style={[TextStyle.subhead1, styles.horizontalListTitle]}>
+              Categories
+            </Text>
+            <Button compact={true} onPress={viewCategories}>
+              See All
+            </Button>
+          </View>
           <FlatList
-            style={styles.horizontalListContainer}
+            contentContainerStyle={styles.horizontalListContainer}
             horizontal={true}
-            data={banners}
+            data={categories}
             renderItem={({ item }) => (
-              <View style={styles.listItemContainer}>
-                <Image
-                  style={styles.horizontalProductImage}
-                  source={{ uri: 'https://tinyurl.com/urszpsxs' }}
-                />
-              </View>
+              <CategoryCard type="category" category={item} />
             )}
           />
         </View>
         {/* Horizontal list mockup */}
-        <View style={styles.horizontalProductContainer}>
-          <Title style={styles.horizontalListTitle}>
-            Hot Products near you!
-          </Title>
-          <FlatList
-            style={styles.horizontalListContainer}
-            horizontal={true}
-            data={banners}
-            renderItem={({ item }) => (
-              <View style={styles.listItemContainer}>
-                <Image
-                  style={styles.horizontalProductImage}
-                  source={{ uri: 'https://tinyurl.com/268aa7js' }}
-                />
-              </View>
-            )}
-          />
+        {stores.length != 0 && (
+          <View style={styles.horizontalProductContainer}>
+            <View style={styles.horizontalTitleContainer}>
+              <Text style={[TextStyle.subhead1, styles.horizontalListTitle]}>
+                Shops around you
+              </Text>
+              <Button compact={true} onPress={viewStores}>
+                See All
+              </Button>
+            </View>
+            <FlatList
+              contentContainerStyle={styles.horizontalListContainer}
+              horizontal={true}
+              data={stores}
+              renderItem={({ item }) => <StoreCard store={item} />}
+            />
+          </View>
+        )}
+        <View style={styles.footer}>
+          <Text style={[TextStyle.body2, styles.footerMessage]}>
+            You have reached the end
+          </Text>
         </View>
       </ScrollView>
     </View>
@@ -101,6 +195,9 @@ export default function Home({ navigation }) {
 
 const styles = StyleSheet.create({
   // Parallax start
+  carousel: {
+    marginTop: 12,
+  },
   item: {
     height: 160,
   },
@@ -112,25 +209,42 @@ const styles = StyleSheet.create({
   },
   image: {
     ...StyleSheet.absoluteFillObject,
-    resizeMode: 'cover',
+    resizeMode: 'center',
   },
   // Parallax end
 
   // Main container
-  container: {
-    paddingTop: 12,
+  container: {},
+
+  // Searchbar
+  searchBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: Theme.roundness,
+    marginHorizontal: 18,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    elevation: 1,
+  },
+  searchBarText: {
+    marginLeft: 18,
+    color: Theme.colors.placeholder,
   },
 
   // Horizontal item list
   horizontalProductContainer: {
-    marginVertical: 12,
+    marginVertical: 8,
   },
-  horizontalListTitle: {
-    marginStart: 22,
-  },
-  horizontalListContainer: {
+  horizontalTitleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 18,
     paddingVertical: 8,
-    paddingHorizontal: 22,
+  },
+  horizontalListTitle: {},
+  horizontalListContainer: {
+    paddingHorizontal: 18,
     backgroundColor: '#F5F5F5',
   },
   horizontalProductImage: {
@@ -149,5 +263,15 @@ const styles = StyleSheet.create({
     shadowRadius: 1.41,
 
     elevation: 2,
+  },
+  footer: {
+    backgroundColor: Theme.colors.background,
+    margin: 18,
+    padding: 16,
+    borderRadius: Theme.roundness,
+  },
+  footerMessage: {
+    textAlign: 'center',
+    color: Theme.colors.placeholder,
   },
 });

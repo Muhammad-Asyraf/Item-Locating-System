@@ -4,7 +4,7 @@ exports.up = async (knex) => {
   await knex.schema.createTable(tableNames.item, (table) => {
     table.uuid('uuid').primary();
     table.string('name').notNullable();
-    table.bigInteger('barcode_number').notNullable().unique();
+    table.bigInteger('barcode_number').notNullable();
     table.decimal('wholesale_price').notNullable();
     table
       .uuid('store_uuid')

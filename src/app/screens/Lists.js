@@ -12,6 +12,7 @@ import Loading from '../components/Loading';
 
 // Utilities
 import axios from 'axios';
+import { getAuthHeader } from '../services/AuthenticationService';
 
 // Redux
 import { useSelector, useDispatch } from 'react-redux';
@@ -50,11 +51,12 @@ export default function Lists() {
 
   useEffect(() => {
     const fetchLoketlists = async () => {
+      const header = await getAuthHeader();
       const { data } = await axios.get(
         environment.host +
           '/api/mobile/planning-cart-service/carts/' +
           user.uuid,
-        auth.authHeader
+        header
       );
       let loketlists = [];
       for (i = 0; i < data.length; i++) {
@@ -86,6 +88,7 @@ export default function Lists() {
 
   // Dialog handlers
   const submitEdit = async () => {
+    const header = await getAuthHeader();
     // Add cart to back end
     const { data } = await axios.patch(
       environment.host + '/api/mobile/planning-cart-service/cart/update',
@@ -94,7 +97,7 @@ export default function Lists() {
         cart_uuid: controlCartUuid,
         name: listName,
       },
-      auth.authHeader
+      header
     );
     closeEditDialog();
     // Refresh
@@ -102,11 +105,12 @@ export default function Lists() {
   };
 
   const submitDelete = async () => {
+    const header = await getAuthHeader();
     // Add cart to back end
     const { data } = await axios.delete(
       environment.host + '/api/mobile/planning-cart-service/cart/delete',
       {
-        headers: auth.authHeader.headers,
+        headers: header.headers,
         data: {
           app_user_uuid: user.uuid,
           cart_uuid: controlCartUuid,
@@ -126,6 +130,7 @@ export default function Lists() {
     setLoading(true);
   };
   const addList = async () => {
+    const header = await getAuthHeader();
     // Add cart to back end
     const { data } = await axios.post(
       environment.host + '/api/mobile/planning-cart-service/cart/create',
@@ -133,7 +138,7 @@ export default function Lists() {
         app_user_uuid: user.uuid,
         name: listName,
       },
-      auth.authHeader
+      header
     );
     closeAddDialog();
     // Refresh the page

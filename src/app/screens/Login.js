@@ -3,17 +3,13 @@ import React, { useState } from 'react';
 import { StyleSheet, ScrollView, View } from 'react-native';
 import { TextInput, Title, Paragraph, Button } from 'react-native-paper';
 
-// Redux
-import { useSelector, useDispatch } from 'react-redux';
-import { login } from '../redux/auth/authThunk';
+// Utilities
+import { login } from '../services/AuthenticationService';
 
 // Styling
 import { TextStyle } from '../styles/Theme';
 
 export default function Login() {
-  const dispatch = useDispatch();
-  const authState = useSelector((state) => state.auth);
-
   const [credentials, setCredentials] = useState({
     email: 'danishrashidin@gmail.com',
     password: 'danish123',
@@ -31,27 +27,12 @@ export default function Login() {
   };
 
   const handleLogIn = () => {
-    dispatch(login(credentials));
-
-    // // Authenticate
-    // auth()
-    //   .signInWithEmailAndPassword(credentials.email, credentials.password)
-    //   .then()
-    //   .catch((error) => {
-    //     if (error.code === "auth/email-already-in-use") {
-    //       console.log("That email address is already in use!");
-    //     }
-
-    //     if (error.code === "auth/invalid-email") {
-    //       console.log("That email address is invalid!");
-    //     }
-
-    //     if (error.code === "auth/user-not-found") {
-    //       // Error handling here
-    //     }
-
-    //     console.error(error);
-    //   });
+    login(credentials)
+      .then((data) => {})
+      .catch((error) => {
+        // TODO: Add snackbar for error handling
+        console.log(error);
+      });
   };
 
   const validateEmail = (text) => {

@@ -1,5 +1,4 @@
 const PlanningCart = require('../model');
-const Product = require('../../products/model');
 const getLogger = require('../../../utils/logger');
 
 const planningCartLogger = getLogger(__filename, 'backoffice-cart');
@@ -9,11 +8,22 @@ exports.getProductsByCart = async (req, res, next) => {
     const { uuid } = req.params;
     const { storeUUID } = req.query;
 
-    console.log('LET SEE', uuid, storeUUID);
+    const planningCart = await PlanningCart.query()
+      .findById(uuid)
+      .withGraphFetched('[products]')
+      .modifyGraph('products', (builder) => {
+        builder.where('store_uuid', storeUUID);
+      });
 
-    planningCartLogger.info(`Successfully get planning cart `);
+    const { products, uuid: planningCartUUID } = planningCart || {};
 
-    res.json('Yezzaaa');
+    console.log('LET SEE', products);
+
+    planningCartLogger.info(
+      `Successfully get products by planning cart with UUID: ${planningCartUUID}`
+    );
+
+    res.json(products);
   } catch (err) {
     planningCartLogger.warn(`Error retrieving planning cart`);
     next(err);

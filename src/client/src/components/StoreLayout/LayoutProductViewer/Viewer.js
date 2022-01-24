@@ -2,6 +2,8 @@ import React, { useEffect, useRef } from 'react';
 import L from 'leaflet';
 import 'leaflet-geometryutil';
 
+import icons from 'leaflet-color-number-markers';
+
 import Button from '@mui/material/Button';
 import CenterFocusStrongIcon from '@mui/icons-material/CenterFocusStrong';
 
@@ -18,6 +20,7 @@ import {
   mapDefaultConfig,
   recenterBtn,
 } from '../utils/mapConfig';
+import { groupBy } from '../../../utils/general';
 
 const useStyles = makeStyles(() => ({
   refreshButton: {
@@ -35,9 +38,10 @@ const useStyles = makeStyles(() => ({
 const Viewer = (props) => {
   const classes = useStyles();
 
-  const { leafletRef, currentLayout, leafletLayers, floorPlan } = props;
+  const { leafletRef, currentLayout, leafletLayers, floorPlan, products } = props;
 
   const mapRef = useRef(null);
+  const markerGroupRef = useRef(null);
   const floorLayers = useRef([]);
   const shelfLayers = useRef([]);
   const shelfPartitionLayers = useRef([]);
@@ -61,6 +65,47 @@ const Viewer = (props) => {
     mapRef.current.flyTo(storeViewport, 3.5);
   };
 
+  const addLookupProductMarker = (latLng, number) => {
+    const markerGroup = markerGroupRef.current;
+
+    const marker = L.marker(latLng, { icon: icons.red.numbers[number] });
+    markerGroup.addLayer(marker);
+  };
+
+  const initMarkers = () => {
+    if (markerGroupRef.current !== null) {
+      const map = mapRef.current;
+      const markerGroup = markerGroupRef.current;
+
+      markerGroup.clearLayers();
+      map.removeLayer(markerGroup);
+
+      if (products.length > 0) {
+        const productsByLayer = groupBy(products, 'partitionUUID');
+        const selectedLayer = Object.keys(productsByLayer);
+
+        const { layers } = currentLayout;
+
+        selectedLayer.forEach((uuid) => {
+          const layer = layers.find(({ uuid: layerUUID }) => layerUUID === uuid);
+
+          if (layer) {
+            const {
+              meta_data: { center },
+            } = layer;
+
+            const latLng = Object.values(center);
+            const productQty = productsByLayer[uuid].length;
+
+            addLookupProductMarker(latLng, productQty);
+          }
+        });
+
+        markerGroup.addTo(map);
+      }
+    }
+  };
+
   const initShapeObj = (layer, shape) => {
     const isPartitionLayer = shelfPartitionShapes.includes(shape);
     const isShelfLayer = shelfShapes.includes(shape);
@@ -68,6 +113,12 @@ const Viewer = (props) => {
     if (isPartitionLayer) {
       layer._path.ontouchend = (e) => {
         e.preventDefault();
+
+        const layerProduct = products.filter(({ partition_uuid: partitionUUID }) => {
+          return partitionUUID === layer.id;
+        });
+
+        window.postMessage(JSON.stringify(layerProduct));
       };
     }
 
@@ -163,6 +214,7 @@ const Viewer = (props) => {
 
     leafletRef.current = { map, leaflet: L };
     mapRef.current = map;
+    markerGroupRef.current = L.layerGroup();
   };
 
   const initCustomPane = () => {
@@ -218,6 +270,7 @@ const Viewer = (props) => {
     loadLayers(leafletLayers);
 
     setZoomBehavior();
+    initMarkers();
 
     return () => {
       floorLayers.current = [];

@@ -15,6 +15,11 @@ import {
   selectIsLoading,
   processed as layoutProcessed,
 } from '../../redux/features/layoutSlice';
+import {
+  // selectProducts,
+  // selectIsLoading,
+  processed as productProcessed,
+} from '../../redux/features/productSlice';
 
 import { getLayouts } from '../../redux/thunks/layoutThunk';
 import { getProductsByPlanningCart } from '../../redux/thunks/productThunk';
@@ -52,6 +57,7 @@ const MobileStoreLayout = () => {
   const [searchParams] = useSearchParams();
 
   const [floorPlan, setFloorPlan] = useState(null);
+  const [products, setProducts] = useState([]);
   const [leafletLayers, setLeafletLayers] = useState([]);
   const [currentLayout, setCurrentLayout] = useState(null);
   const [openPartitionModal, setOpenPartitionModal] = useState(false);
@@ -84,6 +90,7 @@ const MobileStoreLayout = () => {
     setLeafletLayers(layers);
 
     dispatch(layoutProcessed());
+    dispatch(productProcessed());
   };
 
   useEffect(async () => {
@@ -99,6 +106,7 @@ const MobileStoreLayout = () => {
 
     if (requestStatusOk) {
       initLayoutLayers(layoutPayload.layouts);
+      setProducts(productPayload.products);
       console.log('productPayload', productPayload);
     }
   }, []);
@@ -149,6 +157,7 @@ const MobileStoreLayout = () => {
           leafletLayers={leafletLayers}
           floorPlan={floorPlan}
           handleOpen={handleOpen}
+          products={products}
         />
         <PartitionProductModal
           openPartitionModal={openPartitionModal}

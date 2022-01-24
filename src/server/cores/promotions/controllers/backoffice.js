@@ -25,7 +25,6 @@ exports.getAllPromotions = async (req, res, next) => {
 
       const isDiscountBasedPromo =
         promotion_type === 'Basic' || promotion_type === 'Bundle';
-      let updatedProducts;
 
       if (isDiscountBasedPromo) {
         const { products, ...remainingAtts } = promotion;
@@ -327,7 +326,6 @@ exports.editPromotion = async (req, res, next) => {
                 .format('DD/MM/YYYY hh:mm A');
 
               const errMessage = `Product "${productName}" already has a ${currentPromoType.toLowerCase()} promotion applied on the chosen dates. The conflicted promotion "${promoName}" effective date is as follows: ${formattedStartDate} — ${formattedEndDate}`;
-              // const errMessage = `Product "${productName}" already has a ${currentPromoType.toLowerCase()} promotion applied on the chosen dates. Please refer to promotion "${promoName}" (${formattedStartDate} — ${formattedEndDate}) for further details`;
               errorMessages.push(errMessage);
             }
           }

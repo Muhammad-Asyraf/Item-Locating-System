@@ -1353,16 +1353,14 @@ const ProductForm = (props) => {
                       onDrop={onDrop}
                       onDragOver={(e) => e.preventDefault()}
                     >
-                      <Box style={{ width: '310px', height: '500px' }}>
-                        <ReactLogo />
-                        <div style={{ fontSize: '0.8rem', position: 'relative', top: -30 }}>
-                          Drop images here or click &nbsp;
-                          <span style={{ color: '#004C99', textDecoration: 'underline' }}>
-                            browse
-                          </span>
-                          &nbsp; to upload
-                        </div>
-                      </Box>
+                      <ReactLogo style={{ width: '100%' }} />
+                      <div style={{ fontSize: '0.8rem' }}>
+                        Drop images here or click &nbsp;
+                        <span style={{ color: '#004C99', textDecoration: 'underline' }}>
+                          browse
+                        </span>
+                        &nbsp; to upload
+                      </div>
                     </label>
 
                     <FormHelperText error={errors.image !== false}>

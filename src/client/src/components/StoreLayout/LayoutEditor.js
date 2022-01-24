@@ -464,7 +464,7 @@ const Editor = (props) => {
       mapRef.current.pm.disableGlobalRotateMode();
     }
 
-    if (key === 'Delete') {
+    if (key === 'Delete' || key === 'Backspace') {
       document.removeEventListener('mouseup', enableEdit);
       editedShapesRef.current.forEach(({ pm: { _shape }, pm, id }) => {
         const floorPaneShapes = floorShapes.includes(_shape);

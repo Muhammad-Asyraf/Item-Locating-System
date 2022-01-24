@@ -34,16 +34,6 @@ exports.findItem = async (req, res, next) => {
   try {
     const { uuid } = req.params;
 
-    // const test = await Item.query()
-    //   .findById(uuid)
-    //   .withGraphFetched('[products]')
-    //   .modifyGraph('products', (builder) => {
-    //     builder.where('store_uuid', '60db5d58-5905-4cd2-9d97-53225e58785b');
-    //     // builder.where('store_uuid', 'd9d75b4d-6bc8-4dc1-9d61-18cee50cb908');
-    //   });
-
-    // console.log('test', test);
-
     const item = await Item.query()
       .findById(uuid)
       .withGraphFetched('[sub_categories.category, images]')

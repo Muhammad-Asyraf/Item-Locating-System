@@ -45,6 +45,7 @@ const Viewer = (props) => {
   const floorLayers = useRef([]);
   const shelfLayers = useRef([]);
   const shelfPartitionLayers = useRef([]);
+  const selectedPartition = useRef([]);
   const storeViewport = [50, 50];
 
   const {
@@ -73,36 +74,34 @@ const Viewer = (props) => {
   };
 
   const initMarkers = () => {
-    if (markerGroupRef.current !== null) {
-      const map = mapRef.current;
-      const markerGroup = markerGroupRef.current;
+    const map = mapRef.current;
+    const markerGroup = markerGroupRef.current;
 
-      markerGroup.clearLayers();
-      map.removeLayer(markerGroup);
+    markerGroup.clearLayers();
+    map.removeLayer(markerGroup);
 
-      if (products.length > 0) {
-        const productsByLayer = groupBy(products, 'partitionUUID');
-        const selectedLayer = Object.keys(productsByLayer);
+    if (products.length > 0) {
+      const productsByLayer = groupBy(products, 'partition_uuid');
+      const selectedLayer = Object.keys(productsByLayer);
 
-        const { layers } = currentLayout;
+      const { layers } = currentLayout;
 
-        selectedLayer.forEach((uuid) => {
-          const layer = layers.find(({ uuid: layerUUID }) => layerUUID === uuid);
+      selectedLayer.forEach((uuid) => {
+        const layer = layers.find(({ uuid: layerUUID }) => layerUUID === uuid);
 
-          if (layer) {
-            const {
-              meta_data: { center },
-            } = layer;
+        if (layer) {
+          const {
+            meta_data: { center },
+          } = layer;
 
-            const latLng = Object.values(center);
-            const productQty = productsByLayer[uuid].length;
+          const latLng = Object.values(center);
+          const productQty = productsByLayer[uuid].length;
 
-            addLookupProductMarker(latLng, productQty);
-          }
-        });
+          addLookupProductMarker(latLng, productQty);
+        }
+      });
 
-        markerGroup.addTo(map);
-      }
+      markerGroup.addTo(map);
     }
   };
 
@@ -111,13 +110,23 @@ const Viewer = (props) => {
     const isShelfLayer = shelfShapes.includes(shape);
 
     if (isPartitionLayer) {
+      const locatedShelf = products.some(
+        ({ partition_uuid: partitionUUID }) => partitionUUID === layer.id
+      );
+
+      if (locatedShelf) {
+        layer.setStyle({ ...shelfPartitionStyles, fillColor: '#d7e75c' });
+        selectedPartition.current = [...selectedPartition.current, layer.id];
+      }
+
       layer._path.ontouchend = (e) => {
         e.preventDefault();
 
-        const layerProduct = products.filter(({ partition_uuid: partitionUUID }) => {
-          return partitionUUID === layer.id;
-        });
+        const layerProduct = products.filter(
+          ({ partition_uuid: partitionUUID }) => partitionUUID === layer.id
+        );
 
+        console.log('layerProduct', layerProduct);
         window.postMessage(JSON.stringify(layerProduct));
       };
     }
@@ -245,18 +254,34 @@ const Viewer = (props) => {
       const zoomlevel = map.getZoom();
       const adjustedZoomLevel = (zoomlevel - 2).toFixed(1);
 
+      console.log('selectedPartition.current', selectedPartition.current);
       if (adjustedZoomLevel >= 0.9) {
         shelfPartitionLayers.current.forEach((currentLayer) => {
           L.DomUtil.addClass(currentLayer._path, 'leaflet-interactive');
-          currentLayer.setStyle({ ...shelfPartitionStyles });
+
+          const locatedShelf = selectedPartition.current.includes(currentLayer.id);
+
+          if (locatedShelf) {
+            currentLayer.setStyle({ ...shelfPartitionStyles, fillColor: '#d7e75c' });
+          } else {
+            currentLayer.setStyle({ ...shelfPartitionStyles });
+          }
         });
       } else if (adjustedZoomLevel < 0.9) {
         shelfPartitionLayers.current.forEach((currentLayer) => {
           L.DomUtil.removeClass(currentLayer._path, 'leaflet-interactive');
-          currentLayer.setStyle({
-            ...shelfPartitionStyles,
-            weight: 0.5,
-          });
+
+          const locatedShelf = selectedPartition.current.includes(currentLayer.id);
+
+          if (locatedShelf) {
+            currentLayer.setStyle({
+              ...shelfPartitionStyles,
+              fillColor: '#d7e75c',
+              weight: 0.5,
+            });
+          } else {
+            currentLayer.setStyle({ ...shelfPartitionStyles, weight: 0.5 });
+          }
         });
       }
     });
@@ -267,15 +292,17 @@ const Viewer = (props) => {
     initCustomPane();
     initFloorPlan();
 
+    setZoomBehavior();
     loadLayers(leafletLayers);
 
-    setZoomBehavior();
     initMarkers();
 
     return () => {
       floorLayers.current = [];
       shelfLayers.current = [];
       shelfPartitionLayers.current = [];
+      selectedPartition.current = [];
+      markerGroupRef.current = null;
 
       mapRef.current.remove();
     };

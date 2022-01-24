@@ -10,7 +10,7 @@ exports.getProductsByCart = async (req, res, next) => {
 
     const planningCart = await PlanningCart.query()
       .findById(uuid)
-      .withGraphFetched('[products]')
+      .withGraphFetched('[products.[images]]')
       .modifyGraph('products', (builder) => {
         builder.where('store_uuid', storeUUID);
       });

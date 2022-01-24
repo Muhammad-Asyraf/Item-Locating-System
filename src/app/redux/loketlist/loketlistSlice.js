@@ -1,63 +1,62 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import axios from 'axios';
 
 // Environment configs
-import { environment } from "../../environment";
+import { environment } from '../../environment';
 
 export const loadAllItems = createAsyncThunk(
-  "loketlist/loadAllItems",
+  'loketlist/loadAllItems',
   async (params, thunkAPI) => {
-    const auth = thunkAPI.getState().auth
-    console.log(auth)
+    const header = await getAuthHeader();
+    console.log(auth);
     const { data } = await axios.get(
-      environment.host + "/api/mobile/planning-cart-service/cart/" + params,
-      auth.authHeader
+      environment.host + '/api/mobile/planning-cart-service/cart/' + params,
+      header
     );
     return data.products;
   }
 );
 
 export const addItem = createAsyncThunk(
-  "loketlist/addItem",
+  'loketlist/addItem',
   async (params, thunkAPI) => {
-    const auth = thunkAPI.getState().auth
-    console.log(auth)
+    const header = await getAuthHeader();
+    console.log(auth);
     const { data } = await axios.post(
-      environment.host + "/api/mobile/planning-cart-service/cart/items/add",
+      environment.host + '/api/mobile/planning-cart-service/cart/items/add',
       {
         cart_uuid: params.cart_uuid,
         product_uuid: params.product_uuid,
         quantity: params.quantity,
       },
-      auth.authHeader
+      header
     );
-    if (data === 1) console.log("Database updated");
+    if (data === 1) console.log('Database updated');
 
     return params;
   }
-)
+);
 
 export const changeItemQuantity = createAsyncThunk(
-  "loketlist/changeItemQuantity",
+  'loketlist/changeItemQuantity',
   async (params, thunkAPI) => {
-    const auth = thunkAPI.getState().auth
-    console.log(auth)
+    console.log(auth);
     const { data } = await axios.post(
-      environment.host + "/api/mobile/planning-cart-service/cart/items/update",
+      environment.host + '/api/mobile/planning-cart-service/cart/items/update',
       {
         cart_uuid: params.cart_uuid,
         product_uuid: params.product_uuid,
         quantity: params.quantity,
       },
-      auth.authHeader
+      header
     );
-    if (data === 1) console.log("Database updated");
+    if (data === 1) console.log('Database updated');
 
     return params;
   }
 );
 export const loketlistSlice = createSlice({
-  name: "loketlist",
+  name: 'loketlist',
   initialState: {
     products: [],
     quantity: [],
@@ -77,10 +76,10 @@ export const loketlistSlice = createSlice({
 
       // Check of the array index exists
       if (quantityArr[index] == null) {
-        console.log("Product quantity not exist, creating one");
+        console.log('Product quantity not exist, creating one');
         quantityArr.push(1);
       } else {
-        console.log("Product quantity exist, updating it");
+        console.log('Product quantity exist, updating it');
         quantityArr[index] += 1;
       }
 
@@ -106,11 +105,11 @@ export const loketlistSlice = createSlice({
 
       // If quantity == 0, remove product from array
       if (quantity === 0) {
-        console.log("Quantity is zero, removing records");
+        console.log('Quantity is zero, removing records');
         productArr.splice(index, 1);
         quantityArr.splice(index, 1);
       } else {
-        console.log("Product quantity exist, updating it");
+        console.log('Product quantity exist, updating it');
         quantityArr[index] = quantity;
       }
 
@@ -157,7 +156,7 @@ export const loketlistSlice = createSlice({
       let product = payload.product_uuid;
       let quantity = payload.quantity;
 
-      console.log("Product uuid: " + product + ` (${quantity})`);
+      console.log('Product uuid: ' + product + ` (${quantity})`);
 
       // Copy state
       let productArr = [...state.products];
@@ -168,11 +167,11 @@ export const loketlistSlice = createSlice({
 
       // If quantity == 0, remove product from array
       if (quantity === 0) {
-        console.log("Quantity is zero, removing records");
+        console.log('Quantity is zero, removing records');
         productArr.splice(index, 1);
         quantityArr.splice(index, 1);
       } else {
-        console.log("Product quantity exist, updating it");
+        console.log('Product quantity exist, updating it');
         quantityArr[index] = quantity;
       }
 
@@ -183,7 +182,7 @@ export const loketlistSlice = createSlice({
       console.log(state);
     },
     [changeItemQuantity.rejected]: (state, { payload }) => {
-      console.log("changeItemQuantity rejected");
+      console.log('changeItemQuantity rejected');
     },
     [addItem.fulfilled]: (state, { payload }) => {
       // Place productId to a variable
@@ -196,17 +195,17 @@ export const loketlistSlice = createSlice({
       // Get the index of the product
       let index = state.products.indexOf(product);
 
-      if(index == -1){
-        productArr.push(product)
+      if (index == -1) {
+        productArr.push(product);
         index = state.products.indexOf(product);
       }
 
       // Check of the array index exists
       if (quantityArr[index] == null) {
-        console.log("Product quantity not exist, creating one");
+        console.log('Product quantity not exist, creating one');
         quantityArr.push(1);
       } else {
-        console.log("Product quantity exist, updating it");
+        console.log('Product quantity exist, updating it');
         quantityArr[index] += 1;
       }
 
@@ -215,9 +214,10 @@ export const loketlistSlice = createSlice({
       state.quantity = quantityArr;
 
       console.log(state);
-    }
+    },
   },
 });
-export const { addProduct, updateQuantity, removeProduct } = loketlistSlice.actions;
+export const { addProduct, updateQuantity, removeProduct } =
+  loketlistSlice.actions;
 
 export default loketlistSlice.reducer;

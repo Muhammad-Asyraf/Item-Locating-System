@@ -9,6 +9,7 @@ import Loading from '../components/Loading';
 
 // Utilities
 import axios from 'axios';
+import { getAuthHeader } from '../services/AuthenticationService';
 
 // Redux
 import { useSelector, useDispatch } from 'react-redux';
@@ -26,9 +27,8 @@ export default function Cart({ navigation }) {
   const [totalPrice, setTotalPrice] = useState(0);
 
   const cart = useSelector((state) => state.cart);
-  const { authHeader } = useSelector((state) => state.auth);
-  const dispatch = useDispatch();
   const { default_cart_uuid } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
 
   // Create a data list
   const [DATA, setData] = useState([]);
@@ -39,11 +39,12 @@ export default function Cart({ navigation }) {
       console.log('Reload? : ' + isLoading);
 
       const fetchProducts = async () => {
+        const header = await getAuthHeader();
         const { data } = await axios.get(
           environment.host +
             '/api/mobile/planning-cart-service/cart/' +
             default_cart_uuid,
-          authHeader
+          header
         );
         let DATA = [];
         for (i = 0; i < cart.products.length; i++) {

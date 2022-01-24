@@ -1,60 +1,44 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
-import {addItemReducer, updateItemReducer} from './cartReducers'
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import axios from 'axios';
+import { addItemReducer, updateItemReducer } from './cartReducers';
+import { addItemThunk } from '../cart/cartThunk';
+import { getAuthHeader } from '../../services/AuthenticationService';
 
 // Environment configs
-import { environment } from "../../environment";
+import { environment } from '../../environment';
 
 export const loadAllItems = createAsyncThunk(
-  "cart/loadAllItems",
+  'cart/loadAllItems',
   async (params, thunkAPI) => {
-    const auth = thunkAPI.getState().auth
+    const header = await getAuthHeader();
     const { data } = await axios.get(
-      environment.host + "/api/mobile/planning-cart-service/cart/" + params, auth.authHeader
+      environment.host + '/api/mobile/planning-cart-service/cart/' + params,
+      header
     );
     return data.products;
   }
 );
 
-export const addItem = createAsyncThunk(
-  "cart/addItem",
-  async (params, thunkAPI) => {
-    const auth = thunkAPI.getState().auth
-    const { data } = await axios.post(
-      environment.host + "/api/mobile/planning-cart-service/cart/items/add",
-      {
-        cart_uuid: params.cart_uuid,
-        product_uuid: params.product_uuid,
-        quantity: params.quantity,
-      },
-      auth.authHeader
-    );
-    if (data === 1) console.log("Database updated");
-
-    return params;
-  }
-)
-
 export const changeItemQuantity = createAsyncThunk(
-  "cart/changeItemQuantity",
+  'cart/changeItemQuantity',
   async (params, thunkAPI) => {
-    const auth = thunkAPI.getState().auth
+    const header = await getAuthHeader();
     const { data } = await axios.post(
-      environment.host + "/api/mobile/planning-cart-service/cart/items/update",
+      environment.host + '/api/mobile/planning-cart-service/cart/items/update',
       {
         cart_uuid: params.cart_uuid,
         product_uuid: params.product_uuid,
         quantity: params.quantity,
       },
-      auth.authHeader
+      header
     );
-    if (data === 1) console.log("Database updated");
+    if (data === 1) console.log('Database updated');
 
     return params;
   }
 );
 export const cartSlice = createSlice({
-  name: "cart",
+  name: 'cart',
   initialState: {
     products: [],
     quantity: [],
@@ -62,8 +46,12 @@ export const cartSlice = createSlice({
   },
   // Local reducers
   reducers: {
-    addProduct: (state, { payload }) => { addItemReducer(state, payload) },
-    updateQuantity: (state, { payload }) => { updateItemReducer(state, payload) },
+    addProduct: (state, { payload }) => {
+      addItemReducer(state, payload);
+    },
+    updateQuantity: (state, { payload }) => {
+      updateItemReducer(state, payload);
+    },
     removeProduct: (state, { payload }) => {
       // Place productId to a variable
       let product = payload;
@@ -81,8 +69,8 @@ export const cartSlice = createSlice({
       }
     },
     update: (state, { payload }) => {
-      state.update = payload
-    }
+      state.update = payload;
+    },
   },
   // Async reducers
   extraReducers: {
@@ -99,13 +87,21 @@ export const cartSlice = createSlice({
       state.quantity = quantityArr;
       console.log(state);
     },
-    [changeItemQuantity.fulfilled]: (state, { payload }) => { updateItemReducer(state, payload)},
-    [changeItemQuantity.rejected]: (state, { payload }) => {
-      console.log("changeItemQuantity rejected");
+    [changeItemQuantity.fulfilled]: (state, { payload }) => {
+      updateItemReducer(state, payload);
     },
-    [addItem.fulfilled]: (state, { payload }) => { addItemReducer(state, payload) }
+    [changeItemQuantity.rejected]: (state, { payload }) => {
+      console.log('changeItemQuantity rejected');
+    },
+    [addItemThunk.fulfilled]: (state, { payload }) => {
+      addItemReducer(state, payload);
+    },
+    [addItemThunk.rejected]: (state, { payload }) => {
+      console.log(payload);
+    },
   },
 });
-export const { addProduct, updateQuantity, removeProduct, update } = cartSlice.actions;
+export const { addProduct, updateQuantity, removeProduct, update } =
+  cartSlice.actions;
 
 export default cartSlice.reducer;

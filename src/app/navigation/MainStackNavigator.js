@@ -10,6 +10,8 @@ import ProfileEdit from '../screens/ProfileEdit';
 import ProductDetails from '../screens/ProductDetails';
 import CategoryList from '../screens/CategoryList';
 import StoreDetails from '../screens/StoreDetails';
+import CampaignDetails from '../screens/CampaignDetails';
+import CampaignProducts from '../screens/CampaignProducts';
 
 // Utilities
 import auth from '@react-native-firebase/auth';
@@ -221,6 +223,9 @@ export default function MainStackNavigator() {
       {/* <Stack.Screen name="Subcategories" component={CategoryList} /> */}
       {/* Profiles */}
       <Stack.Screen name="Edit Profile" component={ProfileEdit} />
+      {/* Campaigns */}
+      <Stack.Screen name="Campaign" component={CampaignDetails} />
+      <Stack.Screen name="Campaign Products" component={CampaignProducts} />
     </Stack.Navigator>
   );
 }

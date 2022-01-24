@@ -21,8 +21,12 @@ import CategoryCard from '../components/products/CategoryCard';
 import StoreCard from '../components/stores/StoreCard';
 
 // Utilities
+import { getImage } from '../services/BackendService';
 import { getCategories } from '../services/ProductService';
 import { getStores } from '../services/StoreService';
+import { getAllCampaigns } from '../services/CampaignService';
+
+import { environment } from '../environment';
 
 // Styling
 import { Theme, GlobalStyle, TextStyle } from '../styles/Theme';
@@ -32,10 +36,17 @@ export default function Home({ navigation }) {
   const [isLoading, setLoading] = useState(true);
   const [categories, setCategories] = useState([]);
   const [stores, setStores] = useState([]);
-  const [banners, setBanners] = useState([1, 2, 3]);
+  const [banners, setBanners] = useState([]);
 
   useEffect(() => {
     if (isLoading) {
+      getAllCampaigns()
+        .then((data) => {
+          setBanners(data);
+        })
+        .catch((error) => {
+          console.log(`[Home.js/useEffect] ${error}`);
+        });
       getCategories()
         .then((data) => {
           setCategories(data.slice(0, 9));
@@ -69,7 +80,15 @@ export default function Home({ navigation }) {
     navigation.dangerouslyGetParent().navigate('Categories');
   };
 
+  // Open store list screen
   const viewStores = () => {};
+
+  const viewCampaign = (campaign) => {
+    // console.log(
+    //   `[Home.js/viewCampaign] Campaign object : ${JSON.stringify(campaign)}`
+    // );
+    navigation.dangerouslyGetParent().navigate('Campaign', { campaign });
+  };
 
   return (
     <View style={GlobalStyle.screenContainer}>
@@ -103,24 +122,29 @@ export default function Home({ navigation }) {
           />
         }
       >
-        <Carousel
-          containerCustomStyle={styles.carousel}
-          sliderWidth={screenWidth}
-          itemWidth={screenWidth - 40}
-          data={banners}
-          renderItem={({ item }, parallaxProps) => (
-            <View style={styles.item}>
-              <ParallaxImage
-                source={{ uri: 'https://via.placeholder.com/670x320' }}
-                containerStyle={styles.imageContainer}
-                style={styles.image}
-                parallaxFactor={0.1}
-                {...parallaxProps}
-              />
-            </View>
-          )}
-          hasParallaxImages={true}
-        />
+        {banners.length != 0 && (
+          <Carousel
+            containerCustomStyle={styles.carousel}
+            sliderWidth={screenWidth}
+            itemWidth={screenWidth - 40}
+            data={banners}
+            renderItem={({ item }, parallaxProps) => (
+              <TouchableOpacity
+                style={styles.item}
+                onPress={() => viewCampaign(item)}
+              >
+                <ParallaxImage
+                  source={{ uri: `${environment.host}${item.banner_ad_path}` }}
+                  containerStyle={styles.imageContainer}
+                  style={styles.image}
+                  parallaxFactor={0.1}
+                  {...parallaxProps}
+                />
+              </TouchableOpacity>
+            )}
+            hasParallaxImages={true}
+          />
+        )}
         {/* Horizontal list mockup */}
         <View style={styles.horizontalProductContainer}>
           <View style={styles.horizontalTitleContainer}>

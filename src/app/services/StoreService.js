@@ -65,3 +65,17 @@ export const getProductsForStore = async (uuid, type) => {
     return Promise.reject(error.response.data.message);
   }
 };
+
+export const getCampaignsForStore = async (uuid) => {
+  const header = await getAuthHeader();
+  try {
+    const { data } = await axiosInstance.get(
+      `/api/mobile/store-service/stores/${uuid}/campaigns`,
+      header
+    );
+
+    return data;
+  } catch (error) {
+    return Promise.reject(error.response.data.message);
+  }
+};

@@ -5,6 +5,7 @@ import {
   View,
   FlatList,
   StyleSheet,
+  TouchableOpacity,
 } from 'react-native';
 import { Searchbar, Text } from 'react-native-paper';
 import AppbarScreen from '../components/core/AppbarScreen';
@@ -14,7 +15,13 @@ import Carousel, { ParallaxImage } from 'react-native-snap-carousel';
 import { FlatGrid } from 'react-native-super-grid';
 
 // Utilities
-import { getProductsForStore } from '../services/StoreService';
+import {
+  getProductsForStore,
+  getCampaignsForStore,
+} from '../services/StoreService';
+
+// Configurations
+import { environment } from '../environment';
 
 //Styling
 import { Theme, GlobalStyle, TextStyle, AppbarStyle } from '../styles/Theme';
@@ -25,9 +32,10 @@ export default function StoreDetails({ navigation, route }) {
   const [isLoading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [catalogProducts, setCatalogProducts] = useState({});
+  const [campaigns, setCampaigns] = useState([]);
 
   useEffect(() => {
-    const fetchProducts = async () => {
+    const fetchData = async () => {
       if (isLoading) {
         // Load all store data
         try {
@@ -39,6 +47,10 @@ export default function StoreDetails({ navigation, route }) {
           let fetchedProducts = { promotional, bitl };
 
           setCatalogProducts({ ...catalogProducts, ...fetchedProducts });
+
+          let campaigns = await getCampaignsForStore(store.uuid);
+
+          setCampaigns(campaigns);
 
           //   console.log(
           //     `[StoreDetails.js/useEffect] catalogProducts : ${JSON.stringify(
@@ -52,7 +64,7 @@ export default function StoreDetails({ navigation, route }) {
       }
     };
 
-    fetchProducts();
+    fetchData();
     // console.log(
     //   `[StoreDetails.js/useEffect] catalogProducts : ${JSON.stringify(
     //     catalogProducts
@@ -69,30 +81,41 @@ export default function StoreDetails({ navigation, route }) {
     });
   };
 
+  const viewCampaign = (campaign) => {
+    navigation.navigate('Campaign', { campaign });
+  };
+
   return (
     <AppbarScreen name={store.store_name}>
       {isLoading ? (
         <Loading message="Loading store catalog" />
       ) : (
         <ScrollView>
-          <Carousel
-            containerCustomStyle={styles.carousel}
-            sliderWidth={screenWidth}
-            itemWidth={screenWidth - 40}
-            data={[0, 1, 2]}
-            renderItem={({ item }, parallaxProps) => (
-              <View style={styles.item}>
-                <ParallaxImage
-                  source={{ uri: 'https://via.placeholder.com/670x320' }}
-                  containerStyle={styles.imageContainer}
-                  style={styles.image}
-                  parallaxFactor={0.1}
-                  {...parallaxProps}
-                />
-              </View>
-            )}
-            hasParallaxImages={true}
-          />
+          {campaigns != 0 && (
+            <Carousel
+              containerCustomStyle={styles.carousel}
+              sliderWidth={screenWidth}
+              itemWidth={screenWidth - 40}
+              data={campaigns}
+              renderItem={({ item }, parallaxProps) => (
+                <TouchableOpacity
+                  style={styles.item}
+                  onPress={() => viewCampaign(item)}
+                >
+                  <ParallaxImage
+                    source={{
+                      uri: `${environment.host}${item.banner_ad_path}`,
+                    }}
+                    containerStyle={styles.imageContainer}
+                    style={styles.image}
+                    parallaxFactor={0.1}
+                    {...parallaxProps}
+                  />
+                </TouchableOpacity>
+              )}
+              hasParallaxImages={true}
+            />
+          )}
           <View>
             <Searchbar
               style={styles.searchBar}

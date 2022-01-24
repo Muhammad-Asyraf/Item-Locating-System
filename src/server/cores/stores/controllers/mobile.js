@@ -1,4 +1,5 @@
 const Store = require('../model');
+const Campaign = require('../../marketing_campaigns/model');
 const Category = require('../../categories/model');
 const SubCategory = require('../../categories/sub_categories/model');
 const Product = require('../../products/model');
@@ -39,6 +40,19 @@ exports.getStoreProducts = async (req, res, next) => {
     res.json(products);
   } catch (err) {
     storeLogger.warn(`Error getting store's products`);
+    next(err);
+  }
+};
+
+exports.getStoreCampaigns = async (req, res, next) => {
+  try {
+    const uuid = req.params.uuid;
+    let campaigns = await Campaign.query()
+      .where('store_uuid', uuid)
+      .withGraphFetched('store');
+    res.json(campaigns);
+  } catch (err) {
+    storeLogger.warn(`Error retrieving store's campaigns`);
     next(err);
   }
 };

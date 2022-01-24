@@ -12,6 +12,17 @@ const axiosInstance = axios.create({
   baseURL: environment.host,
 });
 
+export const getImage = async (publicURL) => {
+  const header = await getAuthHeader();
+  try {
+    let { data } = await axiosInstance.get(publicURL);
+
+    return data;
+  } catch (error) {
+    return Promise.reject(error.response.data.message);
+  }
+};
+
 /**
  * User API
  */

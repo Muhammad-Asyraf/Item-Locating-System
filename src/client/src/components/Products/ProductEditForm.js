@@ -13,6 +13,10 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 
+import FormControl from '@mui/material/FormControl';
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
+import InputLabel from '@mui/material/InputLabel';
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
 import Card from '@mui/material/Card';
@@ -158,6 +162,10 @@ const useStyles = makeStyles((theme) => ({
   },
   customHoverFocus: {
     '&:hover, &.Mui-focusVisible': { backgroundColor: ' rgba(0, 0, 0, 0.05) !important' },
+  },
+  stockPaper: {
+    boxShadow:
+      '0px 3px 3px -2px rgba(0,0,0,0.2),0px 3px 4px 0px rgba(0,0,0,0.14),0px 1px 8px 0px rgba(0,0,0,0.12) !important',
   },
 }));
 
@@ -614,7 +622,7 @@ const ProductForm = (props) => {
     setErrors(updatedError);
   };
 
-  const onSelectStockStatus = (e, value) => {
+  const onSelectStockStatus = ({ target: { value } }) => {
     setSelectedStockStatus(value);
     const updatedError = validateStockStatus(value, errors);
     setErrors(updatedError);
@@ -1038,53 +1046,47 @@ const ProductForm = (props) => {
                   </FormHelperText>
                 </Grid>
                 <Grid item xs={12}>
-                  <Autocomplete
-                    disablePortal
-                    id="stock-select"
-                    options={['In Stock', 'Low Stock', 'Out of Stock']}
-                    sx={{ width: '100%' }}
-                    defaultValue={currentProduct.stock_status}
-                    onChange={onSelectStockStatus}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        label="Stock Status"
-                        inputProps={{
-                          ...params.inputProps,
-                          style: { textAlign: 'right' },
-                        }}
-                        InputProps={{
-                          ...params.InputProps,
-                          startAdornment: (
-                            <>
-                              <InputAdornment position="start">
-                                {selectedStockStatus ? (
-                                  <Chip
-                                    label={selectedStockStatus}
-                                    style={{
-                                      fontWeight: 'bold',
-                                      paddingRight: 45,
-                                      paddingLeft: 30,
-                                      color: 'white',
-                                      backgroundColor:
-                                        selectedStockStatus === 'In Stock'
-                                          ? '#39A388'
-                                          : selectedStockStatus === 'Low Stock'
-                                          ? '#F0A500'
-                                          : '#FF5151',
-                                    }}
-                                  />
-                                ) : (
-                                  ''
-                                )}
-                              </InputAdornment>
-                              {params.InputProps.startAdornment}
-                            </>
-                          ),
-                        }}
-                      />
-                    )}
-                  />
+                  <FormControl fullWidth>
+                    <InputLabel id="select-stock-status-label">Stock Status</InputLabel>
+                    <Select
+                      labelId="select-stock-status-label"
+                      id="select-stock-status"
+                      label="Stock Status"
+                      onChange={onSelectStockStatus}
+                      value={selectedStockStatus}
+                      style={{ height: '56px' }}
+                      MenuProps={{
+                        PopoverClasses: {
+                          paper: classes.stockPaper,
+                        },
+                      }}
+                      renderValue={(selected) => (
+                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                          <Chip
+                            label={selected}
+                            style={{
+                              fontWeight: 'bold',
+                              paddingRight: 45,
+                              paddingLeft: 30,
+                              color: 'white',
+                              backgroundColor:
+                                selectedStockStatus === 'In Stock'
+                                  ? '#39A388'
+                                  : selectedStockStatus === 'Low Stock'
+                                  ? '#F0A500'
+                                  : '#FF5151',
+                            }}
+                          />
+                        </Box>
+                      )}
+                    >
+                      {['In Stock', 'Low Stock', 'Out of Stock'].map((status) => (
+                        <MenuItem key={status} value={status}>
+                          {status}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
                   <FormHelperText error={errors.stock !== false}>
                     {errors.stock ? errors.stock : null}
                   </FormHelperText>

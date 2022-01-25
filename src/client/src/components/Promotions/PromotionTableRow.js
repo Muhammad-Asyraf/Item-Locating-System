@@ -147,7 +147,6 @@ const PromotionTableRow = (props) => {
     return render;
   };
 
-  console.log('promotion', promotion);
   return (
     <>
       <TableRow

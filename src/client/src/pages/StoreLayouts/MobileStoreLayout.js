@@ -4,9 +4,11 @@ import { useSearchParams, useParams } from 'react-router-dom';
 
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
-import TextField from '@mui/material/TextField';
-import Autocomplete from '@mui/material/Autocomplete';
 import LinearProgress from '@mui/material/LinearProgress';
+import FormControl from '@mui/material/FormControl';
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
+import InputLabel from '@mui/material/InputLabel';
 
 import { makeStyles } from '@mui/styles';
 
@@ -39,12 +41,17 @@ const useStyles = makeStyles(() => ({
   },
   layoutDropdown: {
     position: 'absolute ',
-    top: 10,
+    top: 15,
     right: 10,
     zIndex: '450',
     width: '32vw',
     backgroundColor: 'white',
     borderRadius: 5,
+  },
+  paper: {
+    right: '10px !important',
+    boxShadow:
+      '0px 3px 3px -2px rgba(0,0,0,0.2),0px 3px 4px 0px rgba(0,0,0,0.14),0px 1px 8px 0px rgba(0,0,0,0.12) !important',
   },
 }));
 
@@ -112,7 +119,9 @@ const MobileStoreLayout = () => {
     }
   }, []);
 
-  const handleChangeLayout = async (e, selectedLayout) => {
+  const handleChangeLayout = async ({ target: { value: selectedLayout } }) => {
+    // const handleChangeLayout = async (e, selectedLayout) => {
+
     const { layers, floor_plan_path: path } = selectedLayout;
 
     if (path) {
@@ -142,7 +151,29 @@ const MobileStoreLayout = () => {
     <Grid container justifyContent="center" alignItems="center">
       <Grid item xs={12}>
         <Box className={classes.layoutDropdown}>
-          <Autocomplete
+          <FormControl fullWidth>
+            <InputLabel id="select-layout-label">Layout</InputLabel>
+            <Select
+              labelId="select-layout-label"
+              id="select-layout"
+              value={currentLayout}
+              label="Layout"
+              onChange={handleChangeLayout}
+              style={{ height: '45px' }}
+              MenuProps={{
+                PopoverClasses: {
+                  paper: classes.paper,
+                },
+              }}
+            >
+              {layouts.map((layout) => (
+                <MenuItem key={layout.uuid} value={layout}>
+                  {layout.label}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          {/* <Autocomplete
             disablePortal
             disableClearable
             options={layouts}
@@ -150,7 +181,7 @@ const MobileStoreLayout = () => {
             renderInput={(params) => <TextField {...params} size="small" />}
             onChange={handleChangeLayout}
             value={currentLayout}
-          />
+          /> */}
         </Box>
         <LayoutProductViewer
           leafletRef={leafletRef}

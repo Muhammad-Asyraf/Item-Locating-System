@@ -14,7 +14,7 @@ import { makeStyles } from '@mui/styles';
 
 import '../../../assets/css/leafletOverride.css';
 import {
-  mapBounds,
+  // mapBounds,
   floorPlanBounds,
   mapComponent,
   mapDefaultConfig,
@@ -73,6 +73,12 @@ const Viewer = (props) => {
     markerGroup.addLayer(marker);
   };
 
+  window.addEventListener('message', (message) => {
+    console.log('message', message.data);
+    // const partitionViewport = JSON.parse(message);
+    // mapRef.current.flyTo(partitionViewport, 3);
+  });
+
   const initMarkers = () => {
     const map = mapRef.current;
     const markerGroup = markerGroupRef.current;
@@ -126,7 +132,6 @@ const Viewer = (props) => {
           ({ partition_uuid: partitionUUID }) => partitionUUID === layer.id
         );
 
-        console.log('layerProduct', layerProduct);
         window.postMessage(JSON.stringify(layerProduct));
       };
     }
@@ -218,8 +223,9 @@ const Viewer = (props) => {
   };
 
   const initMap = () => {
-    const map = L.map('map', mapDefaultConfig).setView(storeViewport, 3);
-    map.fitBounds(mapBounds);
+    const map = L.map('map', mapDefaultConfig).setView(storeViewport, 4.5);
+    map.flyTo(storeViewport, 3);
+    // map.fitBounds(mapBounds);
 
     leafletRef.current = { map, leaflet: L };
     mapRef.current = map;
@@ -254,7 +260,6 @@ const Viewer = (props) => {
       const zoomlevel = map.getZoom();
       const adjustedZoomLevel = (zoomlevel - 2).toFixed(1);
 
-      console.log('selectedPartition.current', selectedPartition.current);
       if (adjustedZoomLevel >= 0.9) {
         shelfPartitionLayers.current.forEach((currentLayer) => {
           L.DomUtil.addClass(currentLayer._path, 'leaflet-interactive');
@@ -292,8 +297,8 @@ const Viewer = (props) => {
     initCustomPane();
     initFloorPlan();
 
-    setZoomBehavior();
     loadLayers(leafletLayers);
+    setZoomBehavior();
 
     initMarkers();
 

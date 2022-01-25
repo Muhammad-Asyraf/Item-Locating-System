@@ -21,107 +21,89 @@ exports.getAllPromotions = async (req, res, next) => {
     // })
 
     const updatedPromotions = promotions.map((promotion) => {
-      const { promotion_type } = promotion;
+      const {
+        promotion_type,
+        products,
+        meta_data: { discount, discountType },
+      } = promotion;
 
       const isDiscountBasedPromo =
         promotion_type === 'Basic' || promotion_type === 'Bundle';
 
-      if (isDiscountBasedPromo) {
-        const { products, ...remainingAtts } = promotion;
-        const {
-          meta_data: { discount, discountType },
-        } = promotion;
-        0;
+      const updatedProducts = products.map((product) => {
+        const { retail_price: retailPrice, promotions } = product;
+        let sale_price;
 
-        const updatedProducts = products.map((product) => {
-          const { retail_price: retailPrice } = product;
-
+        if (isDiscountBasedPromo) {
           if (discountType.percentage_off_checked) {
             saving = (parseFloat(discount) / 100) * parseFloat(retailPrice);
           } else {
             saving = parseFloat(discount);
           }
+          sale_price = parseFloat(retailPrice) - saving;
+        }
 
-          salePrice = parseFloat(retailPrice) - saving;
+        const updatedPromotion = promotions.map((promotion) => {
+          const { start_date, end_date, promotion_type } = promotion;
+          let sale_price;
 
-          return {
-            ...product,
-            sale_price: salePrice,
-          };
-        });
+          const currentDateTime = new Date().getTime();
+          const startDateTime = new Date(start_date).getTime();
+          const endDateTime = new Date(end_date).getTime();
 
-        // update promo relation of each products
-        const updatedProducts2 = updatedProducts.map((product) => {
-          const { promotions, retail_price, ...remainingAtts } = product;
+          const activePromotion =
+            currentDateTime >= startDateTime && currentDateTime <= endDateTime;
+          const scheduledPromotion =
+            currentDateTime <= startDateTime && currentDateTime <= endDateTime;
+          const expiredPromotion =
+            currentDateTime >= startDateTime && currentDateTime >= endDateTime;
 
-          const updatedPromotion = promotions.map((promotion) => {
-            const { start_date, end_date, promotion_type } = promotion;
-            let sale_price;
+          let promotion_status;
 
-            const currentDateTime = new Date().getTime();
-            const startDateTime = new Date(start_date).getTime();
-            const endDateTime = new Date(end_date).getTime();
+          if (activePromotion) {
+            promotion_status = 'active';
+          } else if (scheduledPromotion) {
+            promotion_status = 'scheduled';
+          } else if (expiredPromotion) {
+            promotion_status = 'expired';
+          }
 
-            const activePromotion =
-              currentDateTime >= startDateTime &&
-              currentDateTime <= endDateTime;
-            const scheduledPromotion =
-              currentDateTime <= startDateTime &&
-              currentDateTime <= endDateTime;
-            const expiredPromotion =
-              currentDateTime >= startDateTime &&
-              currentDateTime >= endDateTime;
+          const isDiscountBasedPromo =
+            promotion_type === 'Basic' || promotion_type === 'Bundle';
 
-            let promotion_status;
+          if (isDiscountBasedPromo) {
+            const {
+              meta_data: { discount, discountType },
+            } = promotion;
+            let saving;
 
-            if (activePromotion) {
-              promotion_status = 'active';
-            } else if (scheduledPromotion) {
-              promotion_status = 'scheduled';
-            } else if (expiredPromotion) {
-              promotion_status = 'expired';
+            if (discountType.percentage_off_checked) {
+              saving = (parseFloat(discount) / 100) * parseFloat(retailPrice);
+            } else {
+              saving = parseFloat(discount);
             }
 
-            const isDiscountBasedPromo =
-              promotion_type === 'Basic' || promotion_type === 'Bundle';
-
-            if (isDiscountBasedPromo) {
-              const {
-                meta_data: { discount, discountType },
-              } = promotion;
-              let saving;
-
-              if (discountType.percentage_off_checked) {
-                saving =
-                  (parseFloat(discount) / 100) * parseFloat(retail_price);
-              } else {
-                saving = parseFloat(discount);
-              }
-
-              sale_price = parseFloat(retail_price) - saving;
-            }
-
-            return {
-              ...promotion,
-              promotion_status,
-              sale_price,
-            };
-          });
+            sale_price = parseFloat(retailPrice) - saving;
+          }
 
           return {
-            ...remainingAtts,
-            retail_price,
-            promotions: updatedPromotion,
+            ...promotion,
+            promotion_status,
+            sale_price,
           };
         });
 
         return {
-          ...remainingAtts,
-          products: updatedProducts2,
+          ...product,
+          sale_price,
+          promotions: updatedPromotion,
         };
-      }
+      });
 
-      return promotion;
+      return {
+        ...promotion,
+        products: updatedProducts,
+      };
     });
 
     promotionLogger.info(
@@ -486,6 +468,71 @@ exports.editPromotion = async (req, res, next) => {
 //     res.json('test');
 //   } catch (err) {
 //     promotionLogger.warn(`Error saving product's mapping`);
+//     next(err);
+//   }
+// };
+
+// exports.getAllPromotions = async (req, res, next) => {
+//   try {
+//     const { store_uuid } = req.params;
+//     const promotions = await Promotion.query()
+//       .where('store_uuid', store_uuid)
+//       .withGraphFetched(
+//         '[products, products.[images, sub_categories, promotions], campaign]'
+//       );
+
+//     // .modifyGraph('images', (builder) => {
+//     //   builder.select('path');
+//     // })
+//     // .modifyGraph('sub_categories.category', (builder) => {
+//     //   builder.select('uuid', 'name');
+//     // })
+
+//     const updatedPromotions = promotions.map((promotion) => {
+//       const { promotion_type } = promotion;
+//       let updatedProducts;
+
+//       const isDiscountBasedPromo =
+//         promotion_type === 'Basic' || promotion_type === 'Bundle';
+
+//       if (isDiscountBasedPromo) {
+//         const { products, ...remainingAtts } = promotion;
+//         const {
+//           meta_data: { discount, discountType },
+//         } = promotion;
+
+//         updatedProducts = products.map((product) => {
+//           const { retail_price: retailPrice } = product;
+
+//           if (discountType.percentage_off_checked) {
+//             saving = (parseFloat(discount) / 100) * parseFloat(retailPrice);
+//           } else {
+//             saving = parseFloat(discount);
+//           }
+
+//           salePrice = parseFloat(retailPrice) - saving;
+
+//           return {
+//             ...product,
+//             sale_price: salePrice,
+//           };
+//         });
+
+//         return {
+//           ...remainingAtts,
+//           products: updatedProducts,
+//         };
+//       }
+
+//       return promotion;
+//     });
+
+//     promotionLogger.info(
+//       `Successfully retrieve: ${promotions.length} promotions`
+//     );
+//     res.json(updatedPromotions);
+//   } catch (err) {
+//     promotionLogger.warn(`Error retrieving all promotions`);
 //     next(err);
 //   }
 // };

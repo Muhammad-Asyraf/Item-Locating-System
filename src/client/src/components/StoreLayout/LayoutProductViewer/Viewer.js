@@ -54,7 +54,7 @@ const Viewer = (props) => {
   const shelfLayers = useRef([]);
   const shelfPartitionLayers = useRef([]);
   const selectedPartition = useRef([]);
-  const storeViewport = [50, 50];
+  const storeViewport = useRef([50, 50]);
 
   const {
     floor: { config: floorConfig },
@@ -71,7 +71,7 @@ const Viewer = (props) => {
   const shelfPartitionShapes = shelfPartitionConfig.shapes;
 
   const reCenter = () => {
-    mapRef.current.flyTo(storeViewport, 3.5);
+    mapRef.current.flyTo(storeViewport.current, 3.5);
   };
 
   const addLookupProductMarker = (latLng, number) => {
@@ -80,40 +80,6 @@ const Viewer = (props) => {
     const marker = L.marker(latLng, { icon: icons.red.numbers[number] });
     markerGroup.addLayer(marker);
   };
-
-  // window.postMessage({"type":"flyTo","product_uuid":"1849f27e-b797-4c46-8138-9f34d3889c9c"});
-  // window.postMessage({"type":"flyTo","product_uuid":"4ec1bc3b-acea-4ef3-abfc-abca990c90c1"});
-  window.addEventListener('message', (message) => {
-    const {
-      data: { type, product_uuid },
-    } = message;
-
-    console.log('layouts', layouts);
-    console.log('handleChangeLayout', handleChangeLayout);
-    console.log('currentLayout', currentLayout);
-
-    if (type && type === 'flyTo') {
-      console.log('type', type);
-      console.log('uuid', product_uuid);
-
-      const currentProduct = products.find(({ uuid }) => uuid === product_uuid);
-      const {
-        layer: {
-          layout_uuid,
-          meta_data: { center },
-        },
-      } = currentProduct;
-
-      if (layout_uuid !== currentLayout.uuid) {
-        console.log('dfjsdhfkljsdf');
-      }
-
-      console.log('currentProduct', currentProduct);
-      console.log('center', Object.values(center));
-
-      mapRef.current.flyTo([50, 50], 3);
-    }
-  });
 
   const initMarkers = () => {
     const map = mapRef.current;
@@ -265,8 +231,8 @@ const Viewer = (props) => {
   };
 
   const initMap = () => {
-    const map = L.map('map', mapDefaultConfig).setView(storeViewport, 4.5);
-    map.flyTo(storeViewport, 3);
+    const map = L.map('map', mapDefaultConfig).setView(storeViewport.current, 4);
+    map.flyTo(storeViewport.current, 3);
     // map.fitBounds(mapBounds);
 
     leafletRef.current = { map, leaflet: L };
@@ -334,6 +300,35 @@ const Viewer = (props) => {
     });
   };
 
+  // window.postMessage({"type":"flyTo","product_uuid":"1849f27e-b797-4c46-8138-9f34d3889c9c"});
+  // window.postMessage({"type":"flyTo","product_uuid":"4ec1bc3b-acea-4ef3-abfc-abca990c90c1"});
+  // window.postMessage({"type":"flyTo","product_uuid":"1fccd063-a832-4e7f-b563-8a8ace44f877"});
+  const handleMessage = (message) => {
+    const {
+      data: { type, product_uuid },
+    } = message;
+
+    if (type && type === 'flyTo') {
+      const currentProduct = products.find(({ uuid }) => uuid === product_uuid);
+      const {
+        layer: {
+          layout_uuid,
+          meta_data: { center },
+        },
+      } = currentProduct;
+      const productViewport = Object.values(center);
+
+      if (layout_uuid !== currentLayout.uuid) {
+        const correctLayout = layouts.find(({ uuid }) => uuid === layout_uuid);
+
+        storeViewport.current = productViewport;
+        handleChangeLayout({ target: { value: correctLayout } });
+      } else {
+        mapRef.current.flyTo(productViewport, 3);
+      }
+    }
+  };
+
   useEffect(() => {
     initMap();
     initCustomPane();
@@ -344,6 +339,8 @@ const Viewer = (props) => {
 
     initMarkers();
 
+    window.addEventListener('message', handleMessage);
+
     return () => {
       floorLayers.current = [];
       shelfLayers.current = [];
@@ -351,6 +348,7 @@ const Viewer = (props) => {
       selectedPartition.current = [];
       markerGroupRef.current = null;
 
+      window.removeEventListener('message', handleMessage);
       mapRef.current.remove();
     };
   }, [currentLayout]);

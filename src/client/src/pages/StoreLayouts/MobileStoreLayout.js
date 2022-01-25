@@ -123,13 +123,11 @@ const MobileStoreLayout = () => {
         // browser does not support doing this, so catch error and continue
       }
 
-      console.log('productPayload', productPayload);
+      // console.log('productPayload', productPayload);
     }
   }, []);
 
   const handleChangeLayout = async ({ target: { value: selectedLayout } }) => {
-    // const handleChangeLayout = async (e, selectedLayout) => {
-
     const { layers, floor_plan_path: path } = selectedLayout;
 
     if (path) {

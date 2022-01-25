@@ -11,7 +11,7 @@ import { Theme, TextStyle } from '../../styles/Theme';
 
 export default function EnRouteDetails({ style, store }) {
   /**
-   * store object: {key(currentStop), totalStops, uuid, name, price, distance, itemCount, coordinates}
+   * store object: {key(currentStop), totalStops, uuid, name, price, distance, itemCount, coordinates, cartID}
    */
   //const [isExpanded, setExpanded] = useState(false);
   const [isLoading, setLoading] = useState(true);
@@ -27,9 +27,14 @@ export default function EnRouteDetails({ style, store }) {
   };
 
   const openFloorMap = () => {
-    navigation
-      .dangerouslyGetParent()
-      .navigate('Floor Plan', { storeID: 'test' });
+    navigation.dangerouslyGetParent().navigate('Floor Plan', {
+      store: {
+        uuid: storeDetail.uuid,
+      },
+      cart: {
+        uuid: storeDetail.cartID,
+      },
+    });
   };
 
   const load = () => {

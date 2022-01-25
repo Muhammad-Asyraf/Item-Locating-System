@@ -114,7 +114,7 @@ const MobileStoreLayout = () => {
     if (requestStatusOk) {
       initLayoutLayers(layoutPayload.layouts);
       setProducts(productPayload.products);
-      window.postMessage(JSON.stringify(productPayload.products));
+      window.ReactNativeWebView.postMessage(JSON.stringify(productPayload.products));
       console.log('productPayload', productPayload);
     }
   }, []);

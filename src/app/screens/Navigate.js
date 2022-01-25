@@ -237,7 +237,7 @@ export default function Navigate({ navigation }) {
     } else {
       return (
         <EnRouteDetails
-          store={{ ...item, totalStops: route.length - 2, key: index }}
+          store={{ ...item, totalStops: route.length - 2, key: index, cartID }}
         />
       );
     }

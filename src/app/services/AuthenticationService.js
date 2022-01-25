@@ -12,16 +12,19 @@ const axiosInstance = axios.create({
   baseURL: environment.host,
 });
 
-export const getAuthHeader = async () => {
+export const getToken = async () => {
   const user = auth().currentUser;
   const token = user && (await user.getIdToken(true));
+  return token;
+};
 
+export const getAuthHeader = async () => {
   //console.log(`[getAuthHeader()] Token: ${JSON.stringify(token)}`);
 
   return {
     headers: {
       'Content-Type': 'application/json',
-      authorization: `Bearer ${token}`,
+      authorization: `Bearer ${await getToken()}`,
     },
   };
 };

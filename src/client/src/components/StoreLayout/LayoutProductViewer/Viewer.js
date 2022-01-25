@@ -74,9 +74,17 @@ const Viewer = (props) => {
   };
 
   window.addEventListener('message', (message) => {
-    console.log('message', message.data);
+    const {
+      data: { type, product_uuid },
+    } = message;
+
+    console.log('type', type);
+    console.log('uuid', product_uuid);
+
+    if (type && type === 'flyTo') {
+      mapRef.current.flyTo([50, 50], 3);
+    }
     // const partitionViewport = JSON.parse(message);
-    // mapRef.current.flyTo(partitionViewport, 3);
   });
 
   const initMarkers = () => {

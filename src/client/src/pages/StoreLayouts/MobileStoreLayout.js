@@ -79,7 +79,7 @@ const MobileStoreLayout = () => {
   // console.log('layouts', layouts);
   // console.log('authToken', authToken);
   // console.log('storeUUID', storeUUID);
-  // console.log('planningCartUUID', planningCartUUID);
+  // console.log('products', products);
 
   const handleOpen = () => setOpenPartitionModal(true);
   const handleClose = () => setOpenPartitionModal(false);

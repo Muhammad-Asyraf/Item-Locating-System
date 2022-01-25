@@ -100,6 +100,22 @@ const MobileStoreLayout = () => {
     dispatch(productProcessed());
   };
 
+  const groupBy = (arr) => {
+    const result = arr.reduce((acc, currentValue) => {
+      if (!acc[currentValue.layer.layout.name]) {
+        acc[currentValue.layer.layout.name] = [];
+      }
+      acc[currentValue.layer.layout.name].push(currentValue);
+      return acc;
+    }, {});
+
+    const final = Object.entries(result).map((e) => ({
+      label: e[0],
+      products: e[1],
+    }));
+    return final;
+  };
+
   useEffect(async () => {
     const { type: layoutStatus, payload: layoutPayload } = await dispatch(
       getLayouts({ storeUUID, authToken })
@@ -115,15 +131,15 @@ const MobileStoreLayout = () => {
       initLayoutLayers(layoutPayload.layouts);
       setProducts(productPayload.products);
 
+      const productsByFloor = groupBy(productPayload.products);
+
       try {
         window.ReactNativeWebView.postMessage(
-          JSON.stringify({ type: 'init', products: productPayload.products })
+          JSON.stringify({ type: 'init', products: productsByFloor })
         );
       } catch (ignore) {
         // browser does not support doing this, so catch error and continue
       }
-
-      // console.log('productPayload', productPayload);
     }
   }, []);
 

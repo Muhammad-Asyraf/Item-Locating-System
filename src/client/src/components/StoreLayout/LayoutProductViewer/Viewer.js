@@ -38,7 +38,15 @@ const useStyles = makeStyles(() => ({
 const Viewer = (props) => {
   const classes = useStyles();
 
-  const { leafletRef, currentLayout, leafletLayers, floorPlan, products } = props;
+  const {
+    leafletRef,
+    currentLayout,
+    leafletLayers,
+    floorPlan,
+    products,
+    layouts,
+    handleChangeLayout,
+  } = props;
 
   const mapRef = useRef(null);
   const markerGroupRef = useRef(null);
@@ -73,18 +81,38 @@ const Viewer = (props) => {
     markerGroup.addLayer(marker);
   };
 
+  // window.postMessage({"type":"flyTo","product_uuid":"1849f27e-b797-4c46-8138-9f34d3889c9c"});
+  // window.postMessage({"type":"flyTo","product_uuid":"4ec1bc3b-acea-4ef3-abfc-abca990c90c1"});
   window.addEventListener('message', (message) => {
     const {
       data: { type, product_uuid },
     } = message;
 
-    console.log('type', type);
-    console.log('uuid', product_uuid);
+    console.log('layouts', layouts);
+    console.log('handleChangeLayout', handleChangeLayout);
+    console.log('currentLayout', currentLayout);
 
     if (type && type === 'flyTo') {
+      console.log('type', type);
+      console.log('uuid', product_uuid);
+
+      const currentProduct = products.find(({ uuid }) => uuid === product_uuid);
+      const {
+        layer: {
+          layout_uuid,
+          meta_data: { center },
+        },
+      } = currentProduct;
+
+      if (layout_uuid !== currentLayout.uuid) {
+        console.log('dfjsdhfkljsdf');
+      }
+
+      console.log('currentProduct', currentProduct);
+      console.log('center', Object.values(center));
+
       mapRef.current.flyTo([50, 50], 3);
     }
-    // const partitionViewport = JSON.parse(message);
   });
 
   const initMarkers = () => {
@@ -140,7 +168,13 @@ const Viewer = (props) => {
           ({ partition_uuid: partitionUUID }) => partitionUUID === layer.id
         );
 
-        window.postMessage(JSON.stringify(layerProduct));
+        try {
+          window.ReactNativeWebView.postMessage(
+            JSON.stringify({ type: 'partitionFocus', products: layerProduct })
+          );
+        } catch (ignore) {
+          // browser does not support doing this, so catch error and continue
+        }
       };
     }
 

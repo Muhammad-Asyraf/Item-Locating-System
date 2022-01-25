@@ -114,7 +114,15 @@ const MobileStoreLayout = () => {
     if (requestStatusOk) {
       initLayoutLayers(layoutPayload.layouts);
       setProducts(productPayload.products);
-      window.ReactNativeWebView.postMessage(JSON.stringify(productPayload.products));
+
+      try {
+        window.ReactNativeWebView.postMessage(
+          JSON.stringify({ type: 'init', products: productPayload.products })
+        );
+      } catch (ignore) {
+        // browser does not support doing this, so catch error and continue
+      }
+
       console.log('productPayload', productPayload);
     }
   }, []);
@@ -185,7 +193,9 @@ const MobileStoreLayout = () => {
         </Box>
         <LayoutProductViewer
           leafletRef={leafletRef}
+          layouts={layouts}
           currentLayout={currentLayout}
+          handleChangeLayout={handleChangeLayout}
           leafletLayers={leafletLayers}
           floorPlan={floorPlan}
           handleOpen={handleOpen}

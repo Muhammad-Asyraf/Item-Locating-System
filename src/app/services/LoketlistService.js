@@ -18,23 +18,18 @@ const axiosInstance = axios.create({
  * Cart/LOKETLIST CRUD methods
  */
 
-// export const getDefaultCartsForUser = (authHeader, appUserID) => {
-//   try {
-//     let carts;
-//     carts = await axiosInstance.get(
-//       '/api/mobile/planning-cart-service/cart/default/:app_user_uuid',
-//       {
-//         params: {
-//           app_user_uuid: appUserID,
-//         },
-//         authHeader,
-//       }
-//     );
-//     return carts;
-//   } catch (error) {
-//     console.log(error);
-//   }
-// };
+export const getDefaultCartForUser = async (appUserID) => {
+  const header = await getAuthHeader();
+  try {
+    const { data } = await axiosInstance.get(
+      `/api/mobile/planning-cart-service/cart/default/${appUserID}`,
+      header
+    );
+    return data;
+  } catch (error) {
+    return Promise.reject(error.response.data.message);
+  }
+};
 
 export const getAllCartsForUser = async (appUserID) => {
   const header = await getAuthHeader();

@@ -1,15 +1,17 @@
 // Components
 import React, { useState } from 'react';
 import { StyleSheet, View, Text, FlatList } from 'react-native';
-import { Appbar, Title, Dialog } from 'react-native-paper';
+import { Appbar, Title, Divider } from 'react-native-paper';
 import { useFocusEffect } from '@react-navigation/native';
 import CartListItem from '../components/CartListItem';
 import CartHeader from '../components/CartHeader';
 import Loading from '../components/Loading';
+import ListSeparator from '../components/core/ListSeparator';
 
 // Utilities
 import axios from 'axios';
 import { getAuthHeader } from '../services/AuthenticationService';
+import { getCartById } from '../services/LoketlistService';
 
 // Redux
 import { useSelector, useDispatch } from 'react-redux';
@@ -19,8 +21,7 @@ import { update } from '../redux/cart/cartSlice';
 import { environment } from '../environment';
 
 // Styling
-import { GlobalStyle } from '../styles/Theme';
-import { appBarStyles } from '../styles/appBarStyles';
+import { GlobalStyle, AppbarStyle, TextStyle } from '../styles/Theme';
 
 export default function Cart({ navigation }) {
   const [isLoading, setLoading] = useState(true);
@@ -36,50 +37,44 @@ export default function Cart({ navigation }) {
   useFocusEffect(
     React.useCallback(() => {
       setLoading(cart.update);
-      console.log('Reload? : ' + isLoading);
 
       const fetchProducts = async () => {
-        const header = await getAuthHeader();
-        const { data } = await axios.get(
-          environment.host +
-            '/api/mobile/planning-cart-service/cart/' +
-            default_cart_uuid,
-          header
-        );
-        let DATA = [];
-        for (i = 0; i < cart.products.length; i++) {
-          DATA.push({
-            key: i,
-            cart_uuid: default_cart_uuid,
-            product_uuid: cart.products[i],
-            name: data.products[i].name,
-            quantity: data.products[i].quantity,
-            selling_price: data.products[i].selling_price,
-            imageUrl: 'https://tinyurl.com/cu8nm69m',
-          });
-        }
-        console.log('Loaded all products into array');
+        getCartById(default_cart_uuid).then((data) => {
+          let DATA = [];
+          for (i = 0; i < cart.products.length; i++) {
+            let idx = data.products
+              .map((val) => val.uuid)
+              .indexOf(cart.products[i]);
+            DATA.push({
+              key: i,
+              cart_uuid: default_cart_uuid,
+              product_uuid: cart.products[i],
+              ...data.products[idx],
+            });
+          }
 
-        // Update redux states
-        dispatch(update(false));
+          console.log('Loaded all products into array');
 
-        // Update local states
-        setData(DATA);
-        setTotalPrice(totalPrice);
-        setLoading(false);
+          // Update the totalPrice
+          let totalPrice = 0;
+          for (i = 0; i < DATA.length; i++) {
+            totalPrice += parseFloat(DATA[i].total_price);
+          }
+          console.log(totalPrice);
+
+          // Update redux states
+          dispatch(update(false));
+
+          // Update local states
+          setData(DATA);
+          setTotalPrice(totalPrice);
+          setLoading(false);
+        });
       };
 
       if (isLoading) {
         fetchProducts();
       }
-
-      // Update the totalPrice
-      let totalPrice = 0;
-      for (i = 0; i < DATA.length; i++) {
-        totalPrice += DATA[i].selling_price * DATA[i].quantity;
-      }
-      console.log(totalPrice);
-      setTotalPrice(totalPrice);
     }, [isLoading, cart.quantity])
   );
 
@@ -87,23 +82,14 @@ export default function Cart({ navigation }) {
     setLoading(true);
   };
 
-  if (isLoading) {
-    return (
-      <View style={GlobalStyle.screenContainer}>
-        <Appbar.Header style={[appBarStyles.appBarContainer, { elevation: 0 }]}>
-          <Text style={appBarStyles.appBarTitle}>CART</Text>
-        </Appbar.Header>
+  return (
+    <View style={GlobalStyle.screenContainer}>
+      <Appbar.Header style={[AppbarStyle.transparent, AppbarStyle.padding]}>
+        <Title style={[TextStyle.headline5]}>Your cart</Title>
+      </Appbar.Header>
+      {isLoading ? (
         <Loading />
-      </View>
-    );
-  }
-
-  if (cart.products.length === 0) {
-    return (
-      <View style={GlobalStyle.screenContainer}>
-        <Appbar.Header style={[appBarStyles.appBarContainer, { elevation: 0 }]}>
-          <Text style={appBarStyles.appBarTitle}>CART</Text>
-        </Appbar.Header>
+      ) : cart.products.length === 0 ? (
         <View
           style={[
             GlobalStyle.contentContainer,
@@ -112,42 +98,28 @@ export default function Cart({ navigation }) {
         >
           <Text>Your cart is empty!</Text>
         </View>
-      </View>
-    );
-  }
-
-  return (
-    <View style={GlobalStyle.screenContainer}>
-      <Appbar.Header
-        style={[
-          appBarStyles.appBarContainer,
-          {
-            elevation: 0,
-            borderBottomWidth: 0.5,
-            borderBottomColor: '#CBCBCB',
-          },
-        ]}
-      >
-        <Text style={appBarStyles.appBarTitle}>CART</Text>
-      </Appbar.Header>
-      <CartHeader price={'RM' + totalPrice} />
-      <FlatList
-        style={styles.sectionListView}
-        onRefresh={refreshCart}
-        refreshing={isLoading}
-        data={DATA}
-        renderItem={({ item }) => (
-          <CartListItem item={item} style={styles.listItem} />
-        )}
-      />
+      ) : (
+        <View style={GlobalStyle.contentContainer}>
+          <CartHeader price={'RM' + totalPrice} />
+          <Divider />
+          <FlatList
+            contentContainerStyle={styles.sectionListView}
+            onRefresh={refreshCart}
+            refreshing={isLoading}
+            data={DATA}
+            renderItem={({ item }) => (
+              <CartListItem product={item} containerStyle={styles.listItem} />
+            )}
+          />
+        </View>
+      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   sectionListView: {
-    paddingHorizontal: 18,
-    marginTop: 8,
+    paddingVertical: 12,
   },
   listSectionContainer: {
     marginVertical: 8,
@@ -159,6 +131,6 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
   },
   listItem: {
-    marginVertical: 8,
+    marginBottom: 18,
   },
 });

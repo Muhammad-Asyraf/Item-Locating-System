@@ -34,8 +34,7 @@ export const GlobalStyle = StyleSheet.create({
   contentContainer: {
     flex: 1,
     flexGrow: 1,
-    paddingHorizontal: 22,
-    paddingVertical: 18,
+    paddingHorizontal: 18,
   },
   center: {
     flexGrow: 1,

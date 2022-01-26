@@ -33,19 +33,46 @@ export default function CartListItem({ containerStyle = {}, product, update }) {
 
   // TODO : Update fields
   return (
-    <View style={[styles.productContainer, containerStyle]}>
-      <Image
-        source={{ uri: 'https://via.placeholder.com/96' }}
-        style={styles.productImage}
-      />
-      <View style={styles.productDetailsContainer}>
-        <Text style={[TextStyle.body2, styles.text]} numberOfLines={2}>
-          {product.name}
-        </Text>
-        <Text style={[TextStyle.subhead2, styles.text]} numberOfLines={2}>
-          {`RM${product.retail_price}`}
-        </Text>
-        <View>{renderChips(product.stock_status)}</View>
+    <View style={[containerStyle]}>
+      <View style={styles.productContainer}>
+        <Image
+          source={{ uri: 'https://via.placeholder.com/96' }}
+          style={styles.productImage}
+        />
+        <View style={styles.productDetailsContainer}>
+          <View>
+            <Text style={[TextStyle.body2, styles.text]} numberOfLines={2}>
+              {product.name}
+            </Text>
+            <View style={styles.pricing}>
+              <Text style={[TextStyle.subhead2, styles.text]} numberOfLines={2}>
+                {`RM${product.total_price}`}
+              </Text>
+              <Text
+                style={[TextStyle.overline2, styles.text, styles.singlePrice]}
+                numberOfLines={2}
+              >
+                {`(RM${product.retail_price}/${product.measurement_value}${product.measurement_unit})`}
+              </Text>
+            </View>
+          </View>
+
+          <View>
+            <View>{renderChips(product.stock_status)}</View>
+          </View>
+        </View>
+      </View>
+      <View>
+        <NumericInput
+          containerStyle={styles.numericInput}
+          value={itemDetails.quantity}
+          onChange={handleQuantityChange}
+          totalHeight={24}
+          totalWidth={96}
+          step={1}
+          rounded
+          editable={false}
+        />
       </View>
     </View>
   );
@@ -55,7 +82,16 @@ export default function CartListItem({ containerStyle = {}, product, update }) {
 const styles = StyleSheet.create({
   productContainer: {
     flexDirection: 'row',
-    justifyContent: 'flex-start',
+  },
+  productDetailsContainer: {
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+  },
+  imageContainer: {
+    flexDirection: 'column',
+  },
+  numericInput: {
+    marginTop: 8,
   },
   productImage: {
     width: 96,
@@ -68,7 +104,15 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'flex-start',
   },
+  pricing: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   text: {
     flexShrink: 1,
+  },
+  singlePrice: {
+    color: Theme.colors.placeholder,
+    marginStart: 8,
   },
 });

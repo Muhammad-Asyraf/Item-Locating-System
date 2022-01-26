@@ -279,7 +279,7 @@ exports.updateCartItem = async (req, res, next) => {
         .relate({
           uuid: product_uuid,
           quantity,
-          total_price: quantity * select.selling_price,
+          total_price: quantity * select.retail_price,
         });
     }
 

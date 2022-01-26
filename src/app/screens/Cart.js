@@ -60,14 +60,14 @@ export default function Cart({ navigation }) {
           for (i = 0; i < DATA.length; i++) {
             totalPrice += parseFloat(DATA[i].total_price);
           }
-          console.log(totalPrice);
+          // console.log(totalPrice.toFixed(2));
 
           // Update redux states
           dispatch(update(false));
 
           // Update local states
           setData(DATA);
-          setTotalPrice(totalPrice);
+          setTotalPrice(totalPrice.toFixed(2));
           setLoading(false);
         });
       };

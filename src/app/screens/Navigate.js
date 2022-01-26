@@ -38,6 +38,9 @@ export default function Navigate({ navigation }) {
   // Track cart dropdown choice
   const [cartID, setCartID] = useState();
 
+  // Total price for cart
+  const totalPrice = useRef(null);
+
   // Store current optimized route
   const [route, setRoute] = useState([]);
 
@@ -89,7 +92,6 @@ export default function Navigate({ navigation }) {
   const fetchPath = async () => {
     setMessage('Calculating route');
 
-    let path;
     let directionsRequest = {
       profile: 'driving-traffic',
       geometries: 'geojson',
@@ -99,7 +101,12 @@ export default function Navigate({ navigation }) {
     let geoJSON = {};
 
     try {
-      path = await getOptimizedPathForCart(position, cartID);
+      let { totalPrice: price, path } = await getOptimizedPathForCart(
+        position,
+        cartID
+      );
+
+      totalPrice.current = price;
 
       // Set waypoint for Directions API
       mapboxWaypoints = path.map((point) => {
@@ -121,7 +128,7 @@ export default function Navigate({ navigation }) {
 
       geoJSON = directions.body.routes[0].geometry;
       setBounds(createBounds(geoJSON));
-      console.log(`Bounds: ${JSON.stringify(bounds)}`);
+      // console.log(`Bounds: ${JSON.stringify(bounds)}`);
       //console.log(directions.body.waypoints);
     } catch (error) {
       console.log(`getDirections Error! :: ` + error);
@@ -144,7 +151,7 @@ export default function Navigate({ navigation }) {
     }
 
     if (flowState == 2) {
-      console.log(`Bounds: ${JSON.stringify(bounds)}`);
+      // console.log(`Bounds: ${JSON.stringify(bounds)}`);
       focusRoute();
     }
     const run = async () => {
@@ -233,7 +240,7 @@ export default function Navigate({ navigation }) {
 
   const renderCarousel = ({ item, index }) => {
     if (index == 0) {
-      return <RouteDetails routeDetails={item} />;
+      return <RouteDetails routeDetails={item} total={totalPrice.current} />;
     } else {
       return (
         <EnRouteDetails

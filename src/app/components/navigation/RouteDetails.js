@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, FlatList, StyleSheet } from 'react-native';
 import { Text } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -11,19 +11,16 @@ import { Theme, TextStyle } from '../../styles/Theme';
  * @param {Array} storesInfo : Contains all of the route's info
  * @returns
  */
-export default function RouteDetails({ routeDetails, style }) {
+export default function RouteDetails({ routeDetails, total, style }) {
   /**
    * routeDetails array : [{storeUUID,storeName,totalPrice}]
    */
   const [isLoading, setLoading] = useState(true);
   const [isExpanded, setExpanded] = useState(false);
-  const [noOfStops, setNoOfStops] = useState();
-  const [totalPrice, setTotalPrice] = useState(0);
+  const totalPrice = useRef(0);
   const [storeList, setStoreList] = useState();
 
   const load = () => {
-    setNoOfStops(routeDetails.length - 2);
-
     let stores = routeDetails.slice();
     stores.pop();
     stores.shift();
@@ -37,7 +34,7 @@ export default function RouteDetails({ routeDetails, style }) {
     if (isLoading) {
       load();
     }
-  });
+  }, [isLoading]);
 
   // IMPLEMENT
   // if (isExpanded) {
@@ -66,7 +63,7 @@ export default function RouteDetails({ routeDetails, style }) {
     <View style={styles.container} {...style}>
       <View style={styles.routeContentContainer}>
         <Text style={[TextStyle.overline1, styles.overlineText]}>
-          {`${noOfStops} STORE(S) \u00B7 ${totalPrice} in total`}
+          {`${routeDetails.length - 2} STORE(S) \u00B7 RM${total} in total`}
         </Text>
         <Text style={[TextStyle.headline5, styles.containerTitle]}>
           Your Route Details
@@ -92,7 +89,7 @@ export default function RouteDetails({ routeDetails, style }) {
 const styles = StyleSheet.create({
   container: {
     borderRadius: Theme.roundness,
-    backgroundColor: Theme.colors.background,
+    backgroundColor: 'white',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,

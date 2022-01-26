@@ -111,7 +111,7 @@ const MobileStoreLayout = () => {
 
     const final = Object.entries(result).map((e) => ({
       label: e[0],
-      products: e[1],
+      data: e[1],
     }));
     return final;
   };
@@ -190,7 +190,7 @@ const MobileStoreLayout = () => {
             >
               {layouts.map((layout) => (
                 <MenuItem key={layout.uuid} value={layout}>
-                  {layout.label}
+                  {layout.name}
                 </MenuItem>
               ))}
             </Select>

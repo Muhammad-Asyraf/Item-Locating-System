@@ -497,16 +497,12 @@ const ItemCreate = (props) => {
                 onDrop={onDrop}
                 onDragOver={(e) => e.preventDefault()}
               >
-                <Box style={{ width: '250px', height: '400px' }}>
-                  <ReactLogo />
-                  <div style={{ fontSize: '0.8rem' }}>Drop images here or click</div>
-                  <div style={{ fontSize: '0.8rem' }}>
-                    <span style={{ color: '#004C99', textDecoration: 'underline' }}>
-                      browse
-                    </span>
-                    &nbsp; thorough your machine
-                  </div>
-                </Box>
+                <ReactLogo style={{ width: '100%' }} />
+                <div style={{ fontSize: '0.8rem' }}>Drop images here or click</div>
+                <div style={{ fontSize: '0.8rem' }}>
+                  <span style={{ color: '#004C99', textDecoration: 'underline' }}>browse</span>
+                  &nbsp; thorough your machine
+                </div>
               </label>
 
               <FormHelperText error={image.error}>

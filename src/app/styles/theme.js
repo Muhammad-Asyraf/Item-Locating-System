@@ -37,6 +37,11 @@ export const GlobalStyle = StyleSheet.create({
     paddingHorizontal: 22,
     paddingVertical: 18,
   },
+  center: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   flatGrid: {},
 });
 

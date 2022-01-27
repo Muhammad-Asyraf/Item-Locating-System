@@ -40,7 +40,7 @@ const styles = StyleSheet.create({
     height: 48,
     fontSize: 14,
     color: Theme.colors.text,
-    backgroundColor: Theme.colors.background,
+    backgroundColor: 'white',
     borderColor: 0,
     borderWidth: 0,
     borderRadius: 5,

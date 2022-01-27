@@ -53,9 +53,15 @@ exports.getDefaultCart = async (req, res, next) => {
 exports.getCart = async (req, res, next) => {
   try {
     const { uuid } = req.params;
+    const { store } = req.query;
     const planningCarts = await PlanningCart.query()
       .where({ uuid })
-      .withGraphFetched('products');
+      .withGraphFetched('products')
+      .modifyGraph('products', (builder) => {
+        if (store && store !== '') {
+          builder.where('store_uuid', store);
+        }
+      });
 
     planningCartLogger.info(`Successfully get planning cart ${uuid}`);
 

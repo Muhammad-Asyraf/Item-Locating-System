@@ -1,5 +1,7 @@
 import L from 'leaflet';
 
+import tileLayer from '../../../assets/svg/tileLayer.svg';
+
 export const mapComponent = {
   floor: {
     shapes: {
@@ -151,7 +153,7 @@ export const floorPlanBounds = [
 ];
 
 export const checkeredTileLayer = {
-  path: '/app/public/uploaded_layout/tileLayer.svg',
+  path: tileLayer,
   bounds: [
     [600, 600],
     [-600, -600],

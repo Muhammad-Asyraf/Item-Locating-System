@@ -3,6 +3,7 @@ const getLogger = require('../../../utils/logger');
 
 // DB Models
 const PlanningCart = require('../../planning_carts/model');
+const PlanningCartProduct = require('../../_bridges/Planning_Cart_Product');
 const Product = require('../../products/model');
 const Store = require('../../stores/model');
 
@@ -242,9 +243,11 @@ exports.getOptimizedPathFromCart = async (req, res, next) => {
     console.log(position);
 
     // Get cart's store latlng with cart id
-    let productIds = PlanningCart.relatedQuery('products')
-      .select('product.uuid')
-      .for(cart_uuid);
+    let products = PlanningCart.relatedQuery('products').for(cart_uuid);
+
+    let totalPrice = await PlanningCartProduct.query()
+      .for(products)
+      .sum('total_price');
 
     let store = await Product.relatedQuery('stores')
       .select([
@@ -252,9 +255,9 @@ exports.getOptimizedPathFromCart = async (req, res, next) => {
         'store.store_name as name',
         'store.store_coordinate as coordinate',
       ])
-      .for(productIds);
+      .for(products);
 
-    if (productIds.length === 0 || store.length === 0) {
+    if (products.length === 0 || store.length === 0) {
       optimizationLogger.info(
         `There are no products added in cart ${cart_uuid}`
       );
@@ -279,7 +282,11 @@ exports.getOptimizedPathFromCart = async (req, res, next) => {
       console.log(path);
       // Call calculate
       finalPath = await calculateObj(path);
-      res.json(finalPath);
+      let resObj = {
+        totalPrice: totalPrice[0].sum,
+        path: finalPath,
+      };
+      res.json(resObj);
     }
   } catch (error) {
     optimizationLogger.warn('getOptimizedPathFromCart() error occured');

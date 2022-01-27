@@ -2,8 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router-dom';
 
-import TextField from '@mui/material/TextField';
-import Autocomplete from '@mui/material/Autocomplete';
+import FormControl from '@mui/material/FormControl';
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
+import InputLabel from '@mui/material/InputLabel';
 import IconButton from '@mui/material/IconButton';
 import Button from '@mui/material/Button';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
@@ -120,6 +122,11 @@ const useStyles = makeStyles(() => ({
       backgroundColor: 'rgba(0, 0, 0, 0.04)',
     },
   },
+  paper: {
+    // right: '10px !important',
+    boxShadow:
+      '0px 3px 3px -2px rgba(0,0,0,0.2),0px 3px 4px 0px rgba(0,0,0,0.14),0px 1px 8px 0px rgba(0,0,0,0.12) !important',
+  },
 }));
 
 const ProductMapping = () => {
@@ -222,7 +229,7 @@ const ProductMapping = () => {
     setPartitionBuckets([...updatedPartitionBucketList]);
   };
 
-  const handleChangeLayout = async (e, selectedLayout) => {
+  const handleChangeLayout = async ({ target: { value: selectedLayout } }) => {
     const { layers, floor_plan_path: path } = selectedLayout;
 
     if (path) {
@@ -357,7 +364,29 @@ const ProductMapping = () => {
         alignItems="center"
       >
         <Grid item xs={6}>
-          <Autocomplete
+          <FormControl fullWidth>
+            <InputLabel id="select-layout-label">Layout</InputLabel>
+            <Select
+              labelId="select-layout-label"
+              id="select-layout"
+              value={currentLayout}
+              label="Layout"
+              onChange={handleChangeLayout}
+              style={{ height: '50px' }}
+              MenuProps={{
+                PopoverClasses: {
+                  paper: classes.paper,
+                },
+              }}
+            >
+              {layouts.map((layout) => (
+                <MenuItem key={layout.uuid} value={layout}>
+                  {layout.label}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          {/* <Autocomplete
             disablePortal
             disableClearable
             options={layouts}
@@ -365,7 +394,7 @@ const ProductMapping = () => {
             renderInput={(params) => <TextField {...params} label="Layout" />}
             onChange={handleChangeLayout}
             value={currentLayout}
-          />
+          /> */}
         </Grid>
         <Grid
           item

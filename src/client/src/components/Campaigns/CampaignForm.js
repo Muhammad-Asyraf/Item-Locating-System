@@ -675,16 +675,14 @@ const CampaignForm = (props) => {
                         autoComplete="off"
                         style={{ display: 'none' }}
                       />
-                      <Box style={{ width: '315px', height: '450px' }}>
-                        <ReactLogo />
-                        <div style={{ fontSize: '0.8rem', position: 'relative', bottom: 7 }}>
-                          Drop advertisement here or click &nbsp;
-                          <span style={{ color: '#004C99', textDecoration: 'underline' }}>
-                            browse
-                          </span>
-                          &nbsp; to upload
-                        </div>
-                      </Box>
+                      <ReactLogo style={{ width: '100%' }} />
+                      <div style={{ fontSize: '0.8rem' }}>
+                        Drop advertisement here or click &nbsp;
+                        <span style={{ color: '#004C99', textDecoration: 'underline' }}>
+                          browse
+                        </span>
+                        &nbsp; to upload
+                      </div>
                     </label>
 
                     <FormHelperText error={errors.imageError !== false}>

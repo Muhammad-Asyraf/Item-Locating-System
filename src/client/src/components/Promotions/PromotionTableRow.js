@@ -147,7 +147,9 @@ const PromotionTableRow = (props) => {
     return render;
   };
 
-  console.log('promotion', promotion);
+  const emptyRows =
+    rowsPerPage - Math.min(rowsPerPage, promotion.products.length - page * rowsPerPage);
+
   return (
     <>
       <TableRow
@@ -461,6 +463,11 @@ const PromotionTableRow = (props) => {
                                       </TableRow>
                                     )
                                   )}
+                                {emptyRows > 0 && (
+                                  <TableRow style={{ height: 53 * emptyRows }}>
+                                    <TableCell colSpan={6} style={{ borderBottom: 'none' }} />
+                                  </TableRow>
+                                )}
                               </TableBody>
                             </Table>
                           </TableContainer>

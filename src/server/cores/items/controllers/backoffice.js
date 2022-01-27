@@ -33,6 +33,7 @@ exports.getAllItems = async (req, res, next) => {
 exports.findItem = async (req, res, next) => {
   try {
     const { uuid } = req.params;
+
     const item = await Item.query()
       .findById(uuid)
       .withGraphFetched('[sub_categories.category, images]')

@@ -981,6 +981,9 @@ const PromotionForm = (props) => {
     return flag;
   };
 
+  const emptyRows =
+    rowsPerPage - Math.min(rowsPerPage, selectedProducts.length - page * rowsPerPage);
+
   return (
     <form
       id="promotion-form"
@@ -1316,7 +1319,7 @@ const PromotionForm = (props) => {
                       <Divider sx={{ width: '100%' }} />
                     </Grid>
                     {promotionType.basic_checked || promotionType.bundle_checked ? (
-                      <Grid item xs={12} container spacing={4} sx={{ mb: 1 }}>
+                      <Grid item xs={12} container spacing={4} sx={{ mb: 2 }}>
                         <Grid item xs={1}>
                           <span
                             style={{
@@ -1740,6 +1743,11 @@ const PromotionForm = (props) => {
                                       </TableRow>
                                     )
                                   )}
+                                {emptyRows > 0 && (
+                                  <TableRow style={{ height: 53 * emptyRows }}>
+                                    <TableCell colSpan={6} style={{ borderBottom: 'none' }} />
+                                  </TableRow>
+                                )}
                               </TableBody>
                             </Table>
                           </TableContainer>

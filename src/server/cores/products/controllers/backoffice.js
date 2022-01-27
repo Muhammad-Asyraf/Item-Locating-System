@@ -30,12 +30,73 @@ exports.getAllProducts = async (req, res, next) => {
           'name',
           'start_date',
           'end_date',
-          'promotion_type'
+          'promotion_type',
+          'meta_data'
         );
       });
 
+    const updatedProducts = products.map((product) => {
+      const { promotions, retail_price, ...remainingAtts } = product;
+
+      const updatedPromotion = promotions.map((promotion) => {
+        const { start_date, end_date, promotion_type } = promotion;
+        let sale_price;
+
+        const currentDateTime = new Date().getTime();
+        const startDateTime = new Date(start_date).getTime();
+        const endDateTime = new Date(end_date).getTime();
+
+        const activePromotion =
+          currentDateTime >= startDateTime && currentDateTime <= endDateTime;
+        const scheduledPromotion =
+          currentDateTime <= startDateTime && currentDateTime <= endDateTime;
+        const expiredPromotion =
+          currentDateTime >= startDateTime && currentDateTime >= endDateTime;
+
+        let promotion_status;
+
+        if (activePromotion) {
+          promotion_status = 'active';
+        } else if (scheduledPromotion) {
+          promotion_status = 'scheduled';
+        } else if (expiredPromotion) {
+          promotion_status = 'expired';
+        }
+
+        const isDiscountBasedPromo =
+          promotion_type === 'Basic' || promotion_type === 'Bundle';
+
+        if (isDiscountBasedPromo) {
+          const {
+            meta_data: { discount, discountType },
+          } = promotion;
+          let saving;
+
+          if (discountType.percentage_off_checked) {
+            saving = (parseFloat(discount) / 100) * parseFloat(retail_price);
+          } else {
+            saving = parseFloat(discount);
+          }
+
+          sale_price = parseFloat(retail_price) - saving;
+        }
+
+        return {
+          ...promotion,
+          promotion_status,
+          sale_price,
+        };
+      });
+
+      return {
+        ...remainingAtts,
+        retail_price,
+        promotions: updatedPromotion,
+      };
+    });
+
     productLogger.info(`Successfully retrieve: ${products.length} products`);
-    res.json(products);
+    res.json(updatedProducts);
   } catch (err) {
     productLogger.warn(`Error retrieving all products`);
     next(err);

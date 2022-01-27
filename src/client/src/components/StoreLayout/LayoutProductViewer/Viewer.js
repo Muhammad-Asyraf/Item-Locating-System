@@ -2,6 +2,8 @@ import React, { useEffect, useRef } from 'react';
 import L from 'leaflet';
 import 'leaflet-geometryutil';
 
+import icons from 'leaflet-color-number-markers';
+
 import Button from '@mui/material/Button';
 import CenterFocusStrongIcon from '@mui/icons-material/CenterFocusStrong';
 
@@ -12,12 +14,13 @@ import { makeStyles } from '@mui/styles';
 
 import '../../../assets/css/leafletOverride.css';
 import {
-  mapBounds,
+  // mapBounds,
   floorPlanBounds,
   mapComponent,
   mapDefaultConfig,
   recenterBtn,
 } from '../utils/mapConfig';
+import { groupBy } from '../../../utils/general';
 
 const useStyles = makeStyles(() => ({
   refreshButton: {
@@ -35,13 +38,23 @@ const useStyles = makeStyles(() => ({
 const Viewer = (props) => {
   const classes = useStyles();
 
-  const { leafletRef, currentLayout, leafletLayers, floorPlan } = props;
+  const {
+    leafletRef,
+    currentLayout,
+    leafletLayers,
+    floorPlan,
+    products,
+    layouts,
+    handleChangeLayout,
+  } = props;
 
   const mapRef = useRef(null);
+  const markerGroupRef = useRef(null);
   const floorLayers = useRef([]);
   const shelfLayers = useRef([]);
   const shelfPartitionLayers = useRef([]);
-  const storeViewport = [50, 50];
+  const selectedPartition = useRef([]);
+  const storeViewport = useRef([50, 50]);
 
   const {
     floor: { config: floorConfig },
@@ -58,7 +71,46 @@ const Viewer = (props) => {
   const shelfPartitionShapes = shelfPartitionConfig.shapes;
 
   const reCenter = () => {
-    mapRef.current.flyTo(storeViewport, 3.5);
+    mapRef.current.flyTo(storeViewport.current, 3.5);
+  };
+
+  const addLookupProductMarker = (latLng, number) => {
+    const markerGroup = markerGroupRef.current;
+
+    const marker = L.marker(latLng, { icon: icons.red.numbers[number] });
+    markerGroup.addLayer(marker);
+  };
+
+  const initMarkers = () => {
+    const map = mapRef.current;
+    const markerGroup = markerGroupRef.current;
+
+    markerGroup.clearLayers();
+    map.removeLayer(markerGroup);
+
+    if (products.length > 0) {
+      const productsByLayer = groupBy(products, 'partition_uuid');
+      const selectedLayer = Object.keys(productsByLayer);
+
+      const { layers } = currentLayout;
+
+      selectedLayer.forEach((uuid) => {
+        const layer = layers.find(({ uuid: layerUUID }) => layerUUID === uuid);
+
+        if (layer) {
+          const {
+            meta_data: { center },
+          } = layer;
+
+          const latLng = Object.values(center);
+          const productQty = productsByLayer[uuid].length;
+
+          addLookupProductMarker(latLng, productQty);
+        }
+      });
+
+      markerGroup.addTo(map);
+    }
   };
 
   const initShapeObj = (layer, shape) => {
@@ -66,8 +118,29 @@ const Viewer = (props) => {
     const isShelfLayer = shelfShapes.includes(shape);
 
     if (isPartitionLayer) {
+      const locatedShelf = products.some(
+        ({ partition_uuid: partitionUUID }) => partitionUUID === layer.id
+      );
+
+      if (locatedShelf) {
+        layer.setStyle({ ...shelfPartitionStyles, fillColor: '#d7e75c' });
+        selectedPartition.current = [...selectedPartition.current, layer.id];
+      }
+
       layer._path.ontouchend = (e) => {
         e.preventDefault();
+
+        const layerProduct = products.filter(
+          ({ partition_uuid: partitionUUID }) => partitionUUID === layer.id
+        );
+
+        try {
+          window.ReactNativeWebView.postMessage(
+            JSON.stringify({ type: 'partitionFocus', products: layerProduct })
+          );
+        } catch (ignore) {
+          // browser does not support doing this, so catch error and continue
+        }
       };
     }
 
@@ -158,11 +231,13 @@ const Viewer = (props) => {
   };
 
   const initMap = () => {
-    const map = L.map('map', mapDefaultConfig).setView(storeViewport, 3);
-    map.fitBounds(mapBounds);
+    const map = L.map('map', mapDefaultConfig).setView(storeViewport.current, 4);
+    map.flyTo(storeViewport.current, 3);
+    // map.fitBounds(mapBounds);
 
     leafletRef.current = { map, leaflet: L };
     mapRef.current = map;
+    markerGroupRef.current = L.layerGroup();
   };
 
   const initCustomPane = () => {
@@ -196,18 +271,62 @@ const Viewer = (props) => {
       if (adjustedZoomLevel >= 0.9) {
         shelfPartitionLayers.current.forEach((currentLayer) => {
           L.DomUtil.addClass(currentLayer._path, 'leaflet-interactive');
-          currentLayer.setStyle({ ...shelfPartitionStyles });
+
+          const locatedShelf = selectedPartition.current.includes(currentLayer.id);
+
+          if (locatedShelf) {
+            currentLayer.setStyle({ ...shelfPartitionStyles, fillColor: '#d7e75c' });
+          } else {
+            currentLayer.setStyle({ ...shelfPartitionStyles });
+          }
         });
       } else if (adjustedZoomLevel < 0.9) {
         shelfPartitionLayers.current.forEach((currentLayer) => {
           L.DomUtil.removeClass(currentLayer._path, 'leaflet-interactive');
-          currentLayer.setStyle({
-            ...shelfPartitionStyles,
-            weight: 0.5,
-          });
+
+          const locatedShelf = selectedPartition.current.includes(currentLayer.id);
+
+          if (locatedShelf) {
+            currentLayer.setStyle({
+              ...shelfPartitionStyles,
+              fillColor: '#d7e75c',
+              weight: 0.5,
+            });
+          } else {
+            currentLayer.setStyle({ ...shelfPartitionStyles, weight: 0.5 });
+          }
         });
       }
     });
+  };
+
+  // window.postMessage({"type":"flyTo","product_uuid":"1849f27e-b797-4c46-8138-9f34d3889c9c"});
+  // window.postMessage({"type":"flyTo","product_uuid":"4ec1bc3b-acea-4ef3-abfc-abca990c90c1"});
+  // window.postMessage({"type":"flyTo","product_uuid":"1fccd063-a832-4e7f-b563-8a8ace44f877"});
+  const handleMessage = (message) => {
+    const {
+      data: { type, product_uuid },
+    } = message;
+
+    if (type && type === 'flyTo') {
+      const currentProduct = products.find(({ uuid }) => uuid === product_uuid);
+      const {
+        layer: {
+          layout_uuid,
+          meta_data: { center },
+        },
+      } = currentProduct;
+      const productViewport = Object.values(center);
+
+      if (layout_uuid !== currentLayout.uuid) {
+        const correctLayout = layouts.find(({ uuid }) => uuid === layout_uuid);
+
+        storeViewport.current = productViewport;
+        handleChangeLayout({ target: { value: correctLayout } });
+      } else {
+        mapRef.current.flyTo(productViewport, 3);
+      }
+    }
   };
 
   useEffect(() => {
@@ -216,14 +335,20 @@ const Viewer = (props) => {
     initFloorPlan();
 
     loadLayers(leafletLayers);
-
     setZoomBehavior();
+
+    initMarkers();
+
+    window.addEventListener('message', handleMessage);
 
     return () => {
       floorLayers.current = [];
       shelfLayers.current = [];
       shelfPartitionLayers.current = [];
+      selectedPartition.current = [];
+      markerGroupRef.current = null;
 
+      window.removeEventListener('message', handleMessage);
       mapRef.current.remove();
     };
   }, [currentLayout]);

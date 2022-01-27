@@ -1,22 +1,28 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Text, Button } from 'react-native-paper';
 import Icon1 from 'react-native-vector-icons/MaterialIcons';
 import Icon2 from 'react-native-vector-icons/MaterialCommunityIcons';
 
+import { useSelector } from 'react-redux';
+
+// Utilities
 import openMap from 'react-native-open-maps';
 import { useNavigation } from '@react-navigation/native';
+import * as turf from '@turf/turf';
+import { getCartById } from '../../services/LoketlistService';
 
 import { Theme, TextStyle } from '../../styles/Theme';
 
 export default function EnRouteDetails({ style, store }) {
   /**
-   * store object: {key(currentStop), totalStops, uuid, name, price, distance, itemCount, coordinates}
+   * store object: {key(currentStop), totalStops, uuid, name, price, distance, itemCount, coordinates, cartID}
    */
   //const [isExpanded, setExpanded] = useState(false);
   const [isLoading, setLoading] = useState(true);
   const [storeDetail, setStoreDetail] = useState(store);
   const navigation = useNavigation();
+  const { position } = useSelector((state) => state.user);
 
   const openMaps = () => {
     openMap({
@@ -27,22 +33,41 @@ export default function EnRouteDetails({ style, store }) {
   };
 
   const openFloorMap = () => {
-    navigation
-      .dangerouslyGetParent()
-      .navigate('Floor Plan', { storeID: 'test' });
+    navigation.dangerouslyGetParent().navigate('Floor Plan', {
+      store: {
+        uuid: storeDetail.uuid,
+      },
+      cart: {
+        uuid: storeDetail.cartID,
+      },
+    });
   };
 
   const load = () => {
     //console.log(`storeDetail: ${JSON.stringify(store)}`);
+    console.log(
+      `[EnRouteDetails.js/load] Store :${JSON.stringify(storeDetail)}`
+    );
+    const coordinates = storeDetail.coordinate;
+    const storePoint = turf.point([coordinates[0], coordinates[1]]);
+    const userPoint = turf.point([position[0], position[1]]);
 
-    setLoading(false);
+    getCartById(storeDetail.cartID, storeDetail.uuid).then((data) => {
+      setStoreDetail({
+        ...storeDetail,
+        distance: turf.distance(userPoint, storePoint),
+        itemCount: data.products.length,
+      });
+
+      setLoading(false);
+    });
   };
 
   useEffect(() => {
     if (isLoading) {
       load();
     }
-  });
+  }, [isLoading]);
 
   return (
     <View style={styles.container} {...style}>
@@ -61,7 +86,7 @@ export default function EnRouteDetails({ style, store }) {
               color={Theme.colors.placeholder}
             />
             <Text style={[TextStyle.caption, styles.text, styles.detailText]}>
-              {storeDetail.distance}
+              {`${parseFloat(storeDetail.distance).toFixed(2)} km`}
             </Text>
           </View>
           <View style={styles.storeDetailItem}>
@@ -91,7 +116,7 @@ export default function EnRouteDetails({ style, store }) {
 const styles = StyleSheet.create({
   container: {
     borderRadius: Theme.roundness,
-    backgroundColor: Theme.colors.background,
+    backgroundColor: 'white',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,

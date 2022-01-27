@@ -470,7 +470,7 @@ const CampaignEditForm = (props) => {
               <Grid item sm={12} md={3}>
                 <h3 style={{ marginBottom: 5, marginTop: 0 }}>General</h3>
                 <span style={{ fontSize: '0.9rem' }}>
-                  Name the campaign, provide campaign details and specify the campaign period
+                  Set the general information regarding this campaign
                 </span>
               </Grid>
               <Grid item sm={12} md={9} container spacing={3}>
@@ -671,16 +671,14 @@ const CampaignEditForm = (props) => {
                         autoComplete="off"
                         style={{ display: 'none' }}
                       />
-                      <Box style={{ width: '315px', height: '450px' }}>
-                        <ReactLogo />
-                        <div style={{ fontSize: '0.8rem', position: 'relative', bottom: 7 }}>
-                          Drop advertisement here or click &nbsp;
-                          <span style={{ color: '#004C99', textDecoration: 'underline' }}>
-                            browse
-                          </span>
-                          &nbsp; to upload
-                        </div>
-                      </Box>
+                      <ReactLogo style={{ width: '100%' }} />
+                      <div style={{ fontSize: '0.8rem' }}>
+                        Drop advertisement here or click &nbsp;
+                        <span style={{ color: '#004C99', textDecoration: 'underline' }}>
+                          browse
+                        </span>
+                        &nbsp; to upload
+                      </div>
                     </label>
 
                     <FormHelperText error={errors.imageError !== false}>

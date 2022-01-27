@@ -49,23 +49,26 @@ export const getAllCartsForUser = async (appUserID) => {
   }
 };
 
-// export const getCartById = (authHeader, cartID) => {
-//   try {
-//     let carts;
-//     carts = await axiosInstance.get(
-//       '/api/mobile/planning-cart-service/cart/:uuid',
-//       {
-//         params: {
-//           uuid: cartID,
-//         },
-//         authHeader,
-//       }
-//     );
-//     return carts;
-//   } catch (error) {
-//     console.log(error);
-//   }
-// };
+export const getCartById = async (cartID, storeID = undefined) => {
+  const header = await getAuthHeader();
+  try {
+    let query = {};
+    if (storeID && storeID != '') {
+      console.log(`[LoketlistService.js/getCartById] Store uuid: ${storeID}`);
+      query.store = storeID;
+    }
+    let { data } = await axiosInstance.get(
+      `/api/mobile/planning-cart-service/cart/${cartID}`,
+      {
+        params: query,
+        ...header,
+      }
+    );
+    return data;
+  } catch (error) {
+    return Promise.reject(error.response.data.message);
+  }
+};
 
 // export const createNewCart = (authHeader, appUserID, cartName) => {
 //   try {

@@ -1,5 +1,6 @@
 export const environment = {
   host: 'http://localhost:8000',
+  clientHost: 'http://localhost:3000',
 };
 
 export const mapboxAPIKey =

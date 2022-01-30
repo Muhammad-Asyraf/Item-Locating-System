@@ -3,8 +3,8 @@ import React, { useState } from 'react';
 import { StyleSheet, View, Image } from 'react-native';
 import { Text, Button, TextInput, Surface } from 'react-native-paper';
 import NumericInput from 'react-native-numeric-input';
-import SmallTextChip from './core/SmallTextChip';
 import LocationText from './LocationText';
+import { renderChips } from './products/Extra';
 
 // Redux
 import { useSelector, useDispatch } from 'react-redux';
@@ -13,15 +13,15 @@ import { changeItemQuantity } from '../redux/cart/cartSlice';
 // Styling
 import { Theme, TextStyle } from '../styles/Theme';
 
-export default function CartListItem({ style, item, update }) {
+export default function CartListItem({ containerStyle = {}, product, update }) {
   const dispatch = useDispatch();
-  const [itemDetails, setItemDetails] = useState(item);
+  const [itemDetails, setItemDetails] = useState(product);
 
   const handleQuantityChange = (value) => {
     dispatch(
       changeItemQuantity({
-        cart_uuid: item.cart_uuid,
-        product_uuid: item.product_uuid,
+        cart_uuid: product.cart_uuid,
+        product_uuid: product.product_uuid,
         quantity: value,
       })
     );
@@ -33,87 +33,86 @@ export default function CartListItem({ style, item, update }) {
 
   // TODO : Update fields
   return (
-    <Surface style={[style, { borderRadius: 5, elevation: 2 }]}>
-      <View style={styles.listItemContainer}>
+    <View style={[containerStyle]}>
+      <View style={styles.productContainer}>
         <Image
-          style={styles.itemImage}
-          source={{ uri: itemDetails.imageUrl }}
-        ></Image>
-        <View style={styles.itemDetailsContainer}>
-          <LocationText
-            text={'General Store'}
-            size={10}
-            color="#707070"
-            style={[styles.itemLocation, { flexDirection: 'row-reverse' }]}
-          />
-          <View style={styles.horizontalContainer}>
-            <Text style={[TextStyle.caption, styles.itemName]}>
-              {item.name}
+          source={{ uri: 'https://via.placeholder.com/96' }}
+          style={styles.productImage}
+        />
+        <View style={styles.productDetailsContainer}>
+          <View>
+            <Text style={[TextStyle.body2, styles.text]} numberOfLines={2}>
+              {product.name}
             </Text>
-            <Text style={[TextStyle.caption, styles.itemPrice]}>
-              {'RM' + itemDetails.selling_price + '/pc'}
-            </Text>
+            <View style={styles.pricing}>
+              <Text style={[TextStyle.subhead2, styles.text]} numberOfLines={2}>
+                {`RM${product.total_price}`}
+              </Text>
+              <Text
+                style={[TextStyle.overline2, styles.text, styles.singlePrice]}
+                numberOfLines={2}
+              >
+                {`(RM${product.retail_price}/${product.measurement_value}${product.measurement_unit})`}
+              </Text>
+            </View>
           </View>
-          <View style={styles.horizontalContainer}>
-            <NumericInput
-              initValue={itemDetails.quantity}
-              minValue={0}
-              totalHeight={30}
-              onChange={handleQuantityChange}
-            />
-            <SmallTextChip
-              text={'RM' + itemDetails.quantity * itemDetails.selling_price}
-            />
+
+          <View>
+            <View>{renderChips(product.stock_status)}</View>
           </View>
         </View>
       </View>
-    </Surface>
+      <View>
+        <NumericInput
+          containerStyle={styles.numericInput}
+          value={itemDetails.quantity}
+          onChange={handleQuantityChange}
+          totalHeight={24}
+          totalWidth={96}
+          step={1}
+          rounded
+          editable={false}
+        />
+      </View>
+    </View>
   );
 }
 
 // Dedicated styling
 const styles = StyleSheet.create({
-  horizontalContainer: {
+  productContainer: {
     flexDirection: 'row',
+  },
+  productDetailsContainer: {
+    flexDirection: 'column',
     justifyContent: 'space-between',
-    alignItems: 'flex-end',
-    flexWrap: 'wrap',
-    flexGrow: 1,
-    marginTop: 12,
   },
-  listItemContainer: {
+  imageContainer: {
+    flexDirection: 'column',
+  },
+  numericInput: {
+    marginTop: 8,
+  },
+  productImage: {
+    width: 96,
+    height: 96,
+    borderRadius: Theme.roundness,
+  },
+  productDetailsContainer: {
+    marginStart: 12,
+    flexShrink: 1,
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+  },
+  pricing: {
     flexDirection: 'row',
-    justifyContent: 'flex-start',
-    borderRadius: 4,
-    overflow: 'hidden',
-    backgroundColor: 'white',
+    alignItems: 'center',
   },
-  itemImage: {
-    height: undefined,
-    width: undefined,
-    aspectRatio: 1,
+  text: {
+    flexShrink: 1,
   },
-  itemDetailsContainer: {
-    padding: 8,
-    flexGrow: 1,
-  },
-  itemLocation: {
-    marginBottom: 12,
-  },
-  itemName: {},
-  itemPrice: {
-    color: Theme.colors.primary,
-  },
-  itemQuantityContainer: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-  },
-  itemQuantityButton: {},
-  itemQuantityInput: {
-    height: 24,
-    width: 40,
-    textAlign: 'center',
-    fontSize: 12,
-    padding: 0,
+  singlePrice: {
+    color: Theme.colors.placeholder,
+    marginStart: 8,
   },
 });

@@ -1,3 +1,7 @@
+// export const environment = {
+//   host: 'https://soft-gecko-44.loca.lt/',
+//   clientHost: 'https://b3b6-175-136-154-254.ngrok.io/',
+// };
 export const environment = {
   host: 'http://localhost:8000',
   clientHost: 'http://localhost:3000',

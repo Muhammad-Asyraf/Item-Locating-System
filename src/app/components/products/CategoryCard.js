@@ -44,8 +44,7 @@ const styles = StyleSheet.create({
     borderRadius: Theme.roundness,
     width: 72,
     height: 133,
-    elevation: 1,
-    marginEnd: 16,
+    marginEnd: 12,
   },
   categoryImageContainer: {
     paddingVertical: 20,

@@ -138,8 +138,6 @@ const ProductTableRow = (props) => {
     productLoading,
   } = props;
 
-  console.log('product', product);
-
   const handleOpenModal = () => setOpenModal(true);
   const handleCloseModal = () => setOpenModal(false);
 

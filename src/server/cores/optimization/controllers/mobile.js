@@ -249,6 +249,8 @@ exports.getOptimizedPathFromCart = async (req, res, next) => {
       .for(products)
       .sum('total_price');
 
+    console.log(totalPrice);
+
     let store = await Product.relatedQuery('stores')
       .select([
         'store.uuid',
@@ -286,6 +288,7 @@ exports.getOptimizedPathFromCart = async (req, res, next) => {
         totalPrice: totalPrice[0].sum,
         path: finalPath,
       };
+      console.log('resObj', resObj);
       res.json(resObj);
     }
   } catch (error) {

@@ -8,6 +8,9 @@ import NumericInput from 'react-native-numeric-input';
 import SmallTextChip from '../core/SmallTextChip';
 import LocationText from '../LocationText';
 
+// Utilities
+import { calculateDistance } from '../../utils/Geolocation';
+
 // Redux
 import { useSelector, useDispatch } from 'react-redux';
 import { changeItemQuantity, update } from '../../redux/cart/cartSlice';
@@ -22,6 +25,7 @@ export default function ProductCard({ style, product, withStoreName = true }) {
   const auth = useSelector((state) => state.auth);
   const navigation = useNavigation();
   const dispatch = useDispatch();
+  const [isLoading, setLoading] = useState(true);
 
   const [productInCart, setProductInCart] = useState(false);
 
@@ -107,8 +111,17 @@ export default function ProductCard({ style, product, withStoreName = true }) {
     };
   });
 
+  useEffect(() => {
+    if (isLoading) {
+      console.log(
+        `[ProductCard.js/useEffect] Product : ${JSON.stringify(product)}`
+      );
+      setLoading(false);
+    }
+  }, [isLoading]);
+
   const openProductDetails = () => {
-    console.log(`[ProductCard.js] Open product ${product.uuid} details`);
+    // console.log(`[ProductCard.js] Open product ${product.uuid} details`);
     navigation.navigate('Product Page', { product });
   };
 
@@ -177,7 +190,11 @@ export default function ProductCard({ style, product, withStoreName = true }) {
         {withStoreName && (
           <LocationText
             style={{ alignSelf: 'flex-start', marginTop: 4 }}
-            text={product.stores.store_name}
+            text={`${calculateDistance(
+              { longitude: user.position[0], latitude: user.position[1] },
+              product.stores.store_coordinate
+            )} km`}
+            caption={product.stores.store_name}
             color="#707070"
           />
         )}

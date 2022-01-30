@@ -8,6 +8,7 @@ import { useSelector } from 'react-redux';
 
 // Utilities
 import { useNavigation } from '@react-navigation/native';
+import { calculateDistance } from '../../utils/Geolocation';
 import * as turf from '@turf/turf';
 
 // Styling
@@ -31,19 +32,12 @@ export default function StoreCard({ store }) {
   useEffect(() => {
     //TODO: Get the distance of the store
     if (isLoading) {
-      const coordinates = store.store_coordinate;
-      const storePoint = turf.point([
-        coordinates.longitude,
-        coordinates.latitude,
-      ]);
-      const userPoint = turf.point([position[0], position[1]]);
-      console.log(
-        `[StoreCard.js/useEffect] Coordinates: ${JSON.stringify(coordinates)}`
+      const distance = calculateDistance(
+        { longitude: position[0], latitude: position[1] },
+        store.store_coordinate
       );
 
-      const distance = turf.distance(userPoint, storePoint);
-
-      setStoreDistance(`${distance.toFixed(2)} km away`);
+      setStoreDistance(`${distance} km away`);
       setLoading(false);
     }
   }, [isLoading]);

@@ -100,12 +100,20 @@ const MobileStoreLayout = () => {
     dispatch(productProcessed());
   };
 
-  const groupBy = (arr) => {
+  const groupByFloor = (arr) => {
     const result = arr.reduce((acc, currentValue) => {
-      if (!acc[currentValue.layer.layout.name]) {
-        acc[currentValue.layer.layout.name] = [];
+      if (currentValue.layer) {
+        if (!acc[currentValue.layer.layout.name]) {
+          acc[currentValue.layer.layout.name] = [];
+        }
+        acc[currentValue.layer.layout.name].push(currentValue);
+      } else {
+        if (!acc['Unmapped Product']) {
+          acc['Unmapped Product'] = [];
+        }
+        acc['Unmapped Product'].push(currentValue);
       }
-      acc[currentValue.layer.layout.name].push(currentValue);
+
       return acc;
     }, {});
 
@@ -131,7 +139,7 @@ const MobileStoreLayout = () => {
       initLayoutLayers(layoutPayload.layouts);
       setProducts(productPayload.products);
 
-      const productsByFloor = groupBy(productPayload.products);
+      const productsByFloor = groupByFloor(productPayload.products);
 
       try {
         window.ReactNativeWebView.postMessage(

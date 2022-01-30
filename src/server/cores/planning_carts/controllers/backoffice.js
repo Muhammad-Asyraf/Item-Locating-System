@@ -35,7 +35,7 @@ exports.getProductsByCart = async (req, res, next) => {
             );
           })
           .map((promotion) => {
-            const { promotion_type } = promotion;
+            const { promotion_type, meta_data } = promotion;
             let sale_price;
             let promotion_value;
 
@@ -61,7 +61,7 @@ exports.getProductsByCart = async (req, res, next) => {
             } else {
               const {
                 BxGy: { buyQty, freeQty },
-              } = metaData;
+              } = meta_data;
 
               promotion_value = `Buy ${buyQty} Free ${freeQty}`;
             }

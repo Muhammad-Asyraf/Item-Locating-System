@@ -11,8 +11,6 @@ import LoketlistListItem from '../components/LoketlistListItem';
 import Loading from '../components/Loading';
 
 // Utilities
-import axios from 'axios';
-import { getAuthHeader } from '../services/AuthenticationService';
 import {
   getAllCartsForUser,
   createNewCart,
@@ -29,7 +27,7 @@ import { environment } from '../environment';
 // Styling
 import { GlobalStyle, AppbarStyle, TextStyle } from '../styles/Theme';
 
-export default function Lists() {
+export default function Lists({ navigation, route }) {
   const [isLoading, setLoading] = useState(true);
   const [addVisible, setAddVisible] = useState(false);
   const [editVisible, setEditVisible] = useState(false);
@@ -42,13 +40,14 @@ export default function Lists() {
 
   // Dialog states
   const [listName, setListName] = useState('');
-  let name = listName;
+  const nameRef = useRef(null);
 
   // Dialog functions
   const showAddDialog = () => setAddVisible(true);
   const closeAddDialog = () => setAddVisible(false);
   const showEditDialog = ({ uuid, name }) => {
     setControlCartUuid(uuid);
+    nameRef.current = name;
     setListName(name);
     setEditVisible(true);
   };
@@ -134,10 +133,20 @@ export default function Lists() {
           data={loketlists}
           onRefresh={refresh}
           refreshing={isLoading}
-          renderItem={({ item }) => (
+          renderItem={({ item, index }) => (
             <TouchableOpacity
-              onPress={null}
-              onLongPress={() => showEditDialog(item)}
+              onPress={() => {
+                if (index == 0) {
+                  navigation.navigate('Cart');
+                } else {
+                  // Open loketlist
+                }
+              }}
+              onLongPress={() => {
+                if (index != 0) {
+                  showEditDialog(item);
+                }
+              }}
             >
               <LoketlistListItem item={item} />
             </TouchableOpacity>
@@ -155,7 +164,7 @@ export default function Lists() {
         </Dialog.Actions>
       </Dialog>
       <Dialog visible={editVisible} onDismiss={closeEditDialog}>
-        <Dialog.Title>Manage {name}</Dialog.Title>
+        <Dialog.Title>Manage {nameRef.current}</Dialog.Title>
         <Dialog.Content>
           <TextInput
             label="Name"

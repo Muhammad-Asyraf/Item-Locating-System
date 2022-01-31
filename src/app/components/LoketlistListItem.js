@@ -10,11 +10,11 @@ import { Text } from 'react-native-paper';
 import SmallTextChip from './core/SmallTextChip';
 
 // Styling
-import { TextStyle } from '../styles/Theme';
+import { Theme, TextStyle } from '../styles/Theme';
 
 export default function LoketlistListItem({ item }) {
   const [isLoading, setLoading] = useState(true);
-  const image = { uri: 'https://tinyurl.com/cu8nm69m' };
+  const image = { uri: '' };
 
   const totalPrice = useRef(0);
 
@@ -33,9 +33,9 @@ export default function LoketlistListItem({ item }) {
     const now = Date.now();
     const past = Date.parse(date);
     const daysElapsed = (now - past) / (1000 * 3600 * 24);
-    console.log(
-      `[LoketlistListItem.js/parseDate] daysElapsed : ${daysElapsed}`
-    );
+    // console.log(
+    //   `[LoketlistListItem.js/parseDate] daysElapsed : ${daysElapsed}`
+    // );
     if (daysElapsed < 3) {
       return 'Recently updated';
     } else {
@@ -77,6 +77,7 @@ export default function LoketlistListItem({ item }) {
 
 const styles = StyleSheet.create({
   listItemContainer: {
+    backgroundColor: Theme.colors.darkBackground,
     paddingTop: 64,
     paddingHorizontal: 12,
     paddingBottom: 12,

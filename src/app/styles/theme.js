@@ -11,6 +11,7 @@ export const Theme = {
     primary: '#007FFF',
     accent: '#003366',
     background: '#F5F5F5',
+    darkBackground: '#003366',
     text: '#001933',
     placeholder: 'rgba(0,25,51,0.5)',
     error: '#E71D36',

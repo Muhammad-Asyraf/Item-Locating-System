@@ -192,4 +192,5 @@ export const AppbarStyle = StyleSheet.create({
     color: 'white',
     marginHorizontal: 18,
   },
+  appBarButtons: {},
 });

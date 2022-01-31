@@ -65,63 +65,62 @@ export const getCartById = async (cartID, storeID = undefined) => {
   }
 };
 
-// export const createNewCart = (authHeader, appUserID, cartName) => {
-//   try {
-//     let carts;
-//     carts = await axiosInstance.post(
-//       '/api/mobile/planning-cart-service/cart/create',
-//       {
-//         app_user_uuid: appUserID,
-//         name: cartName,
-//       },
-//       {
-//         authHeader,
-//       }
-//     );
-//     return carts;
-//   } catch (error) {
-//     console.log(error);
-//   }
-// };
+export const createNewCart = async (appUserID, cartName) => {
+  try {
+    const header = await getAuthHeader();
+    // Add cart to back end
+    const { data } = await axiosInstance.post(
+      '/api/mobile/planning-cart-service/cart/create',
+      {
+        app_user_uuid: appUserID,
+        name: cartName,
+      },
+      header
+    );
+    return data;
+  } catch (error) {
+    return Promise.reject(error.response.data.message);
+  }
+};
 
-// export const deleteCart = (authHeader, appUserID, cartID) => {
-//   try {
-//     let carts;
-//     carts = await axiosInstance.delete(
-//       '/api/mobile/planning-cart-service/cart/delete',
-//       {
-//         app_user_uuid: appUserID,
-//         cart_uuid: cartID,
-//       },
-//       {
-//         authHeader,
-//       }
-//     );
-//     return carts;
-//   } catch (error) {
-//     console.log(error);
-//   }
-// };
+export const deleteCart = async (appUserID, cartID) => {
+  try {
+    const header = await getAuthHeader();
+    // Add cart to back end
+    const { data } = await axiosInstance.delete(
+      '/api/mobile/planning-cart-service/cart/delete',
+      {
+        ...header,
+        data: {
+          app_user_uuid: appUserID,
+          cart_uuid: cartID,
+        },
+      }
+    );
+    return data;
+  } catch (error) {
+    return Promise.reject(error.response.data.message);
+  }
+};
 
-// export const modifyCart = (authHeader, appUserID, cartID, cartName) => {
-//   try {
-//     let carts;
-//     carts = await axiosInstance.patch(
-//       '/api/mobile/planning-cart-service/cart/update',
-//       {
-//         app_user_uuid: appUserID,
-//         cart_uuid: cartID,
-//         name: cartName,
-//       },
-//       {
-//         authHeader,
-//       }
-//     );
-//     return carts;
-//   } catch (error) {
-//     console.log(error);
-//   }
-// };
+export const modifyCart = async (appUserID, cartID, newCartName) => {
+  try {
+    const header = await getAuthHeader();
+    // Add cart to back end
+    const { data } = await axiosInstance.patch(
+      '/api/mobile/planning-cart-service/cart/update',
+      {
+        app_user_uuid: appUserID,
+        cart_uuid: cartID,
+        name: newCartName,
+      },
+      header
+    );
+    return data;
+  } catch (error) {
+    return Promise.reject(error.response.data.message);
+  }
+};
 
 // export const saveDefaultCartAs = (authHeader, appUserID, cartID, cartName) => {
 //   try {

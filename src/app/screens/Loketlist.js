@@ -16,8 +16,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { environment } from '../environment';
 
 // Styling
-import { GlobalStyle } from '../styles/Theme';
-import { appBarStyles } from '../styles/appBarStyles';
+import { GlobalStyle, AppbarStyle, TextStyle } from '../styles/Theme';
 
 export default function Loketlist({ navigation, route }) {
   const [isLoading, setLoading] = useState(true);
@@ -105,20 +104,11 @@ export default function Loketlist({ navigation, route }) {
 
   return (
     <View style={GlobalStyle.screenContainer}>
-      <Appbar.Header
-        style={[
-          appBarStyles.appBarContainer,
-          {
-            elevation: 0,
-            borderBottomWidth: 0.5,
-            borderBottomColor: '#CBCBCB',
-          },
-        ]}
-      >
+      <Appbar.Header style={[AppbarStyle.transparent, AppbarStyle.padding]}>
         {navigation.canGoBack() ? (
           <Appbar.BackAction color="#007AFF" onPress={navigation.goBack} />
         ) : null}
-        <Text style={appBarStyles.appBarTitle}>CART</Text>
+        <Text style={AppbarStyle.appBarTitle}>CART</Text>
       </Appbar.Header>
       <CartHeader price={'RM' + totalPrice} />
       <FlatList

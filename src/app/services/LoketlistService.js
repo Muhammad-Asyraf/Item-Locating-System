@@ -122,25 +122,23 @@ export const modifyCart = async (appUserID, cartID, newCartName) => {
   }
 };
 
-// export const saveDefaultCartAs = (authHeader, appUserID, cartID, cartName) => {
-//   try {
-//     let carts;
-//     carts = await axiosInstance.patch(
-//       '/api/mobile/planning-cart-service/cart/save',
-//       {
-//         app_user_uuid: appUserID,
-//         cart_uuid: cartID,
-//         name: cartName,
-//       },
-//       {
-//         authHeader,
-//       }
-//     );
-//     return carts;
-//   } catch (error) {
-//     console.log(error);
-//   }
-// };
+export const saveDefaultCartAs = async (appUserID, cartID, cartName) => {
+  try {
+    const header = await getAuthHeader();
+    const { data } = await axiosInstance.patch(
+      '/api/mobile/planning-cart-service/cart/save',
+      {
+        app_user_uuid: appUserID,
+        cart_uuid: cartID,
+        name: cartName,
+      },
+      header
+    );
+    return data;
+  } catch (error) {
+    return Promise.reject(error.response.data.message);
+  }
+};
 
 // /**
 //  * CartItem CRUD methods
@@ -165,25 +163,23 @@ export const addItemIntoCart = async (cartID, productID, quantity) => {
   }
 };
 
-// export const modifyItemInCart = (authHeader, cartID, productID, quantity) => {
-//   try {
-//     let carts;
-//     carts = await axiosInstance.post(
-//       '/api/mobile/planning-cart-service/cart/items/update',
-//       {
-//         cart_uuid: cartID,
-//         product_uuid: productID,
-//         quantity,
-//       },
-//       {
-//         authHeader,
-//       }
-//     );
-//     return carts;
-//   } catch (error) {
-//     console.log(error);
-//   }
-// };
+export const modifyItemInCart = async (cartID, productID, quantity) => {
+  const header = await getAuthHeader();
+  try {
+    const { data } = await axiosInstance.post(
+      '/api/mobile/planning-cart-service/cart/items/update',
+      {
+        cart_uuid: cartID,
+        product_uuid: productID,
+        quantity,
+      },
+      header
+    );
+    return data;
+  } catch (error) {
+    return Promise.reject(error.response.data.message);
+  }
+};
 
 // export const removeItemFromCart = (authHeader, cartID, productID) => {
 //   try {

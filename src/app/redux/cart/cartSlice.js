@@ -7,6 +7,12 @@ import { getAuthHeader } from '../../services/AuthenticationService';
 // Environment configs
 import { environment } from '../../environment';
 
+const initialState = {
+  products: [],
+  quantity: [],
+  update: true,
+};
+
 export const loadAllItems = createAsyncThunk(
   'cart/loadAllItems',
   async (params, thunkAPI) => {
@@ -39,11 +45,7 @@ export const changeItemQuantity = createAsyncThunk(
 );
 export const cartSlice = createSlice({
   name: 'cart',
-  initialState: {
-    products: [],
-    quantity: [],
-    update: true,
-  },
+  initialState,
   // Local reducers
   reducers: {
     addProduct: (state, { payload }) => {
@@ -70,6 +72,9 @@ export const cartSlice = createSlice({
     },
     update: (state, { payload }) => {
       state.update = payload;
+    },
+    resetCart: () => {
+      state = initialState;
     },
   },
   // Async reducers
@@ -101,7 +106,7 @@ export const cartSlice = createSlice({
     },
   },
 });
-export const { addProduct, updateQuantity, removeProduct, update } =
+export const { addProduct, updateQuantity, removeProduct, update, resetCart } =
   cartSlice.actions;
 
 export default cartSlice.reducer;

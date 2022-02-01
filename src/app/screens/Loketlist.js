@@ -1,95 +1,69 @@
-import React, { useEffect, useState } from 'react';
+// Components
+import React, { useEffect, useState, useRef } from 'react';
 import { StyleSheet, View, Text, FlatList } from 'react-native';
-import { Appbar, Title, Dialog } from 'react-native-paper';
-import CartListItem from '../components/CartListItem';
+import { Appbar, Title, Divider } from 'react-native-paper';
+import { useFocusEffect } from '@react-navigation/native';
+import LoketlistProduct from '../components/loketlist/LoketlistProduct';
 import CartHeader from '../components/CartHeader';
 import Loading from '../components/Loading';
 
 // Utilities
-import axios from 'axios';
-import { getAuthHeader } from '../services/AuthenticationService';
+import { getCartById } from '../services/LoketlistService';
 
 // Redux
 import { useSelector, useDispatch } from 'react-redux';
-
-// Environment configs
-import { environment } from '../environment';
+import { update } from '../redux/cart/cartSlice';
 
 // Styling
 import { GlobalStyle, AppbarStyle, TextStyle } from '../styles/Theme';
 
 export default function Loketlist({ navigation, route }) {
+  const cart = route.params;
+  const [loketlist, setLoketlist] = useState({});
   const [isLoading, setLoading] = useState(true);
   const [totalPrice, setTotalPrice] = useState(0);
 
-  const cartUuid = route.params.query;
-
-  const cart = useSelector((state) => state.cart);
-  const { default_cart_uuid } = useSelector((state) => state.user);
-  const auth = useSelector((state) => state.auth);
-
-  // Create a data list
-  const [DATA, setData] = useState([]);
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      const header = await getAuthHeader();
-      const { data } = await axios.get(
-        environment.host + '/api/mobile/planning-cart-service/cart/' + cartUuid,
-        header
-      );
-      let totalPrice = 0;
-      let DATA = [];
-      for (i = 0; i < cart.products.length; i++) {
-        totalPrice +=
-          data.products[i].selling_price * data.products[i].quantity;
-        DATA.push({
-          key: i,
-          cart_uuid: default_cart_uuid,
-          product_uuid: cart.products[i],
-          name: data.products[i].name,
-          quantity: data.products[i].quantity,
-          selling_price: data.products[i].selling_price,
-          imageUrl: 'https://tinyurl.com/cu8nm69m',
-        });
-      }
-      console.log('Loaded all products into array');
-      setData(DATA);
-      setTotalPrice(totalPrice);
-      setLoading(false);
-    };
     if (isLoading) {
-      fetchProducts();
+      getCartById(cart.uuid)
+        .then((data) => {
+          setLoketlist(data);
+          data.products.map((product) =>
+            setTotalPrice(totalPrice + parseFloat(product.total_price))
+          );
+          setLoading(false);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     }
   }, [isLoading]);
 
   const refreshCart = () => {
+    setTotalPrice(0);
     setLoading(true);
   };
 
-  if (isLoading) {
-    return (
-      <View style={GlobalStyle.screenContainer}>
-        <Appbar.Header style={[appBarStyles.appBarContainer, { elevation: 0 }]}>
-          {navigation.canGoBack() ? (
-            <Appbar.BackAction color="#007AFF" onPress={navigation.goBack} />
-          ) : null}
-          <Text style={appBarStyles.appBarTitle}>CART</Text>
-        </Appbar.Header>
+  return (
+    <View style={GlobalStyle.screenContainer}>
+      <Appbar.Header style={[AppbarStyle.transparent]}>
+        {navigation.canGoBack() && (
+          <Appbar.BackAction onPress={() => navigation.goBack()} />
+        )}
+        <Title style={[TextStyle.headline5, GlobalStyle.flexGrow]}>
+          {cart.name}
+        </Title>
+        <Appbar.Action
+          style={AppbarStyle.appBarButtons}
+          icon="playlist-edit"
+          onPress={null}
+        />
+      </Appbar.Header>
+      {isLoading ? (
         <Loading />
-      </View>
-    );
-  }
-
-  if (cart.products.length === 0) {
-    return (
-      <View style={GlobalStyle.screenContainer}>
-        <Appbar.Header style={[appBarStyles.appBarContainer, { elevation: 0 }]}>
-          {navigation.canGoBack() ? (
-            <Appbar.BackAction color="#007AFF" onPress={navigation.goBack} />
-          ) : null}
-          <Text style={appBarStyles.appBarTitle}>CART</Text>
-        </Appbar.Header>
+      ) : loketlist.products.length === 0 ? (
         <View
           style={[
             GlobalStyle.contentContainer,
@@ -98,36 +72,33 @@ export default function Loketlist({ navigation, route }) {
         >
           <Text>Your cart is empty!</Text>
         </View>
-      </View>
-    );
-  }
-
-  return (
-    <View style={GlobalStyle.screenContainer}>
-      <Appbar.Header style={[AppbarStyle.transparent, AppbarStyle.padding]}>
-        {navigation.canGoBack() ? (
-          <Appbar.BackAction color="#007AFF" onPress={navigation.goBack} />
-        ) : null}
-        <Text style={AppbarStyle.appBarTitle}>CART</Text>
-      </Appbar.Header>
-      <CartHeader price={'RM' + totalPrice} />
-      <FlatList
-        style={styles.sectionListView}
-        onRefresh={refreshCart}
-        refreshing={isLoading}
-        data={DATA}
-        renderItem={({ item }) => (
-          <CartListItem item={item} style={styles.listItem} />
-        )}
-      />
+      ) : (
+        <View style={GlobalStyle.contentContainer}>
+          <CartHeader price={'RM' + totalPrice} />
+          <Divider />
+          <FlatList
+            contentContainerStyle={styles.sectionListView}
+            onRefresh={refreshCart}
+            refreshing={isLoading}
+            data={loketlist.products}
+            renderItem={({ item }) => (
+              <LoketlistProduct
+                product={item}
+                cartID={cart.uuid}
+                containerStyle={styles.listItem}
+                load={refreshCart}
+              />
+            )}
+          />
+        </View>
+      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   sectionListView: {
-    paddingHorizontal: 18,
-    marginTop: 8,
+    paddingVertical: 12,
   },
   listSectionContainer: {
     marginVertical: 8,
@@ -139,6 +110,6 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
   },
   listItem: {
-    marginVertical: 8,
+    marginBottom: 18,
   },
 });

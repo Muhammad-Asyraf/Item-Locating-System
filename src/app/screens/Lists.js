@@ -6,6 +6,7 @@ import {
   FlatList,
   TouchableOpacity,
 } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import { Appbar, Dialog, Button, Title, TextInput } from 'react-native-paper';
 import LoketlistListItem from '../components/LoketlistListItem';
 import Loading from '../components/Loading';
@@ -20,9 +21,6 @@ import {
 
 // Redux
 import { useSelector, useDispatch } from 'react-redux';
-
-// Environment configs
-import { environment } from '../environment';
 
 // Styling
 import { GlobalStyle, AppbarStyle, TextStyle } from '../styles/Theme';
@@ -53,28 +51,29 @@ export default function Lists({ navigation, route }) {
   };
   const closeEditDialog = () => setEditVisible(false);
 
-  useEffect(() => {
-    const fetchLoketlists = async () => {
-      const data = await getAllCartsForUser(user.uuid);
+  const fetchLoketlists = async () => {
+    const data = await getAllCartsForUser(user.uuid);
 
-      let loketlists = [];
-      for (i = 0; i < data.length; i++) {
-        if (data[i].is_default == true) {
-          loketlists.push({
-            key: i,
-            ...data[i],
-            name: 'General Cart',
-          });
-        } else {
-          loketlists.push({
-            key: i,
-            ...data[i],
-          });
-        }
+    let loketlists = [];
+    for (i = 0; i < data.length; i++) {
+      if (data[i].is_default == true) {
+        loketlists.unshift({
+          key: i,
+          ...data[i],
+          name: 'General Cart',
+        });
+      } else {
+        loketlists.push({
+          key: i,
+          ...data[i],
+        });
       }
-      setLoketlists(loketlists);
-      setLoading(false);
-    };
+    }
+    setLoketlists(loketlists);
+    setLoading(false);
+  };
+
+  useEffect(() => {
     if (isLoading) {
       fetchLoketlists();
     }
@@ -118,7 +117,9 @@ export default function Lists({ navigation, route }) {
   return (
     <View style={GlobalStyle.screenContainer}>
       <Appbar.Header style={[AppbarStyle.transparent, AppbarStyle.padding]}>
-        <Title style={TextStyle.headline5}>Your Loketlists</Title>
+        <Title style={[TextStyle.headline5, GlobalStyle.flexGrow]}>
+          Your Loketlists
+        </Title>
         <Appbar.Action
           style={AppbarStyle.appBarButtons}
           icon="plus"
@@ -136,14 +137,17 @@ export default function Lists({ navigation, route }) {
           renderItem={({ item, index }) => (
             <TouchableOpacity
               onPress={() => {
-                if (index == 0) {
+                if (item.is_default) {
                   navigation.navigate('Cart');
                 } else {
                   // Open loketlist
+                  navigation
+                    .dangerouslyGetParent()
+                    .navigate('Loketlist', { ...item });
                 }
               }}
               onLongPress={() => {
-                if (index != 0) {
+                if (!item.is_default) {
                   showEditDialog(item);
                 }
               }}

@@ -43,6 +43,9 @@ export const GlobalStyle = StyleSheet.create({
     alignItems: 'center',
   },
   flatGrid: {},
+  flexGrow: {
+    flexGrow: 1,
+  },
 });
 
 export const TextStyle = StyleSheet.create({
@@ -193,5 +196,7 @@ export const AppbarStyle = StyleSheet.create({
     color: 'white',
     marginHorizontal: 18,
   },
-  appBarButtons: {},
+  appBarButtons: {
+    marginEnd: 12,
+  },
 });

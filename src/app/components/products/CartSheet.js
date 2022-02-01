@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Button } from 'react-native-paper';
+import { Button, IconButton, Menu } from 'react-native-paper';
 import NumericInput from 'react-native-numeric-input';
+
+// Utilities
+import { addItemIntoCart } from '../../services/LoketlistService';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { addItemThunk } from '../../redux/cart/cartThunk';
@@ -9,10 +12,17 @@ import { addItemThunk } from '../../redux/cart/cartThunk';
 // Styling
 import { Theme } from '../../styles/Theme';
 
-export default function CartSheet({ product }) {
+export default function CartSheet({ product, loketlists }) {
   const [addQuantity, setAddQuantity] = useState(1);
   const user = useSelector((state) => state.user);
   const dispatch = useDispatch();
+
+  // Menu states
+  const [menuVisible, setMenuVisible] = useState(false);
+
+  const showCartMenu = () => setMenuVisible(true);
+  const hideCartMenu = () => setMenuVisible(false);
+
   const handleQuantityChange = (value) => {
     setAddQuantity(value);
   };
@@ -28,6 +38,19 @@ export default function CartSheet({ product }) {
     );
   };
 
+  const addQuantityToLoketlist = (uuid) => {
+    addItemIntoCart(uuid, product.uuid, addQuantity)
+      .then((data) => {
+        console.log(
+          `[CartSheet.js/addQuantityToLoketlist] Added product ${addQuantity} ${product.uuid}`
+        );
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    hideCartMenu();
+  };
+
   return (
     <View style={styles.container}>
       <NumericInput
@@ -40,13 +63,27 @@ export default function CartSheet({ product }) {
         onChange={handleQuantityChange}
         rounded={true}
       />
-      <Button
-        style={styles.button}
-        mode="contained"
-        onPress={addQuantityToCart}
-      >
-        Add To Cart
-      </Button>
+      <View style={styles.cartButtonContainer}>
+        <Button labelStyle={styles.button} onPress={addQuantityToCart}>
+          Add To Cart
+        </Button>
+        <Menu
+          visible={menuVisible}
+          anchor={
+            <IconButton icon="menu-down" onPress={showCartMenu} color="white" />
+          }
+          onDismiss={hideCartMenu}
+        >
+          {loketlists.map((list) => {
+            return (
+              <Menu.Item
+                onPress={() => addQuantityToLoketlist(list.uuid)}
+                title={list.name}
+              />
+            );
+          })}
+        </Menu>
+      </View>
     </View>
   );
 }
@@ -63,6 +100,14 @@ const styles = StyleSheet.create({
     marginHorizontal: 8,
   },
   button: {
+    color: 'white',
+  },
+  cartButtonContainer: {
+    backgroundColor: Theme.colors.primary,
+    borderRadius: Theme.roundness,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
     marginHorizontal: 8,
   },
 });

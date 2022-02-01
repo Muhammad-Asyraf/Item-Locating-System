@@ -1,30 +1,40 @@
 // Components
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { StyleSheet, View, Image } from 'react-native';
 import { Text, Button, TextInput, Surface } from 'react-native-paper';
 import NumericInput from 'react-native-numeric-input';
-import LocationText from './LocationText';
-import { renderChips } from './products/Extra';
+import { renderChips } from '../products/Extra';
 
-// Redux
-import { useSelector, useDispatch } from 'react-redux';
-import { changeItemQuantity } from '../redux/cart/cartSlice';
+// Utilities
+import { modifyItemInCart } from '../../services/LoketlistService';
 
 // Styling
-import { Theme, TextStyle } from '../styles/Theme';
+import { Theme, TextStyle } from '../../styles/Theme';
 
-export default function CartListItem({ containerStyle = {}, product, update }) {
-  const dispatch = useDispatch();
+export default function LoketlistProduct({
+  containerStyle = {},
+  product,
+  cartID,
+  load,
+}) {
   const [itemDetails, setItemDetails] = useState(product);
+  const previousQuantity = useRef(product.quantity);
 
   const handleQuantityChange = (value) => {
-    dispatch(
-      changeItemQuantity({
-        cart_uuid: product.cart_uuid,
-        product_uuid: product.product_uuid,
-        quantity: value,
+    modifyItemInCart(cartID, product.uuid, value)
+      .then((data) => {
+        previousQuantity.current = value;
       })
-    );
+      .catch((error) => {
+        console.log(error);
+        setItemDetails({
+          ...itemDetails,
+          quantity: previousQuantity.current,
+        });
+      })
+      .finally(() => {
+        load();
+      });
     setItemDetails({
       ...itemDetails,
       quantity: value,

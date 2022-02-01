@@ -1,24 +1,30 @@
 // Components
 import React, { useState } from 'react';
-import { StyleSheet, View, Text, FlatList } from 'react-native';
-import { Appbar, Title, Divider } from 'react-native-paper';
+import { StyleSheet, View, FlatList } from 'react-native';
+import {
+  Appbar,
+  Title,
+  Divider,
+  Button,
+  Dialog,
+  Text,
+  TextInput,
+} from 'react-native-paper';
 import { useFocusEffect } from '@react-navigation/native';
 import CartListItem from '../components/CartListItem';
 import CartHeader from '../components/CartHeader';
 import Loading from '../components/Loading';
-import ListSeparator from '../components/core/ListSeparator';
 
 // Utilities
-import axios from 'axios';
-import { getAuthHeader } from '../services/AuthenticationService';
-import { getCartById } from '../services/LoketlistService';
+import {
+  getDefaultCartForUser,
+  saveDefaultCartAs,
+} from '../services/LoketlistService';
 
 // Redux
 import { useSelector, useDispatch } from 'react-redux';
-import { update } from '../redux/cart/cartSlice';
-
-// Environment configs
-import { environment } from '../environment';
+import { update, resetCart } from '../redux/cart/cartSlice';
+import { setDefaultCart } from '../redux/user/userSlice';
 
 // Styling
 import { GlobalStyle, AppbarStyle, TextStyle } from '../styles/Theme';
@@ -28,49 +34,54 @@ export default function Cart({ navigation }) {
   const [totalPrice, setTotalPrice] = useState(0);
 
   const cart = useSelector((state) => state.cart);
-  const { default_cart_uuid } = useSelector((state) => state.user);
+  const { uuid, default_cart_uuid } = useSelector((state) => state.user);
   const dispatch = useDispatch();
+
+  // Save dialog states
+  const [isDialogVisible, setDialogVisible] = useState(false);
+  const [newCartName, setNewCartName] = useState('');
 
   // Create a data list
   const [DATA, setData] = useState([]);
 
+  const fetchProducts = async () => {
+    getDefaultCartForUser(uuid).then((data) => {
+      dispatch(setDefaultCart(data.uuid));
+      let DATA = [];
+      for (i = 0; i < cart.products.length; i++) {
+        let idx = data.products
+          .map((val) => val.uuid)
+          .indexOf(cart.products[i]);
+        DATA.push({
+          key: i,
+          cart_uuid: data.uuid,
+          product_uuid: cart.products[i],
+          ...data.products[idx],
+        });
+      }
+
+      console.log('Loaded all products into array');
+
+      // Update the totalPrice
+      let totalPrice = 0;
+      for (i = 0; i < DATA.length; i++) {
+        totalPrice += parseFloat(DATA[i].total_price);
+      }
+      // console.log(totalPrice.toFixed(2));
+
+      // Update redux states
+      dispatch(update(false));
+
+      // Update local states
+      setData(DATA);
+      setTotalPrice(totalPrice.toFixed(2));
+      setLoading(false);
+    });
+  };
+
   useFocusEffect(
     React.useCallback(() => {
       setLoading(cart.update);
-
-      const fetchProducts = async () => {
-        getCartById(default_cart_uuid).then((data) => {
-          let DATA = [];
-          for (i = 0; i < cart.products.length; i++) {
-            let idx = data.products
-              .map((val) => val.uuid)
-              .indexOf(cart.products[i]);
-            DATA.push({
-              key: i,
-              cart_uuid: default_cart_uuid,
-              product_uuid: cart.products[i],
-              ...data.products[idx],
-            });
-          }
-
-          console.log('Loaded all products into array');
-
-          // Update the totalPrice
-          let totalPrice = 0;
-          for (i = 0; i < DATA.length; i++) {
-            totalPrice += parseFloat(DATA[i].total_price);
-          }
-          // console.log(totalPrice.toFixed(2));
-
-          // Update redux states
-          dispatch(update(false));
-
-          // Update local states
-          setData(DATA);
-          setTotalPrice(totalPrice.toFixed(2));
-          setLoading(false);
-        });
-      };
 
       if (isLoading) {
         fetchProducts();
@@ -82,10 +93,33 @@ export default function Cart({ navigation }) {
     setLoading(true);
   };
 
+  const showSaveDialog = () => setDialogVisible(true);
+  const hideSaveDialog = () => setDialogVisible(false);
+
+  const saveDialog = () => {
+    hideSaveDialog();
+    saveDefaultCartAs(uuid, default_cart_uuid, newCartName)
+      .then((data) => {
+        console.log(data);
+        dispatch(resetCart());
+        setLoading(true);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
   return (
     <View style={GlobalStyle.screenContainer}>
       <Appbar.Header style={[AppbarStyle.transparent, AppbarStyle.padding]}>
-        <Title style={[TextStyle.headline5]}>Your cart</Title>
+        <Title style={[TextStyle.headline5, GlobalStyle.flexGrow]}>
+          Your cart
+        </Title>
+        <Appbar.Action
+          style={AppbarStyle.appBarButtons}
+          icon="content-save"
+          onPress={showSaveDialog}
+        />
       </Appbar.Header>
       {isLoading ? (
         <Loading />
@@ -113,6 +147,26 @@ export default function Cart({ navigation }) {
           />
         </View>
       )}
+      <Dialog visible={isDialogVisible} onDismiss={hideSaveDialog}>
+        <Dialog.Title>Save cart for future use</Dialog.Title>
+        <Dialog.Content>
+          <Text>
+            From here, you can save this cart for future so you will not have to
+            add those products again into a cart.
+          </Text>
+          <TextInput
+            style={styles.dialogTextInput}
+            value={newCartName}
+            onChangeText={(text) => setNewCartName(text)}
+            placeholder="Eg. Kids favourites, Snacks etc.."
+            label="List name"
+          />
+        </Dialog.Content>
+        <Dialog.Actions>
+          <Button onPress={hideSaveDialog}>Cancel</Button>
+          <Button onPress={saveDialog}>Save</Button>
+        </Dialog.Actions>
+      </Dialog>
     </View>
   );
 }
@@ -132,5 +186,8 @@ const styles = StyleSheet.create({
   },
   listItem: {
     marginBottom: 18,
+  },
+  dialogTextInput: {
+    marginTop: 12,
   },
 });

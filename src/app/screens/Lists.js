@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   StyleSheet,
   View,
@@ -6,25 +6,26 @@ import {
   FlatList,
   TouchableOpacity,
 } from 'react-native';
-import { Appbar, Dialog, Button, TextInput } from 'react-native-paper';
+import { useFocusEffect } from '@react-navigation/native';
+import { Appbar, Dialog, Button, Title, TextInput } from 'react-native-paper';
 import LoketlistListItem from '../components/LoketlistListItem';
 import Loading from '../components/Loading';
 
 // Utilities
-import axios from 'axios';
-import { getAuthHeader } from '../services/AuthenticationService';
+import {
+  getAllCartsForUser,
+  createNewCart,
+  deleteCart,
+  modifyCart,
+} from '../services/LoketlistService';
 
 // Redux
 import { useSelector, useDispatch } from 'react-redux';
 
-// Environment configs
-import { environment } from '../environment';
-
 // Styling
-import { GlobalStyle } from '../styles/Theme';
-import { appBarStyles } from '../styles/appBarStyles';
+import { GlobalStyle, AppbarStyle, TextStyle } from '../styles/Theme';
 
-export default function Lists() {
+export default function Lists({ navigation, route }) {
   const [isLoading, setLoading] = useState(true);
   const [addVisible, setAddVisible] = useState(false);
   const [editVisible, setEditVisible] = useState(false);
@@ -37,50 +38,42 @@ export default function Lists() {
 
   // Dialog states
   const [listName, setListName] = useState('');
-  let name = listName;
+  const nameRef = useRef(null);
 
   // Dialog functions
   const showAddDialog = () => setAddVisible(true);
   const closeAddDialog = () => setAddVisible(false);
   const showEditDialog = ({ uuid, name }) => {
     setControlCartUuid(uuid);
+    nameRef.current = name;
     setListName(name);
     setEditVisible(true);
   };
   const closeEditDialog = () => setEditVisible(false);
 
-  useEffect(() => {
-    const fetchLoketlists = async () => {
-      const header = await getAuthHeader();
-      const { data } = await axios.get(
-        environment.host +
-          '/api/mobile/planning-cart-service/carts/' +
-          user.uuid,
-        header
-      );
-      let loketlists = [];
-      for (i = 0; i < data.length; i++) {
-        if (data[i].is_default == true) {
-          loketlists.push({
-            key: i,
-            uuid: data[i].uuid,
-            app_user_uuid: data[i].app_user_uuid,
-            name: 'General Cart',
-            updated_at: data[i].updated_at,
-          });
-        } else {
-          loketlists.push({
-            key: i,
-            uuid: data[i].uuid,
-            app_user_uuid: data[i].app_user_uuid,
-            name: data[i].name,
-            updated_at: data[i].updated_at,
-          });
-        }
+  const fetchLoketlists = async () => {
+    const data = await getAllCartsForUser(user.uuid);
+
+    let loketlists = [];
+    for (i = 0; i < data.length; i++) {
+      if (data[i].is_default == true) {
+        loketlists.unshift({
+          key: i,
+          ...data[i],
+          name: 'General Cart',
+        });
+      } else {
+        loketlists.push({
+          key: i,
+          ...data[i],
+        });
       }
-      setLoketlists(loketlists);
-      setLoading(false);
-    };
+    }
+    setLoketlists(loketlists);
+    setLoading(false);
+  };
+
+  useEffect(() => {
     if (isLoading) {
       fetchLoketlists();
     }
@@ -88,35 +81,18 @@ export default function Lists() {
 
   // Dialog handlers
   const submitEdit = async () => {
-    const header = await getAuthHeader();
-    // Add cart to back end
-    const { data } = await axios.patch(
-      environment.host + '/api/mobile/planning-cart-service/cart/update',
-      {
-        app_user_uuid: user.uuid,
-        cart_uuid: controlCartUuid,
-        name: listName,
-      },
-      header
-    );
+    modifyCart(user.uuid, controlCartUuid, listName)
+      .then((data) => {})
+      .catch((error) => {});
     closeEditDialog();
     // Refresh
     setLoading(true);
   };
 
   const submitDelete = async () => {
-    const header = await getAuthHeader();
-    // Add cart to back end
-    const { data } = await axios.delete(
-      environment.host + '/api/mobile/planning-cart-service/cart/delete',
-      {
-        headers: header.headers,
-        data: {
-          app_user_uuid: user.uuid,
-          cart_uuid: controlCartUuid,
-        },
-      }
-    );
+    deleteCart(user.uuid, controlCartUuid)
+      .then((data) => {})
+      .catch((error) => {});
     closeEditDialog();
     // Refresh
     setLoading(true);
@@ -130,53 +106,57 @@ export default function Lists() {
     setLoading(true);
   };
   const addList = async () => {
-    const header = await getAuthHeader();
-    // Add cart to back end
-    const { data } = await axios.post(
-      environment.host + '/api/mobile/planning-cart-service/cart/create',
-      {
-        app_user_uuid: user.uuid,
-        name: listName,
-      },
-      header
-    );
+    createNewCart(user.uuid, listName)
+      .then((data) => {})
+      .catch((error) => {});
     closeAddDialog();
     // Refresh the page
     setLoading(true);
   };
 
   return (
-    <View>
-      <View style={GlobalStyle.screenContainer}>
-        <Appbar.Header style={[appBarStyles.appBarContainer, styles.appBar]}>
-          <Text style={appBarStyles.appBarTitle}>LOKETLISTS</Text>
-          <Appbar.Action
-            icon="plus"
-            onPress={() => {
-              console.log('Open add new list dialog');
-              showAddDialog();
-            }}
-          />
-        </Appbar.Header>
-        {isLoading ? (
-          <Loading />
-        ) : (
-          <FlatList
-            style={styles.flatListView}
-            data={loketlists}
-            onRefresh={refresh}
-            refreshing={isLoading}
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                onPress={null}
-                onLongPress={() => showEditDialog(item)}
-              >
-                <LoketlistListItem item={item} store_count={1} />
-              </TouchableOpacity>
-            )}
-          />
-        )}
-      </View>
+    <View style={GlobalStyle.screenContainer}>
+      <Appbar.Header style={[AppbarStyle.transparent, AppbarStyle.padding]}>
+        <Title style={[TextStyle.headline5, GlobalStyle.flexGrow]}>
+          Your Loketlists
+        </Title>
+        <Appbar.Action
+          style={AppbarStyle.appBarButtons}
+          icon="plus"
+          onPress={showAddDialog}
+        />
+      </Appbar.Header>
+      {isLoading ? (
+        <Loading />
+      ) : (
+        <FlatList
+          style={styles.flatListView}
+          data={loketlists}
+          onRefresh={refresh}
+          refreshing={isLoading}
+          renderItem={({ item, index }) => (
+            <TouchableOpacity
+              onPress={() => {
+                if (item.is_default) {
+                  navigation.navigate('Cart');
+                } else {
+                  // Open loketlist
+                  navigation
+                    .dangerouslyGetParent()
+                    .navigate('Loketlist', { ...item });
+                }
+              }}
+              onLongPress={() => {
+                if (!item.is_default) {
+                  showEditDialog(item);
+                }
+              }}
+            >
+              <LoketlistListItem item={item} />
+            </TouchableOpacity>
+          )}
+        />
+      )}
       <Dialog visible={addVisible} onDismiss={closeAddDialog}>
         <Dialog.Title>Add a new list</Dialog.Title>
         <Dialog.Content>
@@ -188,7 +168,7 @@ export default function Lists() {
         </Dialog.Actions>
       </Dialog>
       <Dialog visible={editVisible} onDismiss={closeEditDialog}>
-        <Dialog.Title>Manage {name}</Dialog.Title>
+        <Dialog.Title>Manage {nameRef.current}</Dialog.Title>
         <Dialog.Content>
           <TextInput
             label="Name"

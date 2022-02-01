@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Appbar, Text, Surface } from 'react-native-paper';
 import CollapsibleToolbar from 'react-native-collapsible-toolbar';
@@ -7,16 +7,42 @@ import LocationText from '../components/LocationText';
 import CartSheet from '../components/products/CartSheet';
 import SmallTextChip from '../components/core/SmallTextChip';
 import { WebViewQuillJS } from 'react-native-webview-quilljs';
+import Loading from '../components/Loading';
+
+// Utilities
+import { getAllCartsForUser } from '../services/LoketlistService';
+
+// Redux
+import { useSelector } from 'react-redux';
 
 // styling
 import { TextStyle, AppbarStyle, GlobalStyle, Theme } from '../styles/Theme';
+import { useEffect } from 'react';
 
 export default function ProductDetails({ navigation, route }) {
+  const user = useSelector((state) => state.user);
+  const loketlists = useRef([]);
+  const [isLoading, setLoading] = useState(true);
   const [images, setImages] = useState([
     'https://tinyurl.com/27wk7pdz',
     'https://tinyurl.com/2s37dtph',
   ]);
   const { product } = route.params;
+
+  useEffect(() => {
+    if (isLoading) {
+      getAllCartsForUser(user.uuid)
+        .then((data) => {
+          loketlists.current = data.filter((cart) => !cart.is_default);
+        })
+        .catch((error) => {
+          console.log(error);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    }
+  }, [isLoading]);
 
   const renderAppbar = () => {
     return (
@@ -99,14 +125,20 @@ export default function ProductDetails({ navigation, route }) {
   // Dont modify below!
   return (
     <View style={GlobalStyle.screenContainer}>
-      <CollapsibleToolbar
-        renderNavBar={renderAppbar}
-        renderContent={renderContent}
-        renderToolBar={renderHeader}
-      />
-      <Surface style={styles.addToCartSheet}>
-        <CartSheet product={product} />
-      </Surface>
+      {isLoading ? (
+        <Loading />
+      ) : (
+        <View style={{ flex: 1, flexGrow: 1 }}>
+          <CollapsibleToolbar
+            renderNavBar={renderAppbar}
+            renderContent={renderContent}
+            renderToolBar={renderHeader}
+          />
+          <Surface style={styles.addToCartSheet}>
+            <CartSheet product={product} loketlists={loketlists.current} />
+          </Surface>
+        </View>
+      )}
     </View>
   );
 }

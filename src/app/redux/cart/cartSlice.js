@@ -74,7 +74,7 @@ export const cartSlice = createSlice({
       state.update = payload;
     },
     resetCart: () => {
-      state = initialState;
+      return initialState;
     },
   },
   // Async reducers

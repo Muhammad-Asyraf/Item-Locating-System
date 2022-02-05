@@ -7,24 +7,19 @@ import { Text } from 'react-native-paper';
 import { Theme, TextStyle } from '../../styles/Theme';
 
 export default function SmallTextChip(
-  {
-    text,
-    fill = false,
-    size = 10,
-    color = Theme.colors.primary,
-    marginEnd = true,
-    style,
-  },
+  { text, fill = false, size = 10, color = Theme.colors.primary, style },
   props
 ) {
   return (
     <Text
+      numberOfLines={1}
+      ellipsizeMode="tail"
       style={[
         TextStyle.overline2,
         styles.text,
         styles.chip,
         fill
-          ? { backgroundColor: color, color: 'white', borderWidth: 0 }
+          ? { backgroundColor: color, color: 'white', borderColor: color }
           : { borderColor: color, color: color },
         { fontSize: size },
         style,
@@ -42,6 +37,7 @@ const styles = StyleSheet.create({
     paddingVertical: 1,
     paddingHorizontal: 4,
     marginVertical: 2,
+    marginEnd: 4,
     borderRadius: 2,
     borderWidth: 1,
   },

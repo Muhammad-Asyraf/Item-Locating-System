@@ -1,6 +1,6 @@
 // Components
 import React, { useState } from 'react';
-import { StyleSheet, View, FlatList } from 'react-native';
+import { StyleSheet, View, SectionList } from 'react-native';
 import {
   Appbar,
   Title,
@@ -14,12 +14,15 @@ import { useFocusEffect } from '@react-navigation/native';
 import CartListItem from '../components/CartListItem';
 import CartHeader from '../components/CartHeader';
 import Loading from '../components/Loading';
+import NavigateButton from '../components/loketlist/NavigateButton';
+import { renderSectionHeader } from '../components/loketlist/Extra';
 
 // Utilities
 import {
   getDefaultCartForUser,
   saveDefaultCartAs,
 } from '../services/LoketlistService';
+import { productsGroupByStores } from '../utils/Utils';
 
 // Redux
 import { useSelector, useDispatch } from 'react-redux';
@@ -45,43 +48,68 @@ export default function Cart({ navigation }) {
   const [DATA, setData] = useState([]);
 
   const fetchProducts = async () => {
-    getDefaultCartForUser(uuid).then((data) => {
-      dispatch(setDefaultCart(data.uuid));
-      let DATA = [];
-      for (i = 0; i < cart.products.length; i++) {
-        let idx = data.products
-          .map((val) => val.uuid)
-          .indexOf(cart.products[i]);
-        DATA.push({
-          key: i,
-          cart_uuid: data.uuid,
-          product_uuid: cart.products[i],
-          ...data.products[idx],
-        });
-      }
+    getDefaultCartForUser(uuid)
+      .then((data) => {
+        dispatch(setDefaultCart(data.uuid));
+        let DATA = [];
+        let totalPrice = 0;
 
-      console.log('Loaded all products into array');
+        if (data.products.length > 0) {
+          for (i = 0; i < cart.products.length; i++) {
+            let idx = data.products
+              .map((val) => val.uuid)
+              .indexOf(cart.products[i]);
+            DATA.push({
+              key: i,
+              cart_uuid: data.uuid,
+              product_uuid: cart.products[i],
+              ...data.products[idx],
+            });
+          }
 
-      // Update the totalPrice
-      let totalPrice = 0;
-      for (i = 0; i < DATA.length; i++) {
-        totalPrice += parseFloat(DATA[i].total_price);
-      }
-      // console.log(totalPrice.toFixed(2));
+          console.log('Loaded all products into array');
 
-      // Update redux states
-      dispatch(update(false));
+          // Update the totalPrice
+          for (i = 0; i < DATA.length; i++) {
+            const { promotions } = DATA[i];
+            if (promotions.length > 0) {
+              let salePrice;
+              for (promo of promotions) {
+                if ('sale_price' in promo) {
+                  salePrice = promo.sale_price;
+                  break;
+                }
+              }
 
-      // Update local states
-      setData(DATA);
-      setTotalPrice(totalPrice.toFixed(2));
-      setLoading(false);
-    });
+              totalPrice += parseFloat(salePrice * DATA[i].quantity);
+            } else {
+              totalPrice += parseFloat(DATA[i].total_price);
+            }
+          }
+
+          DATA = productsGroupByStores(DATA);
+        }
+
+        // Update redux states
+        dispatch(update(false));
+
+        // Update local states
+        setData(DATA);
+        setTotalPrice(totalPrice.toFixed(2));
+      })
+      .catch((error) => {
+        error;
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   };
 
   useFocusEffect(
     React.useCallback(() => {
-      setLoading(cart.update);
+      if (cart.update) {
+        setLoading(true);
+      }
 
       if (isLoading) {
         fetchProducts();
@@ -98,15 +126,19 @@ export default function Cart({ navigation }) {
 
   const saveDialog = () => {
     hideSaveDialog();
-    saveDefaultCartAs(uuid, default_cart_uuid, newCartName)
-      .then((data) => {
-        console.log(data);
-        dispatch(resetCart());
-        setLoading(true);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    if (newCartName == '') {
+    } else {
+      saveDefaultCartAs(uuid, default_cart_uuid, newCartName)
+        .then((data) => {
+          console.log(data);
+          dispatch(resetCart());
+          setData([]);
+          setLoading(true);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
   };
 
   return (
@@ -136,11 +168,13 @@ export default function Cart({ navigation }) {
         <View style={GlobalStyle.contentContainer}>
           <CartHeader price={'RM' + totalPrice} />
           <Divider />
-          <FlatList
+          <SectionList
             contentContainerStyle={styles.sectionListView}
+            ListFooterComponent={<NavigateButton cartID={default_cart_uuid} />}
             onRefresh={refreshCart}
             refreshing={isLoading}
-            data={DATA}
+            sections={DATA}
+            renderSectionHeader={renderSectionHeader}
             renderItem={({ item }) => (
               <CartListItem product={item} containerStyle={styles.listItem} />
             )}
@@ -174,6 +208,9 @@ export default function Cart({ navigation }) {
 const styles = StyleSheet.create({
   sectionListView: {
     paddingVertical: 12,
+  },
+  sectionHeaderContainer: {
+    paddingVertical: 8,
   },
   listSectionContainer: {
     marginVertical: 8,

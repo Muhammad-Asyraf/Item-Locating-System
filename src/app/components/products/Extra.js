@@ -34,7 +34,6 @@ export const renderChips = (stockStatus) => {
       />
     );
   }
-  // Promo check
 };
 
 const styles = StyleSheet.create({

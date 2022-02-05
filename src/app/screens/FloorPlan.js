@@ -16,6 +16,7 @@ import BottomSheet, {
 
 // Utilities
 import { getToken } from '../services/AuthenticationService';
+import { hasLayouts } from '../services/StoreService';
 
 // Configurations
 import { environment } from '../environment';
@@ -36,6 +37,7 @@ export default function FloorPlan({ navigation, route }) {
   const productList = useRef(null);
 
   const [isLoading, setLoading] = useState(true);
+  const [hasLayout, setHasLayout] = useState(false);
   const [products, setProducts] = useState([]);
   const [focusingProduct, setFocusingProduct] = useState({});
 
@@ -43,11 +45,20 @@ export default function FloorPlan({ navigation, route }) {
     if (isLoading) {
       // console.log(`[FloorPlan.js/useEffect] Store: ${JSON.stringify(store)}`);
       // console.log(`[FloorPlan.js/useEffect] Cart: ${JSON.stringify(cart)}`);
+
+      // Check if store has any layouts
+
       getToken().then((data) => {
         url.current = `${environment.clientHost}/layout-product-viewer/store/${store.uuid}?cart=${cart.uuid}&token=${data}`;
         // console.log(`[FloorPlan.js/useEffect] url : ${url.current}`);
-        setLoading(false);
       });
+
+      hasLayouts(store.uuid)
+        .then((data) => {
+          setHasLayout(data);
+          setLoading(false);
+        })
+        .catch((error) => {});
     }
   }, [isLoading]);
 
@@ -112,7 +123,7 @@ export default function FloorPlan({ navigation, route }) {
         <View style={GlobalStyle.center}>
           <Loading message="Fetching floor plan" />
         </View>
-      ) : (
+      ) : hasLayout ? (
         <View style={styles.container}>
           <WebView
             ref={webView}
@@ -158,6 +169,20 @@ export default function FloorPlan({ navigation, route }) {
             itemWidth={screenWidth - 44}
             onSnapToItem={sendMessage}
           /> */}
+        </View>
+      ) : (
+        <View
+          style={{
+            flex: 1,
+            flexGrow: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <Text style={[TextStyle.body1, { marginHorizontal: 24 }]}>
+            Store does not any floor maps. Please ask the store's staffs for
+            assistance
+          </Text>
         </View>
       )}
     </AppbarScreen>

@@ -22,10 +22,11 @@ import { getOptimizedPathForCart } from '../services/OptimizationService';
 import { mapboxAPIKey } from '../environment';
 import { Theme } from '../styles/Theme';
 
-export default function Navigate({ navigation }) {
+export default function Navigate({ navigation, route }) {
   // Initialize Mapbox access token
   MapboxGL.setAccessToken(mapboxAPIKey);
   const directionsProvider = DirectionsProvider({ accessToken: mapboxAPIKey });
+  const params = route.params ? route.params : {};
 
   const { width: screenWidth } = Dimensions.get('window');
   const { uuid, position } = useSelector((state) => state.user);
@@ -42,7 +43,7 @@ export default function Navigate({ navigation }) {
   const totalPrice = useRef(null);
 
   // Store current optimized route
-  const [route, setRoute] = useState([]);
+  const [path, setPath] = useState([]);
 
   // Store current route geometry
   const [geometry, setGeometry] = useState();
@@ -116,7 +117,7 @@ export default function Navigate({ navigation }) {
       });
       directionsRequest.waypoints = mapboxWaypoints;
 
-      setRoute(path);
+      setPath(path);
     } catch (error) {
       console.log(`getOptimizedPathForCart Error! :: ${error}`);
     }
@@ -139,6 +140,11 @@ export default function Navigate({ navigation }) {
 
   useEffect(() => {
     console.log(`Position: ${position}`);
+
+    // if ('cart_uuid' in params && params?.cart_uuid != '') {
+    //   setCartID(params.cart_uuid);
+    //   setFlowState(1);
+    // }
 
     if (flowState == 0) {
       if (camera.current != null) {
@@ -166,7 +172,7 @@ export default function Navigate({ navigation }) {
     };
 
     run().then(() => {
-      if (route.length != 0) {
+      if (path.length != 0) {
         setFlowState(2);
         // DEBUG: Ensure route is stored properly
         //console.log(`(Navigate.js)Route: ${JSON.stringify(route)}`);
@@ -206,7 +212,7 @@ export default function Navigate({ navigation }) {
   };
 
   const renderPoints = () => {
-    let storesPoint = route.slice();
+    let storesPoint = path.slice();
     storesPoint.shift();
     storesPoint.pop();
 
@@ -244,17 +250,17 @@ export default function Navigate({ navigation }) {
     } else {
       return (
         <EnRouteDetails
-          store={{ ...item, totalStops: route.length - 2, key: index, cartID }}
+          store={{ ...item, totalStops: path.length - 2, key: index, cartID }}
         />
       );
     }
   };
 
   const getData = () => {
-    let storesDetails = route.slice();
+    let storesDetails = path.slice();
     storesDetails.shift();
     storesDetails.pop();
-    return [route, ...storesDetails];
+    return [path, ...storesDetails];
   };
 
   const focusStoreMarker = (slideIndex) => {
@@ -262,7 +268,7 @@ export default function Navigate({ navigation }) {
       focusRoute();
     } else {
       camera.current.setCamera({
-        centerCoordinate: route[slideIndex].coordinate,
+        centerCoordinate: path[slideIndex].coordinate,
         zoomLevel: 17,
         animationDuration: 1000,
       });
@@ -312,7 +318,7 @@ export default function Navigate({ navigation }) {
       {flowState == 1 && (
         <LoadingSheet text={message} style={styles.bottomSheets} />
       )}
-      {flowState == 2 && route != null && (
+      {flowState == 2 && path != null && (
         <Carousel
           containerCustomStyle={styles.carousel}
           contentContainerCustomStyle={styles.carouselContent}

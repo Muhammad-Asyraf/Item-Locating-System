@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Dimensions } from 'react-native';
 import { Appbar, Text, Surface } from 'react-native-paper';
 import CollapsibleToolbar from 'react-native-collapsible-toolbar';
 import { SliderBox } from 'react-native-image-slider-box';
@@ -8,6 +8,7 @@ import CartSheet from '../components/products/CartSheet';
 import SmallTextChip from '../components/core/SmallTextChip';
 import { WebViewQuillJS } from 'react-native-webview-quilljs';
 import Loading from '../components/Loading';
+import { renderChips } from '../components/products/Extra';
 
 // Utilities
 import { getAllCartsForUser } from '../services/LoketlistService';
@@ -20,14 +21,13 @@ import { TextStyle, AppbarStyle, GlobalStyle, Theme } from '../styles/Theme';
 import { useEffect } from 'react';
 
 export default function ProductDetails({ navigation, route }) {
+  const { width: screenWidth } = Dimensions.get('window');
   const user = useSelector((state) => state.user);
   const loketlists = useRef([]);
   const [isLoading, setLoading] = useState(true);
-  const [images, setImages] = useState([
-    'https://tinyurl.com/27wk7pdz',
-    'https://tinyurl.com/2s37dtph',
-  ]);
+
   const { product } = route.params;
+  const [images, setImages] = useState([]);
 
   useEffect(() => {
     if (isLoading) {
@@ -41,6 +41,14 @@ export default function ProductDetails({ navigation, route }) {
         .finally(() => {
           setLoading(false);
         });
+
+      setImages(
+        product?.images
+          ? product.images.map((imageObject) => {
+              return imageObject.path;
+            })
+          : [`https://via.placeholder.com/${screenWidth}x200`]
+      );
     }
   }, [isLoading]);
 
@@ -55,39 +63,9 @@ export default function ProductDetails({ navigation, route }) {
   const renderHeader = () => {
     return (
       <View>
-        <SliderBox images={images} sliderBoxHeight={250} />
+        <SliderBox images={images} sliderBoxHeight={200} />
       </View>
     );
-  };
-
-  const renderChips = () => {
-    // Stock check
-    if (product.stock_status == 'In Stock') {
-      return (
-        <SmallTextChip
-          text={product.stock_status}
-          fill={true}
-          color={Theme.colors.ok}
-        />
-      );
-    } else if (product.stock_status == 'Low Stock') {
-      return (
-        <SmallTextChip
-          text={product.stock_status}
-          fill={true}
-          color={Theme.colors.warn}
-        />
-      );
-    } else {
-      return (
-        <SmallTextChip
-          text={product.stock_status}
-          fill={true}
-          color={Theme.colors.error}
-        />
-      );
-    }
-    // Promo check
   };
 
   /**
@@ -96,8 +74,10 @@ export default function ProductDetails({ navigation, route }) {
    */
   const renderContent = () => {
     return (
-      <View style={GlobalStyle.contentContainer}>
-        <View style={styles.chipContainer}>{renderChips()}</View>
+      <View style={[GlobalStyle.contentContainer, { paddingVertical: 18 }]}>
+        <View style={styles.chipContainer}>
+          {renderChips(product.stock_status)}
+        </View>
         <LocationText
           text={product.stores.store_name}
           color={Theme.colors.primary}

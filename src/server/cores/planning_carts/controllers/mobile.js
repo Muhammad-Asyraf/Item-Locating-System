@@ -14,7 +14,13 @@ exports.getDefaultCart = async (req, res, next) => {
     let planningCarts = await AppUser.relatedQuery('planning_carts')
       .for(app_user_uuid)
       .where('is_default', true)
-      .withGraphFetched('products');
+      .withGraphFetched('products.[stores,promotions,images]')
+      .modifyGraph('products.promotions', (builder) => {
+        builder.select('start_date', 'end_date', 'promotion_type', 'meta_data');
+      })
+      .modifyGraph('products.images', (builder) => {
+        builder.select('path');
+      });
 
     if (planningCarts.length !== 0) {
       planningCartLogger.info(
@@ -36,13 +42,99 @@ exports.getDefaultCart = async (req, res, next) => {
       planningCarts = await AppUser.relatedQuery('planning_carts')
         .for(app_user_uuid)
         .where('is_default', true)
-        .withGraphFetched('products');
+        .withGraphFetched('products.[stores,promotions]')
+        .modifyGraph('products.promotions', (builder) => {
+          builder.select(
+            'start_date',
+            'end_date',
+            'promotion_type',
+            'meta_data'
+          );
+        })
+        .modifyGraph('products.images', (builder) => {
+          builder.select('path');
+        });
       planningCartLogger.info(
         `Successfully created default planningCart for user ${app_user_uuid}: ${planningCarts.length} carts`
       );
     }
 
-    res.json(planningCarts[0]);
+    const updatedCarts = planningCarts.map((store) => {
+      const { products, ...cartAttrs } = store;
+
+      const updatedProducts = products.map((product) => {
+        const { promotions, retail_price, ...remainingAtts } = product;
+
+        const updatedPromotion = promotions.map((promotion) => {
+          const { start_date, end_date, promotion_type, meta_data } = promotion;
+          let sale_price;
+          let display_name;
+
+          const currentDateTime = new Date().getTime();
+          const startDateTime = new Date(start_date).getTime();
+          const endDateTime = new Date(end_date).getTime();
+
+          const activePromotion =
+            currentDateTime >= startDateTime && currentDateTime <= endDateTime;
+          const scheduledPromotion =
+            currentDateTime <= startDateTime && currentDateTime <= endDateTime;
+          const expiredPromotion =
+            currentDateTime >= startDateTime && currentDateTime >= endDateTime;
+
+          let promotion_status;
+
+          if (activePromotion) {
+            promotion_status = 'active';
+          } else if (scheduledPromotion) {
+            promotion_status = 'scheduled';
+          } else if (expiredPromotion) {
+            promotion_status = 'expired';
+          }
+
+          const isDiscountBasedPromo =
+            promotion_type === 'Basic' || promotion_type === 'Bundle';
+
+          if (isDiscountBasedPromo) {
+            const {
+              meta_data: { discount, discountType },
+            } = promotion;
+            let saving;
+
+            if (discountType.percentage_off_checked) {
+              saving = (parseFloat(discount) / 100) * parseFloat(retail_price);
+              display_name = `${discount}% off`;
+            } else {
+              saving = parseFloat(discount);
+              display_name = `${discount} off`;
+            }
+
+            sale_price = parseFloat(retail_price) - saving;
+          } else {
+            display_name = `Buy ${meta_data?.BxGy.buyQty} Get ${meta_data?.BxGy.freeQty}`;
+          }
+
+          return {
+            ...promotion,
+            promotion_status,
+            sale_price,
+            display_name,
+          };
+        });
+
+        return {
+          ...remainingAtts,
+          retail_price,
+          promotions: updatedPromotion,
+        };
+      });
+
+      return {
+        ...cartAttrs,
+        products: updatedProducts,
+      };
+    });
+
+    res.json(updatedCarts[0]);
   } catch (err) {
     planningCartLogger.warn(`Error retrieving all planningCarts`);
     next(err);
@@ -56,16 +148,97 @@ exports.getCart = async (req, res, next) => {
     const { store } = req.query;
     const planningCarts = await PlanningCart.query()
       .where({ uuid })
-      .withGraphFetched('products')
+      .withGraphFetched('products.[stores,promotions,images]')
       .modifyGraph('products', (builder) => {
         if (store && store !== '') {
           builder.where('store_uuid', store);
         }
+      })
+      .modifyGraph('products.promotions', (builder) => {
+        builder.select('start_date', 'end_date', 'promotion_type', 'meta_data');
+      })
+      .modifyGraph('products.images', (builder) => {
+        builder.select('path');
       });
+
+    const updatedCarts = planningCarts.map((store) => {
+      const { products, ...cartAttrs } = store;
+
+      const updatedProducts = products.map((product) => {
+        const { promotions, retail_price, ...remainingAtts } = product;
+
+        const updatedPromotion = promotions.map((promotion) => {
+          const { start_date, end_date, promotion_type, meta_data } = promotion;
+          let sale_price;
+          let display_name;
+
+          const currentDateTime = new Date().getTime();
+          const startDateTime = new Date(start_date).getTime();
+          const endDateTime = new Date(end_date).getTime();
+
+          const activePromotion =
+            currentDateTime >= startDateTime && currentDateTime <= endDateTime;
+          const scheduledPromotion =
+            currentDateTime <= startDateTime && currentDateTime <= endDateTime;
+          const expiredPromotion =
+            currentDateTime >= startDateTime && currentDateTime >= endDateTime;
+
+          let promotion_status;
+
+          if (activePromotion) {
+            promotion_status = 'active';
+          } else if (scheduledPromotion) {
+            promotion_status = 'scheduled';
+          } else if (expiredPromotion) {
+            promotion_status = 'expired';
+          }
+
+          const isDiscountBasedPromo =
+            promotion_type === 'Basic' || promotion_type === 'Bundle';
+
+          if (isDiscountBasedPromo) {
+            const {
+              meta_data: { discount, discountType },
+            } = promotion;
+            let saving;
+
+            if (discountType.percentage_off_checked) {
+              saving = (parseFloat(discount) / 100) * parseFloat(retail_price);
+              display_name = `${discount}% off`;
+            } else {
+              saving = parseFloat(discount);
+              display_name = `${discount} off`;
+            }
+
+            sale_price = parseFloat(retail_price) - saving;
+          } else {
+            display_name = `Buy ${meta_data?.BxGy.buyQty} Get ${meta_data?.BxGy.freeQty}`;
+          }
+
+          return {
+            ...promotion,
+            promotion_status,
+            sale_price,
+            display_name,
+          };
+        });
+
+        return {
+          ...remainingAtts,
+          retail_price,
+          promotions: updatedPromotion,
+        };
+      });
+
+      return {
+        ...cartAttrs,
+        products: updatedProducts,
+      };
+    });
 
     planningCartLogger.info(`Successfully get planning cart ${uuid}`);
 
-    res.json(planningCarts[0]);
+    res.json(updatedCarts[0]);
   } catch (err) {
     planningCartLogger.warn(`Error retrieving planning cart`);
     next(err);
@@ -78,13 +251,94 @@ exports.getAllCarts = async (req, res, next) => {
     const { app_user_uuid } = req.params;
     const planningCarts = await PlanningCart.query()
       .where({ app_user_uuid })
-      .withGraphFetched('products');
+      .withGraphFetched('products.[stores,promotions,images]')
+      .modifyGraph('products.promotions', (builder) => {
+        builder.select('start_date', 'end_date', 'promotion_type', 'meta_data');
+      })
+      .modifyGraph('products.images', (builder) => {
+        builder.select('path');
+      });
+
+    const updatedCarts = planningCarts.map((store) => {
+      const { products, ...cartAttrs } = store;
+
+      const updatedProducts = products.map((product) => {
+        const { promotions, retail_price, ...remainingAtts } = product;
+
+        const updatedPromotion = promotions.map((promotion) => {
+          const { start_date, end_date, promotion_type, meta_data } = promotion;
+          let sale_price;
+          let display_name;
+
+          const currentDateTime = new Date().getTime();
+          const startDateTime = new Date(start_date).getTime();
+          const endDateTime = new Date(end_date).getTime();
+
+          const activePromotion =
+            currentDateTime >= startDateTime && currentDateTime <= endDateTime;
+          const scheduledPromotion =
+            currentDateTime <= startDateTime && currentDateTime <= endDateTime;
+          const expiredPromotion =
+            currentDateTime >= startDateTime && currentDateTime >= endDateTime;
+
+          let promotion_status;
+
+          if (activePromotion) {
+            promotion_status = 'active';
+          } else if (scheduledPromotion) {
+            promotion_status = 'scheduled';
+          } else if (expiredPromotion) {
+            promotion_status = 'expired';
+          }
+
+          const isDiscountBasedPromo =
+            promotion_type === 'Basic' || promotion_type === 'Bundle';
+
+          if (isDiscountBasedPromo) {
+            const {
+              meta_data: { discount, discountType },
+            } = promotion;
+            let saving;
+
+            if (discountType.percentage_off_checked) {
+              saving = (parseFloat(discount) / 100) * parseFloat(retail_price);
+              display_name = `${discount}% off`;
+            } else {
+              saving = parseFloat(discount);
+              display_name = `${discount} off`;
+            }
+
+            sale_price = parseFloat(retail_price) - saving;
+          } else {
+            display_name = `Buy ${meta_data?.BxGy.buyQty} Get ${meta_data?.BxGy.freeQty}`;
+          }
+
+          return {
+            ...promotion,
+            promotion_status,
+            sale_price,
+            display_name,
+          };
+        });
+
+        return {
+          ...remainingAtts,
+          retail_price,
+          promotions: updatedPromotion,
+        };
+      });
+
+      return {
+        ...cartAttrs,
+        products: updatedProducts,
+      };
+    });
 
     planningCartLogger.info(
-      `Successfully retrieved planningCarts for user ${app_user_uuid}: ${planningCarts.length} carts`
+      `Successfully retrieved planningCarts for user ${app_user_uuid}: ${updatedCarts.length} carts`
     );
 
-    res.json(planningCarts);
+    res.json(updatedCarts);
   } catch (err) {
     planningCartLogger.warn(`Error retrieving all planningCarts`);
     next(err);

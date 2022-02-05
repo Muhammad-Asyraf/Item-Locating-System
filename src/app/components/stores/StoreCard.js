@@ -56,7 +56,7 @@ export default function StoreCard({ store }) {
           <View></View>
         ) : (
           <View style={[StyleSheet.absoluteFill, styles.contentContainer]}>
-            <Image source={{ uri: images[1] }} style={[styles.storeImage]} />
+            {/* <Image source={{ uri: images[1] }} style={[styles.storeImage]} /> */}
             <View style={styles.storeDetailsContainer}>
               <Text
                 style={[TextStyle.caption, styles.storeNameText]}

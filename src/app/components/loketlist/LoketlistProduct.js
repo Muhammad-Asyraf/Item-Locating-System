@@ -1,9 +1,11 @@
 // Components
-import React, { useState, useRef } from 'react';
-import { StyleSheet, View, Image } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { StyleSheet, View, Image, TouchableOpacity } from 'react-native';
 import { Text, Button, TextInput, Surface } from 'react-native-paper';
 import NumericInput from 'react-native-numeric-input';
 import { renderChips } from '../products/Extra';
+import { useNavigation } from '@react-navigation/native';
+import SmallTextChip from '../../components/core/SmallTextChip';
 
 // Utilities
 import { modifyItemInCart } from '../../services/LoketlistService';
@@ -17,8 +19,28 @@ export default function LoketlistProduct({
   cartID,
   load,
 }) {
+  const navigation = useNavigation();
   const [itemDetails, setItemDetails] = useState(product);
+  const [promotions, setPromotions] = useState([...product.promotions]);
+  const [onSale, setOnSale] = useState(false);
+  const [isLoading, setLoading] = useState(true);
+  const salePrice = useRef(0);
   const previousQuantity = useRef(product.quantity);
+
+  useEffect(() => {
+    if (isLoading) {
+      for (promo of product.promotions) {
+        if (
+          promo.promotion_type == 'Basic' ||
+          promo.promotion_type == 'Bundle'
+        ) {
+          setOnSale(true);
+          salePrice.current = parseFloat(promo.sale_price).toFixed(2);
+        }
+      }
+      setLoading(false);
+    }
+  }, [isLoading]);
 
   const handleQuantityChange = (value) => {
     modifyItemInCart(cartID, product.uuid, value)
@@ -41,12 +63,23 @@ export default function LoketlistProduct({
     });
   };
 
-  // TODO : Update fields
+  const openProductDetails = () => {
+    navigation.navigate('Product Page', { product });
+  };
+
   return (
     <View style={[containerStyle]}>
-      <View style={styles.productContainer}>
+      <TouchableOpacity
+        style={styles.productContainer}
+        onPress={openProductDetails}
+      >
         <Image
-          source={{ uri: 'https://via.placeholder.com/96' }}
+          source={{
+            uri:
+              product?.images > 0
+                ? product.images[0].path
+                : 'https://via.placeholder.com/96',
+          }}
           style={styles.productImage}
         />
         <View style={styles.productDetailsContainer}>
@@ -56,22 +89,34 @@ export default function LoketlistProduct({
             </Text>
             <View style={styles.pricing}>
               <Text style={[TextStyle.subhead2, styles.text]} numberOfLines={2}>
-                {`RM${product.total_price}`}
+                {onSale
+                  ? `RM${salePrice.current * product.quantity}`
+                  : `RM${product.total_price}`}
               </Text>
               <Text
                 style={[TextStyle.overline2, styles.text, styles.singlePrice]}
                 numberOfLines={2}
               >
-                {`(RM${product.retail_price}/${product.measurement_value}${product.measurement_unit})`}
+                {`(RM${onSale ? salePrice.current : product.retail_price}/${
+                  product.measurement_value
+                }${product.measurement_unit})`}
               </Text>
             </View>
           </View>
 
-          <View>
-            <View>{renderChips(product.stock_status)}</View>
+          <View style={styles.promoContainer}>
+            {renderChips(product.stock_status)}
+            {promotions.map((promotion) => {
+              return (
+                <SmallTextChip
+                  text={promotion.display_name}
+                  style={styles.chip}
+                />
+              );
+            })}
           </View>
         </View>
-      </View>
+      </TouchableOpacity>
       <View>
         <NumericInput
           minValue={0}
@@ -103,6 +148,9 @@ const styles = StyleSheet.create({
   },
   numericInput: {
     marginTop: 8,
+  },
+  promoContainer: {
+    flexDirection: 'row',
   },
   productImage: {
     width: 96,

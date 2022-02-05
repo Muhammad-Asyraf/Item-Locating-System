@@ -52,7 +52,7 @@ export default function CampaignDetails({ navigation, route }) {
    */
   const renderContent = () => {
     return (
-      <View style={GlobalStyle.contentContainer}>
+      <View style={[GlobalStyle.contentContainer, { paddingVertical: 18 }]}>
         <LocationText
           text={campaign.store.store_name}
           color={Theme.colors.primary}

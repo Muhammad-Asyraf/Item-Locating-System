@@ -3,6 +3,7 @@ const storeController = require('../controllers/mobile');
 const checkAuth = require('../../../middlewares/checkAuth');
 
 router.get('/stores', checkAuth, storeController.getStores);
+router.get('/stores/layouts', checkAuth, storeController.getStoreLayouts);
 router.get('/stores/products', checkAuth, storeController.getStoreProducts);
 router.get(
   '/stores/:uuid/campaigns',

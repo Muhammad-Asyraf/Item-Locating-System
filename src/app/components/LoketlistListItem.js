@@ -20,11 +20,24 @@ export default function LoketlistListItem({ item }) {
 
   useEffect(() => {
     if (isLoading) {
+      let DATA = [...item.products];
       // Calculate total price
-      item.products.map((product) => {
-        totalPrice.current =
-          totalPrice.current + parseFloat(product.total_price);
-      });
+      for (i = 0; i < DATA.length; i++) {
+        const { promotions } = DATA[i];
+        if (promotions.length > 0) {
+          let salePrice;
+          for (promo of promotions) {
+            if ('sale_price' in promo) {
+              salePrice = promo.sale_price;
+              break;
+            }
+          }
+
+          totalPrice.current += parseFloat(salePrice * DATA[i].quantity);
+        } else {
+          totalPrice.current += parseFloat(DATA[i].total_price);
+        }
+      }
       setLoading(false);
     }
   }, [isLoading]);

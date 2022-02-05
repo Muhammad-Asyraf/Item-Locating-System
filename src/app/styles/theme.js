@@ -168,6 +168,11 @@ export const TextStyle = StyleSheet.create({
     lineHeight: 16,
     letterSpacing: 0.5,
   },
+
+  // Extras
+  strikethrough: {
+    textDecorationLine: 'line-through',
+  },
 });
 
 export const AppbarStyle = StyleSheet.create({

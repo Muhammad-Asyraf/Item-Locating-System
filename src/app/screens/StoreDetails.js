@@ -136,7 +136,7 @@ export default function StoreDetails({ navigation, route }) {
                             styles.horizontalListTitle,
                           ]}
                         >
-                          Promotional products
+                          Some products
                         </Text>
                         {/* <Button compact={true} onPress={viewStores}>
                 See All

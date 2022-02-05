@@ -33,11 +33,25 @@ export default function Loketlist({ navigation, route }) {
       getCartById(cart.uuid)
         .then((data) => {
           let totalPrice = 0;
+          let DATA = [...data.products];
 
           if (data.products.length > 0) {
-            data.products.map(
-              (product) => (totalPrice += parseFloat(product.total_price))
-            );
+            for (i = 0; i < DATA.length; i++) {
+              const { promotions } = DATA[i];
+              if (promotions.length > 0) {
+                let salePrice;
+                for (promo of promotions) {
+                  if ('sale_price' in promo) {
+                    salePrice = promo.sale_price;
+                    break;
+                  }
+                }
+
+                totalPrice += parseFloat(salePrice * DATA[i].quantity);
+              } else {
+                totalPrice += parseFloat(DATA[i].total_price);
+              }
+            }
             setTotalPrice(totalPrice.toFixed(2));
             setProducts(productsGroupByStores(data.products));
           }

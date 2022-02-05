@@ -48,47 +48,68 @@ export default function Cart({ navigation }) {
   const [DATA, setData] = useState([]);
 
   const fetchProducts = async () => {
-    getDefaultCartForUser(uuid).then((data) => {
-      dispatch(setDefaultCart(data.uuid));
-      let DATA = [];
-      let totalPrice = 0;
+    getDefaultCartForUser(uuid)
+      .then((data) => {
+        dispatch(setDefaultCart(data.uuid));
+        let DATA = [];
+        let totalPrice = 0;
 
-      if (data.products.length > 0) {
-        for (i = 0; i < cart.products.length; i++) {
-          let idx = data.products
-            .map((val) => val.uuid)
-            .indexOf(cart.products[i]);
-          DATA.push({
-            key: i,
-            cart_uuid: data.uuid,
-            product_uuid: cart.products[i],
-            ...data.products[idx],
-          });
+        if (data.products.length > 0) {
+          for (i = 0; i < cart.products.length; i++) {
+            let idx = data.products
+              .map((val) => val.uuid)
+              .indexOf(cart.products[i]);
+            DATA.push({
+              key: i,
+              cart_uuid: data.uuid,
+              product_uuid: cart.products[i],
+              ...data.products[idx],
+            });
+          }
+
+          console.log('Loaded all products into array');
+
+          // Update the totalPrice
+          for (i = 0; i < DATA.length; i++) {
+            const { promotions } = DATA[i];
+            if (promotions.length > 0) {
+              let salePrice;
+              for (promo of promotions) {
+                if ('sale_price' in promo) {
+                  salePrice = promo.sale_price;
+                  break;
+                }
+              }
+
+              totalPrice += parseFloat(salePrice * DATA[i].quantity);
+            } else {
+              totalPrice += parseFloat(DATA[i].total_price);
+            }
+          }
+
+          DATA = productsGroupByStores(DATA);
         }
 
-        console.log('Loaded all products into array');
+        // Update redux states
+        dispatch(update(false));
 
-        // Update the totalPrice
-        for (i = 0; i < DATA.length; i++) {
-          totalPrice += parseFloat(DATA[i].total_price);
-        }
-
-        DATA = productsGroupByStores(DATA);
-      }
-
-      // Update redux states
-      dispatch(update(false));
-
-      // Update local states
-      setData(DATA);
-      setTotalPrice(totalPrice.toFixed(2));
-      setLoading(false);
-    });
+        // Update local states
+        setData(DATA);
+        setTotalPrice(totalPrice.toFixed(2));
+      })
+      .catch((error) => {
+        error;
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   };
 
   useFocusEffect(
     React.useCallback(() => {
-      setLoading(cart.update);
+      if (cart.update) {
+        setLoading(true);
+      }
 
       if (isLoading) {
         fetchProducts();

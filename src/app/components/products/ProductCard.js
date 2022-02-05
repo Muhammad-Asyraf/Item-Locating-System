@@ -1,5 +1,5 @@
 // Components
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { View, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { Card, Text, Button } from 'react-native-paper';
@@ -7,6 +7,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import NumericInput from 'react-native-numeric-input';
 import SmallTextChip from '../core/SmallTextChip';
 import LocationText from '../LocationText';
+import { renderChips } from './Extra';
 
 // Utilities
 import { calculateDistance } from '../../utils/Geolocation';
@@ -26,6 +27,12 @@ export default function ProductCard({ style, product, withStoreName = true }) {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const [isLoading, setLoading] = useState(true);
+
+  // Product metadata
+  const [promotions, setPromotions] = useState([]);
+  const [onSale, setOnSale] = useState(false);
+  const salePrice = useRef(0);
+  const [hasBxGy, setHasBxGy] = useState(false);
 
   const [productInCart, setProductInCart] = useState(false);
 
@@ -61,39 +68,6 @@ export default function ProductCard({ style, product, withStoreName = true }) {
   let itemIndex = 0;
   itemIndex = cart.products.indexOf(product.uuid);
 
-  const renderChips = () => {
-    // Stock check
-    if (product.stock_status == 'In Stock') {
-      return (
-        <SmallTextChip
-          text={product.stock_status}
-          fill={true}
-          color={Theme.colors.ok}
-          style={styles.chip}
-        />
-      );
-    } else if (product.stock_status == 'Low Stock') {
-      return (
-        <SmallTextChip
-          text={product.stock_status}
-          fill={true}
-          color={Theme.colors.warn}
-          style={styles.chip}
-        />
-      );
-    } else {
-      return (
-        <SmallTextChip
-          text={product.stock_status}
-          fill={true}
-          color={Theme.colors.error}
-          style={styles.chip}
-        />
-      );
-    }
-    // Promo check
-  };
-
   useEffect(() => {
     let quantityInputTimer;
     if (quantityState == 0) {
@@ -113,9 +87,22 @@ export default function ProductCard({ style, product, withStoreName = true }) {
 
   useEffect(() => {
     if (isLoading) {
-      console.log(
-        `[ProductCard.js/useEffect] Product : ${JSON.stringify(product)}`
-      );
+      // console.log(
+      //   `[ProductCard.js/useEffect] Product : ${JSON.stringify(product)}`
+      // );
+      // Identify if there is a promotion
+      if (product?.promotions.length > 0) {
+        setPromotions(product.promotions);
+        for (promo of product.promotions) {
+          if (
+            promo.promotion_type == 'Basic' ||
+            promo.promotion_type == 'Bundle'
+          ) {
+            setOnSale(true);
+            salePrice.current = parseFloat(promo.sale_price).toFixed(2);
+          }
+        }
+      }
       setLoading(false);
     }
   }, [isLoading]);
@@ -130,9 +117,11 @@ export default function ProductCard({ style, product, withStoreName = true }) {
       <View style={styles.cover}>
         <Image
           style={styles.image}
-          // TODO: Change uri
           source={{
-            uri: 'https://via.placeholder.com/110',
+            uri:
+              product?.images > 0
+                ? product.images[0].path
+                : 'https://via.placeholder.com/400',
           }}
         />
         <View style={styles.addToCartContainer}>
@@ -179,10 +168,36 @@ export default function ProductCard({ style, product, withStoreName = true }) {
       </View>
 
       <View style={styles.content}>
-        {renderChips()}
-        <Text style={[TextStyle.subhead2, styles.sellingPriceText]}>
-          {'RM' + product.retail_price}
-        </Text>
+        <View style={styles.promoContainer}>
+          {renderChips(product.stock_status)}
+          {promotions.map((promotion) => {
+            return (
+              <SmallTextChip
+                size={9}
+                text={promotion.display_name}
+                style={styles.chip}
+              />
+            );
+          })}
+        </View>
+        <View style={styles.pricingContainer}>
+          <Text style={[TextStyle.subhead2, styles.sellingPriceText]}>
+            {onSale ? `RM${salePrice.current}` : `RM${product.retail_price}`}
+          </Text>
+          {onSale && (
+            <Text
+              style={[
+                TextStyle.overline2,
+                {
+                  textDecorationLine: 'line-through',
+                  color: Theme.colors.placeholder,
+                  marginStart: 4,
+                },
+              ]}
+            >{`RM${product.retail_price}`}</Text>
+          )}
+        </View>
+
         <Text style={[TextStyle.body2, styles.productName]} numberOfLines={2}>
           {product.name}
         </Text>
@@ -209,6 +224,7 @@ const styles = StyleSheet.create({
   content: {
     alignItems: 'flex-start',
     paddingVertical: 8,
+    flexShrink: 1,
   },
   itemContainer: {
     flexDirection: 'column',
@@ -228,9 +244,18 @@ const styles = StyleSheet.create({
   chip: {
     marginBottom: 4,
   },
+  promoContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexShrink: 1,
+  },
   productName: {
     height: 40,
     marginVertical: 4,
+  },
+  pricingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   text: {
     fontSize: 12,

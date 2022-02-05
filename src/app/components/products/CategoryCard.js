@@ -8,6 +8,8 @@ import { useNavigation } from '@react-navigation/native';
 // Styling
 import { Theme, TextStyle } from '../../styles/Theme';
 
+import { environment } from '../../environment';
+
 export default function CategoryCard({ category }) {
   const navigation = useNavigation();
   // Open search with category filter
@@ -26,7 +28,11 @@ export default function CategoryCard({ category }) {
       <Surface style={styles.categoryImageContainer}>
         <Image
           style={styles.categoryImage}
-          source={{ uri: 'https://via.placeholder.com/96' }}
+          source={{
+            uri: category?.image
+              ? `${environment.host}${category.image.path}`
+              : 'https://via.placeholder.com/96',
+          }}
         />
       </Surface>
       <Text style={[TextStyle.caption, styles.categoryName]} numberOfLines={2}>

@@ -14,7 +14,7 @@ exports.getDefaultCart = async (req, res, next) => {
     let planningCarts = await AppUser.relatedQuery('planning_carts')
       .for(app_user_uuid)
       .where('is_default', true)
-      .withGraphFetched('products');
+      .withGraphFetched('products.[stores,promotions]');
 
     if (planningCarts.length !== 0) {
       planningCartLogger.info(
@@ -36,7 +36,7 @@ exports.getDefaultCart = async (req, res, next) => {
       planningCarts = await AppUser.relatedQuery('planning_carts')
         .for(app_user_uuid)
         .where('is_default', true)
-        .withGraphFetched('products');
+        .withGraphFetched('products.[stores,promotions]');
       planningCartLogger.info(
         `Successfully created default planningCart for user ${app_user_uuid}: ${planningCarts.length} carts`
       );
@@ -56,7 +56,7 @@ exports.getCart = async (req, res, next) => {
     const { store } = req.query;
     const planningCarts = await PlanningCart.query()
       .where({ uuid })
-      .withGraphFetched('products')
+      .withGraphFetched('products.[stores,promotions]')
       .modifyGraph('products', (builder) => {
         if (store && store !== '') {
           builder.where('store_uuid', store);
@@ -78,7 +78,7 @@ exports.getAllCarts = async (req, res, next) => {
     const { app_user_uuid } = req.params;
     const planningCarts = await PlanningCart.query()
       .where({ app_user_uuid })
-      .withGraphFetched('products');
+      .withGraphFetched('products.[stores,promotions]');
 
     planningCartLogger.info(
       `Successfully retrieved planningCarts for user ${app_user_uuid}: ${planningCarts.length} carts`

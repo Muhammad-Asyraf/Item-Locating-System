@@ -39,7 +39,10 @@ exports.searchProducts = async (req, res, next) => {
 
     const products = await productQuery
       .where('name', 'ilike', `%${query.search}%`)
-      .withGraphFetched('stores');
+      .withGraphFetched('[stores,promotions]')
+      .modifyGraph('promotions', (builder) => {
+        builder.select('start_date', 'end_date', 'promotion_type', 'meta_data');
+      });
     res.json(products);
   } catch (err) {
     productLogger.warn(`Error retrieving all products`);
@@ -80,10 +83,14 @@ exports.getProductsGroupByStore = async (req, res, next) => {
   try {
     const query = req.query;
     const products = await Store.query()
-      .withGraphFetched('products')
+      .withGraphFetched('products.[stores,promotions]')
       .modifyGraph('products', (builder) => {
         builder.where('name', 'ilike', `%${query.search}%`);
+      })
+      .modifyGraph('products.promotions', (builder) => {
+        builder.select('start_date', 'end_date', 'promotion_type', 'meta_data');
       });
+    console.log(JSON.stringify(products));
     res.json(products);
   } catch (err) {
     productLogger.warn(`Error retrieving grouped products`);

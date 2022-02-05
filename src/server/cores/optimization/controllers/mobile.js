@@ -246,7 +246,7 @@ exports.getOptimizedPathFromCart = async (req, res, next) => {
     let products = PlanningCart.relatedQuery('products').for(cart_uuid);
 
     let totalPrice = await PlanningCartProduct.query()
-      .for(products)
+      .where('cart_uuid', cart_uuid)
       .sum('total_price');
 
     console.log(totalPrice);

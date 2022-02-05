@@ -39,7 +39,7 @@ export default function LoketlistListItem({ item }) {
     if (daysElapsed < 3) {
       return 'Recently updated';
     } else {
-      return `Updated ${daysElapsed} day(s) ago`;
+      return `Updated ${daysElapsed.toFixed(0)} day(s) ago`;
     }
   };
 

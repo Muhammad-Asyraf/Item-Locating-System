@@ -36,7 +36,11 @@ exports.getStoreProducts = async (req, res, next) => {
       }
     }
 
-    const products = await productQuery.withGraphFetched('stores');
+    const products = await productQuery
+      .withGraphFetched('[stores,promotions]')
+      .modifyGraph('promotions', (builder) => {
+        builder.select('start_date', 'end_date', 'promotion_type', 'meta_data');
+      });
     res.json(products);
   } catch (err) {
     storeLogger.warn(`Error getting store's products`);

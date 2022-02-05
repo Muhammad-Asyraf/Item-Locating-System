@@ -1,10 +1,11 @@
 // Components
 import React, { useState } from 'react';
-import { StyleSheet, View, Image } from 'react-native';
-import { Text, Button, TextInput, Surface } from 'react-native-paper';
+import { StyleSheet, View, Image, TouchableOpacity } from 'react-native';
+import { Text } from 'react-native-paper';
 import NumericInput from 'react-native-numeric-input';
 import LocationText from './LocationText';
 import { renderChips } from './products/Extra';
+import { useNavigation } from '@react-navigation/native';
 
 // Redux
 import { useSelector, useDispatch } from 'react-redux';
@@ -15,6 +16,7 @@ import { Theme, TextStyle } from '../styles/Theme';
 
 export default function CartListItem({ containerStyle = {}, product, update }) {
   const dispatch = useDispatch();
+  const navigation = useNavigation();
   const [itemDetails, setItemDetails] = useState(product);
 
   const handleQuantityChange = (value) => {
@@ -31,10 +33,16 @@ export default function CartListItem({ containerStyle = {}, product, update }) {
     });
   };
 
-  // TODO : Update fields
+  const openProductDetails = () => {
+    navigation.navigate('Product Page', { product });
+  };
+
   return (
     <View style={[containerStyle]}>
-      <View style={styles.productContainer}>
+      <TouchableOpacity
+        style={styles.productContainer}
+        onPress={openProductDetails}
+      >
         <Image
           source={{ uri: 'https://via.placeholder.com/96' }}
           style={styles.productImage}
@@ -61,7 +69,7 @@ export default function CartListItem({ containerStyle = {}, product, update }) {
             <View>{renderChips(product.stock_status)}</View>
           </View>
         </View>
-      </View>
+      </TouchableOpacity>
       <View>
         <NumericInput
           minValue={0}

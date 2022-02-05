@@ -1,9 +1,10 @@
 // Components
 import React, { useState, useRef } from 'react';
-import { StyleSheet, View, Image } from 'react-native';
+import { StyleSheet, View, Image, TouchableOpacity } from 'react-native';
 import { Text, Button, TextInput, Surface } from 'react-native-paper';
 import NumericInput from 'react-native-numeric-input';
 import { renderChips } from '../products/Extra';
+import { useNavigation } from '@react-navigation/native';
 
 // Utilities
 import { modifyItemInCart } from '../../services/LoketlistService';
@@ -17,6 +18,7 @@ export default function LoketlistProduct({
   cartID,
   load,
 }) {
+  const navigation = useNavigation();
   const [itemDetails, setItemDetails] = useState(product);
   const previousQuantity = useRef(product.quantity);
 
@@ -41,10 +43,17 @@ export default function LoketlistProduct({
     });
   };
 
+  const openProductDetails = () => {
+    navigation.navigate('Product Page', { product });
+  };
+
   // TODO : Update fields
   return (
     <View style={[containerStyle]}>
-      <View style={styles.productContainer}>
+      <TouchableOpacity
+        style={styles.productContainer}
+        onPress={openProductDetails}
+      >
         <Image
           source={{ uri: 'https://via.placeholder.com/96' }}
           style={styles.productImage}
@@ -71,7 +80,7 @@ export default function LoketlistProduct({
             <View>{renderChips(product.stock_status)}</View>
           </View>
         </View>
-      </View>
+      </TouchableOpacity>
       <View>
         <NumericInput
           minValue={0}

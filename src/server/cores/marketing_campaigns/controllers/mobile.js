@@ -31,7 +31,10 @@ exports.getCampaignProducts = async (req, res, next) => {
     const uuid = req.params.uuid;
     let products = await Promotion.query()
       .where('campaign_uuid', uuid)
-      .withGraphFetched('products.stores');
+      .withGraphFetched('products.[stores,promotions]')
+      .modifyGraph('products.promotions', (builder) => {
+        builder.select('start_date', 'end_date', 'promotion_type', 'meta_data');
+      });
     res.json(products);
   } catch (err) {
     campaignLogger.warn(`Error retrieving all campaigns`);
